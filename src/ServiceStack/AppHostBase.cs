@@ -36,7 +36,7 @@ namespace ServiceStack
         {
             try
             {
-                return HasStarted ? HttpContext.Current.ToRequest() : null;
+                return Ready ? HttpContext.Current.ToRequest() : null;
             }
             catch
             {

@@ -14,8 +14,7 @@ namespace ServiceStack.Platforms
 
         public override string GetAppConfigPath()
         {
-            var host = ServiceStackHost.Instance
-                ?? (ServiceStackHost) HostInstance;
+            var host = HostContext.AppHost ?? (ServiceStackHost) HostInstance;
 
             if (host == null) return null;
 

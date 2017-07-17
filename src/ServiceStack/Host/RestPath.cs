@@ -210,7 +210,7 @@ namespace ServiceStack.Host
                 : WildCardChar + PathSeparator + firstLiteralMatch;
 
             this.IsValid = sbHashKey.Length > 0;
-            this.UniqueMatchHashKey = StringBuilderCache.ReturnAndFree(sbHashKey);
+            this.UniqueMatchHashKey = StringBuilderCache.Retrieve(sbHashKey);
 
             this.typeDeserializer = new StringMapTypeDeserializer(this.RequestType);
             RegisterCaseInsenstivePropertyNameMappings();
@@ -438,7 +438,7 @@ namespace ServiceStack.Host
                         {
                             sb.Append(PathSeparatorChar + requestComponents[j]);
                         }
-                        value = StringBuilderCache.ReturnAndFree(sb);
+                        value = StringBuilderCache.Retrieve(sb);
                     }
                     else
                     {
@@ -455,7 +455,7 @@ namespace ServiceStack.Host
                             {
                                 sb.Append(PathSeparatorChar + requestComponents[pathIx++]);
                             }
-                            value = StringBuilderCache.ReturnAndFree(sb);
+                            value = StringBuilderCache.Retrieve(sb);
                         }
                         else
                         {

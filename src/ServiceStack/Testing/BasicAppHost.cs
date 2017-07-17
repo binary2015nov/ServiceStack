@@ -41,10 +41,8 @@ namespace ServiceStack.Testing
             set { ServiceController = value(this); }
         }
 
-        public override void OnConfigLoad()
+        protected override void OnBeforeInit()
         {
-            base.OnConfigLoad();
-
             ConfigFilter?.Invoke(Config);
         }
     }

@@ -11,7 +11,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Does_call_Hello_Service()
         {
-            var client = new Soap12ServiceClient(Config.ServiceStackBaseUri);
+            var client = new Soap12ServiceClient(Constant.ServiceStackBaseUri);
 
             var response = client.Send<HelloResponse>(new Hello { Name = "World" });
 
@@ -37,7 +37,7 @@ xmlns:a=""http://www.w3.org/2005/08/addressing"">
 </s:Body>
 </s:Envelope>";
 
-            var url = Config.ServiceStackBaseUri.AppendPath("Soap12");
+            var url = Constant.ServiceStackBaseUri.AppendPath("Soap12");
             var soapBytes = url.PostBytesToUrl(requestBody: soapBody.ToUtf8Bytes(),
                 contentType: "application/soap+xml; charset=utf-8");
 

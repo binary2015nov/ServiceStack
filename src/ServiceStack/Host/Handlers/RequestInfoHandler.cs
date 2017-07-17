@@ -201,6 +201,9 @@ namespace ServiceStack.Host.Handlers
         public override void ProcessRequest(IRequest httpReq, IResponse httpRes, string operationName)
         {
             var response = this.RequestInfo ?? GetRequestInfo(httpReq);
+            if (response == null)
+                return;
+
             response.HandlerFactoryArgs = HttpHandlerFactory.DebugLastHandlerArgs;
             response.DebugString = "";
 #if !NETSTANDARD1_6
@@ -271,6 +274,11 @@ namespace ServiceStack.Host.Handlers
 
         public static RequestInfoResponse GetRequestInfo(IRequest httpReq)
         {
+            var session = httpReq.GetSession();
+            var allow = HostContext.DebugMode || HostContext.HasValidAuthSecret(httpReq) || session != null && session.Roles.Contains("admin");
+            if (!allow)          
+                return null;
+            
             int virtualPathCount = 0;
             int.TryParse(httpReq.QueryString["virtualPathCount"], out virtualPathCount);
             var hostType = HostContext.AppHost.GetType();
@@ -296,7 +304,7 @@ namespace ServiceStack.Host.Handlers
                 Usage = "append '?debug=requestinfo' to any querystring. Optional params: virtualPathCount",
                 Host = HostContext.ServiceName + "_" + HostContext.Config.DebugHttpListenerHostEnvironment + "_" + Env.ServerUserAgent,
                 HostType = "{0} ({1})".Fmt(HostContext.IsAspNetHost ? "ASP.NET" : "SelfHost", hostType.BaseType()?.Name ?? hostType.Name),
-                StartedAt = HostContext.AppHost.StartedAt.ToString("yyyy-MM-dd HH:mm:ss"),
+                StartedAt = HostContext.AppHost.ReadyAt.ToString("yyyy-MM-dd HH:mm:ss"),
                 Date = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
                 ServiceName = HostContext.ServiceName,
                 HandlerFactoryPath = HostContext.Config.HandlerFactoryPath,

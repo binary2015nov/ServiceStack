@@ -831,7 +831,7 @@ namespace ServiceStack
                 sb.AppendLine("Num of Continuous Errors: " + Interlocked.CompareExchange(ref noOfContinuousErrors, 0, 0));
                 sb.AppendLine("Last ErrorMsg: " + lastExMsg);
                 sb.AppendLine("===============");
-                return StringBuilderCache.ReturnAndFree(sb);
+                return StringBuilderCache.Retrieve(sb);
             }
         }
 

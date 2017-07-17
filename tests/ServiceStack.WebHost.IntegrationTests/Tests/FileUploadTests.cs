@@ -111,12 +111,12 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_POST_upload_file_using_ServiceClient_with_request()
         {
-            IServiceClient client = new JsonServiceClient(Config.ServiceStackBaseUri);
+            IServiceClient client = new JsonServiceClient(Constant.ServiceStackBaseUri);
 
             var uploadFile = new FileInfo("~/TestExistingDir/upload.html".MapHostAbsolutePath());
 
             var request = new FileUpload { CustomerId = 123, CustomerName = "Foo,Bar" };
-            var response = client.PostFileWithRequest<FileUploadResponse>(Config.ServiceStackBaseUri + "/fileuploads", uploadFile, request);
+            var response = client.PostFileWithRequest<FileUploadResponse>(Constant.ServiceStackBaseUri + "/fileuploads", uploadFile, request);
 
             var expectedContents = new StreamReader(uploadFile.OpenRead()).ReadToEnd();
             Assert.That(response.Name, Is.EqualTo("upload"));
@@ -130,13 +130,13 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_POST_upload_file_using_ServiceClient_with_request_and_QueryString()
         {
-            IServiceClient client = new JsonServiceClient(Config.ServiceStackBaseUri);
+            IServiceClient client = new JsonServiceClient(Constant.ServiceStackBaseUri);
 
             var uploadFile = new FileInfo("~/TestExistingDir/upload.html".MapHostAbsolutePath());
 
             var request = new FileUpload();
             var response = client.PostFileWithRequest<FileUploadResponse>(
-                Config.ServiceStackBaseUri + "/fileuploads?CustomerId=123&CustomerName=Foo,Bar",
+                Constant.ServiceStackBaseUri + "/fileuploads?CustomerId=123&CustomerName=Foo,Bar",
                 uploadFile, request);
 
             var expectedContents = new StreamReader(uploadFile.OpenRead()).ReadToEnd();
@@ -148,7 +148,6 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             Assert.That(response.CustomerId, Is.EqualTo(123));
         }
     }
-
 
     public static class TestExtensions
     {

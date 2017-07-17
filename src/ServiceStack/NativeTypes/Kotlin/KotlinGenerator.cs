@@ -237,7 +237,7 @@ namespace ServiceStack.NativeTypes.Kotlin
                 }
             }
 
-            return StringBuilderCache.ReturnAndFree(sbInner);
+            return StringBuilderCache.Retrieve(sbInner);
         }
 
         private bool ReferencesGson(MetadataTypes metadata)
@@ -468,7 +468,7 @@ namespace ServiceStack.NativeTypes.Kotlin
                 }
                 else
                 {
-                    var args = StringBuilderCacheAlt.Allocate();
+                    var args = StringBuilderCache.Allocate();
                     if (attr.ConstructorArgs != null)
                     {
                         if (attr.ConstructorArgs.Count > 1)
@@ -490,7 +490,7 @@ namespace ServiceStack.NativeTypes.Kotlin
                             args.Append($"{attrArg.Name}={TypeValue(attrArg.Type, attrArg.Value)}");
                         }
                     }
-                    sb.AppendLine(prefix + $"@{attr.Name}({StringBuilderCacheAlt.ReturnAndFree(args)})");
+                    sb.AppendLine(prefix + $"@{attr.Name}({StringBuilderCache.Retrieve(args)})");
                 }
             }
 
@@ -556,7 +556,7 @@ namespace ServiceStack.NativeTypes.Kotlin
                 var parts = type.Split('`');
                 if (parts.Length > 1)
                 {
-                    var args = StringBuilderCacheAlt.Allocate();
+                    var args = StringBuilderCache.Allocate();
                     foreach (var arg in genericArgs)
                     {
                         if (args.Length > 0)
@@ -566,7 +566,7 @@ namespace ServiceStack.NativeTypes.Kotlin
                     }
 
                     var typeName = TypeAlias(type);
-                    return $"{typeName}<{StringBuilderCacheAlt.ReturnAndFree(args)}>";
+                    return $"{typeName}<{StringBuilderCache.Retrieve(args)}>";
                 }
             }
             else

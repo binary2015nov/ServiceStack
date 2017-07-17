@@ -8,15 +8,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 	public interface IFoo { }
 	public class Foo : IFoo { }
 
-	public class TestAppHost
-		: AppHostBase
+	public class TestAppHost : AppHostBase
 	{
         public TestAppHost(params Assembly[] assembliesWithServices)
             : base("Example Service", 
                     assembliesWithServices.Length > 0 ? assembliesWithServices : new[] { typeof(Nested).GetAssembly() })
 		{
-			Instance = null;
-		}
+
+        }
 
 		public override void Configure(Container container)
 		{

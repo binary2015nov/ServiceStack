@@ -206,7 +206,7 @@ namespace ServiceStack
                 sb.Append($"Server StackTrace:\n {ServerStackTrace}\n");
 
 
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
 
         public ResponseStatus ToResponseStatus()

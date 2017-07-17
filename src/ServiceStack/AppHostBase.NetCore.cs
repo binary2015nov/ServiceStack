@@ -23,8 +23,7 @@ namespace ServiceStack
 {
     public abstract class AppHostBase : ServiceStackHost
     {
-        protected AppHostBase(string serviceName, params Assembly[] assembliesWithServices)
-            : base(serviceName, assembliesWithServices) 
+        protected AppHostBase(string serviceName, params Assembly[] assembliesWithServices) : base(serviceName, assembliesWithServices) 
         {
             Platforms.PlatformNetCore.HostInstance = this;
         }
@@ -61,7 +60,7 @@ namespace ServiceStack
             return env.WebRootPath ?? env.ContentRootPath;
         }
 
-        public override void OnConfigLoad()
+        protected override void OnBeforeInit()
         {
             if (app != null)
             {

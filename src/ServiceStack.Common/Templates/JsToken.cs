@@ -98,7 +98,7 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
                 sb.Append(JsonValue(item));
             }
             sb.Append(']');
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
 
         protected bool Equals(JsArray other)
@@ -148,7 +148,7 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
                     .Append(JsonValue(entry.Value));
             }
             sb.Append("}");
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => Object.GetEnumerator();
@@ -456,26 +456,26 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
         //Output different format for debugging to verify command was parsed correctly
         public virtual string ToDebugString()
         {
-            var sb = StringBuilderCacheAlt.Allocate();
+            var sb = StringBuilderCache.Allocate();
             foreach (var arg in Args)
             {
                 if (sb.Length > 0)
                     sb.Append('|');
                 sb.Append(arg);
             }
-            return $"[{Name}:{StringBuilderCacheAlt.ReturnAndFree(sb)}]";
+            return $"[{Name}:{StringBuilderCache.Retrieve(sb)}]";
         }
 
         public override string ToString()
         {
-            var sb = StringBuilderCacheAlt.Allocate();
+            var sb = StringBuilderCache.Allocate();
             foreach (var arg in Args)
             {
                 if (sb.Length > 0)
                     sb.Append(',');
                 sb.Append(JsonValue(arg));
             }
-            return $"{Name}({StringBuilderCacheAlt.ReturnAndFree(sb)})";
+            return $"{Name}({StringBuilderCache.Retrieve(sb)})";
         }
 
         public StringSegment ToStringSegment() => ToString().ToStringSegment();

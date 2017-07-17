@@ -45,14 +45,14 @@ namespace ServiceStack
 
         public override string ToString()
         {
-            var sb = StringBuilderCacheAlt.Allocate();
+            var sb = StringBuilderCache.Allocate();
             foreach (var arg in Args)
             {
                 if (sb.Length > 0)
                     sb.Append(',');
                 sb.Append(arg);
             }
-            return $"{Name}({StringBuilderCacheAlt.ReturnAndFree(sb)}){Suffix}";
+            return $"{Name}({StringBuilderCache.Retrieve(sb)}){Suffix}";
         }
     }
 

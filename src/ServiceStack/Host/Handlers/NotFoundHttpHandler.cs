@@ -50,7 +50,7 @@ namespace ServiceStack.Host.Handlers
             if (responseStatus != null)
                 response.StatusDescription = responseStatus.ErrorCode;
 
-            var text = StringBuilderCache.ReturnAndFree(sb);
+            var text = StringBuilderCache.Retrieve(sb);
             response.EndHttpHandlerRequest(skipClose: true, afterHeaders: r => r.Write(text));
         }
 

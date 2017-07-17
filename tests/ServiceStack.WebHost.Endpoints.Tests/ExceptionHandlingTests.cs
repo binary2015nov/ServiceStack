@@ -205,19 +205,16 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         private const string ListeningOn = "http://localhost:1337/";
 
-        public class ExceptionHandlingAppHostHttpListener
-            : AppHostHttpListenerBase
+        public class ExceptionHandlingAppHostHttpListener : AppHostHttpListenerBase
         {
-
-            public ExceptionHandlingAppHostHttpListener()
-                : base("Exception handling tests", typeof(UserService).GetAssembly()) { }
+            public ExceptionHandlingAppHostHttpListener(): base("Exception handling tests", typeof(UserService).GetAssembly())
+            {
+                JsConfig.EmitCamelCaseNames = true;
+                Config.DebugMode = true;
+            }
 
             public override void Configure(Container container)
             {
-                JsConfig.EmitCamelCaseNames = true;
-
-                SetConfig(new HostConfig { DebugMode = false });
-
                 //Custom global uncaught exception handling strategy
                 this.UncaughtExceptionHandlers.Add((req, res, operationName, ex) =>
                 {

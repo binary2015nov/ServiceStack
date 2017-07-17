@@ -54,14 +54,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Gets_404_on_non_existant_page()
         {
-            var webRes = (ListeningOn + "nonexistant.html").GetErrorResponse();
+            var webRes = (ListeningOn + "nonexistant.html").GetWebResponse();
             Assert.That(webRes.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         }
 
         [Test]
         public void Gets_403_on_page_with_non_whitelisted_extension()
         {
-            var webRes = (ListeningOn + "webpage.forbidden").GetErrorResponse();
+            var webRes = (ListeningOn + "webpage.forbidden").GetWebResponse();
             Assert.That(webRes.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
         }
 

@@ -478,7 +478,7 @@ namespace ServiceStack
                     sb.Append(json);
                 }
 
-                var msg = StringBuilderCache.ReturnAndFree(sb);
+                var msg = StringBuilderCache.Retrieve(sb);
 
                 redis.PublishMessage(Topic, msg);
             }

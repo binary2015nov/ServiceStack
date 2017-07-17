@@ -91,18 +91,16 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         public class SessionAppHost : AppHostHttpListenerBase
         {
-            public SessionAppHost() : base(typeof(SessionTests).Name, typeof(SessionTests).GetAssembly()) { }
+            public SessionAppHost() : base(typeof(SessionTests).Name, typeof(SessionTests).GetAssembly())
+            {
+                Config.AllowSessionIdsInHttpParams = true;
+            }
 
             public override void Configure(Container container)
             {
                 Plugins.Add(new SessionFeature());
 
-                SetConfig(new HostConfig
-                {
-                    AllowSessionIdsInHttpParams = true,
-                });
-
-                const bool UseOrmLiteCache = false;
+                bool UseOrmLiteCache = false;
                 if (UseOrmLiteCache)
                 {
                     container.Register<IDbConnectionFactory>(c =>

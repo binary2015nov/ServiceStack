@@ -199,7 +199,7 @@ namespace MarkdownDeep
 			definitions = m_LinkDefinitions;
 
 			// Done
-			return StringBuilderCache.ReturnAndFree(sb);
+			return StringBuilderCache.Retrieve(sb);
 		}
 
 		public int SummaryLength
@@ -648,7 +648,7 @@ namespace MarkdownDeep
 		// Join previously split sections back into one document
 		public static string JoinUserSections(List<string> sections)
 		{
-			var sb = StringBuilderCacheAlt.Allocate();
+			var sb = StringBuilderCache.Allocate();
 			for (int i = 0; i < sections.Count; i++)
 			{
 				if (i > 0)
@@ -665,7 +665,7 @@ namespace MarkdownDeep
 				sb.Append(sections[i]);
 			}
 
-		    return StringBuilderCacheAlt.ReturnAndFree(sb);
+		    return StringBuilderCache.Retrieve(sb);
 		}
 
 		// Split the markdown into sections, one section for each
@@ -708,7 +708,7 @@ namespace MarkdownDeep
 		// Join previously split sections back into one document
 		public static string JoinSections(List<string> sections)
 		{
-            var sb = StringBuilderCacheAlt.Allocate();
+            var sb = StringBuilderCache.Allocate();
             for (int i = 0; i < sections.Count; i++)
 			{
 				if (i > 0)
@@ -723,7 +723,7 @@ namespace MarkdownDeep
 				sb.Append(sections[i]);
 			}
 
-		    return StringBuilderCacheAlt.ReturnAndFree(sb);
+		    return StringBuilderCache.Retrieve(sb);
 		}
 
 		// Add a link definition

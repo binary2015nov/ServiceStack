@@ -20,7 +20,11 @@ namespace RazorRockstars.Console.Files
 {
     public class AppHost : AppHostHttpListenerBase
     {
-        public AppHost() : base("Test Razor", typeof(AppHost).Assembly) { }
+        public AppHost() : base("Test Razor", typeof(AppHost).Assembly)
+        {
+            Config.AdminAuthSecret = "secret";
+            Config.DebugMode = true;
+        }
 
         public bool EnableRazor = true;
         public RSAParameters? JwtRsaPrivateKey;
@@ -63,12 +67,6 @@ namespace RazorRockstars.Console.Files
                 db.DropAndCreateTable<Rockstar>(); //Create table if not exists
                 db.Insert(new Rockstar(1, "Test", "Database", 27));
             }
-
-            SetConfig(new HostConfig
-            {
-                AdminAuthSecret = "secret",
-                DebugMode = true,
-            });
         }
 
         public override IDbConnection GetDbConnection(IRequest req = null)

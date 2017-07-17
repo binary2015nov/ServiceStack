@@ -18,8 +18,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
         readonly HostConfig defaultConfig = new HostConfig();
 
-        public RestsTestBase()
-            : base(Config.ServiceStackBaseUri, typeof(HelloService).Assembly)
+        public RestsTestBase() : base(Constant.ServiceStackBaseUri, typeof(HelloService).Assembly)
         //: base("http://localhost:4000", typeof(HelloService).Assembly) //Uncomment to test on dev web server
         {
         }
@@ -79,7 +78,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
                     {
                         using (var stream = errorResponse.GetResponseStream())
                         {
-                            var response = ContentTypes.Instance.DeserializeFromStream(contentType, typeof(T), stream);
+                            var response = ContentTypes.Default.DeserializeFromStream(contentType, typeof(T), stream);
                             return (T)response;
                         }
                     }

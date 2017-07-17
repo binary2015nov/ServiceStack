@@ -45,9 +45,11 @@ namespace ServiceStack.AuthWeb.Tests
     {
         public static ILog Log = LogManager.GetLogger(typeof(AppHost));
 
-        public AppHost()
-            : base("Test Auth", typeof(AppHost).Assembly)
-        { }
+        public AppHost() : base("Test Auth", typeof(AppHost).Assembly)
+        {
+            Config.AddRedirectParamsToQueryString = true;
+            Config.DebugMode = true;
+        }
 
         public override void Configure(Container container)
         {
@@ -102,12 +104,6 @@ namespace ServiceStack.AuthWeb.Tests
             //Create your own custom User table
             using (var db = container.Resolve<IDbConnectionFactory>().Open())
                 db.DropAndCreateTable<UserTable>();
-
-            SetConfig(new HostConfig
-            {
-                DebugMode = true,
-                AddRedirectParamsToQueryString = true,
-            });
         }
 
         private void ConfigureAuth(Container container)

@@ -284,7 +284,7 @@ namespace ServiceStack.Html
 
             TagBuilder tagBuilder = new TagBuilder("select")
             {
-                InnerHtml = StringBuilderCache.ReturnAndFree(listItemBuilder)
+                InnerHtml = StringBuilderCache.Retrieve(listItemBuilder)
             };
             tagBuilder.MergeAttributes(htmlAttributes);
             tagBuilder.MergeAttribute("name", fullName, true /* replaceExisting */);

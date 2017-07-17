@@ -56,7 +56,7 @@ Request.QueryString: {request.QueryString}
                         sb.AppendLine($"App.DebugLastHandlerArgs: {HttpHandlerFactory.DebugLastHandlerArgs}");
                 }
                 
-                return response.OutputStream.WriteAsync(StringBuilderCache.ReturnAndFree(sb));
+                return response.OutputStream.WriteAsync(StringBuilderCache.Retrieve(sb));
             });
         }
 

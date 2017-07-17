@@ -32,28 +32,18 @@ namespace ServiceStack.OpenApi.Tests.Host
         }
     }
 
-    public class TestAppHost
-    : AppSelfHostBase
+    public class TestAppHost : AppSelfHostBase
     {
-        //private static ILog log;
-
-        public TestAppHost()
-            : base("ServiceStack Autorest Client", typeof(NativeTypesTestService).GetAssembly())
+        public TestAppHost() : base("ServiceStack Autorest Client", typeof(NativeTypesTestService).GetAssembly())
         {
-            //LogManager.LogFactory = new DebugLogFactory();
-            //log = LogManager.GetLogger(typeof(ExampleAppHostHttpListener));
+            JsConfig.EmitCamelCaseNames = true;
+
+            Config.DebugMode = true;
+            Config.Return204NoContentForEmptyResponse = true;
         }
 
         public override void Configure(Container container)
         {
-            JsConfig.EmitCamelCaseNames = true;
-
-            SetConfig(new HostConfig
-            {
-                DebugMode = true,
-                Return204NoContentForEmptyResponse = true,
-            });
-
             container.Register<IDbConnectionFactory>(c => new OrmLiteConnectionFactory(
                 ":memory:", SqliteDialect.Provider));
 

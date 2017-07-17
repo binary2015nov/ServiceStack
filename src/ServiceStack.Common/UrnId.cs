@@ -60,7 +60,7 @@ namespace ServiceStack
                 sb.Append(keyPart);
             }
 
-            return $"urn:{objectTypeName}:{StringBuilderCache.ReturnAndFree(sb)}";
+            return $"urn:{objectTypeName}:{StringBuilderCache.Retrieve(sb)}";
         }
 
         public static string CreateWithParts<T>(params string[] keyParts)

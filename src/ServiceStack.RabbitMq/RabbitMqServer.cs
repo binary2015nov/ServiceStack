@@ -233,7 +233,7 @@ namespace ServiceStack.RabbitMq
                     sb.AppendLine(worker.GetStats().ToString());
                     sb.AppendLine("---------------\n");
                 }
-                return StringBuilderCache.ReturnAndFree(sb);
+                return StringBuilderCache.Retrieve(sb);
             }
         }
 

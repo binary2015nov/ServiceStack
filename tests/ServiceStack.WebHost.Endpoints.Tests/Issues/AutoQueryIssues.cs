@@ -55,12 +55,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Issues
 
         class AppHost : AppSelfHostBase
         {
-            public AppHost()
-                : base(typeof(ClientMemoryLeak).Name, typeof(AutoQueryJoinReferenceId).GetAssembly()) {}
+            public AppHost() : base(typeof(ClientMemoryLeak).Name, typeof(AutoQueryJoinReferenceId).GetAssembly())
+            {
+                Config.UseCamelCase = true;
+            }
 
             public override void Configure(Container container)
             {
-                SetConfig(new HostConfig{ UseCamelCase = true});
                 var dbFactory = new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider);
                 //var dbFactory = new OrmLiteConnectionFactory(Tests.Config.SqlServerConnString, SqlServerDialect.Provider);
                 container.Register<IDbConnectionFactory>(dbFactory);

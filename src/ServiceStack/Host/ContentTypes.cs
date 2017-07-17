@@ -13,7 +13,7 @@ namespace ServiceStack.Host
     {
         private static readonly UTF8Encoding UTF8EncodingWithoutBom = new UTF8Encoding(false);
 
-        public static ContentTypes Instance = new ContentTypes();
+        public static ContentTypes Default = new ContentTypes();
 
         public Dictionary<string, StreamSerializerDelegate> ContentTypeSerializers
             = new Dictionary<string, StreamSerializerDelegate>();
@@ -24,8 +24,7 @@ namespace ServiceStack.Host
         public Dictionary<string, StreamDeserializerDelegate> ContentTypeDeserializers
             = new Dictionary<string, StreamDeserializerDelegate>();
 
-        public static HashSet<string> KnownFormats = new HashSet<string>
-        {
+        public static HashSet<string> KnownFormats = new HashSet<string> {
             "json",
             "xml",
             "jsv",

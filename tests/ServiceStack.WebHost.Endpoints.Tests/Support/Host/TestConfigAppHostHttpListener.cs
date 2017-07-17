@@ -36,20 +36,16 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 		}
 	}
 
-	public class TestConfigAppHostHttpListener
-		: AppHostHttpListenerBase
+	public class TestConfigAppHostHttpListener : AppHostHttpListenerBase
 	{
-		public TestConfigAppHostHttpListener()
-			: base("TestConfigAppHost Service", typeof(BclDto).GetAssembly())
+		public TestConfigAppHostHttpListener() : base("TestConfigAppHost Service", typeof(BclDto).GetAssembly())
 		{
+            Config.UseBclJsonSerializers = true;
 		}
 
-		public override void Configure(Container container)
+        public override void Configure(Container container)
 		{
-			SetConfig(new HostConfig
-			{
-				UseBclJsonSerializers = true,
-			});
+
 		}
 	}
 }

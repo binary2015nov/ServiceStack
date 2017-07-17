@@ -16,25 +16,22 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 	{
 		private const string ListeningOn = "http://localhost:1337/";
 
-		public class HeadersAppHostHttpListener
-			: AppHostHttpListenerBase
+		public class HeadersAppHostHttpListener : AppHostHttpListenerBase
 		{
-			public HeadersAppHostHttpListener()
-				: base("Request Filters Tests", typeof(HeadersService).GetAssembly()) { }
+			public HeadersAppHostHttpListener() : base("Request Filters Tests", typeof(HeadersService).GetAssembly())
+            {
+                //Signal advanced web browsers what HTTP Methods you accept
+                Config.GlobalResponseHeaders = new Dictionary<string, string> {
+                    { "Access-Control-Allow-Origin", "*" },
+                    { "Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS" },
+                };
+            }
 
 			public override void Configure(Container container)
 			{
                 HostContext.Config.GlobalResponseHeaders.Clear();
 
-				//Signal advanced web browsers what HTTP Methods you accept
-				base.SetConfig(new HostConfig
-				{
-					GlobalResponseHeaders =
-					{
-						{ "Access-Control-Allow-Origin", "*" },
-						{ "Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS" },
-					},
-				});
+				
 
 				this.GlobalRequestFilters.Add((req, res, dto) =>
 				{

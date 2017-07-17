@@ -761,7 +761,7 @@ namespace ServiceStack.Host
 
             throw new UnauthorizedAccessException(
                 $"Could not execute service '{requestType.GetOperationName()}', The following restrictions were not met: " +
-                $"'{StringBuilderCache.ReturnAndFree(failedScenarios)}'{internalDebugMsg}");
+                $"'{StringBuilderCache.Retrieve(failedScenarios)}'{internalDebugMsg}");
         }
     }
 

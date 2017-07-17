@@ -85,7 +85,7 @@ namespace ServiceStack.Messaging
                 sb.AppendLine(messageHandler.GetStats().ToString());
                 sb.AppendLine("---------------");
             }
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
 
         protected IMessageHandlerFactory CreateMessageHandlerFactory<T>(

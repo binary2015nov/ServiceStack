@@ -267,7 +267,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 this.services = new List<Type>(services);
             }
 
-            protected override ServiceController CreateServiceController(params Assembly[] assembliesWithServices)
+            protected override ServiceController CreateServiceController()
             {
                 return new ServiceController(this, () => services);
             }
@@ -280,12 +280,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         protected class NoLicenseTestsAppHost : LicenseTestsAppHost
         {
-            public NoLicenseTestsAppHost(params Type[] services)
-                : base(services) {}
+            public NoLicenseTestsAppHost(params Type[] services) : base(services) { }
 #if NETCORE            
-            public override void OnConfigLoad()
+            protected override void OnBeforeInit()
             {
-                base.OnConfigLoad();
+                base.OnBeforeInit();
                 LicenseUtils.RemoveLicense();
             }
 #endif

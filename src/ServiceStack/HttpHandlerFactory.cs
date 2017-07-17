@@ -266,27 +266,6 @@ namespace ServiceStack
             return okToServe ? DefaultHttpHandler : ForbiddenHttpHandler;
         }
 
-        internal static IHttpHandler ReturnRequestInfo(IHttpRequest httpReq)
-        {
-            if ((HostContext.DebugMode
-                || HostContext.Config.AdminAuthSecret != null)
-                && httpReq.QueryString[Keywords.Debug] == Keywords.RequestInfo)
-            {
-                if (HostContext.DebugMode || HostContext.HasValidAuthSecret(httpReq))
-                {
-                    var reqInfo = RequestInfoHandler.GetRequestInfo(httpReq);
-
-                    reqInfo.Host = HostContext.Config.DebugHttpListenerHostEnvironment + "_v" + Env.ServiceStackVersion + "_" + HostContext.ServiceName;
-                    reqInfo.PathInfo = httpReq.PathInfo;
-                    reqInfo.GetPathUrl = httpReq.GetPathUrl();
-
-                    return new RequestInfoHandler { RequestInfo = reqInfo };
-                }
-            }
-
-            return null;
-        }
-
         // no handler registered 
         // serve the file from the filesystem, restricting to a safelist of extensions
         public static bool ShouldAllow(string filePath)

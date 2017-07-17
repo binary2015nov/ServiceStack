@@ -51,7 +51,8 @@ namespace ServiceStack.Platforms
 
         public override string GetAppConfigPath()
         {
-            if (ServiceStackHost.Instance == null) return null;
+            if (HostContext.AppHost == null)
+                return null;
 
             var configPath = "~/web.config".MapHostAbsolutePath();
             if (File.Exists(configPath))
@@ -61,7 +62,7 @@ namespace ServiceStack.Platforms
             if (File.Exists(configPath))
                 return configPath;
 
-            var appHostDll = new FileInfo(ServiceStackHost.Instance.GetType().Assembly.Location).Name;
+            var appHostDll = new FileInfo(HostContext.AppHost.GetType().Assembly.Location).Name;
             configPath = $"~/{appHostDll}.config".MapAbsolutePath();
             return File.Exists(configPath) ? configPath : null;
         }

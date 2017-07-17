@@ -11,7 +11,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     [TestFixture]
     public class VirtualPathTests
     {
-        public static string ServiceStackBaseUri = Config.ServiceStackBaseUri;
+        public static string ServiceStackBaseUri = Constant.ServiceStackBaseUri;
 
         [Test]
         public void Can_download_static_file_at_root_directory()

@@ -18,25 +18,27 @@ namespace ServiceStack
 {
     public static class HostContext
     {
-        public static RequestContext RequestContext => RequestContext.Instance;
+        public static ServiceStackHost AppHost { get; internal set; }
 
-        public static ServiceStackHost AppHost => ServiceStackHost.Instance;
+        public static bool IsReady() => AppHost != null && AppHost.Ready;
+
+        public static RequestContext RequestContext => RequestContext.Instance;
 
         public static AsyncContext Async = new AsyncContext();
 
         internal static ServiceStackHost AssertAppHost()
         {
-            if (ServiceStackHost.Instance == null)
+            if (AppHost == null)
                 throw new ConfigurationErrorsException(
                     "ServiceStack: AppHost does not exist or has not been initialized. " +
                     "Make sure you have created an AppHost and started it with 'new AppHost().Init();' " +
                     " in your Global.asax Application_Start() or alternative Application StartUp");
                     
-            return ServiceStackHost.Instance;
+            return AppHost;
         }
 #if !NETSTANDARD1_6
-        public static bool IsAspNetHost => ServiceStackHost.Instance is AppHostBase;
-        public static bool IsHttpListenerHost => ServiceStackHost.Instance is Host.HttpListener.HttpListenerBase;
+        public static bool IsAspNetHost => AppHost is AppHostBase;
+        public static bool IsHttpListenerHost => AppHost is ServiceStack.Host.HttpListener.HttpListenerBase;
         public static bool IsNetCore => false;
 #else
         public static bool IsAspNetHost => false;
@@ -69,8 +71,8 @@ namespace ServiceStack
 
         public static bool TestMode
         {
-            get => ServiceStackHost.Instance != null && ServiceStackHost.Instance.TestMode;
-            set => ServiceStackHost.Instance.TestMode = value;
+            get => AppHost != null && AppHost.TestMode;
+            set => AppHost.TestMode = value;
         }
 
         public static List<HttpHandlerResolverDelegate> CatchAllHandlers => AssertAppHost().CatchAllHandlers;
@@ -161,9 +163,9 @@ namespace ServiceStack
 
         public static void Release(object service)
         {
-            if (ServiceStackHost.Instance != null)
+            if (AppHost != null)
             {
-                ServiceStackHost.Instance.Release(service);
+                AppHost.Release(service);
             }
             else
             {

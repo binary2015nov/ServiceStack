@@ -83,7 +83,7 @@ namespace MarkdownDeep
 							sb.Append(line.Content);
 							sb.Append('\n');
 						}
-						return StringBuilderCache.ReturnAndFree(sb);
+						return StringBuilderCache.Retrieve(sb);
 				}
 
 
@@ -249,13 +249,13 @@ namespace MarkdownDeep
 				case BlockType.codeblock:
 					if (m.FormatCodeBlock != null)
 					{
-						var sb = StringBuilderCacheAlt.Allocate();
+						var sb = StringBuilderCache.Allocate();
 						foreach (var line in children)
 						{
 							m.HtmlEncodeAndConvertTabsToSpaces(sb, line.buf, line.contentStart, line.contentLen);
 							sb.Append("\n");
 						}
-						b.Append(m.FormatCodeBlock(m, StringBuilderCacheAlt.ReturnAndFree(sb)));
+						b.Append(m.FormatCodeBlock(m, StringBuilderCache.Retrieve(sb)));
 					}
 					else
 					{

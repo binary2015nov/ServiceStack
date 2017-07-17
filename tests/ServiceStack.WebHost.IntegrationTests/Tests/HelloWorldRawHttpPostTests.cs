@@ -10,7 +10,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Post_JSON_to_HelloWorld()
         {
-            var httpReq = (HttpWebRequest)WebRequest.Create(Config.ServiceStackBaseUri + "/hello");
+            var httpReq = (HttpWebRequest)WebRequest.Create(Constant.ServiceStackBaseUri + "/hello");
             httpReq.Method = "POST";
             httpReq.ContentType = httpReq.Accept = "application/json";
 
@@ -31,7 +31,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Post_XML_to_HelloWorld()
         {
-            var httpReq = (HttpWebRequest)WebRequest.Create(Config.ServiceStackBaseUri + "/hello");
+            var httpReq = (HttpWebRequest)WebRequest.Create(Constant.ServiceStackBaseUri + "/hello");
             httpReq.Method = "POST";
             httpReq.ContentType = httpReq.Accept = "application/xml";
 

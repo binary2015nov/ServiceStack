@@ -198,7 +198,7 @@ namespace ServiceStack.NativeTypes.CSharp
                 sb.AppendLine("}");
             sb.AppendLine();
 
-            return StringBuilderCache.ReturnAndFree(sbInner);
+            return StringBuilderCache.Retrieve(sbInner);
         }
 
         private string AppendType(ref StringBuilderWrapper sb, MetadataType type, string lastNS, List<MetadataType> allTypes, CreateTypeOptions options)
@@ -416,7 +416,7 @@ namespace ServiceStack.NativeTypes.CSharp
                 }
                 else
                 {
-                    var args = StringBuilderCacheAlt.Allocate();
+                    var args = StringBuilderCache.Allocate();
                     if (attr.ConstructorArgs != null)
                     {
                         foreach (var ctorArg in attr.ConstructorArgs)
@@ -435,7 +435,7 @@ namespace ServiceStack.NativeTypes.CSharp
                             args.Append($"{attrArg.Name}={TypeValue(attrArg.Type, attrArg.Value)}");
                         }
                     }
-                    sb.AppendLine($"[{attr.Name}({StringBuilderCacheAlt.ReturnAndFree(args)})]");
+                    sb.AppendLine($"[{attr.Name}({StringBuilderCache.Retrieve(args)})]");
                 }
             }
 
@@ -467,7 +467,7 @@ namespace ServiceStack.NativeTypes.CSharp
                 var parts = type.Split('`');
                 if (parts.Length > 1)
                 {
-                    var args = StringBuilderCacheAlt.Allocate();
+                    var args = StringBuilderCache.Allocate();
                     foreach (var arg in genericArgs)
                     {
                         if (args.Length > 0)
@@ -477,7 +477,7 @@ namespace ServiceStack.NativeTypes.CSharp
                     }
 
                     var typeName = NameOnly(type, includeNested: includeNested).SanitizeType();
-                    return $"{typeName}<{StringBuilderCacheAlt.ReturnAndFree(args)}>";
+                    return $"{typeName}<{StringBuilderCache.Retrieve(args)}>";
                 }
             }
 

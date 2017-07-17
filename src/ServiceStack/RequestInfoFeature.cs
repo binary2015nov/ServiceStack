@@ -1,5 +1,8 @@
-﻿using System.Web;
+﻿using System;
+using System.Web;
 using ServiceStack.Host.Handlers;
+using ServiceStack.Text;
+using ServiceStack.Web;
 
 namespace ServiceStack
 {
@@ -7,24 +10,37 @@ namespace ServiceStack
     {
         public void Register(IAppHost appHost)
         {
-            appHost.CatchAllHandlers.Add(ProcessRequest);
+            appHost.RawHttpHandlers.Add(GetRequestInfoHandler);
+            appHost.CatchAllHandlers.Add(GetRequestInfoHandler);
 
-            appHost.GetPlugin<MetadataFeature>()
-                .AddDebugLink($"?{Keywords.Debug}={Keywords.RequestInfo}", "Request Info");
+            appHost.GetPlugin<MetadataFeature>().AddDebugLink($"?{Keywords.Debug}={Keywords.RequestInfo}", "Request Info");
         }
 
-        public IHttpHandler ProcessRequest(string httpMethod, string pathInfo, string filePath)
+        public static IHttpHandler GetRequestInfoHandler(IRequest request)
         {
-            var pathParts = pathInfo.TrimStart('/').Split('/');
-            return pathParts.Length == 0 ? null : GetHandlerForPathParts(pathParts);
+            if (request.QueryString[Keywords.Debug] != Keywords.RequestInfo)
+                return null;
+            
+            var reqInfo = RequestInfoHandler.GetRequestInfo(request);
+            if (reqInfo == null)
+                return null;
+
+            reqInfo.Host = HostContext.Config.DebugHttpListenerHostEnvironment + "_v" + Env.ServiceStackVersion + "_" + HostContext.ServiceName;
+            reqInfo.PathInfo = request.PathInfo;
+            reqInfo.GetPathUrl = request.GetPathUrl();
+            return new RequestInfoHandler { RequestInfo = reqInfo };
         }
 
-        private static IHttpHandler GetHandlerForPathParts(string[] pathParts)
+        public IHttpHandler GetRequestInfoHandler(string httpMethod, string pathInfo, string filePath)
         {
-            var pathController = pathParts[0].ToLower();
-            return pathController == Keywords.RequestInfo
-                ? new RequestInfoHandler()
-                : null;
+            if (string.IsNullOrEmpty(pathInfo))
+                return null;
+
+            var array = pathInfo.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            if (array.Length == 0 || !array[0].Equals(Keywords.RequestInfo, StringComparison.OrdinalIgnoreCase))
+                return null;
+
+            return new RequestInfoHandler();
         }
     }
 }

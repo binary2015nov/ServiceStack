@@ -233,18 +233,16 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         private const string ListeningOn = "http://localhost:1337/";
         private const string ServiceClientBaseUri = "http://localhost:1337/";
 
-        public class AttributeFiltersAppHostHttpListener
-            : AppHostHttpListenerBase
+        public class AttributeFiltersAppHostHttpListener : AppHostHttpListenerBase
         {
-
-            public AttributeFiltersAppHostHttpListener()
-                : base("Attribute Filters Tests", typeof(AttributeAttributeFilteredService).GetAssembly())
-            { }
+            public AttributeFiltersAppHostHttpListener() : base("Attribute Filters Tests", typeof(AttributeAttributeFilteredService).GetAssembly())
+            {
+                Config.DebugMode = true;
+            }
 
             public override void Configure(Funq.Container container)
             {
                 container.Register<ICacheClient>(c => new MemoryCacheClient()).ReusedWithin(Funq.ReuseScope.None);
-                SetConfig(new HostConfig { DebugMode = true }); //show stacktraces
             }
         }
 

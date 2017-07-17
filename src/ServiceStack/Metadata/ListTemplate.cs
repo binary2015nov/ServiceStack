@@ -56,7 +56,7 @@ namespace ServiceStack.Metadata
                 }
             }
             sb.Append("</ul>");
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
     }
 }

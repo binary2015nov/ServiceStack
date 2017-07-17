@@ -205,7 +205,7 @@ namespace ServiceStack
 
         private RSAParameters GetPrivateKey(string useKey)
         {
-            if (useKey.IsEmpty())
+            if (useKey.IsNullOrEmpty())
                 return PrivateKey.Value;
 
             foreach (var entry in PrivateKeyModulusMap)

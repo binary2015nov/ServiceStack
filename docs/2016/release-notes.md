@@ -879,11 +879,11 @@ public static string ToMd5Hash(this Stream stream)
     {
         sb.Append(hash[i].ToString("x2"));
     }
-    return StringBuilderCache.ReturnAndFree(sb);
+    return StringBuilderCache.Retrieve(sb);
 }
 ```
 
-There's also a `StringBuilderCacheAlt` for when you need access to 2x StringBuilders at the same time.
+There's also a `StringBuilderCache` for when you need access to 2x StringBuilders at the same time.
 
 ### String Parsing
 

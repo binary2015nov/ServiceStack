@@ -534,7 +534,7 @@ namespace ServiceStack.MiniProfiler
                     for (int i = children.Count - 1; i >= 0; i--) timings.Push(children[i]);
                 }
             }
-            return new HtmlString(StringBuilderCache.ReturnAndFree(text));
+            return new HtmlString(StringBuilderCache.Retrieve(text));
         }
 
     }

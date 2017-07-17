@@ -100,9 +100,9 @@ namespace MarkdownDeep
 		// (used in formatting the text of links)
 		internal string Format(string str)
 		{
-			var dest = StringBuilderCacheAlt.Allocate();
+			var dest = StringBuilderCache.Allocate();
 			Format(dest, str, 0, str.Length);
-			return StringBuilderCacheAlt.ReturnAndFree(dest);
+			return StringBuilderCache.Retrieve(dest);
 		}
 
 		internal string MakeID(string str)
@@ -115,7 +115,7 @@ namespace MarkdownDeep
 			// Parse the string into a list of tokens
 			Tokenize(str, start, len);
 
-            var sb = StringBuilderCacheAlt.Allocate();
+            var sb = StringBuilderCache.Allocate();
 
             foreach (var t in m_Tokens)
 			{
@@ -164,7 +164,7 @@ namespace MarkdownDeep
 				SkipForward(1);
 			}
 
-			return StringBuilderCacheAlt.ReturnAndFree(sb);
+			return StringBuilderCache.Retrieve(sb);
 		}
 
 		// Render a list of tokens to a destinatino string builder.

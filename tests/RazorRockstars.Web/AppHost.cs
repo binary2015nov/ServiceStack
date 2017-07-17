@@ -19,6 +19,7 @@ namespace RazorRockstars.Web
     {
         public AppHost() : base("Test Razor", typeof (AppHost).Assembly)
         {
+            Config.DebugMode = true;
             typeof(SwaggerResources)
                 .AddAttributes(new RestrictAttribute { VisibilityTo = RequestAttributes.None });
             typeof(SwaggerResource)
@@ -40,10 +41,6 @@ namespace RazorRockstars.Web
                 new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider));
 
             InitData(container);
-
-            SetConfig(new HostConfig {
-                DebugMode = true,
-            });
 
             this.CustomErrorHttpHandlers[HttpStatusCode.ExpectationFailed] = new RazorHandler("/expectationfailed");
         }

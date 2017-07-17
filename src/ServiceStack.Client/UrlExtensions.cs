@@ -159,7 +159,7 @@ namespace ServiceStack
                 }
                 sb.Append(">");
             }
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
 
         public static string ExpandTypeName(this Type type)
@@ -183,7 +183,7 @@ namespace ServiceStack
                 sb.Append(arg.ExpandTypeName());
             }
 
-            var fullName = $"{nameOnly}<{StringBuilderCache.ReturnAndFree(sb)}>";
+            var fullName = $"{nameOnly}<{StringBuilderCache.Retrieve(sb)}>";
             return fullName;
         }
 
@@ -495,7 +495,7 @@ namespace ServiceStack
             }
 
             if (result.Length > 0) result.Length -= 1;
-            return StringBuilderCache.ReturnAndFree(result);
+            return StringBuilderCache.Retrieve(result);
         }
 
         internal static IDictionary<string, RouteMember> GetQueryProperties(Type requestType)

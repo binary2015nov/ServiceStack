@@ -15,10 +15,10 @@ namespace ServiceStack
     /// </summary>
     public class Service : IService, IServiceBase, IDisposable
     {
-        public static IResolver GlobalResolver { get; set; }
+        public static IResolver DefaultResolver { get; set; }
 
         private IResolver resolver;
-        public virtual IResolver GetResolver() => resolver ?? GlobalResolver;
+        public virtual IResolver GetResolver() => resolver ?? DefaultResolver;
 
         public virtual Service SetResolver(IResolver resolver)
         {

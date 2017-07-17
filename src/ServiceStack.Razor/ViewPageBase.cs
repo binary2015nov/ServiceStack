@@ -189,7 +189,7 @@ namespace ServiceStack.Razor
             var renderAttribute = writtenAttribute || values.Length == 0;
 
             if (renderAttribute)
-                return StringBuilderCache.ReturnAndFree(attributeBuilder);
+                return StringBuilderCache.Retrieve(attributeBuilder);
 
             StringBuilderCache.Free(attributeBuilder);
 
@@ -376,7 +376,7 @@ namespace ServiceStack.Razor
 
         public IAppHost AppHost
         {
-            get { return appHost ?? ServiceStackHost.Instance; }
+            get { return appHost ?? HostContext.AppHost; }
             set { appHost = value; }
         }
 

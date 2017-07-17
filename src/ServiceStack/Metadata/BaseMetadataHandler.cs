@@ -162,7 +162,7 @@ namespace ServiceStack.Metadata
                 sb.Append("</div>");
 
                 RenderOperation(writer, httpReq, operationName, requestMessage, responseMessage,
-                    StringBuilderCache.ReturnAndFree(sb), op);
+                    StringBuilderCache.Retrieve(sb), op);
                 return;
             }
 

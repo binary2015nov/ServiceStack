@@ -195,7 +195,7 @@ namespace ServiceStack
             var hasResolver = request as IHasResolver;
             return hasResolver != null 
                 ? hasResolver.Resolver.TryResolve<T>() 
-                : Service.GlobalResolver.TryResolve<T>();
+                : Service.DefaultResolver.TryResolve<T>();
         }
     }
 }

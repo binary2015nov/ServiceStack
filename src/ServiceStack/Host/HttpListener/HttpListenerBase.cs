@@ -39,18 +39,14 @@ namespace ServiceStack.Host.HttpListener
 
         public Action<HttpListenerContext> BeforeRequest { get; set; }
 
-        protected HttpListenerBase(string serviceName, params Assembly[] assembliesWithServices)
-            : base(serviceName, assembliesWithServices)
+        protected HttpListenerBase(string serviceName, params Assembly[] assembliesWithServices) : base(serviceName, assembliesWithServices)
         {
             RawHttpHandlers.Add(RedirectDirectory);
         }
 
-        public override void OnAfterInit()
+        protected override void OnAfterInit()
         {
-            base.OnAfterInit();
-
             SetAppDomainData();
-
             if (ServiceStack.Text.Env.IsMono)
             {
                 // Required or throws NRE in Xamarin.Mac
@@ -58,7 +54,7 @@ namespace ServiceStack.Host.HttpListener
             }
         }
 
-        public virtual void SetAppDomainData()
+        protected virtual void SetAppDomainData()
         {
             //Required for Mono to resolve VirtualPathUtility and Url.Content urls
             var domain = Thread.GetDomain(); // or AppDomain.Current

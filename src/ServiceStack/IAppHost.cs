@@ -21,6 +21,23 @@ namespace ServiceStack
     public interface IAppHost : IResolver
     {
         /// <summary>
+        /// The AppHost config
+        /// </summary>
+        HostConfig Config { get; }
+
+        /// <summary>
+        /// The AppHost AppSettings. Defaults to App or Web.config appSettings.
+        /// </summary>
+        IAppSettings AppSettings { get; }
+
+        string RootPath { get; }
+
+        /// <summary>
+        /// Access Service Controller for ServiceStack
+        /// </summary>
+        ServiceController ServiceController { get; }
+
+        /// <summary>
         /// Register dependency in AppHost IOC on Startup
         /// </summary>
         void Register<T>(T instance);
@@ -201,16 +218,6 @@ namespace ServiceStack
         Dictionary<Type, Func<IRequest, object>> RequestBinders { get; }
 
         /// <summary>
-        /// The AppHost config
-        /// </summary>
-        HostConfig Config { get; }
-
-        /// <summary>
-        /// The AppHost AppSettings. Defaults to App or Web.config appSettings.
-        /// </summary>
-        IAppSettings AppSettings { get; }
-
-        /// <summary>
         /// Register an Adhoc web service on Startup
         /// </summary>
         void RegisterService(Type serviceType, params string[] atRestPaths);
@@ -268,11 +275,6 @@ namespace ServiceStack
         /// Execute MQ Message in ServiceStack
         /// </summary>
         object ExecuteMessage(IMessage mqMessage);
-
-        /// <summary>
-        /// Access Service Controller for ServiceStack
-        /// </summary>
-        ServiceController ServiceController { get; }
     }
 
     public interface IHasAppHost

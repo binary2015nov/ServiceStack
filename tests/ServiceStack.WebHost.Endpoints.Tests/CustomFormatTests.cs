@@ -31,17 +31,15 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         public class AppHost : AppHostHttpListenerBase
         {
-            public AppHost()
-                : base(typeof(CustomFormatTests).Name, typeof(CustomFormatTests).GetAssembly()) { }
+            public AppHost() : base(typeof(CustomFormatTests).Name, typeof(CustomFormatTests).GetAssembly())
+            {
+                Config.DefaultContentType = MimeTypes.Json;
+                Config.EnableFeatures = Feature.All.Remove(Feature.Html);
+            }
 
             public override void Configure(Container container)
             {
                 ContentTypes.ClearCustomFilters();
-                SetConfig(new HostConfig
-                {
-                    DefaultContentType = MimeTypes.Json,
-                    EnableFeatures = Feature.All.Remove(Feature.Html)
-                });
             }
         }
 

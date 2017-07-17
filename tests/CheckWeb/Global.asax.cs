@@ -33,8 +33,23 @@ namespace CheckWeb
         /// <summary>
         /// Initializes a new instance of the <see cref="AppHost"/> class.
         /// </summary>
-        public AppHost()
-            : base("CheckWeb", typeof(ErrorsService).Assembly, typeof(HtmlServices).Assembly) { }
+        public AppHost() : base("CheckWeb", typeof(ErrorsService).Assembly, typeof(HtmlServices).Assembly)
+        {
+            // Change ServiceStack configuration
+            Config.DebugMode = true;
+            //Config.UseHttpsLinks = true;
+            Config.AppendUtf8CharsetOnContentTypes = new HashSet<string> { MimeTypes.Html };
+            Config.UseCamelCase = true;
+            //Config.AllowJsConfig = false;
+
+            // Set to return JSON if no request content type is defined
+            // e.g. text/html or application/json
+            //Config.DefaultContentType = MimeTypes.Json;
+            // Disable SOAP endpoints
+            //Config.EnableFeatures = Feature.All.Remove(Feature.Soap);
+            //Config.EnableFeatures = Feature.All.Remove(Feature.Metadata);
+  
+        }
 
         /// <summary>
         /// Configure the Web Application host.
@@ -46,23 +61,6 @@ namespace CheckWeb
             nativeTypes.MetadataTypesConfig.ExportTypes.Add(typeof(DayOfWeek));
             nativeTypes.MetadataTypesConfig.IgnoreTypes.Add(typeof(IgnoreInMetadataConfig));
             //nativeTypes.MetadataTypesConfig.GlobalNamespace = "Check.ServiceInterface";
-
-            // Change ServiceStack configuration
-            this.SetConfig(new HostConfig
-            {
-                DebugMode = true,
-                //UseHttpsLinks = true,
-                AppendUtf8CharsetOnContentTypes = new HashSet<string> { MimeTypes.Html },
-                UseCamelCase = true,
-                //AllowJsConfig = false,
-
-                // Set to return JSON if no request content type is defined
-                // e.g. text/html or application/json
-                //DefaultContentType = MimeTypes.Json,
-                // Disable SOAP endpoints
-                //EnableFeatures = Feature.All.Remove(Feature.Soap)
-                //EnableFeatures = Feature.All.Remove(Feature.Metadata)
-            });
 
             container.Register<IServiceClient>(c =>
                 new JsonServiceClient("http://localhost:55799/")

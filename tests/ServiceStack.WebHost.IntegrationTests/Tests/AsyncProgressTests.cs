@@ -21,7 +21,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
             try
             {
-                var asyncClient = new JsonServiceClient(Config.ServiceStackBaseUri);
+                var asyncClient = new JsonServiceClient(Constant.ServiceStackBaseUri);
 
                 var progress = new List<string>();
 
@@ -80,7 +80,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
             try
             {
-                var asyncClient = new JsonServiceClient(Config.ServiceStackBaseUri);
+                var asyncClient = new JsonServiceClient(Constant.ServiceStackBaseUri);
 
                 var progress = new List<string>();
 

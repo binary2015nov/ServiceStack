@@ -519,7 +519,7 @@ namespace ServiceStack
             }
             if (!pathRootFound) return null;
 
-            var path = StringBuilderCache.ReturnAndFree(sbPathInfo);
+            var path = StringBuilderCache.Retrieve(sbPathInfo);
             return path.Length > 1 ? path.TrimEnd('/') : "/";
         }
 
@@ -978,7 +978,7 @@ namespace ServiceStack
 
         public static IHttpRequest ToRequest(this HttpListenerContext httpCtxReq, string operationName = null)
         {
-            return ((HttpListenerBase)ServiceStackHost.Instance).CreateRequest(httpCtxReq, operationName);
+            return ((HttpListenerBase)HostContext.AppHost).CreateRequest(httpCtxReq, operationName);
         }
 
         public static IHttpResponse ToResponse(this HttpContext httpCtx)

@@ -23,7 +23,7 @@ namespace ServiceStack.Host.HttpListener
         private IResolver resolver;
         public IResolver Resolver
         {
-            get { return resolver ?? Service.GlobalResolver; }
+            get { return resolver ?? Service.DefaultResolver; }
             set { resolver = value; }
         }
 

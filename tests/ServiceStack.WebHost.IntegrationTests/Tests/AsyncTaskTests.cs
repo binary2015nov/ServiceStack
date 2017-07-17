@@ -7,7 +7,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
     public abstract class AsyncTaskTests
     {
-        private const string ListeningOn = Config.ServiceStackBaseUri;
+        private const string ListeningOn = Constant.ServiceStackBaseUri;
 
         protected abstract IServiceClient CreateServiceClient();
 
@@ -158,7 +158,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Load_test_GetFactorialSync_sync()
         {
-            var client = new JsonServiceClient(Config.ServiceStackBaseUri);
+            var client = new JsonServiceClient(Constant.ServiceStackBaseUri);
 
             for (var i = 0; i < NoOfTimes; i++)
             {
@@ -173,7 +173,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public async Task Load_test_GetFactorialSync_async()
         {
-            var client = new JsonServiceClient(Config.ServiceStackBaseUri);
+            var client = new JsonServiceClient(Constant.ServiceStackBaseUri);
 
             int i = 0;
 
@@ -193,7 +193,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Load_test_GetFactorialGenericAsync_sync()
         {
-            var client = new JsonServiceClient(Config.ServiceStackBaseUri);
+            var client = new JsonServiceClient(Constant.ServiceStackBaseUri);
 
             for (var i = 0; i < NoOfTimes; i++)
             {
@@ -208,7 +208,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public async Task Load_test_GetFactorialGenericAsync_async()
         {
-            var client = new JsonServiceClient(Config.ServiceStackBaseUri);
+            var client = new JsonServiceClient(Constant.ServiceStackBaseUri);
 
             int i = 0;
 

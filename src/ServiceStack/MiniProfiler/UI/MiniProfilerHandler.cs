@@ -238,7 +238,7 @@ namespace ServiceStack.MiniProfiler.UI
 				.AppendLine(";</script>")
 				.Append(RenderIncludes(profiler)) // figure out how to better pass display options
 				.AppendLine("</head><body><div class='profiler-result-full'></div></body></html>");
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
 
         private static string GetResource(string filename)

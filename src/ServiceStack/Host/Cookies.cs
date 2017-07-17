@@ -144,7 +144,7 @@ namespace ServiceStack.Host
                 sb.Append(";HttpOnly");
             }
 
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
     }
 }

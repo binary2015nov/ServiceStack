@@ -113,7 +113,7 @@ namespace ServiceStack.Metadata
             {
                 sb.AppendFormat(template, item);
             }
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
 
         public string RepeaterTemplate(string template, object arg0, IEnumerable<string> dataSource)
@@ -123,7 +123,7 @@ namespace ServiceStack.Metadata
             {
                 sb.AppendFormat(template, arg0, item);
             }
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
 
         public override string ToString()

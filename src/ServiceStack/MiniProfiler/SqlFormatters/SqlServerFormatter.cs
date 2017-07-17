@@ -108,7 +108,7 @@ namespace ServiceStack.MiniProfiler.SqlFormatters
                 buffer.Append(niceName).Append(" ").Append(resolvedType).Append(" = ").Append(PrepareValue(p));
             }
 
-            return StringBuilderCache.ReturnAndFree(buffer
+            return StringBuilderCache.Retrieve(buffer
                 .AppendLine()
                 .AppendLine()
                 .Append(timing.CommandString));

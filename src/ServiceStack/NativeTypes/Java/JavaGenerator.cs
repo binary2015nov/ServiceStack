@@ -248,7 +248,7 @@ namespace ServiceStack.NativeTypes.Java
             sb.AppendLine();
             sb.AppendLine("}");
 
-            return StringBuilderCache.ReturnAndFree(sbInner);
+            return StringBuilderCache.Retrieve(sbInner);
         }
 
         private bool ReferencesGson(MetadataTypes metadata)
@@ -426,7 +426,7 @@ namespace ServiceStack.NativeTypes.Java
         {
             var wasAdded = false;
 
-            var sbInner = StringBuilderCacheAlt.Allocate();
+            var sbInner = StringBuilderCache.Allocate();
             var sbAccessors = new StringBuilderWrapper(sbInner);
             if (addPropertyAccessors)
             {
@@ -478,7 +478,7 @@ namespace ServiceStack.NativeTypes.Java
             }
 
             if (sbAccessors.Length > 0)
-                sb.AppendLine(StringBuilderCacheAlt.ReturnAndFree(sbInner).TrimEnd()); //remove last \n
+                sb.AppendLine(StringBuilderCache.Retrieve(sbInner).TrimEnd()); //remove last \n
         }
         
         public bool AppendAttributes(StringBuilderWrapper sb, List<MetadataAttribute> attributes)
@@ -502,7 +502,7 @@ namespace ServiceStack.NativeTypes.Java
                 }
                 else
                 {
-                    var args = StringBuilderCacheAlt.Allocate();
+                    var args = StringBuilderCache.Allocate();
                     if (attr.ConstructorArgs != null)
                     {
                         if (attr.ConstructorArgs.Count > 1)
@@ -524,7 +524,7 @@ namespace ServiceStack.NativeTypes.Java
                             args.Append("{0}={1}".Fmt(attrArg.Name, TypeValue(attrArg.Type, attrArg.Value)));
                         }
                     }
-                    sb.AppendLine(prefix + "@{0}({1})".Fmt(attr.Name, StringBuilderCacheAlt.ReturnAndFree(args)));
+                    sb.AppendLine(prefix + "@{0}({1})".Fmt(attr.Name, StringBuilderCache.Retrieve(args)));
                 }
             }
 
@@ -592,7 +592,7 @@ namespace ServiceStack.NativeTypes.Java
                 var parts = type.Split('`');
                 if (parts.Length > 1)
                 {
-                    var args = StringBuilderCacheAlt.Allocate();
+                    var args = StringBuilderCache.Allocate();
                     foreach (var arg in genericArgs)
                     {
                         if (args.Length > 0)
@@ -602,7 +602,7 @@ namespace ServiceStack.NativeTypes.Java
                     }
 
                     var typeName = TypeAlias(type);
-                    return "{0}<{1}>".Fmt(typeName, StringBuilderCacheAlt.ReturnAndFree(args));
+                    return "{0}<{1}>".Fmt(typeName, StringBuilderCache.Retrieve(args));
                 }
             }
             else

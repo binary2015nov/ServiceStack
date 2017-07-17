@@ -47,7 +47,7 @@ namespace ServiceStack.Metadata
 
             opTemplate.Append("</tr>");
 
-            return show ? string.Format(StringBuilderCache.ReturnAndFree(opTemplate), operationName) : "";
+            return show ? string.Format(StringBuilderCache.Retrieve(opTemplate), operationName) : "";
         }
 
         private static string CreateIcons(Operation op)
@@ -61,7 +61,7 @@ namespace ServiceStack.Metadata
                 if (hasRoles)
                 {
                     sbIcons.Append("Requires Roles:");
-                    var sbRoles = StringBuilderCacheAlt.Allocate();
+                    var sbRoles = StringBuilderCache.Allocate();
                     foreach (var role in op.RequiredRoles)
                     {
                         if (sbRoles.Length > 0)
@@ -77,7 +77,7 @@ namespace ServiceStack.Metadata
 
                         sbRoles.Append(" " + role + "?");
                     }
-                    sbIcons.Append(StringBuilderCacheAlt.ReturnAndFree(sbRoles));
+                    sbIcons.Append(StringBuilderCache.Retrieve(sbRoles));
                 }
 
                 var hasPermissions = op.RequiredPermissions.Count + op.RequiresAnyPermission.Count > 0;
@@ -87,7 +87,7 @@ namespace ServiceStack.Metadata
                         sbIcons.Append(". ");
 
                     sbIcons.Append("Requires Permissions:");
-                    var sbPermission = StringBuilderCacheAlt.Allocate();
+                    var sbPermission = StringBuilderCache.Allocate();
                     foreach (var permission in op.RequiredPermissions)
                     {
                         if (sbPermission.Length > 0)
@@ -103,7 +103,7 @@ namespace ServiceStack.Metadata
 
                         sbPermission.Append(" " + permission + "?");
                     }
-                    sbIcons.Append(StringBuilderCacheAlt.ReturnAndFree(sbPermission));
+                    sbIcons.Append(StringBuilderCache.Retrieve(sbPermission));
                 }
 
                 if (!hasRoles && !hasPermissions)
@@ -113,7 +113,7 @@ namespace ServiceStack.Metadata
             }
 
             var icons = sbIcons.Length > 0
-                ? "<span class=\"icons\">" + StringBuilderCache.ReturnAndFree(sbIcons) + "</span>"
+                ? "<span class=\"icons\">" + StringBuilderCache.Retrieve(sbIcons) + "</span>"
                 : "";
             return icons;
         }
@@ -191,7 +191,7 @@ namespace ServiceStack.Metadata
                 this.XsdServiceTypesIndex,
                 operationsPart,
                 xsdsPart,
-                StringBuilderCache.ReturnAndFree(wsdlTemplate),
+                StringBuilderCache.Retrieve(wsdlTemplate),
                 pluginLinks,
                 debugOnlyInfo,
                 Env.VersionString,

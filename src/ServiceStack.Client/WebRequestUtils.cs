@@ -191,7 +191,7 @@ namespace ServiceStack
             {
                 sb.Append(b.ToString("X2"));
             }
-            return StringBuilderCache.ReturnAndFree(sb).ToLower(); // The RFC requires the hex values are lowercase
+            return StringBuilderCache.Retrieve(sb).ToLower(); // The RFC requires the hex values are lowercase
         }
 #endif
 

@@ -556,7 +556,7 @@ namespace ServiceStack.Api.OpenApi
 
             var responseSchema = GetResponseSchema(restPath, schemas, out string schemaDescription);
             //schema is null when return type is IReturnVoid
-            var statusCode = responseSchema == null && HostConfig.Instance.Return204NoContentForEmptyResponse
+            var statusCode = responseSchema == null && HostContext.Config.Return204NoContentForEmptyResponse
                 ? ((int)HttpStatusCode.NoContent).ToString()
                 : ((int)HttpStatusCode.OK).ToString();
 

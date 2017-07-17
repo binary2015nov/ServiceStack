@@ -289,7 +289,7 @@ namespace ServiceStack
                     sb.Append(parts[0]);
                 }
             }
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
     }
 

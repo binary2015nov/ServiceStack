@@ -169,7 +169,7 @@ namespace ServiceStack.NativeTypes.FSharp
 
             sb.AppendLine();
 
-            return StringBuilderCache.ReturnAndFree(sbInner);
+            return StringBuilderCache.Retrieve(sbInner);
         }
 
         private string AppendType(ref StringBuilderWrapper sb, MetadataType type, string lastNS,
@@ -340,7 +340,7 @@ namespace ServiceStack.NativeTypes.FSharp
                 }
                 else
                 {
-                    var args = StringBuilderCacheAlt.Allocate();
+                    var args = StringBuilderCache.Allocate();
                     if (attr.ConstructorArgs != null)
                     {
                         foreach (var ctorArg in attr.ConstructorArgs)
@@ -359,7 +359,7 @@ namespace ServiceStack.NativeTypes.FSharp
                             args.Append("{0}={1}".Fmt(attrArg.Name, TypeValue(attrArg.Type, attrArg.Value)));
                         }
                     }
-                    sb.AppendLine("[<{0}({1})>]".Fmt(attr.Name, StringBuilderCacheAlt.ReturnAndFree(args)));
+                    sb.AppendLine("[<{0}({1})>]".Fmt(attr.Name, StringBuilderCache.Retrieve(args)));
                 }
             }
 
@@ -396,7 +396,7 @@ namespace ServiceStack.NativeTypes.FSharp
                 var parts = type.Split('`');
                 if (parts.Length > 1)
                 {
-                    var args = StringBuilderCacheAlt.Allocate();
+                    var args = StringBuilderCache.Allocate();
                     foreach (var arg in genericArgs)
                     {
                         if (args.Length > 0)
@@ -406,7 +406,7 @@ namespace ServiceStack.NativeTypes.FSharp
                     }
 
                     var typeName = NameOnly(type);
-                    return "{0}<{1}>".Fmt(typeName, StringBuilderCacheAlt.ReturnAndFree(args));
+                    return "{0}<{1}>".Fmt(typeName, StringBuilderCache.Retrieve(args));
                 }
             }
 

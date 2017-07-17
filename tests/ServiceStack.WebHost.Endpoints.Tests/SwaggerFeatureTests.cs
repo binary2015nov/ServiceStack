@@ -289,20 +289,17 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         private const string BaseUrl = "http://localhost:8024";
         private const string ListeningOn = BaseUrl + "/";
 
-        public class SwaggerFeatureAppHostHttpListener
-            : AppHostHttpListenerBase
+        public class SwaggerFeatureAppHostHttpListener : AppHostHttpListenerBase
         {
-            public SwaggerFeatureAppHostHttpListener()
-                : base("Swagger Feature Tests", typeof(SwaggerFeatureServiceTests).GetAssembly()) { }
+            public SwaggerFeatureAppHostHttpListener() : base("Swagger Feature Tests", typeof(SwaggerFeatureServiceTests).GetAssembly())
+            {
+                Config.DebugMode = true; //Show StackTraces for easier debugging
+
+            }
 
             public override void Configure(Funq.Container container)
             {
                 Plugins.Add(new SwaggerFeature());
-
-                SetConfig(new HostConfig
-                {
-                    DebugMode = true //Show StackTraces for easier debugging
-                });
             }
         }
 

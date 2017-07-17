@@ -33,8 +33,7 @@ namespace ServiceStack.Metadata
                 var i = 0;
                 if (xsdNo >= schemas.Count)
                     throw new ArgumentOutOfRangeException("xsd");
-
-                httpRes.ContentType = "text/xml";
+                httpRes.ContentType = "text/xml;";
                 foreach (XmlSchema schema in schemaSet.Schemas())
                 {
                     if (xsdNo != i++) continue;

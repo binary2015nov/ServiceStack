@@ -332,7 +332,7 @@ namespace MarkdownDeep
 			if (str == null || str.IndexOf('\\')==-1)
 				return str;
 
-		    var sb = StringBuilderCacheAlt.Allocate();
+		    var sb = StringBuilderCache.Allocate();
 			for (int i = 0; i < str.Length; i++)
 			{
 				if (str[i] == '\\' && i+1<str.Length && IsEscapableChar(str[i+1], ExtraMode))
@@ -346,7 +346,7 @@ namespace MarkdownDeep
 				}
 			}
 
-		    return StringBuilderCacheAlt.ReturnAndFree(sb);
+		    return StringBuilderCache.Retrieve(sb);
 		}
 
 		// Normalize the line ends in a string to just '\n'
@@ -357,7 +357,7 @@ namespace MarkdownDeep
 			if (str.IndexOfAny(lineends) < 0)
 				return str;
 
-            var sb = StringBuilderCacheAlt.Allocate();
+            var sb = StringBuilderCache.Allocate();
             StringScanner sp = new StringScanner(str);
 			while (!sp.eof)
 			{
@@ -373,7 +373,7 @@ namespace MarkdownDeep
 				}
 			}
 
-		    return StringBuilderCacheAlt.ReturnAndFree(sb);
+		    return StringBuilderCache.Retrieve(sb);
 		}
 
 		/*

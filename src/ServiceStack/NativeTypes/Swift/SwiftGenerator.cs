@@ -202,7 +202,7 @@ namespace ServiceStack.NativeTypes.Swift
                 sb.AppendLine(sbExt.ToString());
             }
 
-            return StringBuilderCache.ReturnAndFree(sbInner);
+            return StringBuilderCache.Retrieve(sbInner);
         }
 
         //Use built-in types already in net.servicestack.client package
@@ -664,7 +664,7 @@ namespace ServiceStack.NativeTypes.Swift
                 }
                 else
                 {
-                    var args = StringBuilderCacheAlt.Allocate();
+                    var args = StringBuilderCache.Allocate();
                     if (attr.ConstructorArgs != null)
                     {
                         foreach (var ctorArg in attr.ConstructorArgs)
@@ -683,7 +683,7 @@ namespace ServiceStack.NativeTypes.Swift
                             args.Append("{0}={1}".Fmt(attrArg.Name, TypeValue(attrArg.Type, attrArg.Value)));
                         }
                     }
-                    sb.AppendLine("// @{0}({1})".Fmt(attr.Name, StringBuilderCacheAlt.ReturnAndFree(args)));
+                    sb.AppendLine("// @{0}({1})".Fmt(attr.Name, StringBuilderCache.Retrieve(args)));
                 }
             }
 
@@ -820,7 +820,7 @@ namespace ServiceStack.NativeTypes.Swift
                 var parts = type.Split('`');
                 if (parts.Length > 1)
                 {
-                    var args = StringBuilderCacheAlt.Allocate();
+                    var args = StringBuilderCache.Allocate();
                     foreach (var arg in genericArgs)
                     {
                         if (args.Length > 0)
@@ -830,7 +830,7 @@ namespace ServiceStack.NativeTypes.Swift
                     }
 
                     var typeName = TypeAlias(type);
-                    return "{0}<{1}>".Fmt(typeName, StringBuilderCacheAlt.ReturnAndFree(args));
+                    return "{0}<{1}>".Fmt(typeName, StringBuilderCache.Retrieve(args));
                 }
             }
             else

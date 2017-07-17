@@ -579,9 +579,9 @@ namespace ServiceStack
         public virtual void OnLogError(Type type, string message, Exception innerEx=null)
         {
             if (innerEx != null)
-                Log.Error(message, innerEx);
+                Logger.Error(message, innerEx);
             else
-                Log.Error(message);
+                Logger.Error(message);
         }
 
         public virtual void OnSaveSession(IRequest httpReq, IAuthSession session, TimeSpan? expiresIn = null)
@@ -607,9 +607,9 @@ namespace ServiceStack
             if (session.Id == withSessionId)
                 return session;
 
-            if (Log.IsDebugEnabled)
+            if (Logger.IsDebugEnabled)
             {
-                Log.Debug($"ignoring cached sessionId '{session.Id}' which is different to request '{withSessionId}'");
+                Logger.Debug($"ignoring cached sessionId '{session.Id}' which is different to request '{withSessionId}'");
             }
             return null;
         }

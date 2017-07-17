@@ -73,7 +73,7 @@ namespace ServiceStack.Validation
                         sb.Append($"\n  - {error.ErrorCode}{fieldLabel}");
                     }
                 }
-                return StringBuilderCache.ReturnAndFree(sb);
+                return StringBuilderCache.Retrieve(sb);
             }
         }
 
@@ -96,7 +96,7 @@ namespace ServiceStack.Validation
                     .Append("</ValidationError>");
             }
             sb.Append("</ValidationException>");
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
 
         public static ValidationError CreateException(Enum errorCode)

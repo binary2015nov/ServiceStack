@@ -246,7 +246,7 @@ namespace ServiceStack.Host.HttpListener
                 using (StreamReader s = new StreamReader(input, ContentEncoding))
                 {
                     var key = StringBuilderCache.Allocate();
-                    var value = StringBuilderCacheAlt.Allocate();
+                    var value = StringBuilderCache.Allocate();
                     int c;
 
                     while ((c = s.Read()) != -1)
@@ -281,7 +281,7 @@ namespace ServiceStack.Host.HttpListener
                     EndSubStream(input);
 
                     StringBuilderCache.Free(key);
-                    StringBuilderCacheAlt.Free(key);
+                    StringBuilderCache.Free(key);
                 }
             }
         }
@@ -403,7 +403,7 @@ namespace ServiceStack.Host.HttpListener
                     }
                     sb.Append(Get(key));
                 }
-                return StringBuilderCache.ReturnAndFree(sb);
+                return StringBuilderCache.Retrieve(sb);
             }
         }
 

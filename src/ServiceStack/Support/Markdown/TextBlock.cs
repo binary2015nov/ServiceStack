@@ -409,7 +409,7 @@ namespace ServiceStack.Support.Markdown
 				sb.Append(lastBlock);
 			}
 
-			return allStatements.Count > initialCount ? StringBuilderCache.ReturnAndFree(sb) : content;
+			return allStatements.Count > initialCount ? StringBuilderCache.Retrieve(sb) : content;
 		}
 
 		protected void WriteStatement(MarkdownViewBase instance, TextWriter textWriter, Dictionary<string, object> scopeArgs)

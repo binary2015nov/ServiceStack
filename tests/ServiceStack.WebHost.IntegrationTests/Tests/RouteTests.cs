@@ -32,7 +32,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void ApiPath_returns_BaseUrl()
         {
-            var url = Config.AbsoluteBaseUri.AppendPath("api");
+            var url = Constant.AbsoluteBaseUri.AppendPath("api");
 
             var reqInfoResponse = url.AddQueryParam("debug", "requestinfo")
                 .GetJsonFromUrl().FromJson<RequestInfoResponse>();

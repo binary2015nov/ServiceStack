@@ -84,11 +84,11 @@ namespace ServiceStack
             var ssHost = HostContext.AppHost;
             if (ssHost == null) return false;
 
-            if (!ssHost.HasStarted)
+            if (!ssHost.Ready)
             {
                 ssHost.OnStartupException(ex);
             }
-            return !ssHost.HasStarted;
+            return !ssHost.Ready;
         }
 
         public static string Localize(this string text, IRequest request)

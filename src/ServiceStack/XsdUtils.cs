@@ -32,7 +32,7 @@ namespace ServiceStack
                 }
             }
             sb = sb.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", ""); //remove xml declaration
-            return StringBuilderCache.ReturnAndFree(sb).Trim();
+            return StringBuilderCache.Retrieve(sb).Trim();
         }
 
         public static string GetXsd(Type operationType)
@@ -52,7 +52,7 @@ namespace ServiceStack
                     schema.Write(new StringWriter(sb));
                 }
             }
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
     }
 }

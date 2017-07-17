@@ -347,7 +347,7 @@ namespace ServiceStack.Auth
                     sb.Append($"%{c:X2}");
                 }
             }
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
     }
 }

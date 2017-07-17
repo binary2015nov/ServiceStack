@@ -51,7 +51,7 @@ namespace ServiceStack.Html
       {
         sb = StringBuilderCache.Allocate();
         jsmin();
-        return StringBuilderCache.ReturnAndFree(sb); // return the minified string  
+        return StringBuilderCache.Retrieve(sb); // return the minified string  
       }
     }
 

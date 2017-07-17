@@ -184,15 +184,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
     public class RouteAppHost : AppHostHttpListenerBase
     {
-        public RouteAppHost() : base(typeof(BufferedRequestTests).Name, typeof(CustomRouteService).GetAssembly()) { }
+        public RouteAppHost() : base(typeof(BufferedRequestTests).Name, typeof(CustomRouteService).GetAssembly())
+        {
+            Config.AllowRouteContentTypeExtensions = true;
+        }
 
         public override void Configure(Container container)
         {
-            SetConfig(new HostConfig
-            {
-                AllowRouteContentTypeExtensions = true
-            });
-
             Plugins.Add(new CsvFormat()); //required to allow .csv
 
             Plugins.RemoveAll(x => x is MarkdownFormat);

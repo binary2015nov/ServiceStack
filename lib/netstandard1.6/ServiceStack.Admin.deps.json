@@ -1533,7 +1533,7 @@
     "system.net.websockets/4.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-avDLiunkLkl3wZnAmm8hNaiMmY7UZaYgXdXQeLUXIhRbJ60YUa4KVIVFp/+N9INOrfFzS0IgvvH67iySMSpb8w==",
+      "sha512": "sha512-2KJo8hir6Edi9jnMDAMhiJoI691xRBmKcbNpwjrvpIMOCTYOtBpSsSEGBxBDV7PKbasJNaFp1+PZz1D7xS41Hg==",
       "path": "system.net.websockets/4.0.0",
       "hashPath": "system.net.websockets.4.0.0.nupkg.sha512"
     },
@@ -1575,7 +1575,7 @@
     "system.reflection.dispatchproxy/4.0.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-pbjkxSB3ug9RvoyRuqLW0qAxOA+/IZltpGfxAMtWpz2YpZsZ+UC3RT5N0cEjhLT91YeP6As7zeSR/gN/JFhObw==",
+      "sha512": "sha512-GPPgWoSxQEU3aCKSOvsAc1dhTTi4iq92PUVEVfnGPGwqCf6synaAJGYLKMs5E3CuRfel8ufACWUijXqDpOlGrA==",
       "path": "system.reflection.dispatchproxy/4.0.1",
       "hashPath": "system.reflection.dispatchproxy.4.0.1.nupkg.sha512"
     },

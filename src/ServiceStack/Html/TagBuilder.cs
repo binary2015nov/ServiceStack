@@ -99,7 +99,7 @@ namespace ServiceStack.Html
 				}
 			}
 
-			return StringBuilderCache.ReturnAndFree(sb);
+			return StringBuilderCache.Retrieve(sb);
 		}
 
 		public void GenerateId(string name)
@@ -216,7 +216,7 @@ namespace ServiceStack.Html
                         .Append('>');
                     break;
             }
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
 
         // Valid IDs are defined in http://www.w3.org/TR/html401/types.html#type-id

@@ -632,7 +632,7 @@ namespace ServiceStack.Html
                     //matches.appendTail(sb1);
                     sb.Append(html.Substring(lastValue));
 
-                    html = StringBuilderCache.ReturnAndFree(sb);
+                    html = StringBuilderCache.Retrieve(sb);
                     userBlocks.Add(userBlock);
                 }
             }
@@ -663,7 +663,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
 
             //preserve conditional comments
@@ -693,7 +693,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
 
             //preserve inline events
@@ -721,7 +721,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
 
             if (true)
@@ -748,7 +748,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
 
             //preserve PRE tags
@@ -776,7 +776,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
 
             //preserve SCRIPT tags
@@ -833,7 +833,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
 
             //preserve STYLE tags
@@ -861,7 +861,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
 
             //preserve TEXTAREA tags
@@ -889,7 +889,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
 
             //preserve line breaks
@@ -914,7 +914,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
 
             return html;
@@ -955,7 +955,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
 
             //put TEXTAREA blocks back
@@ -981,7 +981,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
 
             //put STYLE blocks back
@@ -1007,7 +1007,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
 
             //put SCRIPT blocks back
@@ -1033,7 +1033,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
 
             //put PRE blocks back
@@ -1059,7 +1059,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
 
             //put event blocks back
@@ -1085,7 +1085,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
 
             //put conditional comments back
@@ -1111,7 +1111,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
 
             //put skip blocks back
@@ -1137,7 +1137,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
 
             //put user blocks back
@@ -1166,7 +1166,7 @@ namespace ServiceStack.Html
                     //matcher.appendTail(sb);
                     sb.Append(html.Substring(lastValue));
 
-                    html = StringBuilderCache.ReturnAndFree(sb);
+                    html = StringBuilderCache.Retrieve(sb);
                 }
             }
 
@@ -1265,7 +1265,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
             return html;
         }
@@ -1303,7 +1303,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
 
             }
             return html;
@@ -1344,7 +1344,7 @@ namespace ServiceStack.Html
             //matcher.appendTail(sb);
             sb.Append(html.Substring(lastValue));
 
-            html = StringBuilderCache.ReturnAndFree(sb);
+            html = StringBuilderCache.Retrieve(sb);
 
             return html;
         }
@@ -1449,7 +1449,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
             return html;
         }
@@ -1517,7 +1517,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
             return html;
         }
@@ -1555,7 +1555,7 @@ namespace ServiceStack.Html
                 //matcher.appendTail(sb);
                 sb.Append(html.Substring(lastValue));
 
-                html = StringBuilderCache.ReturnAndFree(sb);
+                html = StringBuilderCache.Retrieve(sb);
             }
             return html;
         }

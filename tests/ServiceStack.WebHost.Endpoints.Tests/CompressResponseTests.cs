@@ -66,15 +66,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         class AppHost : AppSelfHostBase
         {
-            public AppHost()
-                : base(nameof(CompressResponseTests), typeof(CompressedServices).GetAssembly()) { }
+            public AppHost() : base(nameof(CompressResponseTests), typeof(CompressedServices).GetAssembly())
+            {
+                Config.CompressFilesWithExtensions = new HashSet<string> { "html", "css" };
+            }
 
             public override void Configure(Container container)
             {
-                SetConfig(new HostConfig
-                {
-                    CompressFilesWithExtensions = { "html", "css" }
-                });
+                
             }
 
             public override List<IVirtualPathProvider> GetVirtualFileSources()

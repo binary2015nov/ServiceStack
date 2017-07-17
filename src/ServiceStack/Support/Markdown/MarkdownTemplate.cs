@@ -127,7 +127,7 @@ namespace ServiceStack.Support.Markdown
 				}
 				sb.Append(textBlock);
 			}
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
 
         public void Write(MarkdownViewBase instance, TextWriter textWriter, Dictionary<string, object> scopeArgs)

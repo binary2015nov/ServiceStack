@@ -40,7 +40,7 @@ namespace ServiceStack
         {
             this.Headers = new Dictionary<string, string>();
             this.Cookies = new List<Cookie>();
-            this.ResponseFilter = ContentTypes.Instance;
+            this.ResponseFilter = ContentTypes.Default;
 
             this.Response = response;
             this.ContentType = contentType;

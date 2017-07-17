@@ -108,16 +108,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         class AppHost : AppSelfHostBase
         {
-            public AppHost()
-                : base(nameof(CustomOrmLiteAuthRepositoryTests), typeof(CustomOrmLiteAuthRepositoryTests).GetAssembly()) { }
+            public AppHost() : base(nameof(CustomOrmLiteAuthRepositoryTests), typeof(CustomOrmLiteAuthRepositoryTests).GetAssembly())
+            {
+                Config.DebugMode = true;
+            }
 
             public override void Configure(Container container)
             {
-                SetConfig(new HostConfig
-                {
-                    DebugMode = true,
-                });
-
                 Plugins.Add(new AuthFeature(() => new CustomAuthUserSession(),
                     new IAuthProvider[] {
                         new CredentialsAuthProvider(AppSettings),

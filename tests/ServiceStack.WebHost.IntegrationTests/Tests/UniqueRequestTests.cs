@@ -33,7 +33,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     [TestFixture]
     public class UniqueRequestTests
     {
-        private const string BaseUri = Config.ServiceStackBaseUri;
+        private const string BaseUri = Constant.ServiceStackBaseUri;
 
         [Test]
         [Explicit("ASP.NET does not allow invalid chars see http://stackoverflow.com/questions/13691829/path-parameters-w-url-unfriendly-characters")]

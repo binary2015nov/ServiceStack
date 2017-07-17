@@ -60,7 +60,7 @@ namespace ServiceStack.Metadata
             sb.Append("</tbody>");
             sb.Append("</table>");
 
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
     }
 }

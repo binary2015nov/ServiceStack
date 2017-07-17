@@ -11,17 +11,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         class AppHost : AppSelfHostBase
         {
-            public AppHost() 
-                : base(nameof(RedirectPathTests), typeof(RedirectPathTests).GetAssembly())
+            public AppHost() : base(nameof(RedirectPathTests), typeof(RedirectPathTests).GetAssembly())
             {
+                Config.DefaultRedirectPath = "~/does-resolve";
             }
 
             public override void Configure(Container container)
             {
-                SetConfig(new HostConfig
-                {
-                    DefaultRedirectPath = "~/does-resolve"
-                });
+                
             }
 
             public override string ResolveAbsoluteUrl(string virtualPath, IRequest httpReq)

@@ -35,7 +35,7 @@ namespace ServiceStack
             app.Use(ProcessRequest);
         }
 
-        public override void OnConfigLoad()
+        protected override void OnBeforeInit()
         {
             if (app != null)
             {

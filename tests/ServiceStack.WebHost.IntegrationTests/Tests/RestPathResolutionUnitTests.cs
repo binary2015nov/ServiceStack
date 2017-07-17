@@ -6,12 +6,11 @@ using ServiceStack.WebHost.IntegrationTests.Services;
 namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
     [TestFixture]
-    public class RestPathResolutionUnitTests
-        : TestBase
+    public class RestPathResolutionUnitTests  : TestBase
     {
-        public RestPathResolutionUnitTests()
-            : base(Config.ServiceStackBaseUri, typeof(ReverseService).Assembly)
+        public RestPathResolutionUnitTests() : base(Constant.ServiceStackBaseUri, typeof(ReverseService).Assembly)
         {
+
         }
 
         protected override void Configure(Funq.Container container)

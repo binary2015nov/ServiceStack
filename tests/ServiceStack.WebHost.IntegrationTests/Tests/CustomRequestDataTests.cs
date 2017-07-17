@@ -15,7 +15,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_parse_custom_form_data()
         {
-            var webReq = (HttpWebRequest)WebRequest.Create(Config.ServiceStackBaseUri + "/customformdata?format=json");
+            var webReq = (HttpWebRequest)WebRequest.Create(Constant.ServiceStackBaseUri + "/customformdata?format=json");
             webReq.Method = HttpMethods.Post;
             webReq.ContentType = MimeTypes.FormUrlEncoded;
 

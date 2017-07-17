@@ -16,7 +16,11 @@ namespace ServiceStack.Server.Tests.Auth
 {
     public class AppHost : AppSelfHostBase
     {
-        public AppHost() : base("Test Auth", typeof(AppHost).GetAssembly()) { }
+        public AppHost() : base("Test Auth", typeof(AppHost).GetAssembly())
+        {
+            Config.AdminAuthSecret = "secret";
+            Config.DebugMode = true;
+        }
 
         public RSAParameters? JwtRsaPrivateKey;
         public RSAParameters? JwtRsaPublicKey;
@@ -51,12 +55,6 @@ namespace ServiceStack.Server.Tests.Auth
                 db.DropAndCreateTable<Rockstar>(); //Create table if not exists
                 db.Insert(new Rockstar(1, "Test", "Database", 27));
             }
-
-            SetConfig(new HostConfig
-            {
-                AdminAuthSecret = "secret",
-                DebugMode = true,
-            });
 
             Plugins.Add(new AuthFeature(() => new AuthUserSession(),
                 new IAuthProvider[] {

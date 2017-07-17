@@ -438,35 +438,26 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
         }
     }
 
-    public class ExampleAppHostHttpListener
-		: AppHostHttpListenerBase
+    public class ExampleAppHostHttpListener : AppHostHttpListenerBase
 	{
-		//private static ILog log;
-
-		public ExampleAppHostHttpListener()
-			: base("ServiceStack Examples", typeof(GetFactorialService).GetAssembly())
+		public ExampleAppHostHttpListener() : base("ServiceStack Examples", typeof(GetFactorialService).GetAssembly())
 		{
 			LogManager.LogFactory = new DebugLogFactory();
-			//log = LogManager.GetLogger(typeof(ExampleAppHostHttpListener));
-		}
 
-		public Action<Container> ConfigureFilter { get; set; }
+            //Signal advanced web browsers what HTTP Methods you accept
+            Config.GlobalResponseHeaders = new Dictionary<string, string> {
+                { "Access-Control-Allow-Origin", "*" },
+                { "Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS" },
+            };
+            Config.WsdlServiceNamespace = "http://www.servicestack.net/types";
+            Config.DebugMode = true;
+            Config. PreferredContentTypes = new List<string> { MimeTypes.ProtoBuf };
+        }
+
+        public Action<Container> ConfigureFilter { get; set; }
 
 		public override void Configure(Container container)
 		{
-			//Signal advanced web browsers what HTTP Methods you accept
-			base.SetConfig(new HostConfig {
-				GlobalResponseHeaders =
-				{
-					{ "Access-Control-Allow-Origin", "*" },
-					{ "Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS" },
-				},
-				WsdlServiceNamespace = "http://www.servicestack.net/types",
-				LogFactory = new ConsoleLogFactory(),
-				DebugMode = true,
-                PreferredContentTypes = { MimeTypes.ProtoBuf },
-			});
-
 			this.RegisterRequestBinder<CustomRequestBinder>(
 				httpReq => new CustomRequestBinder { IsFromBinder = true });
 
@@ -508,32 +499,23 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 
     public class ExampleAppHostHttpListenerPool : AppHostHttpListenerPoolBase
     {
-        //private static ILog log;
-
-        public ExampleAppHostHttpListenerPool()
-            : base("ServiceStack Examples", 500, typeof(GetFactorialService).GetAssembly())
+        public ExampleAppHostHttpListenerPool() : base("ServiceStack Examples", 500, typeof(GetFactorialService).GetAssembly())
         {
             LogManager.LogFactory = new DebugLogFactory();
-            //log = LogManager.GetLogger(typeof(ExampleAppHostHttpListener));
+
+            //Signal advanced web browsers what HTTP Methods you accept
+            Config.GlobalResponseHeaders = new Dictionary<string, string> {
+                { "Access-Control-Allow-Origin", "*" },
+                { "Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS" },
+            };
+            Config.WsdlServiceNamespace = "http://www.servicestack.net/types";
+            Config.DebugMode = true;
         }
 
         public Action<Container> ConfigureFilter { get; set; }
 
         public override void Configure(Container container)
         {
-            //Signal advanced web browsers what HTTP Methods you accept
-            base.SetConfig(new HostConfig
-            {
-                GlobalResponseHeaders =
-				{
-					{ "Access-Control-Allow-Origin", "*" },
-					{ "Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS" },
-				},
-                WsdlServiceNamespace = "http://www.servicestack.net/types",
-                LogFactory = new ConsoleLogFactory(),
-                DebugMode = true,
-            });
-
             this.RegisterRequestBinder<CustomRequestBinder>(
                 httpReq => new CustomRequestBinder { IsFromBinder = true });
 

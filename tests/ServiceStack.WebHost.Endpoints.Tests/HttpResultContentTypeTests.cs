@@ -13,8 +13,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         #region setup for example plaintext service
         public class SimpleAppHostHttpListener : AppHostHttpListenerBase {
             //Tell Service Stack the name of your application and where to find your web services
-            public SimpleAppHostHttpListener()
-                : base("Test Services", typeof(SimpleAppHostHttpListener).GetAssembly()) {
+            public SimpleAppHostHttpListener() : base("Test Services", typeof(SimpleAppHostHttpListener).GetAssembly()) {
                 LogManager.LogFactory = new TestLogFactory();
             }
 
@@ -25,9 +24,9 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             public override void Configure(Funq.Container container) {
                 HostContext.Config.GlobalResponseHeaders.Clear();
 
-			//Signal advanced web browsers what HTTP Methods you accept
-			//base.SetConfig(new EndpointHostConfig());
-			Routes.Add<PlainText>("/test/plaintext", "GET");
+			    //Signal advanced web browsers what HTTP Methods you accept
+			    //base.SetConfig(new EndpointHostConfig());
+			    Routes.Add<PlainText>("/test/plaintext", "GET");
             }
         }
 

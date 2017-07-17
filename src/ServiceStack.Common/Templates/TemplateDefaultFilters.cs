@@ -97,7 +97,7 @@ namespace ServiceStack.Templates
             {
                 sb.Append(text);
             }
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
 
         public static bool isTrue(object target) => target is bool b && b;

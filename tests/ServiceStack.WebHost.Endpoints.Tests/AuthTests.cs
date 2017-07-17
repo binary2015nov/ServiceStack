@@ -306,14 +306,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             this.webHostUrl = webHostUrl;
             this.configureFn = configureFn;
+            Config.WebHostUrl = webHostUrl;
+            Config.DebugMode = true;
         }
 
         private InMemoryAuthRepository userRep;
 
         public override void Configure(Container container)
         {
-            SetConfig(new HostConfig { WebHostUrl = webHostUrl, DebugMode = true });
-
             Plugins.Add(new AuthFeature(() => new CustomUserSession(),
                 GetAuthProviders(), "~/" + AuthTests.LoginUrl)
             {

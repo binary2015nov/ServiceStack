@@ -67,7 +67,7 @@ namespace ServiceStack.Auth
             {
                 hexString.Append($"{byteFromHash:x2}");
             }
-            return StringBuilderCache.ReturnAndFree(hexString);
+            return StringBuilderCache.Retrieve(hexString);
         }
 
         public string CreateAuthResponse(Dictionary<string, string> digestHeaders, string Ha1)

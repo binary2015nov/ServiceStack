@@ -72,7 +72,7 @@ namespace ServiceStack
                     return RequestItems;
 
                 //Don't init CallContext on Main Thread which inits copies in Request threads
-                if (!ServiceStackHost.IsReady())
+                if (!HostContext.IsReady())
                     return new Dictionary<object, object>();
 
                 if (System.Web.HttpContext.Current != null)
@@ -143,7 +143,7 @@ namespace ServiceStack
         /// <param name="instance"></param>
         public void TrackDisposable(IDisposable instance)
         {
-            if (!ServiceStackHost.IsReady()) return;
+            if (!HostContext.IsReady()) return;
             if (instance == null) return;
             if (instance is IService) return; //IService's are already disposed right after they've been executed
 
@@ -161,8 +161,8 @@ namespace ServiceStack
         /// <returns>true if any dependencies were released</returns>
         public bool ReleaseDisposables()
         {
-            if (!ServiceStackHost.IsReady()) return false;
-            if (!ServiceStackHost.Instance.Config.DisposeDependenciesAfterUse) return false;
+            if (!HostContext.IsReady() || !HostContext.Config.DisposeDependenciesAfterUse)
+                return false;
 
             var ctxItems = Instance.Items;
             var disposables = ctxItems[DisposableTracker.HashId] as DisposableTracker;

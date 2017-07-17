@@ -166,6 +166,8 @@
     <Content Include="webpage.html" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppHost.cs" />
+    <Compile Include="Constant.cs" />
     <Compile Include="Services\AsyncTaskServices.cs" />
     <Compile Include="Services\CookiesService.cs" />
     <Compile Include="Services\CustomPathServices.cs" />
@@ -226,7 +228,6 @@
     <Compile Include="Services\UserAuths.cs" />
     <Compile Include="Tests\AppHostBaseTests.cs" />
     <Compile Include="Tests\CachedServiceTests.cs" />
-    <Compile Include="Tests\Config.cs" />
     <Compile Include="Tests\CsvContentTypeFilterTests.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

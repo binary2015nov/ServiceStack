@@ -1,4 +1,5 @@
-﻿using Funq;
+﻿using System;
+using Funq;
 using NUnit.Framework;
 using ServiceStack.Auth;
 
@@ -16,12 +17,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         class AppHost : AppSelfHostBase
         {
-            public AppHost()
-                : base(nameof(StrictModeTests), typeof(BadService).GetAssembly()) { }
+            public AppHost() : base(nameof(StrictModeTests), typeof(BadService).GetAssembly())
+            {
+                Config.StrictMode = true;
+            }
 
             public override void Configure(Container container)
             {
-                SetConfig(new HostConfig { StrictMode = true });
+
             }
         }
 
@@ -59,16 +62,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         class BadUserSessionAppHost : AppSelfHostBase
         {
-            public BadUserSessionAppHost()
-                : base(nameof(StrictModeTests), typeof(BadService).GetAssembly()) { }
+            public BadUserSessionAppHost() : base(nameof(StrictModeTests), typeof(BadService).GetAssembly())
+            {
+                Config.StrictMode = true;
+            }
 
             public override void Configure(Container container)
             {
-                SetConfig(new HostConfig
-                {
-                    StrictMode = true
-                });
-
                 Plugins.Add(new AuthFeature(
                     () => new BadUserSession(), new IAuthProvider[] {
                         new CredentialsAuthProvider(),

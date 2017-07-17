@@ -178,7 +178,7 @@ namespace ServiceStack.Support.Markdown
 				var typeName = type == null
 					//|| type.FullName == null
 					? null
-					: StringBuilderCacheAlt.Allocate()
+					: StringBuilderCache.Allocate()
                         .Append(type.FullName.Replace('+', '.').LeftPart('`'));
 
 				if (typeName == null) return null;
@@ -201,7 +201,7 @@ namespace ServiceStack.Support.Markdown
 					typeName.Append(">");
 				}
 
-				return StringBuilderCacheAlt.ReturnAndFree(typeName);
+				return StringBuilderCache.Retrieve(typeName);
 			}
 			catch (Exception)
 			{
@@ -277,7 +277,7 @@ namespace CSharpEval
 
 			foreach (var item in items)
 			{
-				var sbParams = StringBuilderCacheAlt.Allocate();
+				var sbParams = StringBuilderCache.Allocate();
 				foreach (var param in item.Params)
 				{
 					if (sbParams.Length > 0)
@@ -295,7 +295,7 @@ namespace CSharpEval
 
 				var returnType = isVoid ? "void" : GetTypeName(item.ReturnType);
 				code.AppendFormat("    public {0} {1}({2})",
-					returnType, item.Name, StringBuilderCacheAlt.ReturnAndFree(sbParams));
+					returnType, item.Name, StringBuilderCache.Retrieve(sbParams));
 
 				code.AppendLine("    {");
 				if (isVoid)
@@ -320,7 +320,7 @@ namespace CSharpEval
 				}
 			}
 
-			var src = StringBuilderCache.ReturnAndFree(code);
+			var src = StringBuilderCache.Retrieve(code);
 			var compilerResults = codeCompiler.CompileAssemblyFromSource(cp, src);
 			if (compilerResults.Errors.HasErrors)
 			{
@@ -330,7 +330,7 @@ namespace CSharpEval
 				{
 					error.AppendFormat("{0}\n", err.ErrorText);
 				}
-				throw new Exception("Error Compiling Expression: " + StringBuilderCache.ReturnAndFree(error));
+				throw new Exception("Error Compiling Expression: " + StringBuilderCache.Retrieve(error));
 			}
 
 			compiledAssembly = compilerResults.CompiledAssembly;

@@ -8,7 +8,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
     public abstract class AsyncRestClientTests
     {
-        private const string ListeningOn = Config.ServiceStackBaseUri;
+        private const string ListeningOn = Constant.ServiceStackBaseUri;
 
         protected abstract IRestClientAsync CreateServiceClient();
 

@@ -278,7 +278,7 @@ namespace ServiceStack.NativeTypes.TypeScript
                 sb.AppendLine("}");
             }
 
-            return StringBuilderCache.ReturnAndFree(sbInner);
+            return StringBuilderCache.Retrieve(sbInner);
         }
 
         private string AppendType(ref StringBuilderWrapper sb, MetadataType type, string lastNS,
@@ -341,7 +341,7 @@ namespace ServiceStack.NativeTypes.TypeScript
 
                     sbType.Append(";");
 
-                    sb.AppendLine(StringBuilderCache.ReturnAndFree(sbType));
+                    sb.AppendLine(StringBuilderCache.Retrieve(sbType));
                 }
             }
             else
@@ -511,7 +511,7 @@ namespace ServiceStack.NativeTypes.TypeScript
                 }
                 else
                 {
-                    var args = StringBuilderCacheAlt.Allocate();
+                    var args = StringBuilderCache.Allocate();
                     if (attr.ConstructorArgs != null)
                     {
                         foreach (var ctorArg in attr.ConstructorArgs)
@@ -530,7 +530,7 @@ namespace ServiceStack.NativeTypes.TypeScript
                             args.Append("{0}={1}".Fmt(attrArg.Name, TypeValue(attrArg.Type, attrArg.Value)));
                         }
                     }
-                    sb.AppendLine("// @{0}({1})".Fmt(attr.Name, StringBuilderCacheAlt.ReturnAndFree(args)));
+                    sb.AppendLine("// @{0}({1})".Fmt(attr.Name, StringBuilderCache.Retrieve(args)));
                 }
             }
 
@@ -598,7 +598,7 @@ namespace ServiceStack.NativeTypes.TypeScript
                 var parts = type.Split('`');
                 if (parts.Length > 1)
                 {
-                    var args = StringBuilderCacheAlt.Allocate();
+                    var args = StringBuilderCache.Allocate();
                     foreach (var arg in genericArgs)
                     {
                         if (args.Length > 0)
@@ -608,7 +608,7 @@ namespace ServiceStack.NativeTypes.TypeScript
                     }
 
                     var typeName = TypeAlias(type);
-                    return "{0}<{1}>".Fmt(typeName, StringBuilderCacheAlt.ReturnAndFree(args));
+                    return "{0}<{1}>".Fmt(typeName, StringBuilderCache.Retrieve(args));
                 }
             }
             else

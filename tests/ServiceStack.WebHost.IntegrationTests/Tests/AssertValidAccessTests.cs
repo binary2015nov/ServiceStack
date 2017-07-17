@@ -16,14 +16,14 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
-            Tracer.Instance = new Tracer.ConsoleTracer();
+            Tracer.Default = new ConsoleTracer();
             register = CreateAdminUser();
         }
 
         [OneTimeTearDown]
         public void TestFixtureTearDown()
         {
-            Tracer.Instance = new Tracer.NullTracer();
+            Tracer.Default = new NullTracer();
         }
 
         public string RoleName1 = "Role1";

@@ -18,8 +18,7 @@ namespace ServiceStack
     /// Usage of HttpListener allows you to host webservices on the same port (:80) as IIS 
     /// however it requires admin user privillages.
     /// </summary>
-    public abstract class AppHostHttpListenerBase
-        : HttpListenerBase
+    public abstract class AppHostHttpListenerBase : HttpListenerBase
     {
         public static int ThreadsPerProcessor = 16;
 
@@ -72,10 +71,8 @@ namespace ServiceStack
             throw new NotImplementedException($"Cannot execute handler: {handler} at PathInfo: {httpReq.PathInfo}");
         }
 
-        public override void OnConfigLoad()
+        protected override void OnBeforeInit()
         {
-            base.OnConfigLoad();
-
             Config.HandlerFactoryPath = string.IsNullOrEmpty(HandlerPath)
                 ? null
                 : HandlerPath;
