@@ -126,7 +126,7 @@ namespace ServiceStack.Templates
                 }
             }
 
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
         
         public Task includeFileWithCache(TemplateScopeContext scope, string virtualPath) => includeFileWithCache(scope, virtualPath, null);

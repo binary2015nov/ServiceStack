@@ -522,7 +522,7 @@ namespace ServiceStack.Templates
                 sb.Append($"No similar filters named '{filterName}' were found in registered filter(s): {registeredFilterNames}.");
             }
 
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
 
         // Filters with no args can be used in-place of bindings

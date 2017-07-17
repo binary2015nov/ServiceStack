@@ -27,7 +27,7 @@ namespace CheckHttpListener
 
         public AppSelfHost() : base("DocuRec Services", typeof(TestService).Assembly)
         {
-            Config.CompressFilesWithExtensions = new List<string> { "html", "js" };
+            Config.CompressFilesWithExtensions = new HashSet<string> { "html", "js" };
             Config.DebugMode = false;
         }
 

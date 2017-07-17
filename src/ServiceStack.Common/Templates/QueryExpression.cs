@@ -47,7 +47,7 @@ namespace ServiceStack.Templates
                 sb.Append(JsonValue(expr));
             }
             sb.Append(')');
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
 
         public bool MatchesBinding(JsBinding binding) => binding.Binding.HasValue && (binding.Binding.Equals(Keyword) || binding.Binding.Equals(Syntax));
