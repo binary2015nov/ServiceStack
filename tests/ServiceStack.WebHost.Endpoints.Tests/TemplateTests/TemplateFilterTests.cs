@@ -6,7 +6,7 @@ using ServiceStack.Templates;
 using ServiceStack.Testing;
 using ServiceStack.VirtualPath;
 
-namespace ServiceStack.WebHost.Endpoints.Tests
+namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
 {
     public interface IDep
     {
@@ -41,15 +41,15 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             var contexts = new[]
             {
-                new TemplatePagesContext
+                new TemplateContext
                 {
                     ScanTypes = {typeof(FilterExamples)}
                 },
-                new TemplatePagesContext
+                new TemplateContext
                 {
                     ScanAssemblies = {typeof(FilterExamples).GetAssembly()}
                 },
-                new TemplatePagesContext
+                new TemplateContext
                 {
                     TemplateFilters = {new FilterExamples { Dep = new Dep()} }
                 },
@@ -86,9 +86,9 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        public TemplatePagesContext CreateContext()
+        public TemplateContext CreateContext()
         {
-            var context = new TemplatePagesContext
+            var context = new TemplateContext
             {
                 ScanAssemblies = {typeof(FilterExamples).GetAssembly()}
             };
@@ -205,5 +205,42 @@ pageArg: 2
             
             Assert.That(html, Is.EqualTo("<h1>18</h1>"));
         }
+
+        [Test]
+        public void Caches_are_kept_isolated_in_each_Context_Filter_instance()
+        {
+            var context = new TemplateContext
+            {
+                TemplateFilters = { new TemplateProtectedFilters() }
+            }.Init();
+            context.VirtualFiles.WriteFile("file.txt", "foo");
+            context.VirtualFiles.WriteFile("page.html", "{{ 'file.txt' | includeFileWithCache | assignTo: contents }}" +
+                                                        "{{ contents | append('bar') | upper | repeat(2) }}");
+            
+            Assert.That(new PageResult(context.GetPage("page")).Result, Is.EqualTo("FOOBARFOOBAR"));
+            Assert.That(context.ExpiringCache.Count, Is.EqualTo(1));
+            Assert.That(context.TemplateFilters.First(x => x is TemplateDefaultFilters).InvokerCache.Count, Is.EqualTo(4));
+            
+            /* TEMP START */
+            var tempContext = new TemplateContext
+            {
+                TemplateFilters = { new TemplateProtectedFilters() }
+            }.Init();
+            tempContext.VirtualFiles.WriteFile("file.txt", "...");
+            
+            var tmpPage = tempContext.OneTimePage("{{ 'file.txt' | includeFileWithCache | assignTo: contents }}" +
+                                                  "{{ contents | append('bar') | repeat(3) }}");
+            Assert.That(new PageResult(tmpPage).Result, Is.EqualTo("...bar...bar...bar"));
+            Assert.That(new PageResult(tmpPage).Result, Is.EqualTo("...bar...bar...bar"));
+            
+            Assert.That(tempContext.ExpiringCache.Count, Is.EqualTo(1));
+            Assert.That(tempContext.TemplateFilters.First(x => x is TemplateDefaultFilters).InvokerCache.Count, Is.EqualTo(3));
+            /* TEMP END */
+            
+            Assert.That(new PageResult(context.GetPage("page")).Result, Is.EqualTo("FOOBARFOOBAR"));
+            Assert.That(context.ExpiringCache.Count, Is.EqualTo(1));
+            Assert.That(context.TemplateFilters.First(x => x is TemplateDefaultFilters).InvokerCache.Count, Is.EqualTo(4));
+        }
+
     }
 }

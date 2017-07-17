@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using ServiceStack.Templates;
 using ServiceStack.Text;
@@ -7,7 +8,7 @@ using ServiceStack.Text;
 using Microsoft.Extensions.Primitives;
 #endif
 
-namespace ServiceStack.WebHost.Endpoints.Tests
+namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
 {
     public class TemplatePageUtilsTests
     {
@@ -207,6 +208,37 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [Test]
+        public void Can_parse_template_with_only_variable()
+        {
+            var fragments = TemplatePageUtils.ParseTemplatePage("{{ filter }}");
+            Assert.That(fragments.Count, Is.EqualTo(1));
+            Assert.That(((PageVariableFragment)fragments[0]).Binding, Is.EqualTo("filter"));
+        }
+
+        [Test]
+        public void Can_parse_template_with_arg_and_multiple_filters()
+        {
+            var fragments = TemplatePageUtils.ParseTemplatePage("{{ ' - {{it}}' | forEach(items) | markdown }}");
+            var varFragment = fragments[0] as PageVariableFragment;
+            
+            Assert.That(varFragment.FilterExpressions.Length, Is.EqualTo(2));
+            Assert.That(varFragment.FilterExpressions[0].Name, Is.EqualTo("forEach"));
+            Assert.That(varFragment.FilterExpressions[0].Args.Count, Is.EqualTo(1));
+            Assert.That(varFragment.FilterExpressions[0].Args[0], Is.EqualTo("items"));
+            Assert.That(varFragment.FilterExpressions[1].Name, Is.EqualTo("markdown"));
+        }
+
+        [Test]
+        public void Can_parse_filter_with_different_arg_types()
+        {
+            var fragments = TemplatePageUtils.ParseTemplatePage("{{ array(['a',1,'c']) }}");
+            var varFragment = fragments[0] as PageVariableFragment;
+            
+            Assert.That(varFragment.Expression.Name, Is.EqualTo("array"));
+            Assert.That(varFragment.Expression.Args.Count, Is.EqualTo(1));
+        }
+
+        [Test]
         public void Can_parse_next_token()
         {
             object value;
@@ -267,6 +299,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 3,
                 true,
                 JsNull.Value
+            }));
+            "{ k:'v', data: { id: 1, name: 'foo' }, k2: 'v2', k3: 'v3' }".ToStringSegment().ParseNextToken(out value, out binding);
+            Assert.That(value, Is.EquivalentTo(new Dictionary<string, object>
+            {
+                { "k", "v" },
+                { "data", new Dictionary<string,object> { { "id", 1 }, {"name", "foo"} } },
+                { "k2", "v2" },
+                { "k3", "v3" },                
             }));
         }
 
@@ -330,5 +370,135 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             Assert.That(expr.Args[1], Is.EqualTo("2"));
         }
 
+        [Test]
+        public void Does_support_shorthand_object_initializers()
+        {
+            object value;
+            JsBinding binding;
+
+            "{key}".ToStringSegment().ParseNextToken(out value, out binding);
+            Assert.That(value, Is.EquivalentTo(new Dictionary<string,object>{ { "key", new JsBinding("key") }}));
+            "{ key }".ToStringSegment().ParseNextToken(out value, out binding);
+            Assert.That(value, Is.EquivalentTo(new Dictionary<string,object>{ { "key", new JsBinding("key") }}));
+            "{ map : { key , foo: 'bar' , qux } }".ToStringSegment().ParseNextToken(out value, out binding);
+            Assert.That(value, Is.EquivalentTo(new Dictionary<string,object>{ { "map", 
+                new Dictionary<string, object>
+                {
+                    {"key", new JsBinding("key")},
+                    {"foo", "bar"},
+                    {"qux", new JsBinding("qux")},
+                } 
+            }}));
+        }
+
+        [Test]
+        public void Does_preserve_new_lines()
+        {
+            object value;
+            JsBinding binding;
+
+            "'a\n'".ToStringSegment().ParseNextToken(out value, out binding);
+            Assert.That(value, Is.EqualTo("a\n"));
+        }
+
+        [Test]
+        public void Can_parse_boolean_logic_expressions()
+        {
+            object value;
+            JsBinding binding;
+
+            var literal = "it.Id = 0".ToStringSegment().ParseNextToken(out value, out binding);
+            Assert.That(((JsExpression)binding).Name, Is.EqualTo("it.Id"));
+            literal = literal.ParseNextToken(out value, out binding);
+            Assert.That(binding, Is.EqualTo(JsAssignment.Operator));
+            literal = literal.ParseNextToken(out value, out binding);
+            Assert.That(value, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void Can_use_cleaner_whitespace_sensitive_syntax_for_string_arguments()
+        {
+            var fragments1 = TemplatePageUtils.ParseTemplatePage(
+                @"{{ 
+products 
+  | where: it.UnitsInStock = 0 
+  | select: { it.productName | raw } is sold out!\n 
+}}");
+            
+            var fragments2 = TemplatePageUtils.ParseTemplatePage(
+            @"{{ products 
+                 | where: it.UnitsInStock = 0 
+                 | select: { it.productName | raw } is sold out!\n }}");
+            
+            // i.e. is rewritten and is equivalent to:
+            var fragments3 = TemplatePageUtils.ParseTemplatePage(
+                @"{{ products | where(""it.UnitsInStock = 0"") | select(""{{ it.productName | raw }} is sold out!\n"")}}");
+            Assert.That(fragments3.Count, Is.EqualTo(1));
+            
+            Assert.That(fragments1.Count, Is.EqualTo(1));
+            var varFragment1 = fragments1[0] as PageVariableFragment;
+            Assert.That(varFragment1.FilterExpressions[0].Name, Is.EqualTo("where"));
+            Assert.That(varFragment1.FilterExpressions[0].Args.Count, Is.EqualTo(1));
+            Assert.That(varFragment1.FilterExpressions[0].Args[0], Is.EqualTo("\"it.UnitsInStock = 0\""));
+            Assert.That(varFragment1.FilterExpressions[1].Name, Is.EqualTo("select"));
+            Assert.That(varFragment1.FilterExpressions[1].Args.Count, Is.EqualTo(1));
+            Assert.That(varFragment1.FilterExpressions[1].Args[0], Is.EqualTo("\"{{ it.productName | raw }} is sold out!\\n\""));
+
+            foreach (var fragments in new[]{ fragments2, fragments3 })
+            {
+                var varFragment = fragments[0] as PageVariableFragment;
+                Assert.That(varFragment.FilterExpressions[0].Name, Is.EqualTo(varFragment1.FilterExpressions[0].Name));
+                Assert.That(varFragment.FilterExpressions[0].Args.Count, Is.EqualTo(varFragment1.FilterExpressions[0].Args.Count));
+                Assert.That(varFragment.FilterExpressions[0].Args[0], Is.EqualTo(varFragment1.FilterExpressions[0].Args[0]));
+                Assert.That(varFragment.FilterExpressions[1].Name, Is.EqualTo(varFragment1.FilterExpressions[1].Name));
+                Assert.That(varFragment.FilterExpressions[1].Args.Count, Is.EqualTo(varFragment1.FilterExpressions[1].Args.Count));
+                Assert.That(varFragment.FilterExpressions[1].Args[0], Is.EqualTo(varFragment1.FilterExpressions[1].Args[0]));
+            }
+        }
+
+        [Test]
+        public void Can_detect_invalid_syntax()
+        {
+            try
+            {
+                var fragments = TemplatePageUtils.ParseTemplatePage("{{ arg | filter(' 1) }}");
+                Assert.Fail("should throw");
+            }
+            catch (ArgumentException e)
+            {
+                e.Message.Print();
+            }
+
+            try
+            {
+                var fragments = TemplatePageUtils.ParseTemplatePage("square = {{ 'square-partial | partial({ ten }) }}");
+                Assert.Fail("should throw");
+            }
+            catch (ArgumentException e)
+            {
+                e.Message.Print();
+            }
+
+            try
+            {
+                var fragments = TemplatePageUtils.ParseTemplatePage("{{ arg | filter({ unterminated:1) }}");
+                Assert.Fail("should throw");
+            }
+            catch (ArgumentException e)
+            {
+                e.Message.Print();
+            }
+
+            try
+            {
+                var fragments = TemplatePageUtils.ParseTemplatePage("{{ arg | filter([ 1) }}");
+                Assert.Fail("should throw");
+            }
+            catch (ArgumentException e)
+            {
+                e.Message.Print();
+            }
+            
+        }
     }
 }

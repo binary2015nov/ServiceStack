@@ -4,18 +4,35 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using ServiceStack.Text;
+using ServiceStack.Text.Json;
 
 namespace ServiceStack.Templates
 {
     // ReSharper disable InconsistentNaming
+    
+    public interface IResultInstruction {}
+    public class IgnoreResult : IResultInstruction
+    {
+        internal static readonly IgnoreResult Value = new IgnoreResult();
+        private IgnoreResult(){}
+    }
+
     public class TemplateDefaultFilters : TemplateFilter
     {
+        public static TemplateDefaultFilters Instance = new TemplateDefaultFilters();
+        
         // methods without arguments can be used in bindings, e.g. {{ now | dateFormat }}
         public DateTime now() => DateTime.Now;
         public DateTime utcNow() => DateTime.UtcNow;
+        
+        public string indent() => Context.Args[TemplateConstants.DefaultIndent] as string;
+        public string indents(int count) => repeat(Context.Args[TemplateConstants.DefaultIndent] as string, count);
+        public string space() => " ";
+        public string spaces(int count) => padLeft("", count, ' ');
+        public string newLine() => Context.Args[TemplateConstants.DefaultNewLine] as string;
+        public string newLines(int count) => repeat(newLine(), count);
 
         public IRawString raw(object value)
         {
@@ -31,7 +48,14 @@ namespace ServiceStack.Templates
             var rawStr = value.ToString().ToRawString();
             return rawStr;
         }
-        public IRawString json(object value) => (value.ToJson() ?? "null").ToRawString();
+
+        public IRawString json(object value)
+        {
+            if (value != null && TypeSerializer.HasCircularReferences(value))
+                throw new NotSupportedException($"Cannot serialize type '{value.GetType().Name}' with cyclical dependencies");
+            
+            return (value.ToJson() ?? "null").ToRawString();
+        }
 
         public string appSetting(string name) =>  Context.AppSettings.GetString(name);
 
@@ -51,7 +75,10 @@ namespace ServiceStack.Templates
         public long decr(long value) => value - 1; 
         public long decrement(long value) => value - 1; 
         public long decrBy(long value, long by) => value - by; 
-        public long decrementBy(long value, long by) => value - by; 
+        public long decrementBy(long value, long by) => value - by;
+
+        public bool isEven(int value) => value % 2 == 0;
+        public bool isOdd(int value) => !isEven(value);
 
         public string currency(decimal decimalValue) => currency(decimalValue, null); //required to support 1/2 vars
         public string currency(decimal decimalValue, string culture)
@@ -64,7 +91,9 @@ namespace ServiceStack.Templates
             return fmt;
         }
 
-        public string format(object obj, string format) => string.Format(format, obj);
+        public string format(object obj, string format) => obj is IFormattable formattable 
+            ? formattable.ToString(format, null) 
+            : string.Format(format, obj);
 
         public object dateFormat(DateTime dateValue) =>  dateValue.ToString((string)Context.Args[TemplateConstants.DefaultDateFormat]);
         public object dateFormat(DateTime dateValue, string format) => dateValue.ToString(format ?? throw new ArgumentNullException(nameof(format)));
@@ -90,7 +119,8 @@ namespace ServiceStack.Templates
         public string padRight(string text, int totalWidth) => text?.PadRight(totalWidth);
         public string padRight(string text, int totalWidth, char padChar) => text?.PadRight(totalWidth, padChar);
 
-        public string repeating(string text, int times)
+        public string repeating(int times, string text) => repeat(text, times);
+        public string repeat(string text, int times)
         {
             var sb = StringBuilderCache.Allocate();
             for (var i = 0; i < times; i++)
@@ -99,7 +129,7 @@ namespace ServiceStack.Templates
             }
             return StringBuilderCache.Retrieve(sb);
         }
-
+        
         public static bool isTrue(object target) => target is bool b && b;
         public static bool isFalsey(object target)
         {
@@ -143,11 +173,6 @@ namespace ServiceStack.Templates
         public bool or(object lhs, object rhs) => isTrue(lhs) || isTrue(rhs);
         public bool and(object lhs, object rhs) => isTrue(lhs) && isTrue(rhs);
 
-        public object echo(object value) => value;
-
-        public object join(IEnumerable<object> values) => join(values, ",");
-        public object join(IEnumerable<object> values, string delimiter) => values.Map(x => x.ToString()).Join(delimiter);
-
         public bool equals(object target, object other) =>
             target == null || other == null 
                 ? target == other 
@@ -187,79 +212,235 @@ namespace ServiceStack.Templates
             throw new NotSupportedException($"{target} is not IComparable");
         }
 
-        public Task partial(TemplateScopeContext scope, object target) => partial(scope, target, null);
-        public async Task partial(TemplateScopeContext scope, object target, object scopedParams)
-        {
-            var pageName = target.ToString();
-            var pageParams = scope.AssertOptions(nameof(partial), scopedParams);
+        public object echo(object value) => value;
 
-            var page = scope.Context.GetPage(pageName);
-            await scope.WritePageAsync(page, pageParams);
-        }
+        public object join(IEnumerable<object> values) => join(values, ",");
+        public object join(IEnumerable<object> values, string delimiter) => values.Map(x => x.ToString()).Join(delimiter);
 
-        public Task forEach(TemplateScopeContext scope, object target, object items) => forEach(scope, target, items, "it");
-        public async Task forEach(TemplateScopeContext scope, object target, object items, string scopeName)
-        {
-            var objs = items as IEnumerable;
-            if (objs != null)
-            {
-                var itemScope = scope.CreateScopedContext(target.ToString());
-                foreach (var item in objs)
-                {
-                    itemScope.ScopedParams[scopeName] = item;
-                    await itemScope.WritePageAsync();
-                }
-            }
-            else if (items != null)
-            {
-                throw new ArgumentException($"forEach in '{scope.Page.File.VirtualPath}' requires an IEnumerable, but received a '{items.GetType().Name}' instead");
-            }
-        }
+        public string append(string target, string suffix) => target + suffix;
+        public string appendLine(string target) => target + newLine();
+        public string newLine(string target) => target + newLine();
 
         public string addPath(string target, string pathToAppend) => target.AppendPath(pathToAppend);
-        public string addPaths(string target, IEnumerable pathsToAppend) => target.AppendPath(pathsToAppend.Map(x => x.ToString()).ToArray());
+        public string addPaths(string target, IEnumerable pathsToAppend) => 
+            target.AppendPath(pathsToAppend.Map(x => x.ToString()).ToArray());
 
         public string addQueryString(string url, object urlParams) => 
             urlParams.AssertOptions(nameof(addQueryString)).Aggregate(url, (current, entry) => current.AddQueryParam(entry.Key, entry.Value));
         
         public string addHashParams(string url, object urlParams) => 
             urlParams.AssertOptions(nameof(addHashParams)).Aggregate(url, (current, entry) => current.AddHashParam(entry.Key, entry.Value));
-    }
 
-    public class TemplateProtectedFilters : TemplateFilter
-    {
-        public async Task includeFile(TemplateScopeContext scope, string virtualPath)
+        public List<object[]> zip(TemplateScopeContext scope, IEnumerable original, object itemsOrBinding)
         {
-            var file = scope.Context.VirtualFiles.GetFile(virtualPath);
-            if (file == null)
-                throw new FileNotFoundException($"includeFile '{virtualPath}' in page '{scope.Page.File.VirtualPath}' was not found");
+            var to = new List<object[]>();
 
-            using (var reader = file.OpenRead())
+            if (itemsOrBinding is string literal)
             {
-                await reader.CopyToAsync(scope.OutputStream);
+                literal.ToStringSegment().ParseNextToken(out object value, out JsBinding binding);
+
+                var i = 0;
+                foreach (var a in original)
+                {
+                    scope.AddItemToScope("it", a, i++);
+
+                    var bindValue = binding != null
+                        ? scope.EvaluateToken(binding)
+                        : value;
+
+                    if (bindValue is IEnumerable current)
+                    {
+                        foreach (var b in current)
+                        {
+                            to.Add(new[] {a, b});
+                        }
+                    }
+                    else if (bindValue != null)
+                    {
+                        throw new ArgumentException($"{nameof(zip)} in '{scope.Page.VirtualPath}' requires '{literal}' to evaluate to an IEnumerable, but evaluated to a '{bindValue.GetType().Name}' instead");
+                    }
+                }
+            }
+            else if (itemsOrBinding is IEnumerable current)
+            {
+                var currentArray = current.Cast<object>().ToArray();
+                foreach (var a in original)
+                {
+                    foreach (var b in currentArray)
+                    {
+                        to.Add(new[]{ a, b });
+                    }
+                }
+            }
+
+            return to;
+        }
+
+        public object let(TemplateScopeContext scope, object target, object scopeBindings) //from filter
+        {
+            var objs = target as IEnumerable;
+            if (objs != null)
+            {
+                var scopedParams = scope.GetParamsWithItemBinding(nameof(select), scopeBindings, out string itemBinding);
+
+                var to = new List<Dictionary<string, object>>();
+                var i = 0;
+                foreach (var item in objs)
+                {
+                    scope.AddItemToScope(itemBinding, item, i++);
+
+                    // Copy over previous let bindings into new let bindings
+                    var itemBindings = new Dictionary<string, object>();
+                    if (item is object[] tuple)
+                    {
+                        foreach (var a in tuple)
+                        {
+                            if (a is Dictionary<string, object> aArgs)
+                            {
+                                foreach (var entry in aArgs)
+                                {
+                                    itemBindings[entry.Key] = entry.Value;
+                                }
+                            }
+                        }
+                    }
+                    
+                    foreach (var entry in scopedParams)
+                    {
+                        var bindTo = entry.Key;
+                        var bindToLiteral = (string)entry.Value;
+                        bindToLiteral.ToStringSegment().ParseNextToken(out object value, out JsBinding binding);
+                        var bindValue = binding != null
+                            ? scope.EvaluateToken(binding)
+                            : value;
+                        itemBindings[bindTo] = bindValue;
+                    }
+                    to.Add(itemBindings);
+                }
+
+                return to;
+            }
+
+            return target;
+        }
+
+        public Task assignTo(TemplateScopeContext scope, object value, string argName) //from filter
+        {
+            scope.ScopedParams[argName] = value;
+            return TypeConstants.EmptyTask;
+        }
+
+        public Task assignTo(TemplateScopeContext scope, string argName) //from context filter
+        {
+            var ms = (MemoryStream) scope.OutputStream;
+            var value = ms.ReadFully().FromUtf8Bytes();
+            scope.ScopedParams[argName] = value;
+            ms.SetLength(0); //just capture output, don't write anything to the ResponseStream
+            return TypeConstants.EmptyTask;
+        }
+
+        public Task partial(TemplateScopeContext scope, object target) => partial(scope, target, null);
+        public async Task partial(TemplateScopeContext scope, object target, object scopedParams)
+        {
+            var pageName = target.ToString();
+            var pageParams = scope.AssertOptions(nameof(partial), scopedParams);
+
+            var page = await scope.Context.GetPage(pageName).Init();
+            await scope.WritePageAsync(page, pageParams);
+        }
+
+        public Task forEach(TemplateScopeContext scope, object target, object items) => forEach(scope, target, items, null);
+        public async Task forEach(TemplateScopeContext scope, object target, object items, object scopeOptions) 
+        {
+            var objs = items as IEnumerable;
+            if (objs != null)
+            {
+                var scopedParams = scope.GetParamsWithItemBinding(nameof(select), scopeOptions, out string itemBinding);
+                
+                var itemScope = scope.CreateScopedContext(target.ToString(), scopedParams);
+                var i = 0;
+                foreach (var item in objs)
+                {
+                    itemScope.AddItemToScope(itemBinding, item, i++);
+                    await itemScope.WritePageAsync();
+                }
+            }
+            else if (items != null)
+            {
+                throw new ArgumentException($"{nameof(forEach)} in '{scope.Page.VirtualPath}' requires an IEnumerable, but received a '{items.GetType().Name}' instead");
             }
         }
 
-        public Task includeUrl(TemplateScopeContext scope, string url) => includeUrl(scope, url, null);
-        public async Task includeUrl(TemplateScopeContext scope, string url, object options)
+        public object where(TemplateScopeContext scope, object target, object filter) => where(scope, target, filter, null);
+        public object where(TemplateScopeContext scope, object target, object filter, object scopeOptions)
         {
-            var scopedParams = scope.AssertOptions(nameof(includeUrl), options);
+            var items = target.AssertEnumerable(nameof(where));
 
-            var webReq = (HttpWebRequest)WebRequest.Create(url);
-            if (scopedParams.TryGetValue("method", out object method))
-                webReq.Method = (string)method;
-
-            if (scopedParams.TryGetValue("contentType", out object contentType))
-                webReq.ContentType = (string)contentType;            
+            if (!(filter is string literal)) 
+                throw new NotSupportedException($"'{nameof(where)}' in '{scope.Page.VirtualPath}' requires a string Query Expression but received a '{filter?.GetType()?.Name}' instead");
             
-            if (scopedParams.TryGetValue("accept", out object accept))
-                webReq.Accept = (string)accept;            
+            var scopedParams = scope.GetParamsWithItemBinding(nameof(select), scopeOptions, out string itemBinding);
+            scopedParams.Each((key, val) => scope.ScopedParams[key] = val);
 
-            using (var webRes = await webReq.GetResponseAsync())
-            using (var stream = webRes.GetResponseStream())
+            var to = new List<object>();
+            literal.ParseConditionExpression(out ConditionExpression expr);
+            var i = 0;
+            foreach (var item in items)
             {
-                await stream.CopyToAsync(scope.OutputStream);
+                scope.AddItemToScope(itemBinding, item, i++);
+                var result = expr.Evaluate(scope);
+                if (result)
+                {
+                    to.Add(item);
+                }
             }
-        }        
+
+            return to;
+        }
+        
+        public Task select(TemplateScopeContext scope, object items, object target) => select(scope, items, target, null);
+        public async Task select(TemplateScopeContext scope, object items, object target, object scopeOptions) 
+        {
+            var objs = items as IEnumerable;
+            if (objs != null)
+            {
+                var scopedParams = scope.GetParamsWithItemBinding(nameof(select), scopeOptions, out string itemBinding);
+                var template = JsonTypeSerializer.Unescape(target.ToString());
+                var itemScope = scope.CreateScopedContext(template, scopedParams);
+                
+                var i = 0;
+                foreach (var item in objs)
+                {
+                    itemScope.AddItemToScope(itemBinding, item, i++);
+                    await itemScope.WritePageAsync();
+                }
+            }
+            else if (items != null)
+            {
+                throw new ArgumentException($"{nameof(select)} in '{scope.Page.VirtualPath}' requires an IEnumerable, but received a '{items.GetType().Name}' instead");
+            }
+        }
+
+        public Task selectPartial(TemplateScopeContext scope, object items, string pageName) => selectPartial(scope, items, pageName, null); 
+        public async Task selectPartial(TemplateScopeContext scope, object items, string pageName, object scopedParams) 
+        {
+            var objs = items as IEnumerable;
+            if (objs != null)
+            {
+                var page = await scope.Context.GetPage(pageName).Init();
+                var pageParams = scope.GetParamsWithItemBinding(nameof(selectPartial), page, scopedParams, out string itemBinding);
+                
+                var i = 0;
+                foreach (var item in objs)
+                {
+                    scope.AddItemToScope(itemBinding, item, i++);
+                    await scope.WritePageAsync(page, pageParams);
+                }
+            }
+            else if (items != null)
+            {
+                throw new ArgumentException($"{nameof(selectPartial)} in '{scope.Page.VirtualPath}' requires an IEnumerable, but received a '{items.GetType().Name}' instead");
+            }
+        }
     }
 }

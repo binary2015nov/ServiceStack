@@ -7,13 +7,13 @@ using ServiceStack.Templates;
 using ServiceStack.Text;
 using ServiceStack.VirtualPath;
 
-namespace ServiceStack.WebHost.Endpoints.Tests
+namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
 {
     public class TemplateDefaultFiltersTests
     {
-        public TemplatePagesContext CreateContext(Dictionary<string, object> args = null)
+        public TemplateContext CreateContext(Dictionary<string, object> args = null)
         {
-            var context = new TemplatePagesContext
+            var context = new TemplateContext
             {
                 Args =
                 {
@@ -21,7 +21,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                     ["intVal"] = 1,
                     ["doubleVal"] = 2.2
                 }
-            };
+            }.Init();
             
             args.Each((key,val) => context.Args[key] = val);
             
@@ -91,12 +91,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             var result = await new PageResult(context.GetPage("page")).RenderToStringAsync();
 
-            Assert.That(result.SanitizeNewLines(), Is.EqualTo(@"
+            Assert.That(result.NormalizeNewLines(), Is.EqualTo(@"
 1 + 1 = 2
 2 x 2 = 4 or 4
 3 - 3 = 0 or 0
 4 / 4 = 1 or 1
-".SanitizeNewLines()));
+".NormalizeNewLines()));
         }
 
         [Test]
@@ -111,18 +111,40 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             var html = await new PageResult(context.GetPage("page")).RenderToStringAsync();
 
-            Assert.That(html.SanitizeNewLines(), Is.EqualTo(@"
+            Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 1 + 1 = 2
 2 x 2 = 4 or 4
 3 - 3 = 0 or 0
 4 / 4 = 1 or 1
-".SanitizeNewLines()));
+".NormalizeNewLines()));
         }
 
         [Test]
+        public void Can_use_default_filter_arithmetic_with_shorthand_notation()
+        {
+            var context = new TemplateContext
+            {
+                Args =
+                {
+                    ["num"] = 1
+                }
+            }.Init();
+
+            context.VirtualFiles.WriteFile("page.html", @"
+{{ num | add(9) | assignTo('ten') }}
+square = {{ 'square-partial' | partial({ ten }) }}
+");
+            
+            context.VirtualFiles.WriteFile("square-partial.html", "{{ ten }} x {{ ten }} = {{ ten | multiply(ten) }}");
+            
+            Assert.That(new PageResult(context.GetPage("page")).Result.NormalizeNewLines(), Is.EqualTo(@"
+square = 10 x 10 = 100".NormalizeNewLines()));
+        }
+        
+        [Test]
         public void Can_incrment_and_decrement()
         {
-            var context = new TemplatePagesContext
+            var context = new TemplateContext
             {
                 Args =
                 {
@@ -145,7 +167,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_compare_numbers()
         {
-            var context = new TemplatePagesContext
+            var context = new TemplateContext
             {
                 Args =
                 {
@@ -196,7 +218,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_compare_strings()
         {
-            var context = new TemplatePagesContext
+            var context = new TemplateContext
             {
                 Args =
                 {
@@ -219,7 +241,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_compare_DateTime()
         {
-            var context = new TemplatePagesContext
+            var context = new TemplateContext
             {
                 Args =
                 {
@@ -247,7 +269,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_use_logical_boolean_operators()
         {
-            var context = new TemplatePagesContext
+            var context = new TemplateContext
             {
                 Args =
                 {
@@ -309,12 +331,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             context.VirtualFiles.WriteFile("page-chained.html",
                 @"(((1 + 2) * 3) / 4) - 5 = {{ 1 | add(2) | multiply(3) | divide(4) | subtract(5) }}");
             var result = await new PageResult(context.GetPage("page-chained")).RenderToStringAsync();
-            Assert.That(result.SanitizeNewLines(), Is.EqualTo(@"(((1 + 2) * 3) / 4) - 5 = -2.75".SanitizeNewLines()));
+            Assert.That(result.NormalizeNewLines(), Is.EqualTo(@"(((1 + 2) * 3) / 4) - 5 = -2.75".NormalizeNewLines()));
 
             context.VirtualFiles.WriteFile("page-ordered.html",
                 @"1 + 2 * 3 / 4 - 5 = {{ 1 | add( divide(multiply(2,3), 4) ) | subtract(5) }}");
             result = await new PageResult(context.GetPage("page-ordered")).RenderToStringAsync();
-            Assert.That(result.SanitizeNewLines(), Is.EqualTo(@"1 + 2 * 3 / 4 - 5 = -2.5".SanitizeNewLines()));
+            Assert.That(result.NormalizeNewLines(), Is.EqualTo(@"1 + 2 * 3 / 4 - 5 = -2.5".NormalizeNewLines()));
         }
 
         [Test]
@@ -343,7 +365,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public async Task Does_default_filter_format()
         {
             var context = CreateContext().Init();
-            context.VirtualFiles.WriteFile("page.html", "{{ 3.14159 | format('{0:N2}') }}");
+            context.VirtualFiles.WriteFile("page.html", "{{ 3.14159 | format('N2') }}");
             
             var result = await new PageResult(context.GetPage("page")).RenderToStringAsync();
             Assert.That(result, Is.EqualTo("3.14"));
@@ -412,6 +434,38 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [Test]
+        public void Does_default_spaces_and_indents()
+        {
+            var context = new TemplateContext().Init();
+            
+            Assert.That(context.EvaluateTemplate("{{ indent }}"), Is.EqualTo("\t"));
+            Assert.That(context.EvaluateTemplate("{{ 4 | indents }}"), Is.EqualTo("\t\t\t\t"));
+            
+            Assert.That(context.EvaluateTemplate("{{ space }}"), Is.EqualTo(" "));
+            Assert.That(context.EvaluateTemplate("{{ 4 | spaces }}"), Is.EqualTo("    "));
+
+            Assert.That(context.EvaluateTemplate("{{ 4 | repeating('  ') }}"), Is.EqualTo("        "));
+            Assert.That(context.EvaluateTemplate("{{ '  ' | repeat(4) }}"),    Is.EqualTo("        "));
+            Assert.That(context.EvaluateTemplate("{{ '.' | repeat(3) }}"), Is.EqualTo("..."));
+
+            var newLine = Environment.NewLine;
+            Assert.That(context.EvaluateTemplate("{{ newLine }}"), Is.EqualTo(newLine));
+            Assert.That(context.EvaluateTemplate("{{ 4 | newLines }}"), Is.EqualTo(newLine + newLine + newLine + newLine));
+            
+            context = new TemplateContext
+            {
+                Args =
+                {
+                    [TemplateConstants.DefaultIndent] = "  ",
+                    [TemplateConstants.DefaultNewLine] = "\n"
+                }
+            }.Init();
+
+            Assert.That(context.EvaluateTemplate("{{ indent }}"), Is.EqualTo("  "));
+            Assert.That(context.EvaluateTemplate("{{ 4 | newLines }}"), Is.EqualTo("\n\n\n\n"));
+        }
+
+        [Test]
         public async Task Does_default_filter_string_filters()
         {
             var context = CreateContext().Init();
@@ -452,8 +506,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             result = await new PageResult(context.GetPage("page-padchar")).RenderToStringAsync();
             Assert.That(result, Is.EqualTo("<h1>007</h1><h2>tiredzzzzz</h2>"));
 
-            context.VirtualFiles.WriteFile("page-repeating.html", "<h1>long time ago{{ ' ...' | repeating(3) }}</h1>");
-            result = await new PageResult(context.GetPage("page-repeating")).RenderToStringAsync();
+            context.VirtualFiles.WriteFile("page-repeat.html", "<h1>long time ago{{ ' ...' | repeat(3) }}</h1>");
+            result = await new PageResult(context.GetPage("page-repeat")).RenderToStringAsync();
             Assert.That(result, Is.EqualTo("<h1>long time ago ... ... ...</h1>"));
         }
 
@@ -471,6 +525,9 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             var context = CreateContext(new Dictionary<string, object>{ {"baseUrl", "http://example.org" }}).Init();
 
+            Assert.That(new PageResult(context.OneTimePage("{{ baseUrl | addPaths(['customers',1,'orders']) | raw }}")).Result, 
+                Is.EqualTo("http://example.org/customers/1/orders"));
+
             Assert.That(new PageResult(context.OneTimePage("{{ baseUrl | addQueryString({ id: 1, foo: 'bar' }) | raw }}")).Result, 
                 Is.EqualTo("http://example.org?id=1&foo=bar"));
 
@@ -478,6 +535,127 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 Is.EqualTo("http://example.org?id=1&foo=bar#hash=value"));
         }
 
+        [Test]
+        public void Can_assign_result_to_variable()
+        {
+            string result;
+            var context = new TemplateContext
+            {
+                Args =
+                {
+                    ["num"] = 1,
+                    ["items"] = new[]{ "foo", "bar", "qux" },
+                },
+                FilterTransformers =
+                {
+                    ["markdown"] = MarkdownPageFormat.TransformToHtml,
+                }
+            }.Init();
+
+            result = new PageResult(context.OneTimePage(@"
+{{ num | incr | assignTo('result') }}
+result={{ result }}
+")).Result;
+            Assert.That(result.NormalizeNewLines(), Is.EqualTo("result=2"));
+            
+            result = new PageResult(context.OneTimePage(@"
+{{ '<li> {{it}} </li>' | forEach(items) | assignTo('result') }}
+<ul>{{ result | raw }}</ul>
+")).Result;            
+            Assert.That(result.NormalizeNewLines(), Is.EqualTo("<ul><li> foo </li><li> bar </li><li> qux </li></ul>"));
+            
+            result = new PageResult(context.OneTimePage(@"
+{{ ' - {{it}}' | appendLine | forEach(items) | markdown | assignTo('result') }}
+<div>{{ result | raw }}</div>
+")).Result;            
+            Assert.That(result.NormalizeNewLines(), Is.EqualTo("<div><ul>\n<li>foo</li>\n<li>bar</li>\n<li>qux</li>\n</ul>\n</div>"));
+        }
+
+        [Test]
+        public void Can_assign_to_variables_in_partials()
+        {
+            var context = new TemplateContext
+            {
+                Args =
+                {
+                    ["num"] = 1,
+                },
+            }.Init();
+
+            context.VirtualFiles.WriteFile("_layout.html", @"
+<html>
+<body>
+<header>
+layout num = {{ num }}
+pageMetaTitle = {{ pageMetaTitle }}
+inlinePageTitle = {{ inlinePageTitle }}
+pageResultTitle = {{ pageResultTitle }}
+</header>
+{{ 'add-partial' | partial({ num: 100 }) }} 
+{{ page }}
+{{ 'add-partial' | partial({ num: 400 }) }} 
+<footer>
+layout num = {{ num }}
+inlinePageTitle = {{ inlinePageTitle }}
+</footer>
+</body>
+</html>
+");
+            
+            context.VirtualFiles.WriteFile("page.html", @"
+<!--
+pageMetaTitle: page meta title
+-->
+<section>
+{{ 'page inline title' | upper | assignTo('inlinePageTitle') }}
+{{ 'add-partial' | partial({ num: 200 }) }} 
+{{ num | add(1) | assignTo('num') }}
+<h2>page num = {{ num }}</h2>
+{{ 'add-partial' | partial({ num: 300 }) }} 
+</section>");
+            
+            context.VirtualFiles.WriteFile("add-partial.html", @"
+{{ num | add(10) | assignTo('num') }}
+<h3>partial num = {{ num }}</h3>");
+            
+            var result = new PageResult(context.GetPage("page"))
+            {
+                Args =
+                {
+                    ["pageResultTitle"] = "page result title"
+                }
+            }.Result;
+            
+            /* NOTES: 
+              1. Page Args and Page Result Args are *always* visible to Layout as they're known before page is executed
+              2. Args created during Page execution are *only* visible in Layout after page is rendered (i.e. executed)
+              3. Args assigned in partials are retained within their scope
+            */
+            
+            Assert.That(result.RemoveNewLines(), Is.EqualTo(@"
+<html>
+<body>
+<header>
+layout num = 1
+pageMetaTitle = page meta title
+inlinePageTitle = {{ inlinePageTitle }}
+pageResultTitle = page result title
+</header>
+<h3>partial num = 110</h3> 
+<section>
+<h3>partial num = 210</h3> 
+<h2>page num = 2</h2>
+<h3>partial num = 310</h3> 
+</section>
+<h3>partial num = 410</h3> 
+<footer>
+layout num = 2
+inlinePageTitle = PAGE INLINE TITLE
+</footer>
+</body>
+</html>
+".RemoveNewLines()));
+        }
 
     }
 }

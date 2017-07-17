@@ -40,19 +40,22 @@ namespace ServiceStack.Templates
             while ((pos = text.IndexOf("{{", lastPos)) != -1)
             {
                 var block = text.Subsegment(lastPos, pos - lastPos);
-                to.Add(new PageStringFragment(block));
+                if (!block.IsNullOrEmpty())
+                    to.Add(new PageStringFragment(block));
 
                 var varStartPos = pos + 2;
                 var varEndPos = text.IndexOfNextCharNotInQuotes(varStartPos, '|', '}');
                 var varName = text.Subsegment(varStartPos, varEndPos - varStartPos).Trim();
-                if (varEndPos == -1)
-                    throw new ArgumentException($"Invalid Server HTML Template at '{text.SafeSubsegment(50)}...'", nameof(text));
+                if (varEndPos == -1 || varEndPos >= text.Length)
+                    throw new ArgumentException($"Invalid Server HTML Template at '{text.SubstringWithElipsis(0, 50)}'", nameof(text));
 
                 List<JsExpression> filterCommands = null;
                 
                 var isFilter = text.GetChar(varEndPos) == '|';
                 if (isFilter)
                 {
+                    bool foundVarEnd = false;
+                
                     filterCommands = text.Subsegment(varEndPos + 1).ParseExpression<JsExpression>(
                         separator: '|',
                         atEndIndex: (str, strPos) =>
@@ -62,11 +65,16 @@ namespace ServiceStack.Templates
 
                             if (str.Length > strPos + 1 && str.GetChar(strPos) == '}' && str.GetChar(strPos + 1) == '}')
                             {
+                                foundVarEnd = true;
                                 varEndPos = varEndPos + 1 + strPos + 1;
                                 return strPos;
                             }
                             return null;
-                        });
+                        },
+                        allowWhitespaceSensitiveSyntax: true);
+                
+                    if (!foundVarEnd)
+                        throw new ArgumentException($"Invalid syntax near '{text.Subsegment(pos).SubstringWithElipsis(0, 50)}'");
                 }
                 else
                 {
@@ -137,8 +145,9 @@ namespace ServiceStack.Templates
         public static IRawString ToRawString(this StringSegment value) => 
             new RawString(value.HasValue ? value.Value : "");
 
-        public static Func<object, object> Compile(Type type, StringSegment expr)
+        public static Func<TemplateScopeContext, object, object> Compile(Type type, StringSegment expr)
         {
+            var scope = Expression.Parameter(typeof(TemplateScopeContext), "scope");
             var param = Expression.Parameter(typeof(object), "instance");
             Expression body = Expression.Convert(param, type);
 
@@ -162,12 +171,32 @@ namespace ServiceStack.Templates
                         
                         if (binding is JsExpression)
                             throw new BindingExpressionException($"Only constant binding expressions are supported: '{expr}'", member.Value, expr.Value);
-    
-                        if (depth == 0)
+
+                        var valueExpr = binding != null
+                            ? (Expression) Expression.Call(
+                                typeof(TemplatePageUtils).GetStaticMethod(nameof(EvaluateBinding)), 
+                                scope,
+                                Expression.Constant(binding))
+                            : Expression.Constant(value);
+                        
+                        if (type.IsArray)
+                        {
+                            if (binding != null)
+                            {
+                                var evalAsInt = typeof(TemplatePageUtils).GetStaticMethod(nameof(EvaluateBindingAs))
+                                    .MakeGenericMethod(typeof(int));
+                                body = Expression.ArrayIndex(body, Expression.Call(evalAsInt, scope, Expression.Constant(binding)));
+                            }
+                            else
+                            {
+                                body = Expression.ArrayIndex(body, valueExpr);
+                            }
+                        }
+                        else if (depth == 0)
                         {
                             var pi = AssertProperty(currType, "Item", expr);
                             currType = pi.PropertyType;
-                            body = Expression.Property(body, "Item", Expression.Constant(value));
+                            body = Expression.Property(body, "Item", valueExpr);
                         }
                         else
                         {
@@ -176,7 +205,7 @@ namespace ServiceStack.Templates
                             body = Expression.PropertyOrField(body, prop.Value);
                         
                             var indexMethod = currType.GetMethod("get_Item", new[]{ value.GetType() });
-                            body = Expression.Call(body, indexMethod, Expression.Constant(value));
+                            body = Expression.Call(body, indexMethod, valueExpr);
                         }
                     }
                     else
@@ -196,7 +225,20 @@ namespace ServiceStack.Templates
 
             body = Expression.Convert(body, typeof(object));
 
-            return Expression.Lambda<Func<object, object>>(body, param).Compile();
+            return Expression.Lambda<Func<TemplateScopeContext, object, object>>(body, scope, param).Compile();
+        }
+
+        public static object EvaluateBinding(TemplateScopeContext scope, JsBinding binding)
+        {
+            var result = scope.EvaluateToken(binding);
+            return result;
+        }
+
+        public static T EvaluateBindingAs<T>(TemplateScopeContext scope, JsBinding binding)
+        {
+            var result = EvaluateBinding(scope, binding);
+            var converted = result.ConvertTo<T>();
+            return converted;
         }
 
         private static PropertyInfo AssertProperty(Type currType, string prop, StringSegment expr)

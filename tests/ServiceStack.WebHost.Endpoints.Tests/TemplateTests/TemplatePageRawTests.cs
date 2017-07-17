@@ -13,14 +13,54 @@ using ServiceStack.VirtualPath;
 using Microsoft.Extensions.Primitives;
 #endif
 
-namespace ServiceStack.WebHost.Endpoints.Tests
+namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
 {
+    public class ModelBinding
+    {
+        public int Int { get; set;  }
+            
+        public string Prop { get; set; }
+            
+        public NestedModelBinding Object { get; set; }
+            
+        public Dictionary<string, ModelBinding> Dictionary { get; set; }
+            
+        public List<ModelBinding> List { get; set; }
+            
+        public ModelBinding this[int i]
+        {
+            get => List[i];
+            set => List[i] = value;
+        }
+    }
+        
+    public class NestedModelBinding
+    {
+        public int Int { get; set;  }
+            
+        public string Prop { get; set; }
+            
+        public ModelBinding Object { get; set; }
+            
+        public AltNested AltNested { get; set; }
+            
+        public Dictionary<string, ModelBinding> Dictionary { get; set; }
+            
+        public List<ModelBinding> List { get; set; }
+    }
+        
+    public class AltNested
+    {
+        public string Field { get; set; }
+    }
+
+
     public class TemplatePageRawTests
     {
         [Test]
         public async Task Can_generate_html_template_with_layout_in_memory()
         {
-            var context = new TemplatePagesContext();
+            var context = new TemplateContext().Init();
 
             context.VirtualFiles.WriteFile("_layout.html", @"
 <html>
@@ -43,7 +83,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             var html = await result.RenderToStringAsync();
             
-            Assert.That(html, Is.EqualTo(@"<html>
+            Assert.That(html, Is.EqualTo(@"
+<html>
   <title>The Title</title>
 </head>
 <body>
@@ -54,13 +95,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public async Task Can_generate_markdown_template_with_layout_in_memory()
         {
-            var context = new TemplatePagesContext
+            var context = new TemplateContext
             {
                 PageFormats =
                 {
                     new MarkdownPageFormat()
                 }
-            };
+            }.Init();;
             
             context.VirtualFiles.WriteFile("_layout.md", @"
 # {{ title }}
@@ -79,27 +120,27 @@ Brackets in Layout < & >
                     {"title", "The Title"},
                 },
                 ContentType = MimeTypes.Html,
-                OutputFilters = { MarkdownPageFormat.TransformToHtml },
+                OutputTransformers = { MarkdownPageFormat.TransformToHtml },
             };
 
             var html = await result.RenderToStringAsync();
             
-            Assert.That(html.SanitizeNewLines(), Is.EqualTo(@"<h1>The Title</h1>
+            Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"<h1>The Title</h1>
 <p>Brackets in Layout &lt; &amp; &gt; </p>
-<h2>The Title</h2>".SanitizeNewLines()));
+<h2>The Title</h2>".NormalizeNewLines()));
             
         }
 
         [Test]
         public async Task Can_generate_markdown_template_with_html_layout_in_memory()
         {
-            var context = new TemplatePagesContext
+            var context = new TemplateContext
             {
                 PageFormats =
                 {
                     new MarkdownPageFormat()
                 }
-            };
+            }.Init();;
             
             context.VirtualFiles.WriteFile("_layout.html", @"
 <html>
@@ -119,24 +160,24 @@ Brackets in Layout < & >
                     {"title", "The Title"},
                 },
                 ContentType = MimeTypes.Html,
-                PageFilters = { MarkdownPageFormat.TransformToHtml },
+                PageTransformers = { MarkdownPageFormat.TransformToHtml },
             };
 
             var html = await result.RenderToStringAsync();
             
-            Assert.That(html.SanitizeNewLines(), Is.EqualTo(@"<html>
+            Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"<html>
   <title>The Title</title>
 </head>
 <body>
   <h3>The Title</h3>
 
-</body>".SanitizeNewLines()));
+</body>".NormalizeNewLines()));
         }
 
         [Test]
         public async Task Does_explode_Model_properties_into_scope()
         {
-            var context = new TemplatePagesContext();
+            var context = new TemplateContext().Init();
             
             context.VirtualFiles.WriteFile("page.html", @"Id: {{ Id }}, Name: {{ Name }}");
             
@@ -151,7 +192,7 @@ Brackets in Layout < & >
         [Test]
         public async Task Does_explode_Model_properties_of_anon_object_into_scope()
         {
-            var context = new TemplatePagesContext();
+            var context = new TemplateContext().Init();
             
             context.VirtualFiles.WriteFile("page.html", @"Id: {{ Id }}, Name: {{ Name }}");
             
@@ -166,10 +207,10 @@ Brackets in Layout < & >
         [Test]
         public async Task Does_reload_modified_page_contents_in_DebugMode()
         {
-            var context = new TemplatePagesContext
+            var context = new TemplateContext
             {
                 DebugMode = true, //default
-            };
+            }.Init();
             
             context.VirtualFiles.WriteFile("page.html", "<h1>Original</h1>");
             Assert.That(await new PageResult(context.GetPage("page")).RenderToStringAsync(), Is.EqualTo("<h1>Original</h1>"));
@@ -183,7 +224,7 @@ Brackets in Layout < & >
         [Test]
         public void Context_Throws_FileNotFoundException_when_page_does_not_exist()
         {
-            var context = new TemplatePagesContext();
+            var context = new TemplateContext();
 
             Assert.That(context.Pages.GetPage("not-exists.html"), Is.Null);
 
@@ -207,7 +248,7 @@ Brackets in Layout < & >
         [Test]
         public async Task Does_use_custom_filter()
         {
-            var context = new TemplatePagesContext
+            var context = new TemplateContext
             {
                 Args =
                 {
@@ -233,7 +274,7 @@ Brackets in Layout < & >
         [Test]
         public async Task Does_embed_partials()
         {
-            var context = new TemplatePagesContext
+            var context = new TemplateContext
             {
                 Args =
                 {
@@ -267,7 +308,7 @@ Brackets in Layout < & >
                 }
             }.RenderToStringAsync();
             
-            Assert.That(result.SanitizeNewLines(), Is.EqualTo(@"
+            Assert.That(result.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <head><title>{{ title }}</title></head>
 <body>
@@ -276,48 +317,8 @@ Brackets in Layout < & >
 <footer>Copyright &copy; ServiceStack 2008-2017</footer>
 </body>
 </html>
-".SanitizeNewLines()));
+".NormalizeNewLines()));
         }
-
-        public class ModelBinding
-        {
-            public int Int { get; set;  }
-            
-            public string Prop { get; set; }
-            
-            public NestedModelBinding Object { get; set; }
-            
-            public Dictionary<string, ModelBinding> Dictionary { get; set; }
-            
-            public List<ModelBinding> List { get; set; }
-            
-            public ModelBinding this[int i]
-            {
-                get => List[i];
-                set => List[i] = value;
-            }
-        }
-        
-        public class NestedModelBinding
-        {
-            public int Int { get; set;  }
-            
-            public string Prop { get; set; }
-            
-            public ModelBinding Object { get; set; }
-            
-            public AltNested AltNested { get; set; }
-            
-            public Dictionary<string, ModelBinding> Dictionary { get; set; }
-            
-            public List<ModelBinding> List { get; set; }
-        }
-        
-        public class AltNested
-        {
-            public string Field { get; set; }
-        }
-
 
         private static ModelBinding CreateModelBinding()
         {
@@ -375,7 +376,7 @@ Brackets in Layout < & >
         [Test]
         public async Task Does_evaluate_variable_binding_expressions()
         {
-            var context = new TemplatePagesContext
+            var context = new TemplateContext
             {
                 Args =
                 {
@@ -451,7 +452,7 @@ Brackets in Layout < & >
         [Test]
         public async Task Does_evaluate_variable_binding_expressions_in_template()
         {
-            var context = new TemplatePagesContext
+            var context = new TemplateContext
             {
                 Args =
                 {
@@ -470,12 +471,12 @@ model.Dictionary['map-key'].Object.AltNested.Field | lower = '{{ model.Dictionar
             
             var result = await new PageResult(context.GetPage("page")) { Model = model }.RenderToStringAsync();
             
-            Assert.That(result.SanitizeNewLines(), Is.EqualTo(@"
+            Assert.That(result.NormalizeNewLines(), Is.EqualTo(@"
 Object.Object.Prop = 'Nested Nested Prop'
 model.Object.Object.Prop = 'Nested Nested Prop'
 model.Dictionary['map-key'].Object.AltNested.Field = 'Dictionary AltNested Field'
 model.Dictionary['map-key'].Object.AltNested.Field | lower = 'dictionary altnested field'
-".SanitizeNewLines()));
+".NormalizeNewLines()));
         }
 
 //#if NET45
@@ -496,23 +497,23 @@ model.Dictionary['map-key'].Object.AltNested.Field | lower = 'dictionary altnest
         [Test]
         public void Can_render_onetime_page_and_layout()
         {
-            var context = new TemplatePagesContext
+            var context = new TemplateContext
             {                
                 Args = { ["key"] = "the-key" }
             }.Init();
 
-            var adhocPage = context.Pages.OneTimePage("<h1>{{ key }}</h1>", "html");
+            var adhocPage = context.OneTimePage("<h1>{{ key }}</h1>", "html");
             var result = new PageResult(adhocPage) { Model = CreateModelBinding() }.Result;
             Assert.That(result, Is.EqualTo("<h1>the-key</h1>"));
             
-            adhocPage = context.Pages.OneTimePage("<h1>{{ model.Dictionary['map-key'].Object.AltNested.Field | lower }}</h1>", "html");
+            adhocPage = context.OneTimePage("<h1>{{ model.Dictionary['map-key'].Object.AltNested.Field | lower }}</h1>", "html");
             result = new PageResult(adhocPage) { Model = CreateModelBinding() }.Result;
             Assert.That(result, Is.EqualTo("<h1>dictionary altnested field</h1>"));
             
-            adhocPage = context.Pages.OneTimePage("<h1>{{ key }}</h1>", "html");
+            adhocPage = context.OneTimePage("<h1>{{ key }}</h1>", "html");
             result = new PageResult(adhocPage)
             {
-                LayoutPage = context.Pages.OneTimePage("<html><title>{{ model.List[0].Object.Prop | lower }}</title><body>{{ page }}</body></html>", "html"),
+                LayoutPage = context.OneTimePage("<html><title>{{ model.List[0].Object.Prop | lower }}</title><body>{{ page }}</body></html>", "html"),
                 Model = CreateModelBinding()
             }.Result;
             Assert.That(result, Is.EqualTo("<html><title>nested list prop</title><body><h1>the-key</h1></body></html>"));
@@ -521,14 +522,14 @@ model.Dictionary['map-key'].Object.AltNested.Field | lower = 'dictionary altnest
         [Test]
         public async Task Can_render_onetime_page_with_real_layout()
         {
-            var context = new TemplatePagesContext
+            var context = new TemplateContext
             {                
                 Args = { ["key"] = "the-key" }
             }.Init();
             
             context.VirtualFiles.WriteFile("_layout.html", "<html><title>{{ model.List[0].Object.Prop | lower }}</title><body>{{ page }}</body></html>");
 
-            var adhocPage = context.Pages.OneTimePage(@"<h1>{{ key }}</h1>", "html");
+            var adhocPage = context.OneTimePage(@"<h1>{{ key }}</h1>", "html");
             var result = await new PageResult(adhocPage)
             {
                 LayoutPage = context.GetPage("_layout"),
@@ -549,7 +550,7 @@ model.Dictionary['map-key'].Object.AltNested.Field | lower = 'dictionary altnest
         [Test]
         public void Does_not_allow_invoking_method_on_binding_expression()
         {
-            var context = new TemplatePagesContext().Init();
+            var context = new TemplateContext().Init();
 
             var model = new ModelWithMethods { Nested = new ModelWithMethods { Name = "Nested" } };
             
@@ -577,7 +578,7 @@ model.Dictionary['map-key'].Object.AltNested.Field | lower = 'dictionary altnest
         [Test]
         public void Binding_expressions_with_null_references_evaluate_to_null()
         {
-            var context = new TemplatePagesContext().Init();
+            var context = new TemplateContext().Init();
 
             Assert.That(new PageResult(context.OneTimePage("{{ model.Object.Prop }}")) { Model = new ModelBinding() }.Result, Is.Empty);
             Assert.That(new PageResult(context.OneTimePage("{{ Object.Prop }}")) { Model = new ModelBinding() }.Result, Is.Empty);
@@ -590,7 +591,7 @@ model.Dictionary['map-key'].Object.AltNested.Field | lower = 'dictionary altnest
         [Test]
         public void when_only_shows_code_when_true()
         {
-            var context = new TemplatePagesContext().Init();
+            var context = new TemplateContext().Init();
 
             Assert.That(new PageResult(context.OneTimePage("{{ 'Is Authenticated' | when(auth) }}"))
             {
@@ -619,7 +620,7 @@ model.Dictionary['map-key'].Object.AltNested.Field | lower = 'dictionary altnest
         [Test]
         public void unless_shows_code_when_not_true()
         {
-            var context = new TemplatePagesContext().Init();
+            var context = new TemplateContext().Init();
 
             Assert.That(new PageResult(context.OneTimePage("{{ 'Not Authenticated' | unless(auth) }}"))
             {
@@ -649,7 +650,7 @@ model.Dictionary['map-key'].Object.AltNested.Field | lower = 'dictionary altnest
         [Test]
         public void can_use_if_and_ifNot_as_alias_to_when_and_unless()
         {
-            var context = new TemplatePagesContext().Init();
+            var context = new TemplateContext().Init();
 
             Assert.That(new PageResult(context.OneTimePage("{{ 'Is Authenticated' | if(auth) }}"))
             {
@@ -665,7 +666,7 @@ model.Dictionary['map-key'].Object.AltNested.Field | lower = 'dictionary altnest
         [Test]
         public void Can_use_else_and_otherwise_filter_to_show_alternative_content()
         {
-            var context = new TemplatePagesContext().Init();
+            var context = new TemplateContext().Init();
 
             Assert.That(new PageResult(context.OneTimePage("{{ 'Not Authenticated' | unless(auth) | otherwise('Is Authenticated') }}"))
             {
@@ -691,7 +692,7 @@ model.Dictionary['map-key'].Object.AltNested.Field | lower = 'dictionary altnest
         [Test]
         public void Returns_original_string_with_unknown_variable()
         {
-            var context = new TemplatePagesContext
+            var context = new TemplateContext
             {
                 Args =
                 {
@@ -711,7 +712,7 @@ model.Dictionary['map-key'].Object.AltNested.Field | lower = 'dictionary altnest
         [Test]
         public void Filters_with_HandleUnknownValueAttribute_handles_unkownn_values()
         {
-            var context = new TemplatePagesContext().Init();
+            var context = new TemplateContext().Init();
 
             Assert.That(new PageResult(context.OneTimePage("{{ undefined | otherwise('undefined serverArg') }}")).Result, Is.EqualTo("undefined serverArg"));
         }
@@ -719,7 +720,7 @@ model.Dictionary['map-key'].Object.AltNested.Field | lower = 'dictionary altnest
         [Test]
         public void Handles_truthy_and_falsy_conditions()
         {
-            var context = new TemplatePagesContext().Init();
+            var context = new TemplateContext().Init();
             
             Assert.That(new PageResult(context.OneTimePage("{{ undefined | falsy('undefined value') }}")).Result, Is.EqualTo("undefined value"));
             Assert.That(new PageResult(context.OneTimePage("{{ null      | falsy('null value') }}")).Result, Is.EqualTo("null value"));
@@ -745,7 +746,7 @@ model.Dictionary['map-key'].Object.AltNested.Field | lower = 'dictionary altnest
         [Test]
         public void Handles_ifTruthy_and_ifFalsy_conditions()
         {
-            var context = new TemplatePagesContext().Init();
+            var context = new TemplateContext().Init();
             
             Assert.That(new PageResult(context.OneTimePage("{{ 'undefined value' | ifFalsey(undefined) }}")).Result, Is.EqualTo("undefined value"));
             Assert.That(new PageResult(context.OneTimePage("{{ 'null value'      | ifFalsey(null) }}")).Result, Is.EqualTo("null value"));
@@ -771,7 +772,7 @@ model.Dictionary['map-key'].Object.AltNested.Field | lower = 'dictionary altnest
         [Test]
         public void Handles_strict_if_and_else_conditions()
         {
-            var context = new TemplatePagesContext().Init();
+            var context = new TemplateContext().Init();
 
             Assert.That(new PageResult(context.OneTimePage("{{ 'undefined value' | ifNot(undefined) }}")).Result, Is.EqualTo("undefined value"));
             Assert.That(new PageResult(context.OneTimePage("{{ 'null value'      | ifNot(null) }}")).Result, Is.EqualTo("null value"));
@@ -797,7 +798,7 @@ model.Dictionary['map-key'].Object.AltNested.Field | lower = 'dictionary altnest
         [Test]
         public void Null_exceptions_render_empty_string()
         {
-            var context = new TemplatePagesContext
+            var context = new TemplateContext
             {
 //                RenderExpressionExceptions = true,
                 Args =
@@ -811,301 +812,25 @@ model.Dictionary['map-key'].Object.AltNested.Field | lower = 'dictionary altnest
         }
 
         [Test]
-        public void Can_pass_variables_into_partials()
+        public void Can_use_whitespace_for_last_string_arg()
         {
-            var context = new TemplatePagesContext
-            {
-                Args = { ["defaultMessage"] = "this is the default message" }
-            }.Init();
-
-            context.VirtualFiles.WriteFile("_layout.html", @"
-<html>
-  <title>{{ title }}</title>
-</head>
-<body>
-{{ 'header' | partial({ id: 'the-page', message: 'in your header' }) }}
-{{ page }}
-</body>");
-
-            context.VirtualFiles.WriteFile("header.html", @"
-<header id='{{ id | otherwise('header') }}'>
-  {{ message | otherwise(defaultMessage) }}
-</header>");
-
-            context.VirtualFiles.WriteFile("page.html", @"<h1>{{ title }}</h1>");
-
-            var result = new PageResult(context.GetPage("page")) 
-            {
-                Args = { ["title"] = "The title" }
-            }.Result;
-            Assert.That(result.SanitizeNewLines(), Is.EqualTo(@"
-<html>
-  <title>The title</title>
-</head>
-<body>
-<header id='the-page'>
-  in your header
-</header>
-<h1>The title</h1>
-</body>
-".SanitizeNewLines()));            
-        }
-
-        [Test]
-        public void Can_load_page_with_partial_and_scoped_variables()
-        {
-            var context = new TemplatePagesContext
+            var context = new TemplateContext
             {
                 Args =
                 {
-                    ["myPartial"] = "my-partial"
+                    ["ten"] = 10
                 }
             }.Init();
-
-            context.VirtualFiles.WriteFile("_layout.html", @"
-<html>
-  <title>{{ title }}</title>
-</head>
-<body>
-{{ 'my-partial' | partial({ title: 'with-partial', tag: 'h2' }) }}
-{{ myPartial | partial({ title: 'with-partial-binding', tag: 'h2' }) }}
-<footer>{{ title }}</footer>
-</body>");
             
-            context.VirtualFiles.WriteFile("my-partial.html", "<{{ tag }}>{{ title }}</{{ tag }}>");
-            
-            var result = new PageResult(context.GetPage("my-partial"))
-            {
-                Args = { ["title"] = "The title" }
-            }.Result;
-            Assert.That(result.SanitizeNewLines(), Is.EqualTo(@"
-<html>
-  <title>The title</title>
-</head>
-<body>
-<h2>with-partial</h2>
-<h2>with-partial-binding</h2>
-<footer>The title</footer>
-</body>
-".SanitizeNewLines()));
+            Assert.That(context.EvaluateTemplate(@"{{ ten | multiply(ten) | assignTo: result }}
+                10 x 10 = {{ result }}").Trim(), Is.EqualTo("10 x 10 = 100"));
         }
-
-        [Test]
-        public void Can_load_page_with_page_or_partial_with_scoped_variables_containing_bindings()
-        {
-            var context = new TemplatePagesContext
-            {
-                Args =
-                {
-                    ["myPartial"] = "my-partial",
-                    ["headingTag"] = "h2",
-                }
-            }.Init();
-
-            context.VirtualFiles.WriteFile("_layout.html", @"
-<html>
-  <title>{{ title }}</title>
-</head>
-<body>
-{{ 'my-partial' | partial({ title: title, tag: headingTag }) }}
-{{ myPartial | partial({ title: partialTitle, tag: headingTag }) }}
-</body>");
-            
-            context.VirtualFiles.WriteFile("my-partial.html", "<{{ tag }}>{{ title }}</{{ tag }}>");
-            
-            var result = new PageResult(context.GetPage("my-partial"))
-            {
-                Args =
-                {
-                    ["title"] = "The title",
-                    ["partialTitle"] = "Partial Title",
-                }
-            }.Result;
-            Assert.That(result.SanitizeNewLines(), Is.EqualTo(@"
-<html>
-  <title>The title</title>
-</head>
-<body>
-<h2>The title</h2>
-<h2>Partial Title</h2>
-</body>
-".SanitizeNewLines()));
-        }
-
-        [Test]
-        public void Does_replace_bindings()
-        {
-            var context = new TemplatePagesContext
-            {
-                Args =
-                {
-                    ["contextTitle"] = "The title",
-                    ["contextPartial"] = "bind-partial",
-                    ["contextTag"] = "h2",
-                    ["a"] = "foo",
-                    ["b"] = "bar",
-                }
-            }.Init();
-
-            context.VirtualFiles.WriteFile("_layout.html", @"
-<html>
-  <title>{{ title }}</title>
-</head>
-<body>
-{{ contextPartial | partial({ title: contextTitle, tag: contextTag, items: [a,b] }) }}
-{{ page }}
-</body>");
-            
-            context.VirtualFiles.WriteFile("bind-partial.html", @"
-<{{ tag }}>{{ title | upper }}</{{ tag }}>
-<p>{{ items | join(', ') }}</p>");
-            
-            context.VirtualFiles.WriteFile("bind-page.html", @"
-<section>
-{{ pagePartial | partial({ tag: pageTag, items: items }) }}
-</section>
-");
-            
-            var result = new PageResult(context.GetPage("bind-page"))
-            {
-                Args =
-                {
-                    ["title"] = "Page title",
-                    ["pagePartial"] = "bind-partial",
-                    ["pageTag"] = "h3",
-                    ["items"] = new[] { 1, 2, 3 },
-                }
-            }.Result;
-
-            Assert.That(result.SanitizeNewLines(), Is.EqualTo(@"
-<html>
-  <title>Page title</title>
-</head>
-<body>
-<h2>THE TITLE</h2>
-<p>foo, bar</p>
-<section>
-<h3>PAGE TITLE</h3>
-<p>1, 2, 3</p>
-</section>
-
-</body>
-".SanitizeNewLines()));
-
-        }
-
-        [Test]
-        public void Can_repeat_templates_using_forEach()
-        {
-            var context = new TemplatePagesContext
-            {
-                Args =
-                {
-                    ["letters"] = new[]{ "A", "B", "C" },
-                    ["numbers"] = new[]{ 1, 2, 3 },
-                }
-            };
-            
-            Assert.That(new PageResult(context.OneTimePage("<ul> {{ '<li> {{it}} </li>' | forEach(letters) }} </ul>")).Result,
-                Is.EqualTo("<ul> <li> A </li><li> B </li><li> C </li> </ul>"));
-
-            Assert.That(new PageResult(context.OneTimePage("<ul> {{ '<li> {{it}} </li>' | forEach(numbers) }} </ul>")).Result,
-                Is.EqualTo("<ul> <li> 1 </li><li> 2 </li><li> 3 </li> </ul>"));
-        }
-
-        [Test]
-        public void Can_repeat_templates_using_forEach_in_page_and_layouts()
-        {
-            var context = new TemplatePagesContext
-            {
-                Args =
-                {
-                    ["numbers"] = new[]{ 1, 2, 3 },
-                }
-            };
-            
-            context.VirtualFiles.WriteFile("_layout.html", @"
-<html>
-<body>
-<header>
-<ul> {{ '<li> {{it}} </li>' | forEach(numbers) }} </ul>
-</header>
-<section>
-{{ page }}
-</section>
-</body>
-</html>
-");
-            context.VirtualFiles.WriteFile("page.html", "<ul> {{ '<li> {{it}} </li>' | forEach(letters) }} </ul>");
-            
-            var result = new PageResult(context.GetPage("page"))
-            {
-                Args =
-                {
-                    ["letters"] = new[]{ "A", "B", "C" },
-                }
-            }.Result;
-            
-            Assert.That(result.SanitizeNewLines(),
-                Is.EqualTo(@"
-<html>
-<body>
-<header>
-<ul> <li> 1 </li><li> 2 </li><li> 3 </li> </ul>
-</header>
-<section>
-<ul> <li> A </li><li> B </li><li> C </li> </ul>
-</section>
-</body>
-</html>"
-.SanitizeNewLines()));
-        }
-
-        [Test]
-        public void Can_repeat_templates_with_bindings_using_forEach()
-        {
-            var context = new TemplatePagesContext
-            {
-                Args =
-                {
-                    ["items"] = new[]
-                    {
-                        new ModelBinding { Object = new NestedModelBinding { Prop = "A" }}, 
-                        new ModelBinding { Object = new NestedModelBinding { Prop = "B" }}, 
-                        new ModelBinding { Object = new NestedModelBinding { Prop = "C" }}, 
-                    },
-                }
-            };
-            
-            Assert.That(new PageResult(context.OneTimePage("<ul> {{ '<li> {{ it.Object.Prop }} </li>' | forEach(items) }} </ul>")).Result,
-                Is.EqualTo("<ul> <li> A </li><li> B </li><li> C </li> </ul>"));
-        }
-
-        [Test]
-        public void Can_repeat_templates_with_bindings_and_custom_scope_using_forEach()
-        {
-            var context = new TemplatePagesContext
-            {
-                Args =
-                {
-                    ["items"] = new[]
-                    {
-                        new ModelBinding { Object = new NestedModelBinding { Prop = "A" }}, 
-                        new ModelBinding { Object = new NestedModelBinding { Prop = "B" }}, 
-                        new ModelBinding { Object = new NestedModelBinding { Prop = "C" }}, 
-                    },
-                }
-            };
-            
-            Assert.That(new PageResult(context.OneTimePage("<ul> {{ '<li> {{ item.Object.Prop }} </li>' | forEach(items, 'item') }} </ul>")).Result,
-                Is.EqualTo("<ul> <li> A </li><li> B </li><li> C </li> </ul>"));
-        }
-
     }
-    
+
     public static class TestUtils
     {
-        public static string SanitizeNewLines(this string text) => text.Trim().Replace("\r", "");
+        public static string NormalizeNewLines(this string text) => text.Trim().Replace("\r", "");
+        public static string RemoveNewLines(this string text) => text.Trim().Replace("\r", "").Replace("\n", "");
         
         static readonly Regex whitespace = new Regex(@"\s+", RegexOptions.Compiled);
         public static string RemoveAllWhitespace(this StringSegment text) => whitespace.Replace(text.Value, "");

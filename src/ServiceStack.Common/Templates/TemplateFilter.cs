@@ -1,117 +1,72 @@
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using ServiceStack.Text;
-
-#if NETSTANDARD1_3
-using Microsoft.Extensions.Primitives;
-#endif
 
 namespace ServiceStack.Templates
 {
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     public class HandleUnknownValueAttribute : AttributeBase {}
 
-    public struct TemplateScopeContext
+    public enum InvokerType
     {
-        public PageResult PageResult { get; }
-        public TemplatePage Page => PageResult.Page;
-        public TemplatePagesContext Context => Page.Context;
-        public Dictionary<string, object> ScopedParams { get; internal set; }
-        public Stream OutputStream { get; }
-
-        public TemplateScopeContext(PageResult pageResult, Stream outputStream, Dictionary<string, object> scopedParams)
-        {
-            PageResult = pageResult;
-            ScopedParams = scopedParams;
-            OutputStream = outputStream;
-        }
+        Filter,
+        ContextFilter,
+        ContextBlock,
     }
 
-    public static class TemplateScopeContextUtils
-    {
-        public static TemplateScopeContext CreateScopedContext(this TemplateScopeContext scope, string template)
-        {
-            var dynamicPage = scope.Context.OneTimePage(template);
-            scope.Page.Args.Each((x,y) => dynamicPage.Args[x] = y);
-            var pageResult = new PageResult(dynamicPage) {
-                Args = scope.PageResult.Args
-            }.Init().Result;
-
-            var itemScope = new TemplateScopeContext(pageResult, scope.OutputStream, 
-                scope.ScopedParams == null ? new Dictionary<string, object>() : new Dictionary<string, object>(scope.ScopedParams));
-
-            return itemScope;
-        }
-
-        public static async Task WritePageAsync(this TemplateScopeContext scope)
-        {
-            await scope.PageResult.WritePageAsync(scope.Page, scope);            
-        }
-
-        public static TemplateScopeContext ScopeWithParams(this TemplateScopeContext parentContext, Dictionary<string, object> scopedParams)
-        {
-            if (scopedParams == null)
-                return parentContext;
-
-            if (parentContext.ScopedParams == null)
-                return new TemplateScopeContext(parentContext.PageResult, parentContext.OutputStream, scopedParams);
-            
-            var to = new Dictionary<string, object>();
-            foreach (var entry in parentContext.ScopedParams)
-            {
-                to[entry.Key] = entry.Value;
-            }
-            foreach (var entry in scopedParams)
-            {
-                to[entry.Key] = entry.Value;
-            }
-            return new TemplateScopeContext(parentContext.PageResult, parentContext.OutputStream, to);
-        }
-
-        public static async Task WritePageAsync(this TemplateScopeContext scope, TemplatePage page, Dictionary<string, object> pageParams, CancellationToken token = default(CancellationToken))
-        {
-            await scope.PageResult.WritePageAsync(page, scope.ScopeWithParams(pageParams), token);
-        }
-    }
-    
     public class TemplateFilter
     {
-        public TemplatePagesContext Context { get; set; }
+        public TemplateContext Context { get; set; }
         public ITemplatePages Pages { get; set; }
         
-        public virtual bool HandlesUnknownValue(StringSegment name, int argsCount)
+        public virtual bool HandlesUnknownValue(string name, int argsCount)
         {
             var method = GetInvokerMethod(name, argsCount);
             return method?.AllAttributes().Any(x => x is HandleUnknownValueAttribute) == true;
         }
 
-        readonly ConcurrentDictionary<string, MethodInvoker> invokerCache = new ConcurrentDictionary<string, MethodInvoker>();
-
-        public MethodInvoker GetInvoker(StringSegment name, int argsCount)
+        public List<MethodInfo> QueryFilters(string filterName)
         {
-            var key = $"{name}`{argsCount}";
+            var filters = GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                .Where(x => x.Name.IndexOf(filterName, StringComparison.OrdinalIgnoreCase) >= 0)
+                .ToList();
+            return filters;
+        }
 
-            if (invokerCache.TryGetValue(key, out MethodInvoker invoker))
+        public ConcurrentDictionary<string, MethodInvoker> InvokerCache { get; } = new ConcurrentDictionary<string, MethodInvoker>();
+
+        public MethodInvoker GetInvoker(string name, int argsCount, InvokerType type) => type == InvokerType.Filter
+            ? GetInvoker(name, argsCount)
+            : type == InvokerType.ContextFilter
+                ? GetContextFilterInvoker(name, argsCount)
+                : GetContextBlockInvoker(name, argsCount);
+        
+        // Normal Filters
+        private MethodInvoker GetInvoker(string name, int argsCount)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+            
+            if (Context.ExcludeFiltersNamed.Contains(name))
+                return null;
+            
+            var key = name + "`" + argsCount;
+            if (InvokerCache.TryGetValue(key, out MethodInvoker invoker))
                 return invoker;
 
             var method = GetInvokerMethod(name, argsCount);
             if (method == null)
                 return null;
 
-            invoker = TypeExtensions.GetInvokerToCache(method);
-
-            invokerCache[key] = invoker;
-            
-            return invoker;
+            return InvokerCache[key] = TypeExtensions.GetInvokerToCache(method);
         }
 
-        private MethodInfo GetInvokerMethod(StringSegment name, int argsCount)
+        private MethodInfo GetInvokerMethod(string name, int argsCount)
         {
             var method = GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public)
                 .FirstOrDefault(x => name.EqualsIgnoreCase(x.Name) && 
@@ -120,33 +75,64 @@ namespace ServiceStack.Templates
             return method;
         }
 
-        public MethodInvoker GetContextInvoker(StringSegment name, int argsCount)
+        // Filters which require access to the TemplateScopeContext but act like a normal filter
+        private MethodInvoker GetContextFilterInvoker(string name, int argsCount)
         {
-            var key = $"{name}`{argsCount}";
-
-            if (invokerCache.TryGetValue(key, out MethodInvoker invoker))
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+            
+            if (Context.ExcludeFiltersNamed.Contains(name))
+                return null;
+            
+            var key = "context-filter::" + name + "`" + argsCount;
+            if (InvokerCache.TryGetValue(key, out MethodInvoker invoker))
                 return invoker;
 
-            var method = GetContextInvokerMethod(name, argsCount);
+            var method = GetContextFilterInvokerMethod(name, argsCount);
             if (method == null)
                 return null;
 
-            invoker = TypeExtensions.GetInvokerToCache(method);
-
-            invokerCache[key] = invoker;
-            
-            return invoker;
+            return InvokerCache[key] = TypeExtensions.GetInvokerToCache(method);
         }
 
-        private MethodInfo GetContextInvokerMethod(StringSegment name, int argsCount)
+        private MethodInfo GetContextFilterInvokerMethod(string name, int argsCount)
         {
             var method = GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public)
                 .FirstOrDefault(x => name.EqualsIgnoreCase(x.Name) && 
                      x.GetParameters().Length == argsCount && 
-                     x.GetParameters()[0].ParameterType == typeof(TemplateScopeContext));
+                     x.GetParameters()[0].ParameterType == typeof(TemplateScopeContext) &&
+                     x.ReturnType != typeof(Task)); //Returns results like normal filters, i.e. don't write to the OutputStream 
             
-            if (method != null && method.ReturnType != typeof(Task))
-                throw new NotSupportedException($"Filter '{name}' with scope context does not have a Task return type");
+            return method;
+        }
+
+        // Filters which write directly to the OutputStream
+        private MethodInvoker GetContextBlockInvoker(string name, int argsCount)
+        {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+            
+            if (Context.ExcludeFiltersNamed.Contains(name))
+                return null;
+            
+            var key = "context-block::" + name + "`" + argsCount;
+            if (InvokerCache.TryGetValue(key, out MethodInvoker invoker))
+                return invoker;
+
+            var method = GetContextBlockInvokerMethod(name, argsCount);
+            if (method == null)
+                return null;
+
+            return InvokerCache[key] = TypeExtensions.GetInvokerToCache(method);
+        }
+
+        private MethodInfo GetContextBlockInvokerMethod(string name, int argsCount)
+        {
+            var method = GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                .FirstOrDefault(x => name.EqualsIgnoreCase(x.Name) && 
+                     x.GetParameters().Length == argsCount && 
+                     x.GetParameters()[0].ParameterType == typeof(TemplateScopeContext) &&
+                     x.ReturnType == typeof(Task)); //Context Block Filters require Task return Type as they should write to the Output Stream
             
             return method;
         }
@@ -172,6 +158,51 @@ namespace ServiceStack.Templates
                     $"{filterName} only accepts an Object dictionary as an argument but received a '{scopedParams.GetType().Name}' instead");
 
             return pageParams ?? new Dictionary<string, object>();
+        }
+
+        public static IEnumerable AssertEnumerable(this object items, string filterName)
+        {
+            var enumItems = items as IEnumerable;
+            if (enumItems == null && items != null)
+                throw new ArgumentException(
+                    $"{filterName} expects an IEnumerable but received a '{items.GetType().Name}' instead");
+
+            return enumItems ?? TypeConstants.EmptyObjectArray;
+        }
+
+        public static Dictionary<string, object> GetParamsWithItemBinding(this TemplateScopeContext scope, string filterName, object scopedParams, out string itemBinding) =>
+            GetParamsWithItemBinding(scope, filterName, null, scopedParams, out itemBinding);
+
+        public static Dictionary<string, object> GetParamsWithItemBinding(this TemplateScopeContext scope, string filterName, TemplatePage page, object scopedParams, out string itemBinding)
+        {
+            var pageParams = scope.AssertOptions(filterName, scopedParams);
+            itemBinding = pageParams.TryGetValue("it", out object bindingName) && bindingName is string binding
+                ? binding
+                : "it";
+            
+            if (bindingName != null && !(bindingName is string))
+                throw new NotSupportedException($"'it' option in filter '{filterName}' should contain the name to bind to but contained a '{bindingName.GetType().Name}' instead");
+
+            // page vars take precedence
+            if (page != null && page.Args.TryGetValue("it", out object pageBinding))
+                itemBinding = (string)pageBinding;
+            
+            return pageParams;
+        }
+
+        public static void AddItemToScope(this TemplateScopeContext scope, string itemBinding, object item, int index)
+        {
+            scope.ScopedParams[TemplateConstants.Index] = index;
+            scope.ScopedParams[itemBinding] = item;
+
+            var explodeBindings = item as Dictionary<string, object>;
+            if (explodeBindings != null)
+            {
+                foreach (var entry in explodeBindings)
+                {
+                    scope.ScopedParams[entry.Key] = entry.Value;
+                }
+            }
         }
     }
 }

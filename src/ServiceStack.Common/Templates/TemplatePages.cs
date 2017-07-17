@@ -15,9 +15,9 @@ namespace ServiceStack.Templates
 
     public class TemplatePages : ITemplatePages
     {
-        public TemplatePagesContext Context { get; }
+        public TemplateContext Context { get; }
 
-        public TemplatePages(TemplatePagesContext context) => this.Context = context;
+        public TemplatePages(TemplateContext context) => this.Context = context;
 
         public static string Layout = "layout";
         

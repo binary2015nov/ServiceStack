@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using ServiceStack.Configuration;
 using ServiceStack.IO;
 using ServiceStack.Text;
@@ -16,7 +17,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace ServiceStack.Templates
 {
-    public class TemplatePagesContext : IDisposable
+    public class TemplateContext : IDisposable
     {
         public List<PageFormat> PageFormats { get; set; } = new List<PageFormat>();
         
@@ -47,6 +48,19 @@ namespace ServiceStack.Templates
         public List<TemplateFilter> TemplateFilters { get; } = new List<TemplateFilter>();
 
         public List<TemplateCode> CodePages { get; } = new List<TemplateCode>();
+        
+        public HashSet<string> ExcludeFiltersNamed { get; } = new HashSet<string>();
+
+        public ConcurrentDictionary<string, object> Cache { get; } = new ConcurrentDictionary<string, object>();
+
+        public ConcurrentDictionary<string, Tuple<DateTime, object>> ExpiringCache { get; } = new ConcurrentDictionary<string, Tuple<DateTime, object>>();
+
+        public ConcurrentDictionary<string, Func<TemplateScopeContext, object, object>> BinderCache { get; } = new ConcurrentDictionary<string, Func<TemplateScopeContext, object, object>>();
+
+        /// <summary>
+        /// Available transformers that can transform context filter stream outputs
+        /// </summary>
+        public Dictionary<string, Func<Stream, Task<Stream>>> FilterTransformers { get; set; } = new Dictionary<string, Func<Stream, Task<Stream>>>();
 
         public bool CheckForModifiedPages { get; set; } = false;
         
@@ -61,21 +75,32 @@ namespace ServiceStack.Templates
             return page;
         }
 
-        public TemplatePage OneTimePage(string contents, string ext=null) => Pages.OneTimePage(contents, ext ?? PageFormats.First().Extension);
+        public TemplatePage OneTimePage(string contents, string ext=null) 
+            => Pages.OneTimePage(contents, ext ?? PageFormats.First().Extension);
 
-        public TemplatePagesContext()
+        public TemplateContext()
         {
             Pages = new TemplatePages(this);
             PageFormats.Add(new HtmlPageFormat());
             TemplateFilters.Add(new TemplateDefaultFilters());
+            FilterTransformers["htmlencode"] = HtmlPageFormat.HtmlEncodeTransformer;
 
             Args[TemplateConstants.DefaultCulture] = CultureInfo.CurrentCulture;
             Args[TemplateConstants.DefaultDateFormat] = "yyyy-MM-dd";
             Args[TemplateConstants.DefaultDateTimeFormat] = "u";
+            Args[TemplateConstants.DefaultCacheExpiry] = TimeSpan.FromHours(1);
+            Args[TemplateConstants.DefaultIndent] = "\t";
+            Args[TemplateConstants.DefaultNewLine] = Environment.NewLine;
         }
 
-        public TemplatePagesContext Init()
+        public bool HasInit { get; private set; }
+
+        public TemplateContext Init()
         {
+            if (HasInit)
+                return this;
+            HasInit = true;
+            
             Container.AddSingleton(() => this);
             Container.AddSingleton(() => Pages);
 
@@ -117,13 +142,14 @@ namespace ServiceStack.Templates
 
         internal void InitFilter(TemplateFilter filter)
         {
+            if (filter == null) return;
             if (filter.Context == null)
                 filter.Context = this;
             if (filter.Pages == null)
                 filter.Pages = Pages;
         }
 
-        public TemplatePagesContext ScanType(Type type)
+        public TemplateContext ScanType(Type type)
         {
             if (typeof(TemplateFilter).IsAssignableFromType(type))
             {
@@ -140,21 +166,19 @@ namespace ServiceStack.Templates
             return this;
         }
 
-        private readonly ConcurrentDictionary<string, Func<object, object>> binderCache = new ConcurrentDictionary<string, Func<object, object>>();
-
-        public Func<object, object> GetExpressionBinder(Type targetType, StringSegment expression)
+        public Func<TemplateScopeContext, object, object> GetExpressionBinder(Type targetType, StringSegment expression)
         {
             if (targetType == null)
                 throw new ArgumentNullException(nameof(targetType));
             if (expression.IsNullOrWhiteSpace())
                 throw new ArgumentNullException(nameof(expression));
 
-            var key = $"{targetType.FullName}::{expression}";
+            var key = targetType.FullName + "::" + expression;
 
-            if (binderCache.TryGetValue(key, out Func<object, object> fn))
+            if (BinderCache.TryGetValue(key, out Func<TemplateScopeContext, object, object> fn))
                 return fn;
 
-            binderCache[key] = fn = TemplatePageUtils.Compile(targetType, expression);
+            BinderCache[key] = fn = TemplatePageUtils.Compile(targetType, expression);
 
             return fn;
         }
@@ -162,6 +186,23 @@ namespace ServiceStack.Templates
         public void Dispose()
         {
             using (Container as IDisposable) {}
+        }
+    }
+
+    public static class TemplatePagesContextExtensions
+    {
+        public static string EvaluateTemplate(this TemplateContext context, string template, Dictionary<string, object> args=null)
+        {
+            var pageResult = new PageResult(context.OneTimePage(template));
+            args.Each((x,y) => pageResult.Args[x] = y);
+            return pageResult.Result;
+        }
+        
+        public static Task<string> EvaluateTemplateAsync(this TemplateContext context, string template, Dictionary<string, object> args=null)
+        {
+            var pageResult = new PageResult(context.OneTimePage(template));
+            args.Each((x,y) => pageResult.Args[x] = y);
+            return pageResult.RenderToStringAsync();
         }
     }
 }
