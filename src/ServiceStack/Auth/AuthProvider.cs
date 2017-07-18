@@ -10,6 +10,18 @@ using ServiceStack.Web;
 
 namespace ServiceStack.Auth
 {
+    public static class AuthProviderCatagery
+    {
+        public const string BasicProvider = "basic";
+        public const string ApiKeyProvider = "apikey";
+        public const string JwtProvider = "jwt";
+        public const string CredentialsProvider = "credentials";
+        public const string WindowsAuthProvider = "windowsauth";
+        public const string CredentialsAliasProvider = "login";
+        public const string LogoutAction = "logout";
+        public const string DigestProvider = "digest";
+    }
+
     public abstract class AuthProvider : IAuthProvider
     {
         protected static readonly ILog Log = LogManager.GetLogger(typeof(AuthProvider));

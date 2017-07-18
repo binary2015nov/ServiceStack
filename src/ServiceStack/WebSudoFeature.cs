@@ -18,7 +18,7 @@ namespace ServiceStack
 
         public void Register(IAppHost appHost)
         {
-            var s = AuthenticateService.CurrentSessionFactory() as IWebSudoAuthSession;
+            var s = SessionFeature.DefaultSessionFactory() as IWebSudoAuthSession;
             if (s == null)
             {
                 throw new NotSupportedException("The IUserAuth session must also implement IWebSudoAuthSession");
@@ -39,9 +39,9 @@ namespace ServiceStack
             if (!session.IsAuthenticated) return;
 
             var authenticateDto = dto as Authenticate;
-            if (authenticateDto != null && !AuthenticateService.LogoutAction.EqualsIgnoreCase(authenticateDto.provider))
+            if (authenticateDto != null && !AuthProviderCatagery.LogoutAction.EqualsIgnoreCase(authenticateDto.provider))
             {
-                var copy = AuthenticateService.CurrentSessionFactory().PopulateWith(session);
+                var copy = SessionFeature.DefaultSessionFactory().PopulateWith(session);
 
                 request.Items[SessionCopyRequestItemKey] = copy;
 

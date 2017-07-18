@@ -19,6 +19,13 @@ namespace ServiceStack
         public static TimeSpan DefaultSessionExpiry = TimeSpan.FromDays(7 * 2); //2 weeks
         public static TimeSpan DefaultPermanentSessionExpiry = TimeSpan.FromDays(7 * 4); //4 weeks
 
+        private static Func<IAuthSession> sessionFn;
+        public static Func<IAuthSession> DefaultSessionFactory
+        {
+            get { return sessionFn ?? (() => new AuthUserSession()); }
+            set { sessionFn = value; }
+        }
+
         public TimeSpan? SessionExpiry { get; set; }
         public TimeSpan? SessionBagExpiry { get; set; }
         public TimeSpan? PermanentSessionExpiry { get; set; }
@@ -26,13 +33,8 @@ namespace ServiceStack
         [Obsolete("Removing rarely used feature, if needed override OnSessionFilter() and return null if invalid session")]
         public static bool VerifyCachedSessionId = false;
 
-        private static bool alreadyConfigured;
-
         public void Register(IAppHost appHost)
         {
-            if (alreadyConfigured) return;
-            alreadyConfigured = true;
-
             //Add permanent and session cookies if not already set.
             appHost.GlobalRequestFilters.Add(AddSessionIdToRequestFilter);
         }
@@ -93,15 +95,14 @@ namespace ServiceStack
             return (T)CreateNewSession(httpReq, sessionId);
         }
 
-        public static IAuthSession CreateNewSession(IRequest httpReq, string sessionId)
+        public static IAuthSession CreateNewSession(IRequest request, string sessionId)
         {
-            var session = AuthenticateService.CurrentSessionFactory();
-            session.Id = sessionId ?? CreateSessionIds(httpReq);
-            session.CreatedAt = session.LastModified = DateTime.UtcNow;
-            session.OnCreated(httpReq);
+            var session = DefaultSessionFactory();
+            session.Id = sessionId ?? CreateSessionIds(request);
+            session.OnCreated(request);
 
             var authEvents = HostContext.TryResolve<IAuthEvents>();
-            authEvents?.OnCreated(httpReq, session);
+            authEvents?.OnCreated(request, session);
 
             return session;
         }

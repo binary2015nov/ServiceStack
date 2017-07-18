@@ -8,11 +8,11 @@ namespace ServiceStack
 {
     public class MetadataFeature : IPlugin
     {
-        public string PluginLinksTitle { get; set; }
-        public Dictionary<string, string> PluginLinks { get; set; }
+        public const string PluginLinks = "Plugin Links";
+        public const string DebugInfo = "Debug Info";
+        public const string Features = "Features";
 
-        public string DebugLinksTitle { get; set; }
-        public Dictionary<string, string> DebugLinks { get; set; }
+        public Dictionary<string, Dictionary<string, string>> Sections { get; private set; }
 
         public Action<IndexOperationsControl> IndexPageFilter { get; set; }
         public Action<OperationControl> DetailPageFilter { get; set; }
@@ -21,14 +21,9 @@ namespace ServiceStack
 
         public MetadataFeature()
         {
-
-            PluginLinksTitle = "Plugin Links:";
-            PluginLinks = new Dictionary<string, string>();
-
-            DebugLinksTitle = "Debug Info:";
-            DebugLinks = new Dictionary<string, string> {
-                {"operations/metadata", "Operations Metadata"},
-            };
+            Sections = new Dictionary<string, Dictionary<string, string>>();
+            AddSection(PluginLinks);
+            AddLink(DebugInfo, "operations/metadata", "Operations Metadata");
         }
 
         public void Register(IAppHost appHost)
@@ -103,38 +98,19 @@ namespace ServiceStack
             }
             return null;
         }
-    }
 
-    public static class MetadataFeatureExtensions
-    {
-        public static MetadataFeature AddPluginLink(this MetadataFeature metadata, string href, string title)
+        public void AddSection(string sectionName)
         {
-            if (metadata != null)
-            {
-                metadata.PluginLinks[href] = title;
-            }
-            return metadata;
+            if (Sections.ContainsKey(sectionName))
+                return;
+
+            Sections[sectionName] = new Dictionary<string, string>();
         }
 
-        public static MetadataFeature RemovePluginLink(this MetadataFeature metadata, string href)
+        public void AddLink(string sectionName, string href, string title)
         {
-            metadata.PluginLinks.Remove(href);
-            return metadata;
-        }
-
-        public static MetadataFeature AddDebugLink(this MetadataFeature metadata, string href, string title)
-        {
-            if (metadata != null)
-            {
-                metadata.DebugLinks[href] = title;
-            }
-            return metadata;
-        }
-
-        public static MetadataFeature RemoveDebugLink(this MetadataFeature metadata, string href)
-        {
-            metadata.DebugLinks.Remove(href);
-            return metadata;
+            AddSection(sectionName);
+            Sections[sectionName][href] = title;
         }
     }
 }

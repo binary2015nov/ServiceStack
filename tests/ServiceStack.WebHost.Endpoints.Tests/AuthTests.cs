@@ -1300,7 +1300,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_logout_using_CredentailsAuth()
         {
-            Assert.That(AuthenticateService.LogoutAction, Is.EqualTo("logout"));
+            Assert.That(AuthProviderCatagery.LogoutAction, Is.EqualTo("logout"));
 
             try
             {
@@ -1322,7 +1322,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
                 logoutResponse = client.Send(new Authenticate
                 {
-                    provider = AuthenticateService.LogoutAction,
+                    provider = AuthProviderCatagery.LogoutAction,
                 });
 
                 Assert.That(logoutResponse.ResponseStatus.ErrorCode, Is.Null);

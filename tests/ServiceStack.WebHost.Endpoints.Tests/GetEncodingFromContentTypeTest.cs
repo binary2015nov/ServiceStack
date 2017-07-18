@@ -26,7 +26,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TestExistingDir
         [Test]
         public void Return_Null_When_No_Encoding()
         {
-            var ct = "Content-Type: text/plain";
+            var ct = $"{HttpHeaders.ContentType}:{MimeTypes.PlainText}";
 
             var encoding = ListenerRequest.GetEncoding(ct);
 

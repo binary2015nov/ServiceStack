@@ -25,8 +25,8 @@ namespace ServiceStack.Auth
             }
         }
 
-        public static string Name = AuthenticateService.CredentialsProvider;
-        public static string Realm = "/auth/" + AuthenticateService.CredentialsProvider;
+        public static string Name = AuthProviderCatagery.CredentialsProvider;
+        public static string Realm = "/auth/" + AuthProviderCatagery.CredentialsProvider;
 
         public bool SkipPasswordVerificationForInProcessRequests { get; set; }
 

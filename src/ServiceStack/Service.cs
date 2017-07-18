@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Reflection;
 using ServiceStack.Auth;
 using ServiceStack.Caching;
 using ServiceStack.Configuration;
+using ServiceStack.Host;
 using ServiceStack.IO;
 using ServiceStack.Messaging;
 using ServiceStack.Redis;
@@ -16,6 +19,26 @@ namespace ServiceStack
     public class Service : IService, IServiceBase, IDisposable
     {
         public static IResolver DefaultResolver { get; set; }
+
+        public static bool IsServiceType(Type type)
+        {
+            return typeof(IService).IsAssignableFrom(type) && !type.IsAbstract() && !type.IsGenericTypeDefinition() && !type.ContainsGenericParameters();
+        }
+
+        public static IEnumerable<MethodInfo> GetActions(Type type)
+        {
+            foreach (var methodInfo in type.GetMethods(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (methodInfo.GetParameters().Length != 1)
+                    continue;
+
+                string actionName = methodInfo.Name.ToUpper();
+                if (!HttpMethods.AllVerbs.Contains(actionName) && actionName != ActionContext.AnyAction)
+                    continue;
+
+                yield return methodInfo;
+            }
+        }
 
         private IResolver resolver;
         public virtual IResolver GetResolver() => resolver ?? DefaultResolver;
@@ -93,14 +116,6 @@ namespace ServiceStack
         private ISession session;
         public virtual ISession SessionBag => session ?? (session = TryResolve<ISession>() //Easier to mock
             ?? SessionFactory.GetOrCreateSession(Request, Response));
-
-        public virtual IAuthSession GetSession(bool reload = false)
-        {
-            var req = this.Request;
-            if (req.GetSessionId() == null)
-                req.Response.CreateSessionIds(req);
-            return req.GetSession(reload);
-        }
 
         /// <summary>
         /// Typed UserSession

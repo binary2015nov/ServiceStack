@@ -340,7 +340,7 @@ namespace ServiceStack.AuthWeb.Tests
             {
                 return service.Post(new Authenticate
                 {
-                    provider = AuthenticateService.CredentialsProvider,
+                    provider = ServiceStack.Auth.AuthProviderCatagery.CredentialsProvider,
                     UserName = request.UserName,
                 });
             }

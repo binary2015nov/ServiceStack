@@ -34,7 +34,7 @@ namespace ServiceStack
 {
     public abstract partial class ServiceStackHost : IAppHost, IFunqlet, IHasContainer, IDisposable
     {
-        private readonly ILog Logger = LogManager.GetLogger(typeof(ServiceStackHost));
+        private static ILog Logger = LogManager.GetLogger(typeof(ServiceStackHost));
 
         public DateTime CreateAt { get; private set; }
 
@@ -169,7 +169,6 @@ namespace ServiceStack
                 Service.DefaultResolver = this;
                 ServiceController = ServiceController ?? CreateServiceController();
                 ServiceController.Init();
-                Container.RegisterAutoWiredTypes(Metadata.ServiceTypes);
             }
             catch (Exception ex)
             {
@@ -196,8 +195,7 @@ namespace ServiceStack
             {
                 OnStartupException(ex);
             }
-            OnAfterInit();
-            HttpHandlerFactory.Init();
+            OnAfterInit();      
             ReadyAt = DateTime.UtcNow;
             LogInitResult();
             return this;
@@ -377,8 +375,34 @@ namespace ServiceStack
             {
                 callback(this);
             }
+            //Register any routes configured on Metadata.Routes
+            foreach (var restPath in RestPaths)
+            {
+                ServiceController.RegisterRestPath(restPath);
 
-            ReadyAt = DateTime.UtcNow;
+                //Auto add Route Attributes so they're available in T.ToUrl() extension methods
+                restPath.RequestType
+                    .AddAttributes(new RouteAttribute(restPath.Path, restPath.AllowedVerbs)
+                    {
+                        Priority = restPath.Priority,
+                        Summary = restPath.Summary,
+                        Notes = restPath.Notes,
+                    });
+            }
+
+            //Sync the RestPaths collections
+            RestPaths.Clear();
+            RestPaths.AddRange(ServiceController.RestPathMap.Values.SelectMany(x => x));
+
+            foreach (var restPath in RestPaths)
+            {
+                Operation operation;
+                if (!Metadata.OperationsMap.TryGetValue(restPath.RequestType, out operation))
+                    continue;
+
+                operation.Routes.Add(restPath);
+            }
+            HttpHandlerFactory.Init();
         }
 
         private void AfterPluginsLoaded(string specifiedContentType)
@@ -391,25 +415,25 @@ namespace ServiceStack
             Config.PreferredContentTypes.Remove(Config.DefaultContentType);
             Config.PreferredContentTypes.Insert(0, Config.DefaultContentType);
 
-            Config.PreferredContentTypesArray = Config.PreferredContentTypes.ToArray();
-
+            MetadataFeature metadataFeature = GetPlugin<MetadataFeature>();
+            metadataFeature.AddSection(MetadataFeature.Features);
             foreach (var plugin in Plugins)
             {
+                string title = plugin.GetType().Name;
+                metadataFeature.AddLink(MetadataFeature.Features, "#" + title, title);
                 var preInitPlugin = plugin as IPostInitPlugin;
-                if (preInitPlugin != null)
+                try
                 {
-                    try
+                    if (preInitPlugin != null)
                     {
                         preInitPlugin.AfterPluginsLoaded(this);
                     }
-                    catch (Exception ex)
-                    {
-                        OnStartupException(ex);
-                    }
                 }
+                catch (Exception ex)
+                {
+                    OnStartupException(ex);
+                }                
             }
-
-            ServiceController.AfterInit();
         }
 
         private void LogInitResult()

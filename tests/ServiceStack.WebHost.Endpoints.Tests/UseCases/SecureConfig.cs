@@ -104,7 +104,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
         [Authenticate]
         public object Any(HelloAuthenticated request)
         {
-            var session = GetSession();
+            var session = Request.GetSession();
 
             return new HelloAuthenticatedResponse
             {

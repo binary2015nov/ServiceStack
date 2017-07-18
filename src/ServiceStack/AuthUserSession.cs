@@ -13,6 +13,7 @@ namespace ServiceStack
         {
             this.ProviderOAuthAccess = new List<IAuthTokens>();
             this.Meta = new Dictionary<string, string>();
+            CreatedAt = LastModified = DateTime.UtcNow;
         }
 
         [DataMember(Order = 01)] public string ReferrerUrl { get; set; }

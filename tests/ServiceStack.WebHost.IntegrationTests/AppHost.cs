@@ -93,14 +93,14 @@ namespace ServiceStack.WebHost.IntegrationTests
                 });
 
             container.Register<ICacheClient>(new MemoryCacheClient());
-            //this.Container.Register<ICacheClient>(new BasicRedisClientManager());
+            //container.Register<ICacheClient>(new BasicRedisClientManager());
 
             ConfigureAuth(container);
 
-            //this.Container.Register<ISessionFactory>(
+            //container.Register<ISessionFactory>(
             //    c => new SessionFactory(c.Resolve<ICacheClient>()));
 
-            var dbFactory = this.Container.Resolve<IDbConnectionFactory>();
+            var dbFactory = container.Resolve<IDbConnectionFactory>();
 
             using (var db = dbFactory.Open())
                 db.DropAndCreateTable<Movie>();

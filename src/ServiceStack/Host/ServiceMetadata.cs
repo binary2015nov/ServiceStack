@@ -86,18 +86,6 @@ namespace ServiceStack.Host
             LicenseUtils.AssertValidUsage(LicenseFeature.ServiceStack, QuotaType.Operations, nonCoreServicesCount);
         }
 
-        public void AfterInit()
-        {
-            foreach (var restPath in restPaths)
-            {
-                Operation operation;
-                if (!OperationsMap.TryGetValue(restPath.RequestType, out operation))
-                    continue;
-
-                operation.Routes.Add(restPath);
-            }
-        }
-
         readonly HashSet<Assembly> excludeAssemblies = new HashSet<Assembly>
         {
             typeof(string).GetAssembly(),            //mscorelib
@@ -136,7 +124,7 @@ namespace ServiceStack.Host
             if (!typeof(IService).IsAssignableFrom(serviceType))
                 throw new NotSupportedException("All Services must implement IService");
 
-            return serviceType.GetActions()
+            return Service.GetActions(serviceType)
                 .Where(x => x.GetParameters()[0].ParameterType == requestType)
                 .ToList();
         }

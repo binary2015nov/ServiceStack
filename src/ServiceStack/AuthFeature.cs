@@ -114,10 +114,12 @@ namespace ServiceStack
 
         public void Register(IAppHost appHost)
         {
-            AuthenticateService.Init(sessionFactory, authProviders);
+            SessionFeature.DefaultSessionFactory = sessionFactory;
+            AuthenticateService.Init(authProviders);
 
             var unitTest = appHost == null;
-            if (unitTest) return;
+            if (unitTest)
+                return;
 
             if (HostContext.StrictMode)
             {

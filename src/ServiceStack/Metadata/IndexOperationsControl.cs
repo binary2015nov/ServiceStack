@@ -161,23 +161,31 @@ namespace ServiceStack.Metadata
             }
 
             var metadata = HostContext.GetPlugin<MetadataFeature>();
-            var pluginLinks = metadata != null && metadata.PluginLinks.Count > 0
-                ? new ListTemplate
-                {
-                    Title = metadata.PluginLinksTitle,
-                    ListItemsMap = ToAbsoluteUrls(metadata.PluginLinks),
-                    ListItemTemplate = @"<li><a href=""{0}"">{1}</a></li>"
-                }.ToString()
-                : "";
+            var pluginLinks = metadata != null && metadata.Sections[MetadataFeature.PluginLinks].Count > 0
+                 ? new ListTemplate
+                 {
+                     Title = MetadataFeature.PluginLinks,
+                     ListItemsMap = ToAbsoluteUrls(metadata.Sections[MetadataFeature.PluginLinks]),
+                     ListItemTemplate = @"<li><a href=""{0}"">{1}</a></li>"
+                 }.ToString()
+                 : "";
 
-            var debugOnlyInfo = HostContext.DebugMode && metadata != null && metadata.DebugLinks.Count > 0
+            var debugOnlyInfo = metadata != null && metadata.Sections[MetadataFeature.DebugInfo].Count > 0
                 ? new ListTemplate
                 {
-                    Title = metadata.DebugLinksTitle,
-                    ListItemsMap = ToAbsoluteUrls(metadata.DebugLinks),
+                    Title = MetadataFeature.DebugInfo,
+                    ListItemsMap = ToAbsoluteUrls(metadata.Sections[MetadataFeature.DebugInfo]),
                     ListItemTemplate = @"<li><a href=""{0}"">{1}</a></li>"
                 }.ToString()
                 : "";
+            var features = metadata != null && metadata.Sections[MetadataFeature.Features].Count > 0
+              ? new ListTemplate
+              {
+                  Title = MetadataFeature.Features,
+                  ListItemsMap = ToAbsoluteUrls(metadata.Sections[MetadataFeature.Features]),
+                  ListItemTemplate = @"<li><a href=""{0}"">{1}</a></li>"
+              }.ToString()
+              : "";
 
             var errorCount = HostContext.AppHost.StartUpErrors.Count;
             var plural = errorCount > 1 ? "s" : "";
@@ -195,7 +203,8 @@ namespace ServiceStack.Metadata
                 pluginLinks,
                 debugOnlyInfo,
                 Env.VersionString,
-                startupErrors);
+                startupErrors,
+                features);
 
             output.Write(renderedTemplate);
         }
@@ -207,12 +216,11 @@ namespace ServiceStack.Metadata
 
             foreach (var entry in linksMap)
             {
-                var url = baseUrl.CombineWith(entry.Key);
+                var url = entry.Key.StartsWith("#") ? entry.Key : baseUrl.CombineWith(entry.Key);
                 to[url] = entry.Value;
             }
 
             return to;
         }
     }
-
 }

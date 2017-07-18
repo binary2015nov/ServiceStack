@@ -700,19 +700,19 @@ namespace ServiceStack
             }
 
             var customContentTypes = HostContext.ContentTypes.ContentTypeFormats.Values;
-            var preferredContentTypes = HostContext.Config.PreferredContentTypesArray;
+            var preferredContentTypes = HostContext.Config.PreferredContentTypes;
 
             var acceptsAnything = false;
             var hasDefaultContentType = !IsNullOrEmpty(defaultContentType);
             if (acceptContentTypes != null)
             {
-                var hasPreferredContentTypes = new bool[preferredContentTypes.Length];
+                var hasPreferredContentTypes = new bool[preferredContentTypes.Count];
                 foreach (var acceptsType in acceptContentTypes)
                 {
                     var contentType = ContentFormat.GetRealContentType(acceptsType);
                     acceptsAnything = acceptsAnything || contentType == "*/*";
 
-                    for (var i = 0; i < preferredContentTypes.Length; i++)
+                    for (var i = 0; i < preferredContentTypes.Count; i++)
                     {
                         if (hasPreferredContentTypes[i]) continue;
                         var preferredContentType = preferredContentTypes[i];
@@ -724,7 +724,7 @@ namespace ServiceStack
                     }
                 }
 
-                for (var i = 0; i < preferredContentTypes.Length; i++)
+                for (var i = 0; i < preferredContentTypes.Count; i++)
                 {
                     if (hasPreferredContentTypes[i]) return preferredContentTypes[i];
                 }

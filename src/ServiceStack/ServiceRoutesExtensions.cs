@@ -36,9 +36,9 @@ namespace ServiceStack
                 .Where(t => !t.IsAbstract()
                             && t.HasInterface(typeof(IService)));
 
-            foreach (Type service in services)
+            foreach (Type serviceType in services)
             {
-                var allServiceActions = service.GetActions();
+                var allServiceActions = Service.GetActions(serviceType);
                 foreach (var requestDtoActions in allServiceActions.GroupBy(x => x.GetParameters()[0].ParameterType))
                 {
                     var requestType = requestDtoActions.Key;

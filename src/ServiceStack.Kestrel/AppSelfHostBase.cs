@@ -164,13 +164,13 @@ namespace ServiceStack
 
         protected override void Dispose(bool disposing)
         {
+            base.Dispose(disposing);
+
             if (disposing)
             {
                 this.WebHost?.Dispose();
                 this.WebHost = null;
             }
-
-            base.Dispose(disposing);
         }
     }    
 }

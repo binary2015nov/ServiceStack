@@ -18,8 +18,8 @@ namespace ServiceStack.Auth
     {
         public static RsaKeyLengths UseRsaKeyLength = RsaKeyLengths.Bit2048;
 
-        public const string Name = AuthenticateService.JwtProvider;
-        public const string Realm = "/auth/" + AuthenticateService.JwtProvider;
+        public const string Name = AuthProviderCatagery.JwtProvider;
+        public const string Realm = "/auth/" + AuthProviderCatagery.JwtProvider;
 
         public static HashSet<string> IgnoreForOperationTypes = new HashSet<string>
         {

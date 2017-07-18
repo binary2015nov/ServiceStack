@@ -54,8 +54,8 @@ namespace ServiceStack.Auth
     /// </summary>
     public class ApiKeyAuthProvider : AuthProvider, IAuthWithRequest, IAuthPlugin
     {
-        public const string Name = AuthenticateService.ApiKeyProvider;
-        public const string Realm = "/auth/" + AuthenticateService.ApiKeyProvider;
+        public const string Name = AuthProviderCatagery.ApiKeyProvider;
+        public const string Realm = "/auth/" + AuthProviderCatagery.ApiKeyProvider;
 
         public static string[] DefaultTypes = new[] { "secret" };
         public static string[] DefaultEnvironments = new[] { "live", "test" };
@@ -424,7 +424,7 @@ namespace ServiceStack.Auth
             {
                 return new GetApiKeysResponse
                 {
-                    Results = apiRepo.GetUserApiKeys(GetSession().UserAuthId)
+                    Results = apiRepo.GetUserApiKeys(base.Request.GetSession().UserAuthId)
                         .Where(x => x.Environment == env)
                         .Map(k => new UserApiKey {
                             Key = k.Id,
@@ -451,7 +451,7 @@ namespace ServiceStack.Auth
             var apiRepo = (IManageApiKeys)HostContext.AppHost.GetAuthRepository(base.Request);
             using (apiRepo as IDisposable)
             {
-                var userId = GetSession().UserAuthId;
+                var userId = base.Request.GetSession().UserAuthId;
                 var updateKeys = apiRepo.GetUserApiKeys(userId)
                     .Where(x => x.Environment == env)
                     .ToList();
@@ -494,7 +494,7 @@ namespace ServiceStack
 
         internal static ApiKeyAuthProvider AssertValidApiKeyRequest(this IRequest req)
         {
-            var apiKeyAuth = (ApiKeyAuthProvider)AuthenticateService.GetAuthProvider(AuthenticateService.ApiKeyProvider);
+            var apiKeyAuth = (ApiKeyAuthProvider)AuthenticateService.GetAuthProvider(AuthProviderCatagery.ApiKeyProvider);
             if (apiKeyAuth.RequireSecureConnection && !req.IsSecureConnection)
                 throw HttpError.Forbidden(ErrorMessages.ApiKeyRequiresSecureConnection);
 

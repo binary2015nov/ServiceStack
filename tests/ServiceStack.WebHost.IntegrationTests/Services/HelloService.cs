@@ -34,7 +34,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 	{
 		public object Any(Hello request)
 		{
-			return new HelloResponse { Result = "Hello, " + request.Name };
+            return new HelloResponse { Result = "Hello, " + (request.Name.IsNullOrEmpty() ? "World" : request.Name) };
 		}
 	}
 
@@ -66,6 +66,4 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 			return request.Name;
 		}
 	}
-
-
 }

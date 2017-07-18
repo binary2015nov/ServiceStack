@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.IO.Compression;
+using ServiceStack.Auth;
 using ServiceStack.Caching;
 using ServiceStack.Configuration;
 using ServiceStack.Host;
@@ -10,6 +11,59 @@ namespace ServiceStack
 {
     public static class RequestExtensions
     {
+        public static IAuthSession GetSession(this IRequest request, bool reload = false)
+        {
+            if (HostContext.TestMode)
+            {
+                var mockSession = request.TryResolve<IAuthSession>(); //testing
+                if (mockSession != null)
+                    return mockSession;
+            }
+
+            object oSession = null;
+            if (!reload)
+                request.Items.TryGetValue(Keywords.Session, out oSession);
+
+            if (oSession == null && !request.Items.ContainsKey(Keywords.HasPreAuthenticated))
+            {
+                try
+                {
+                    HostContext.AppHost.ApplyPreAuthenticateFilters(request, request.Response);
+                    request.Items.TryGetValue(Keywords.Session, out oSession);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Error in GetSession() when ApplyPreAuthenticateFilters", ex);
+                    /*treat errors as non-existing session*/
+                }
+            }
+
+            var sessionId = request.GetSessionId();
+            var session = oSession as IAuthSession;
+            if (session != null)
+                session = HostContext.AppHost.OnSessionFilter(session, sessionId);
+            if (session != null)
+                return session;
+
+            var sessionKey = SessionFeature.GetSessionKey(sessionId);
+            if (sessionKey != null)
+            {
+                session = request.GetCacheClient().Get<IAuthSession>(sessionKey);
+
+                if (session != null)
+                    session = HostContext.AppHost.OnSessionFilter(session, sessionId);
+            }
+
+            if (session == null)
+            {
+                var newSession = SessionFeature.CreateNewSession(request, sessionId);
+                session = HostContext.AppHost.OnSessionFilter(newSession, sessionId) ?? newSession;
+            }
+
+            request.Items[Keywords.Session] = session;
+            return session;
+        }
+
         public static AuthUserSession ReloadSession(this IRequest request)
         {
             return request.GetSession() as AuthUserSession;

@@ -11,10 +11,9 @@ using ServiceStack.WebHost.IntegrationTests.Services;
 
 namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
-    public class RestsTestBase
-        : TestBase
+    public class RestsTestBase : TestBase
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(RestsTestBase));
+        private static ILog Log = LogManager.GetLogger(typeof(RestsTestBase));
 
         readonly HostConfig defaultConfig = new HostConfig();
 

@@ -12,51 +12,54 @@ namespace ServiceStack.Host
 {
     public interface IServiceExec
     {
-        object Execute(IRequest requestContext, object instance, object request);
+        object Execute(IRequest request, IService service, object requestDto);
     }
 
-    public class ServiceRequestExec<TService, TRequest> : IServiceExec
+    //public class ServiceRequestExec<TService, TRequest> : IServiceExec
+    //{
+    //    public object Execute(IRequest requestContext, object instance, object request)
+    //    {
+    //        return ServiceExec<TService>.Execute(requestContext, instance, request,
+    //            typeof(TRequest).GetOperationName());
+    //    }
+    //}
+
+    //public static class ServiceExecExtensions
+    //{
+    //    public static IEnumerable<MethodInfo> GetActions(this Type serviceType)
+    //    {
+    //        foreach (var mi in serviceType.GetMethods(BindingFlags.Public | BindingFlags.Instance))
+    //        {
+    //            if (mi.GetParameters().Length != 1)
+    //                continue;
+
+    //            var actionName = mi.Name.ToUpper();
+    //            if (!HttpMethods.AllVerbs.Contains(actionName) && 
+    //                actionName != ActionContext.AnyAction &&
+    //                !HttpMethods.AllVerbs.Any(verb => ContentTypes.KnownFormats.Any(format => actionName.EqualsIgnoreCase(verb + format))) &&
+    //                !ContentTypes.KnownFormats.Any(format => actionName.EqualsIgnoreCase(ActionContext.AnyAction + format)))
+    //                continue;
+
+    //            yield return mi;
+    //        }
+    //    }
+    //}
+
+    public class ServiceExec<TService> : IServiceExec
+        where TService : IService
     {
-        public object Execute(IRequest requestContext, object instance, object request)
-        {
-            return ServiceExec<TService>.Execute(requestContext, instance, request,
-                typeof(TRequest).GetOperationName());
-        }
-    }
+        private const string ResponseDtoSuffix = "Response";
 
-    public static class ServiceExecExtensions
-    {
-        public static IEnumerable<MethodInfo> GetActions(this Type serviceType)
-        {
-            foreach (var mi in serviceType.GetMethods(BindingFlags.Public | BindingFlags.Instance))
-            {
-                if (mi.GetParameters().Length != 1)
-                    continue;
-
-                var actionName = mi.Name.ToUpper();
-                if (!HttpMethods.AllVerbs.Contains(actionName) && 
-                    actionName != ActionContext.AnyAction &&
-                    !HttpMethods.AllVerbs.Any(verb => ContentTypes.KnownFormats.Any(format => actionName.EqualsIgnoreCase(verb + format))) &&
-                    !ContentTypes.KnownFormats.Any(format => actionName.EqualsIgnoreCase(ActionContext.AnyAction + format)))
-                    continue;
-
-                yield return mi;
-            }
-        }
-    }
-
-    internal class ServiceExec<TService>
-    {
-        private static Dictionary<Type, List<ActionContext>> actionMap;
+        public static Dictionary<Type, List<ActionContext>> ActionMap { get; private set; }
 
         private static Dictionary<string, InstanceExecFn> execMap;
 
-        public static void Reset()
+        static ServiceExec()
         {
-            actionMap = new Dictionary<Type, List<ActionContext>>();
+            ActionMap = new Dictionary<Type, List<ActionContext>>();
             execMap = new Dictionary<string, InstanceExecFn>();
 
-            foreach (var mi in typeof(TService).GetActions())
+            foreach (var mi in Service.GetActions(typeof(TService)))
             {
                 var actionName = mi.Name.ToUpper();
                 var args = mi.GetParameters();
@@ -101,10 +104,25 @@ namespace ServiceStack.Host
                 if (resFilters.Count > 0)
                     actionCtx.ResponseFilters = resFilters.ToArray();
 
-                if (!actionMap.ContainsKey(requestType))
-                    actionMap[requestType] = new List<ActionContext>();
+                if (!ActionMap.ContainsKey(requestType))
+                    ActionMap[requestType] = new List<ActionContext>();
 
-                actionMap[requestType].Add(actionCtx);
+                ActionMap[requestType].Add(actionCtx);
+            }
+            foreach (var item in ActionMap)
+            {
+                MethodInfo methodInfo = typeof(ServiceExec<>).MakeGenericType(typeof(TService)).
+                    GetMethod("CreateServiceRunnersFor", BindingFlags.NonPublic | BindingFlags.Static).MakeGenericMethod(item.Key);
+                methodInfo.Invoke(null, new object[] { item.Value });
+            }
+        }
+
+        private static void CreateServiceRunnersFor<TRequest>(IEnumerable<ActionContext> collection)
+        {
+            foreach (var actionCtx in collection)
+            {
+                var serviceRunner = HostContext.CreateServiceRunner<TRequest>(actionCtx);
+                execMap[actionCtx.Id] = serviceRunner.Process;
             }
         }
 
@@ -141,27 +159,9 @@ namespace ServiceStack.Host
             }
         }
 
-        private static IEnumerable<ActionContext> GetActionsFor<TRequest>()
+        public object Execute(IRequest request, TService service, object requestDto)
         {
-            return actionMap.TryGetValue(typeof(TRequest), out List<ActionContext> requestActions)
-                ? requestActions
-                : new List<ActionContext>();
-        }
-
-        public static void CreateServiceRunnersFor<TRequest>()
-        {
-            foreach (var actionCtx in GetActionsFor<TRequest>())
-            {
-                if (execMap.ContainsKey(actionCtx.Id)) continue;
-
-                var serviceRunner = HostContext.CreateServiceRunner<TRequest>(actionCtx);
-                execMap[actionCtx.Id] = serviceRunner.Process;
-            }
-        }
-
-        public static object Execute(IRequest request, object instance, object requestDto, string requestName)
-        {
-            var actionName = request.Verb 
+            var actionName = request.Verb
                 ?? HttpMethods.Post; //MQ Services
 
             var overrideVerb = request.GetItem(Keywords.InvokeVerb) as string;
@@ -171,18 +171,23 @@ namespace ServiceStack.Host
             var format = request.ResponseContentType.ToContentFormat()?.ToUpper();
 
             InstanceExecFn action;
-            if (execMap.TryGetValue(ActionContext.Key(actionName + format, requestName), out action) ||
-                execMap.TryGetValue(ActionContext.AnyFormatKey(format, requestName), out action) ||
-                execMap.TryGetValue(ActionContext.Key(actionName, requestName), out action) ||
-                execMap.TryGetValue(ActionContext.AnyKey(requestName), out action))
+            if (execMap.TryGetValue(ActionContext.Key(actionName + format, request.OperationName), out action) ||
+            execMap.TryGetValue(ActionContext.AnyFormatKey(format, request.OperationName), out action) ||
+            execMap.TryGetValue(ActionContext.Key(actionName, request.OperationName), out action) ||
+            execMap.TryGetValue(ActionContext.AnyKey(request.OperationName), out action))
             {
-                return action(request, instance, requestDto);
+                return action(request, service, requestDto);
             }
 
             var expectedMethodName = actionName.Substring(0, 1) + actionName.Substring(1).ToLowerInvariant();
             throw new NotImplementedException(
-                $"Could not find method named {expectedMethodName}({requestDto.GetType().GetOperationName()}) " +
-                $"or Any({requestDto.GetType().GetOperationName()}) on Service {typeof(TService).GetOperationName()}");
+                "Could not find method named {1}({0}) or Any({0}) on Service {2}"
+                .Fmt(request.OperationName, expectedMethodName, typeof(TService).GetOperationName()));
+        }
+
+        object IServiceExec.Execute(IRequest request, IService service, object requestDto)
+        {
+            return Execute(request, (TService)service, requestDto);
         }
     }
 }

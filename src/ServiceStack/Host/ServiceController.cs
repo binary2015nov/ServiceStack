@@ -16,39 +16,31 @@ using ServiceStack.Web;
 
 namespace ServiceStack.Host
 {
-    public delegate object ServiceExecFn(IRequest requestContext, object request);
-    public delegate object InstanceExecFn(IRequest requestContext, object intance, object request);
-    public delegate object ActionInvokerFn(object intance, object request);
-    public delegate void VoidActionInvokerFn(object intance, object request);
+    public delegate object ServiceExecFn(IRequest request, object requestDto);
+    public delegate object InstanceExecFn(IRequest request, object intance, object requestDto);
+    public delegate object ActionInvokerFn(object intance, object requestDto);
+    public delegate void VoidActionInvokerFn(object intance, object requestDto);
 
     public class ServiceController : IServiceController
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ServiceController));
+        private static ILog Logger = LogManager.GetLogger(typeof(ServiceController));
+
         private const string ResponseDtoSuffix = "Response";
         private readonly ServiceStackHost appHost;
 
-        public ServiceController(ServiceStackHost appHost)
+        public ServiceController(ServiceStackHost appHost) : this(appHost, appHost.ServiceAssemblies) { }
+
+        public ServiceController(ServiceStackHost appHost, Assembly[] assembliesWithServices) : this(appHost, assembliesWithServices, null) { }
+
+        public ServiceController(ServiceStackHost appHost, Func<IEnumerable<Type>> resolveServicesFn) : this(appHost, appHost.ServiceAssemblies, resolveServicesFn) { }
+
+        public ServiceController(ServiceStackHost appHost, Assembly[] assembliesWithServices, Func<IEnumerable<Type>> resolveServicesFn)
         {
             this.appHost = appHost;
             appHost.Container.DefaultOwner = Owner.External;
+            typeFactory = new ContainerResolveCache(appHost.Container);
             this.RequestTypeFactoryMap = new Dictionary<Type, Func<IRequest, object>>();
-        }
-
-        public ServiceController(ServiceStackHost appHost, Func<IEnumerable<Type>> resolveServicesFn)
-            : this(appHost)
-        {
-            this.ResolveServicesFn = resolveServicesFn;
-        }
-
-        public ServiceController(ServiceStackHost appHost, params Assembly[] assembliesWithServices)
-            : this(appHost)
-        {
-            if (assembliesWithServices == null || assembliesWithServices.Length == 0)
-                throw new ArgumentException(
-                    "No Assemblies provided in your AppHost's base constructor.\n"
-                    + "To register your services, please provide the assemblies where your web services are defined.");
-
-            this.ResolveServicesFn = () => GetAssemblyTypes(assembliesWithServices);
+            this.ResolveServicesFn = resolveServicesFn ?? (() => GetServiceTypes(assembliesWithServices));
         }
 
         readonly Dictionary<Type, ServiceExecFn> requestExecMap
@@ -67,47 +59,16 @@ namespace ServiceStack.Host
 
         public ServiceController Init()
         {
-            typeFactory = new ContainerResolveCache(appHost.Container);
-
-            this.Register(typeFactory);
-
-            appHost.Container.RegisterAutoWiredTypes(appHost.Metadata.ServiceTypes);
-
+            foreach (var serviceType in ResolveServicesFn())
+            {
+                RegisterService(serviceType);
+            }
             return this;
         }
 
-        private List<Type> GetAssemblyTypes(Assembly[] assembliesWithServices)
-        {
-            var results = new List<Type>();
-            string assemblyName = null;
-            string typeName = null;
-
-            try
-            {
-                foreach (var assembly in assembliesWithServices)
-                {
-                    assemblyName = assembly.FullName;
-                    foreach (var type in assembly.GetTypes())
-                    {
-                        if (appHost.ExcludeAutoRegisteringServiceTypes.Contains(type))
-                            continue;
-
-                        typeName = type.GetOperationName();
-                        results.Add(type);
-                    }
-                }
-                return results;
-            }
-            catch (Exception ex)
-            {
-                var msg = $"Failed loading types, last assembly '{assemblyName}', type: '{typeName}'";
-                Log.Error(msg, ex);
-                throw new Exception(msg, ex);
-            }
-        }
         public void RegisterServicesInAssembly(Assembly assembly)
         {
-            foreach (var serviceType in assembly.GetTypes().Where(IsServiceType))
+            foreach (var serviceType in GetServiceTypes(assembly))
             {
                 RegisterService(serviceType);
             }
@@ -115,63 +76,43 @@ namespace ServiceStack.Host
 
         public void RegisterService(Type serviceType)
         {
-            try
-            {
-                if (!IsServiceType(serviceType))
-                    throw new ArgumentException($"Type {serviceType.FullName} is not a Web Service that implements IService");
-                
-                RegisterService(typeFactory, serviceType);
-                appHost.Container.RegisterAutoWiredType(serviceType);
-            }
-            catch (Exception ex)
-            {
-                appHost.NotifyStartupException(ex);
-                Log.Error(ex.Message, ex);
-            }
+            RegisterService(serviceType, typeFactory);
         }
 
-        public void Register(ITypeFactory serviceFactoryFn)
-        {
-            foreach (var serviceType in ResolveServicesFn())
-            {
-                RegisterService(serviceFactoryFn, serviceType);
-            }
-        }
+        private readonly Dictionary<Type, Dictionary<Type, List<ActionContext>>> serviceActionMap = new Dictionary<Type, Dictionary<Type, List<ActionContext>>>();
 
-        public void RegisterService(ITypeFactory serviceFactoryFn, Type serviceType)
+        public void RegisterService(Type serviceType, ITypeFactory serviceFactoryFn)
         {
-            var processedReqs = new HashSet<Type>();
+            if (!Service.IsServiceType(serviceType))
+                throw new ArgumentException($"{serviceType.FullName} is not a service type that implements IService");
 
-            if (IsServiceType(serviceType))
+            Dictionary<Type, List<ActionContext>> actionMap;
+            if (!serviceActionMap.TryGetValue(serviceType, out actionMap))
             {
-                foreach (var mi in serviceType.GetActions())
+                var serviceExecDef = typeof(ServiceExec<>).MakeGenericType(serviceType);
+                var mi = serviceExecDef.GetProperty("ActionMap", BindingFlags.Public | BindingFlags.Static);
+                actionMap = mi.GetValue(null) as Dictionary<Type, List<ActionContext>>;
+
+                var iserviceExec = (IServiceExec)serviceExecDef.CreateInstance();
+                foreach (var requestType in actionMap.Keys)
                 {
-                    var requestType = mi.GetParameters()[0].ParameterType;
-                    if (processedReqs.Contains(requestType)) continue;
-                    processedReqs.Add(requestType);
+                    ServiceExecFn handlerFn = (req, dto) =>
+                    {
+                        var service = serviceFactoryFn.CreateInstance(req, serviceType) as IService;
 
-                    RegisterServiceExecutor(requestType, serviceType, serviceFactoryFn);
+                        ServiceExecFn serviceExec = (reqCtx, requestDto) =>
+                            iserviceExec.Execute(reqCtx, service, requestDto);
 
-                    var returnMarker = requestType.GetTypeWithGenericTypeDefinitionOf(typeof(IReturn<>));
-                    var responseType = returnMarker != null ?
-                          returnMarker.GetGenericArguments()[0]
-                        : mi.ReturnType != typeof(object) && mi.ReturnType != typeof(void) ?
-                          mi.ReturnType
-#if NETSTANDARD1_6
-                        : Type.GetType(requestType.FullName + ResponseDtoSuffix + "," + requestType.GetAssembly().GetName().Name);
-#else                                                  
-                        : AssemblyUtils.FindType(requestType.FullName + ResponseDtoSuffix);
-#endif
+                        return ManagedServiceExec(serviceExec, service, req, dto);
+                    };
+                    AddToRequestExecMap(requestType, serviceType, handlerFn);
                     RegisterRestPaths(requestType);
-
-                    appHost.Metadata.Add(serviceType, requestType, responseType);
-
                     if (typeof(IRequiresRequestStream).IsAssignableFrom(requestType))
                     {
                         this.RequestTypeFactoryMap[requestType] = req =>
                         {
                             var restPath = req.GetRoute();
-                            var request = restPath != null 
+                            var request = restPath != null
                                 ? RestHandler.CreateRequest(req, restPath, req.GetRequestParams(), requestType.CreateInstance())
                                 : KeyValueDataContractDeserializer.Instance.Parse(req.QueryString, requestType);
 
@@ -180,20 +121,18 @@ namespace ServiceStack.Host
                             return rawReq;
                         };
                     }
-
-                    if (Log.IsDebugEnabled)
-                        Log.DebugFormat("Registering {0} service '{1}' with request '{2}'",
-                            responseType != null ? "Reply" : "OneWay", serviceType.GetOperationName(), requestType.GetOperationName());
+                    foreach (var actionContext in actionMap[requestType])
+                    {
+                        Type responseType = actionContext.ResponseType;
+                        appHost.Metadata.Add(serviceType, requestType, responseType);
+                        if (Logger.IsDebugEnabled)
+                            Logger.DebugFormat("Registering {0} service '{1}' with request '{2}'",
+                                responseType != null ? "Reply" : "OneWay", serviceType.GetOperationName(), requestType.GetOperationName());
+                    }
                 }
+                serviceActionMap[serviceType] = actionMap;
+                appHost.Container.RegisterAutoWiredType(serviceType);
             }
-        }
-
-        public static bool IsServiceType(Type serviceType)
-        {
-            return typeof(IService).IsAssignableFrom(serviceType)
-                && !serviceType.IsAbstract() 
-                && !serviceType.IsGenericTypeDefinition() 
-                && !serviceType.ContainsGenericParameters();
         }
 
         public readonly Dictionary<string, List<RestPath>> RestPathMap = new Dictionary<string, List<RestPath>>();
@@ -248,30 +187,6 @@ namespace ServiceStack.Host
             pathsAtFirstMatch.Add(restPath);
         }
 
-        public void AfterInit()
-        {
-            //Register any routes configured on Metadata.Routes
-            foreach (var restPath in appHost.RestPaths)
-            {
-                RegisterRestPath(restPath);
-
-                //Auto add Route Attributes so they're available in T.ToUrl() extension methods
-                restPath.RequestType
-                    .AddAttributes(new RouteAttribute(restPath.Path, restPath.AllowedVerbs)
-                    {
-                        Priority = restPath.Priority,
-                        Summary = restPath.Summary,
-                        Notes = restPath.Notes,
-                    });
-            }
-
-            //Sync the RestPaths collections
-            appHost.RestPaths.Clear();
-            appHost.RestPaths.AddRange(RestPathMap.Values.SelectMany(x => x));
-
-            appHost.Metadata.AfterInit();
-        }
-
         public IRestPath GetRestPathForRequest(string httpMethod, string pathInfo)
         {
             var matchUsingPathParts = RestPath.GetPathPartsForMatching(pathInfo);
@@ -322,54 +237,6 @@ namespace ServiceStack.Host
             }
 
             return null;
-        }
-
-        private readonly Dictionary<Type, List<Type>> serviceExecCache = new Dictionary<Type, List<Type>>();
-        public void ResetServiceExecCachesIfNeeded(Type serviceType, Type requestType)
-        {
-            List<Type> requestTypes;
-            if (!serviceExecCache.TryGetValue(serviceType, out requestTypes))
-            {
-                var mi = typeof(ServiceExec<>)
-                    .MakeGenericType(serviceType)
-                    .GetMethod("Reset", BindingFlags.Public | BindingFlags.Static);
-
-                mi.Invoke(null, new object[] { });
-
-                serviceExecCache[serviceType] = requestTypes = new List<Type>();
-            }
-
-            if (!requestTypes.Contains(requestType))
-            {
-                var mi = typeof(ServiceExec<>)
-                    .MakeGenericType(serviceType)
-                    .GetMethod("CreateServiceRunnersFor", BindingFlags.Public | BindingFlags.Static)
-                    .MakeGenericMethod(requestType);
-
-                mi.Invoke(null, new object[] { });
-
-                requestTypes.Add(requestType);
-            }
-        }
-
-        public void RegisterServiceExecutor(Type requestType, Type serviceType, ITypeFactory serviceFactoryFn)
-        {
-            ResetServiceExecCachesIfNeeded(serviceType, requestType);
-
-            var serviceExecDef = typeof(ServiceRequestExec<,>).MakeGenericType(serviceType, requestType);
-            var iserviceExec = (IServiceExec)serviceExecDef.CreateInstance();
-
-            ServiceExecFn handlerFn = (req, dto) =>
-            {
-                var service = serviceFactoryFn.CreateInstance(req, serviceType);
-
-                ServiceExecFn serviceExec = (reqCtx, requestDto) =>
-                    iserviceExec.Execute(reqCtx, service, requestDto);
-
-                return ManagedServiceExec(serviceExec, (IService)service, req, dto);
-            };
-
-            AddToRequestExecMap(requestType, serviceType, handlerFn);
         }
 
         private void AddToRequestExecMap(Type requestType, Type serviceType, ServiceExecFn handlerFn)
@@ -763,6 +630,35 @@ namespace ServiceStack.Host
                 $"Could not execute service '{requestType.GetOperationName()}', The following restrictions were not met: " +
                 $"'{StringBuilderCache.Retrieve(failedScenarios)}'{internalDebugMsg}");
         }
-    }
 
+        public static List<Type> GetServiceTypes(params Assembly[] assembliesWithServices)
+        {
+            if (assembliesWithServices == null || assembliesWithServices.Length == 0)
+                throw new ArgumentException("No Assemblies provided to extract the service.\n"
+                    + "To register your services, please provide the assemblies where your services are defined.");
+
+            string assemblyName = string.Empty, typeName = string.Empty;
+            try
+            {
+                var results = new List<Type>();
+                foreach (var assembly in assembliesWithServices)
+                {
+                    assemblyName = assembly.FullName;
+                    foreach (var type in assembly.GetTypes().Where(Service.IsServiceType))
+                    {
+                        if (HostContext.AppHost != null && HostContext.AppHost.ExcludeAutoRegisteringServiceTypes.Contains(type))
+                            continue;
+
+                        typeName = type.GetOperationName();
+                        results.Add(type);
+                    }
+                }
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new TypeLoadException($"Failed loading types, last assembly '{assemblyName}', type: '{typeName}'", ex);
+            }
+        }
+    }
 }

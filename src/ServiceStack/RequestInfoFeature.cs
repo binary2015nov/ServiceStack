@@ -13,7 +13,7 @@ namespace ServiceStack
             appHost.RawHttpHandlers.Add(GetRequestInfoHandler);
             appHost.CatchAllHandlers.Add(GetRequestInfoHandler);
 
-            appHost.GetPlugin<MetadataFeature>().AddDebugLink($"?{Keywords.Debug}={Keywords.RequestInfo}", "Request Info");
+            appHost.GetPlugin<MetadataFeature>().AddLink(MetadataFeature.DebugInfo, $"?{Keywords.Debug}={Keywords.RequestInfo}", "Request Info");
         }
 
         public static IHttpHandler GetRequestInfoHandler(IRequest request)

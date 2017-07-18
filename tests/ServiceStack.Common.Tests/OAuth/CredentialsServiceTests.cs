@@ -62,7 +62,7 @@ namespace ServiceStack.Common.Tests.OAuth
             using (var appHost = new CredentialsTestAppHost().Init())
             {
                 var response = (HttpError)appHost.ExecuteService(
-                    new Authenticate { provider = AuthenticateService.CredentialsProvider });
+                    new Authenticate { provider = AuthProviderCatagery.CredentialsProvider });
 
                 var errors = response.GetFieldErrors();
 

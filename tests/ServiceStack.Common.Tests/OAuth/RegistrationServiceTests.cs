@@ -26,7 +26,7 @@ namespace ServiceStack.Common.Tests.OAuth
                     var authService = new AuthenticateService();
                     c.Register(authService);
                     c.Register<IAuthSession>(authUserSession);
-                    AuthenticateService.Init(() => authUserSession, new CredentialsAuthProvider());
+                    AuthenticateService.Init(new CredentialsAuthProvider());
                 }
             }.Init();
         }

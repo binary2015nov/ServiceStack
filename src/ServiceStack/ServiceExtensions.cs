@@ -140,62 +140,6 @@ namespace ServiceStack
             return SessionFeature.GetOrCreateSession<TUserSession>(req.GetCacheClient(), req, req.Response);
         }
 
-        public static IAuthSession GetSession(this IRequest httpReq, bool reload = false)
-        {
-            if (httpReq == null)
-                return null;
-
-            if (HostContext.TestMode)
-            {
-                var mockSession = httpReq.TryResolve<IAuthSession>(); //testing
-                if (mockSession != null)
-                    return mockSession;
-            }
-
-            object oSession = null;
-            if (!reload)
-                httpReq.Items.TryGetValue(Keywords.Session, out oSession);
-
-            if (oSession == null && !httpReq.Items.ContainsKey(Keywords.HasPreAuthenticated))
-            {
-                try
-                {
-                    HostContext.AppHost.ApplyPreAuthenticateFilters(httpReq, httpReq.Response);
-                    httpReq.Items.TryGetValue(Keywords.Session, out oSession);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error("Error in GetSession() when ApplyPreAuthenticateFilters", ex);
-                    /*treat errors as non-existing session*/
-                }
-            }
-
-            var sessionId = httpReq.GetSessionId();
-            var session = oSession as IAuthSession;
-            if (session != null)
-                session = HostContext.AppHost.OnSessionFilter(session, sessionId);
-            if (session != null)
-                return session;
-
-            var sessionKey = SessionFeature.GetSessionKey(sessionId);
-            if (sessionKey != null)
-            {
-                session = httpReq.GetCacheClient().Get<IAuthSession>(sessionKey);
-
-                if (session != null)
-                    session = HostContext.AppHost.OnSessionFilter(session, sessionId);
-            }
-
-            if (session == null)
-            {
-                var newSession = SessionFeature.CreateNewSession(httpReq, sessionId);
-                session = HostContext.AppHost.OnSessionFilter(newSession, sessionId) ?? newSession;
-            }
-
-            httpReq.Items[Keywords.Session] = session;
-            return session;
-        }
-
         public static TimeSpan? GetSessionTimeToLive(this ICacheClient cache, string sessionId)
         {
             var sessionKey = SessionFeature.GetSessionKey(sessionId);

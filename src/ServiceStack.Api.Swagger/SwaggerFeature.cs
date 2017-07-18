@@ -73,7 +73,7 @@ namespace ServiceStack.Api.Swagger
                 : "swagger-ui/";
 
             appHost.GetPlugin<MetadataFeature>()
-                .AddPluginLink(swaggerUrl, "Swagger UI");
+                .AddLink(MetadataFeature.PluginLinks, swaggerUrl, "Swagger UI");
 
             appHost.CatchAllHandlers.Add((httpMethod, pathInfo, filePath) =>
             {

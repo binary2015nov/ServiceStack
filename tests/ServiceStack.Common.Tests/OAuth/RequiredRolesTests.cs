@@ -17,7 +17,7 @@ namespace ServiceStack.Common.Tests.OAuth
         public void TestFixtureSetUp()
         {
             appHost = new BasicAppHost().Init();
-            AuthenticateService.Init(() => new AuthUserSession(), new CredentialsAuthProvider());
+            AuthenticateService.Init(new CredentialsAuthProvider());
         }
 
         [OneTimeTearDown]

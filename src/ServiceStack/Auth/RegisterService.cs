@@ -77,25 +77,25 @@ namespace ServiceStack.Auth
         /// </summary>
         public object Put(Register request)
         {
-            return Post(request);
+            return UpdateUserAuth(request);
         }
 
         /// <summary>
-        ///     Create new Registration
+        /// Create new Registration
         /// </summary>
         public object Post(Register request)
         {
-            var validateResponse = ValidateFn?.Invoke(this, HttpMethods.Post, request);
+            var validateResponse = ValidateFn?.Invoke(this, base.Request.Verb, request);
             if (validateResponse != null)
                 return validateResponse;
 
             RegisterResponse response = null;
-            var session = this.GetSession();
+            var session = Request.GetSession();
             bool registerNewUser;
             IUserAuth user;
 
-            var authRepo = HostContext.AppHost.GetAuthRepository(base.Request);
-            var newUserAuth = ToUserAuth(authRepo, request);
+            var authRepo = base.AuthRepository;
+            var newUserAuth = CreateUserAuth(request);
             using (authRepo as IDisposable)
             {
                 var existingUser = authRepo.GetUserAuth(session, null);
@@ -143,12 +143,11 @@ namespace ServiceStack.Auth
 
             if (registerNewUser)
             {
-                session = this.GetSession();
                 if (!request.AutoLogin.GetValueOrDefault())
                     session.PopulateSession(user, new List<IAuthTokens>());
 
                 session.OnRegistered(Request, session, this);
-                AuthEvents?.OnRegistered(this.Request, session, this);
+                AuthEvents?.OnRegistered(base.Request, session, this);
             }
 
             if (response == null)
@@ -175,9 +174,9 @@ namespace ServiceStack.Auth
             return response;
         }
 
-        public IUserAuth ToUserAuth(IAuthRepository authRepo, Register request)
+        public IUserAuth CreateUserAuth(Register request)
         {
-            var customUserAuth = authRepo as ICustomUserAuth;
+            var customUserAuth = AuthRepository as ICustomUserAuth;
             var to = customUserAuth != null
                 ? customUserAuth.CreateUserAuth()
                 : new UserAuth();
@@ -190,28 +189,28 @@ namespace ServiceStack.Auth
         /// <summary>
         /// Logic to update UserAuth from Registration info, not enabled on PUT because of security.
         /// </summary>
-        public object UpdateUserAuth(Register request)
+        public RegisterResponse UpdateUserAuth(Register request)
         {
+            var response = ValidateFn?.Invoke(this, base.Request.Verb, request);
+            if (response != null)
+                return (RegisterResponse)response;
+
             if (HostContext.GlobalRequestFilters == null
                 || !HostContext.GlobalRequestFilters.Contains(ValidationFilters.RequestFilter))
             {
                 RegistrationValidator.ValidateAndThrow(request, ApplyTo.Put);
             }
 
-            var response = ValidateFn?.Invoke(this, HttpMethods.Put, request);
-            if (response != null)
-                return response;
+            var session = Request.GetSession();
 
-            var session = this.GetSession();
-
-            var authRepo = HostContext.AppHost.GetAuthRepository(base.Request);
+            var authRepo = base.AuthRepository;
             using (authRepo as IDisposable)
             {
                 var existingUser = authRepo.GetUserAuth(session, null);
                 if (existingUser == null)
                     throw HttpError.NotFound(ErrorMessages.UserNotExists);
 
-                var newUserAuth = ToUserAuth(authRepo, request);
+                var newUserAuth = CreateUserAuth(request);
                 authRepo.UpdateUserAuth(existingUser, newUserAuth, request.Password);
 
                 return new RegisterResponse
