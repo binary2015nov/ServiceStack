@@ -4,8 +4,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using ServiceStack.Text;
 
 namespace ServiceStack.Templates
 {
@@ -51,10 +51,7 @@ namespace ServiceStack.Templates
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
-            
-            if (Context.ExcludeFiltersNamed.Contains(name))
-                return null;
-            
+
             var key = name + "`" + argsCount;
             if (InvokerCache.TryGetValue(key, out MethodInvoker invoker))
                 return invoker;
@@ -80,9 +77,6 @@ namespace ServiceStack.Templates
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
-            
-            if (Context.ExcludeFiltersNamed.Contains(name))
-                return null;
             
             var key = "context-filter::" + name + "`" + argsCount;
             if (InvokerCache.TryGetValue(key, out MethodInvoker invoker))
@@ -111,9 +105,6 @@ namespace ServiceStack.Templates
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
-            
-            if (Context.ExcludeFiltersNamed.Contains(name))
-                return null;
             
             var key = "context-block::" + name + "`" + argsCount;
             if (InvokerCache.TryGetValue(key, out MethodInvoker invoker))
@@ -203,6 +194,25 @@ namespace ServiceStack.Templates
                     scope.ScopedParams[entry.Key] = entry.Value;
                 }
             }
+        }
+
+        public static T GetValueOrEvaluateBinding<T>(this TemplateScopeContext scope, object valueOrBinding) =>
+            (T)GetValueOrEvaluateBinding(scope, valueOrBinding, typeof(T));
+
+        public static object GetValueOrEvaluateBinding(this TemplateScopeContext scope, object valueOrBinding, Type returnType)
+        {
+            if (valueOrBinding is string literal)
+            {
+                literal.ToStringSegment().ParseNextToken(out object value, out JsBinding binding);
+
+                var oValue = binding != null
+                    ? scope.EvaluateToken(binding)
+                    : value;
+
+                return oValue.ConvertTo(returnType);
+            }
+            
+            return valueOrBinding.ConvertTo(returnType);
         }
     }
 }

@@ -76,6 +76,8 @@ namespace ServiceStack.Templates
         public long decrement(long value) => value - 1; 
         public long decrBy(long value, long by) => value - by; 
         public long decrementBy(long value, long by) => value - by;
+        public long mod(long value, long divisor) => 
+            value % divisor; 
 
         public bool isEven(int value) => value % 2 == 0;
         public bool isOdd(int value) => !isEven(value);
@@ -230,7 +232,26 @@ namespace ServiceStack.Templates
         
         public string addHashParams(string url, object urlParams) => 
             urlParams.AssertOptions(nameof(addHashParams)).Aggregate(url, (current, entry) => current.AddHashParam(entry.Key, entry.Value));
+        
+        public IEnumerable<object> take(TemplateScopeContext scope, IEnumerable<object> original, object countOrBinding)
+        {
+            var value = scope.GetValueOrEvaluateBinding<int>(countOrBinding);
+            return original.Take(value);
+        }
 
+        public IEnumerable<object> skip(TemplateScopeContext scope, IEnumerable<object> original, object countOrBinding)
+        {
+            var value = scope.GetValueOrEvaluateBinding<int>(countOrBinding);
+            return original.Skip(value);
+        }
+
+        public IEnumerable<object> limit(TemplateScopeContext scope, IEnumerable<object> original, object skipOrBinding, object takeOrBinding)
+        {
+            var skip = scope.GetValueOrEvaluateBinding<int>(skipOrBinding);
+            var take = scope.GetValueOrEvaluateBinding<int>(takeOrBinding);
+            return original.Skip(skip).Take(take);
+        }
+        
         public List<object[]> zip(TemplateScopeContext scope, IEnumerable original, object itemsOrBinding)
         {
             var to = new List<object[]>();
@@ -252,7 +273,7 @@ namespace ServiceStack.Templates
                     {
                         foreach (var b in current)
                         {
-                            to.Add(new[] {a, b});
+                            to.Add(new[] { a, b });
                         }
                     }
                     else if (bindValue != null)
@@ -371,15 +392,15 @@ namespace ServiceStack.Templates
             }
         }
 
-        public object where(TemplateScopeContext scope, object target, object filter) => where(scope, target, filter, null);
-        public object where(TemplateScopeContext scope, object target, object filter, object scopeOptions)
+        public IEnumerable<object> where(TemplateScopeContext scope, object target, object filter) => where(scope, target, filter, null);
+        public IEnumerable<object> where(TemplateScopeContext scope, object target, object filter, object scopeOptions)
         {
             var items = target.AssertEnumerable(nameof(where));
 
             if (!(filter is string literal)) 
                 throw new NotSupportedException($"'{nameof(where)}' in '{scope.Page.VirtualPath}' requires a string Query Expression but received a '{filter?.GetType()?.Name}' instead");
             
-            var scopedParams = scope.GetParamsWithItemBinding(nameof(select), scopeOptions, out string itemBinding);
+            var scopedParams = scope.GetParamsWithItemBinding(nameof(where), scopeOptions, out string itemBinding);
             scopedParams.Each((key, val) => scope.ScopedParams[key] = val);
 
             var to = new List<object>();
@@ -393,6 +414,66 @@ namespace ServiceStack.Templates
                 {
                     to.Add(item);
                 }
+            }
+
+            return to;
+        }
+
+        public IEnumerable<object> takeWhile(TemplateScopeContext scope, object target, object filter) => takeWhile(scope, target, filter, null);
+        public IEnumerable<object> takeWhile(TemplateScopeContext scope, object target, object filter, object scopeOptions)
+        {
+            var items = target.AssertEnumerable(nameof(takeWhile));
+
+            if (!(filter is string literal)) 
+                throw new NotSupportedException($"'{nameof(takeWhile)}' in '{scope.Page.VirtualPath}' requires a string Query Expression but received a '{filter?.GetType()?.Name}' instead");
+            
+            var scopedParams = scope.GetParamsWithItemBinding(nameof(takeWhile), scopeOptions, out string itemBinding);
+            scopedParams.Each((key, val) => scope.ScopedParams[key] = val);
+
+            var to = new List<object>();
+            literal.ParseConditionExpression(out ConditionExpression expr);
+            var i = 0;
+            foreach (var item in items)
+            {
+                scope.AddItemToScope(itemBinding, item, i++);
+                var result = expr.Evaluate(scope);
+                if (result)
+                {
+                    to.Add(item);
+                }
+                else
+                {
+                    return to;
+                }
+            }
+
+            return to;
+        }
+
+        public IEnumerable<object> skipWhile(TemplateScopeContext scope, object target, object filter) => skipWhile(scope, target, filter, null);
+        public IEnumerable<object> skipWhile(TemplateScopeContext scope, object target, object filter, object scopeOptions)
+        {
+            var items = target.AssertEnumerable(nameof(skipWhile));
+
+            if (!(filter is string literal)) 
+                throw new NotSupportedException($"'{nameof(skipWhile)}' in '{scope.Page.VirtualPath}' requires a string Query Expression but received a '{filter?.GetType()?.Name}' instead");
+            
+            var scopedParams = scope.GetParamsWithItemBinding(nameof(skipWhile), scopeOptions, out string itemBinding);
+            scopedParams.Each((key, val) => scope.ScopedParams[key] = val);
+
+            var to = new List<object>();
+            literal.ParseConditionExpression(out ConditionExpression expr);
+            var i = 0;
+            var keepSkipping = true;
+            foreach (var item in items)
+            {
+                scope.AddItemToScope(itemBinding, item, i++);
+                var result = expr.Evaluate(scope);
+                if (!result)
+                    keepSkipping = false;
+
+                if (!keepSkipping)
+                    to.Add(item);
             }
 
             return to;
@@ -442,5 +523,27 @@ namespace ServiceStack.Templates
                 throw new ArgumentException($"{nameof(selectPartial)} in '{scope.Page.VirtualPath}' requires an IEnumerable, but received a '{items.GetType().Name}' instead");
             }
         }
+        
+        private async Task serialize(TemplateScopeContext scope, object items, string jsconfig, Func<object, string> fn)
+        {
+            if (jsconfig != null)
+            {
+                using (JsConfig.CreateScope(jsconfig))
+                {
+                    await scope.OutputStream.WriteAsync(fn(items));
+                    return;
+                }
+            }
+            await scope.OutputStream.WriteAsync(items.ToJson());
+        }
+
+        public Task json(TemplateScopeContext scope, object items) => scope.OutputStream.WriteAsync(items.ToJson());
+        public Task json(TemplateScopeContext scope, object items, string jsConfig) => serialize(scope, items, jsConfig, x => x.ToJson());
+
+        public Task jsv(TemplateScopeContext scope, object items) => scope.OutputStream.WriteAsync(items.ToJsv());
+        public Task jsv(TemplateScopeContext scope, object items, string jsConfig) => serialize(scope, items, jsConfig, x => x.ToJsv());
+
+        public Task csv(TemplateScopeContext scope, object items) => scope.OutputStream.WriteAsync(items.ToCsv());
+        public Task xml(TemplateScopeContext scope, object items) => scope.OutputStream.WriteAsync(items.ToXml());
     }
 }

@@ -428,8 +428,8 @@ Pairs where a < b:
         public void Linq18()
         {
             var context = CreateContext();
-            
-            Assert.That(context.EvaluateTemplate(@"
+
+            var template = @"
 {{ '1997-01-01' | assignTo: cutoffDate }}
 {{ customers 
    | where: it.Region = 'WA'
@@ -437,7 +437,8 @@ Pairs where a < b:
    | let({ c: 'it[0]', o: 'it[1]' })
    | where: o.OrderDate  >= cutoffDate 
    | select: ({ c.CustomerId }, { o.OrderId })\n }}
-").NormalizeNewLines(),
+";
+            Assert.That(context.EvaluateTemplate(template.NormalizeNewLines()).NormalizeNewLines(),
                 
                 Does.StartWith(@"
 (LAZYK, 10482)
@@ -485,7 +486,169 @@ Customer #2 has an order with OrderID 10625
 Customer #2 has an order with OrderID 10759
 Customer #2 has an order with OrderID 10926
 ".NormalizeNewLines()));
-            
         }
+
+        [Test]
+        public void Linq20()
+        {
+            var context = CreateContext();
+            
+            Assert.That(context.EvaluateTemplate(@"
+First 3 numbers:
+{{ numbers | take(3) | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+First 3 numbers:
+5
+4
+1
+".NormalizeNewLines()));
+        }
+
+        [Test]
+        public void Linq21()
+        {
+            var context = CreateContext();
+            
+            Assert.That(context.EvaluateTemplate(@"
+First 3 orders in WA:
+{{ customers | zip: it.Orders 
+   | let({ c: 'it[0]', o: 'it[1]' })
+   | where: c.Region = 'WA'
+   | select: { [c.CustomerId, o.OrderId, o.OrderDate] | jsv }\n 
+}}
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+First 3 orders in WA:
+[LAZYK,10482,1997-03-21]
+[LAZYK,10545,1997-05-22]
+[TRAIH,10574,1997-06-19]
+".NormalizeNewLines()));
+        }
+
+        [Test]
+        public void Linq22()
+        {
+            var context = CreateContext();
+            
+            Assert.That(context.EvaluateTemplate(@"
+All but first 4 numbers:
+{{ numbers | skip(4) | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+All but first 4 numbers:
+9
+8
+6
+7
+2
+0
+".NormalizeNewLines()));
+        }
+
+        [Test]
+        public void Linq23()
+        {
+            var context = CreateContext();
+            
+            Assert.That(context.EvaluateTemplate(@"
+All but first 2 orders in WA:
+{{ customers | zip: it.Orders
+   | let({ c: 'it[0]', o: 'it[1]' })
+   | where: c.Region = 'WA'
+   | skip(2)
+   | select: { [c.CustomerId, o.OrderId, o.OrderDate] | jsv }\n 
+}}
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+All but first 2 orders in WA:
+[TRAIH,10574,1997-06-19]
+[TRAIH,10577,1997-06-23]
+[TRAIH,10822,1998-01-08]
+[WHITC,10269,1996-07-31]
+[WHITC,10344,1996-11-01]
+[WHITC,10469,1997-03-10]
+[WHITC,10483,1997-03-24]
+[WHITC,10504,1997-04-11]
+[WHITC,10596,1997-07-11]
+[WHITC,10693,1997-10-06]
+[WHITC,10696,1997-10-08]
+[WHITC,10723,1997-10-30]
+[WHITC,10740,1997-11-13]
+[WHITC,10861,1998-01-30]
+[WHITC,10904,1998-02-24]
+[WHITC,11032,1998-04-17]
+[WHITC,11066,1998-05-01]
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq24()
+        { 
+            var context = CreateContext();
+            
+            Assert.That(context.EvaluateTemplate(@"
+First numbers less than 6:
+{{ numbers 
+   | takeWhile: it < 6 
+   | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+First numbers less than 6:
+5
+4
+1
+3
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq25()
+        { 
+            var context = CreateContext();
+            
+            Assert.That(context.EvaluateTemplate(@"
+First numbers not less than their position:
+{{ numbers 
+   | takeWhile: it >= index 
+   | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+First numbers not less than their position:
+5
+4
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq26()
+        { 
+            var context = CreateContext();
+            
+            Assert.That(context.EvaluateTemplate(@"
+All elements starting from first element divisible by 3:
+{{ numbers 
+   | skipWhile: mod(it,3) != 0 
+   | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+All elements starting from first element divisible by 3:
+3
+9
+8
+6
+7
+2
+0
+".NormalizeNewLines()));
+        }
+        
     }
 }
