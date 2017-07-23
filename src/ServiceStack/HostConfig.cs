@@ -7,7 +7,6 @@ using System.Text;
 using System.Xml;
 using MarkdownSharp;
 using ServiceStack.Host;
-using ServiceStack.Logging;
 using ServiceStack.Markdown;
 using ServiceStack.Metadata;
 using ServiceStack.Text;
@@ -20,8 +19,6 @@ namespace ServiceStack
 
         public HostConfig()
         {
-            //var config = new HostConfig
-            //{
             WsdlServiceNamespace = DefaultWsdlNamespace;
             ApiVersion = "1.0";
             EmbeddedResourceSources = new List<Assembly> { GetType().GetAssembly() };
@@ -36,7 +33,6 @@ namespace ServiceStack
             AllowJsonpRequests = true;
             AllowRouteContentTypeExtensions = true;
             AllowNonHttpOnlyCookies = false;
-            DebugMode = GetType().GetAssembly().IsDebugBuild();
             DefaultDocuments = new List<string> {
                 "default.htm",
                 "default.html",

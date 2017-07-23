@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
-using System.Runtime.Serialization;
 using ServiceStack.Messaging;
 using ServiceStack.MiniProfiler;
 
@@ -15,13 +13,13 @@ namespace ServiceStack.WebHost.IntegrationTests
             appHost.Init();
         }
 
-        protected void Application_BeginRequest(object src, EventArgs e)
+        protected void Application_BeginRequest(object sender, EventArgs e)
         {
             if (Request.IsLocal)
                 Profiler.Start();
         }
 
-        protected void Application_EndRequest(object src, EventArgs e)
+        protected void Application_EndRequest(object sender, EventArgs e)
         {
             Profiler.Stop();
 

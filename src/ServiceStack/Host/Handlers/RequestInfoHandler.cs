@@ -275,8 +275,8 @@ namespace ServiceStack.Host.Handlers
         public static RequestInfoResponse GetRequestInfo(IRequest httpReq)
         {
             var session = httpReq.GetSession();
-            var allow = HostContext.DebugMode || HostContext.HasValidAuthSecret(httpReq) || session != null && session.Roles.Contains("admin");
-            if (!allow)          
+            var allowResponse = HostContext.DebugMode || HostContext.HasValidAuthSecret(httpReq) || session != null && session.Roles.Contains("admin");
+            if (!allowResponse)          
                 return null;
             
             int virtualPathCount = 0;

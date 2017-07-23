@@ -33,9 +33,10 @@ namespace ServiceStack
 
         public virtual IHttpHandler ProcessRequest(string httpMethod, string pathInfo, string filePath)
         {
-            var pathParts = pathInfo.TrimStart('/').Split('/');
-            if (pathParts.Length == 0) return null;
-            return GetHandlerForPathParts(pathParts);
+            var pathArray = pathInfo.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            if (pathArray.Length == 0)
+                return null;
+            return GetHandlerForPathParts(pathArray);
         }
 
         private IHttpHandler GetHandlerForPathParts(string[] pathParts)

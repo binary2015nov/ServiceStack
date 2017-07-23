@@ -4,22 +4,17 @@ namespace ServiceStack.Logging
 {
     /// <summary>
 	/// Default logger is to System.Diagnostics.Debug.WriteLine
-    /// 
-    /// Made public so its testable
     /// </summary>
     public class DebugLogger : ILog
     {
-        const string DEBUG = "DEBUG: ";
-        const string ERROR = "ERROR: ";
-        const string FATAL = "FATAL: ";
-        const string INFO = "INFO: ";
-        const string WARN = "WARN: ";
+        public string Name { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DebugLogger"/> class.
         /// </summary>
-        public DebugLogger(string type)
+        public DebugLogger(string typeName)
         {
+            Name = typeName.EndsWith("-") ? typeName : typeName + "-";
         }
 
         /// <summary>
@@ -27,6 +22,7 @@ namespace ServiceStack.Logging
         /// </summary>
         public DebugLogger(Type type)
         {
+            Name = type.Name + "-";
         }
 
         /// <summary>
@@ -37,7 +33,7 @@ namespace ServiceStack.Logging
             string msg = message?.ToString() ?? string.Empty;
             if (exception != null)
             {
-                msg += ", Exception: " + exception.Message;
+                msg += (msg == string.Empty ? "Exception: " : ", Exception: ") + exception.Message;
             }
             System.Diagnostics.Debug.WriteLine(msg);
         }
@@ -45,10 +41,9 @@ namespace ServiceStack.Logging
         /// <summary>
         /// Logs the format.
         /// </summary>
-        private static void LogFormat(object message, params object[] args)
+        private static void LogFormat(object format, params object[] args)
         {
-            string msg = message?.ToString() ?? string.Empty;
-            System.Diagnostics.Debug.WriteLine(string.Format(msg, args));
+            System.Diagnostics.Debug.WriteLine(string.Format(format?.ToString(), args));
         }
 
         /// <summary>
@@ -56,85 +51,84 @@ namespace ServiceStack.Logging
         /// </summary>
         private static void Log(object message)
         {
-            string msg = message?.ToString() ?? string.Empty;
-            System.Diagnostics.Debug.WriteLine(msg);
-        }
-
-        public void Debug(object message, Exception exception)
-        {
-            Log(DEBUG + message, exception);
+            System.Diagnostics.Debug.WriteLine(message?.ToString() ?? string.Empty);
         }
 
         public bool IsDebugEnabled { get; set; }
 
+        public void Debug(object message, Exception exception)
+        {
+            Log(Name + LogLevels.Debug + message, exception);
+        }
+
         public void Debug(object message)
         {
-            Log(DEBUG + message);
+            Log(Name + LogLevels.Debug + message);
         }
 
         public void DebugFormat(string format, params object[] args)
         {
-            LogFormat(DEBUG + format, args);
+            LogFormat(Name + LogLevels.Debug + format, args);
         }
 
         public void Error(object message, Exception exception)
         {
-            Log(ERROR + message, exception);
+            Log(Name + LogLevels.Error + message, exception);
         }
 
         public void Error(object message)
         {
-            Log(ERROR + message);
+            Log(Name + LogLevels.Error + message);
         }
 
         public void ErrorFormat(string format, params object[] args)
         {
-            LogFormat(ERROR + format, args);
+            LogFormat(Name + LogLevels.Error + format, args);
         }
 
         public void Fatal(object message, Exception exception)
         {
-            Log(FATAL + message, exception);
+            Log(Name + LogLevels.Fatal + message, exception);
         }
 
         public void Fatal(object message)
         {
-            Log(FATAL + message);
+            Log(Name + LogLevels.Fatal + message);
         }
 
         public void FatalFormat(string format, params object[] args)
         {
-            LogFormat(FATAL + format, args);
+            LogFormat(Name + LogLevels.Fatal + format, args);
         }
 
         public void Info(object message, Exception exception)
         {
-            Log(INFO + message, exception);
+            Log(Name + LogLevels.Info + message, exception);
         }
 
         public void Info(object message)
         {
-            Log(INFO + message);
+            Log(Name + LogLevels.Info + message);
         }
 
         public void InfoFormat(string format, params object[] args)
         {
-            LogFormat(INFO + format, args);
+            LogFormat(Name + LogLevels.Info + format, args);
         }
 
         public void Warn(object message, Exception exception)
         {
-            Log(WARN + message, exception);
+            Log(Name + LogLevels.Warn + message, exception);
         }
 
         public void Warn(object message)
         {
-            Log(WARN + message);
+            Log(Name + LogLevels.Warn + message);
         }
 
         public void WarnFormat(string format, params object[] args)
         {
-            LogFormat(WARN + format, args);
+            LogFormat(Name + LogLevels.Warn + format, args);
         }
     }
 }

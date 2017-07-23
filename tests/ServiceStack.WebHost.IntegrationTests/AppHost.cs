@@ -30,7 +30,7 @@ namespace ServiceStack.WebHost.IntegrationTests
     {
         protected bool StartMqHost = false;
 
-        public AppHost() : base("ServiceStack WebHost IntegrationTests 铝合金", typeof(AppHost).Assembly)
+        public AppHost() : base("ServiceStack WebHost IntegrationTests", typeof(AppHost).Assembly)
         {
             JsConfig.EmitCamelCaseNames = true;
             Config.AdminAuthSecret = AuthTestsBase.AuthSecret;

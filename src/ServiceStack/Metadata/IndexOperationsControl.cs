@@ -148,14 +148,12 @@ namespace ServiceStack.Metadata
                 if (soap11Config != null)
                 {
                     wsdlTemplate.AppendFormat(
-                        @"<li><a href=""{0}"">{0}</a></li>",
-                        soap11Config.WsdlMetadataUri);
+                        @"<li><a href=""{0}"">{0}</a></li>", soap11Config.WsdlMetadataUri);
                 }
                 if (soap12Config != null)
                 {
                     wsdlTemplate.AppendFormat(
-                        @"<li><a href=""{0}"">{0}</a></li>",
-                        soap12Config.WsdlMetadataUri);
+                        @"<li><a href=""{0}"">{0}</a></li>", soap12Config.WsdlMetadataUri);
                 }
                 wsdlTemplate.AppendLine("</ul>");
             }

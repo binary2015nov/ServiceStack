@@ -83,11 +83,7 @@ namespace ServiceStack
             AfterInitCallbacks = new List<Action<IAppHost>>();
             OnDisposeCallbacks = new List<Action<IAppHost>>();
             OnEndRequestCallbacks = new List<Action<IRequest>>();
-            RawHttpHandlers = new List<Func<IHttpRequest, IHttpHandler>> {
-#if !NETSTANDARD1_6
-                 ServiceStack.MiniProfiler.UI.MiniProfilerHandler.MatchesRequest,
-#endif
-            };
+            RawHttpHandlers = new List<Func<IHttpRequest, IHttpHandler>>();
             CatchAllHandlers = new List<HttpHandlerResolverDelegate>();
             CustomErrorHttpHandlers = new Dictionary<HttpStatusCode, IServiceStackHandler> {
                 { HttpStatusCode.Forbidden, new ForbiddenHttpHandler() },
@@ -215,7 +211,6 @@ namespace ServiceStack
         protected virtual ServiceController CreateServiceController()
         {
             return new ServiceController(this, ServiceAssemblies);
-
             //Alternative way to inject Service Resolver strategy
             //return new ServiceController(this, () => ServiceAssemblies.ToList().SelectMany(x => x.GetTypes()));
         }
@@ -416,14 +411,14 @@ namespace ServiceStack
             Config.PreferredContentTypes.Insert(0, Config.DefaultContentType);
 
             MetadataFeature metadataFeature = GetPlugin<MetadataFeature>();
-            metadataFeature.AddSection(MetadataFeature.Features);
+            metadataFeature?.AddSection(MetadataFeature.Features);
             foreach (var plugin in Plugins)
             {
-                string title = plugin.GetType().Name;
-                metadataFeature.AddLink(MetadataFeature.Features, "#" + title, title);
-                var preInitPlugin = plugin as IPostInitPlugin;
                 try
                 {
+                    string title = plugin.GetType().Name;
+                    metadataFeature?.AddLink(MetadataFeature.Features, "#" + title, title);
+                    var preInitPlugin = plugin as IPostInitPlugin;
                     if (preInitPlugin != null)
                     {
                         preInitPlugin.AfterPluginsLoaded(this);

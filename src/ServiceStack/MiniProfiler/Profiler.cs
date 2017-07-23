@@ -196,6 +196,10 @@ namespace ServiceStack.MiniProfiler
         /// </summary>
         public Timing Head { get; set; }
 
+        static Profiler()
+        {
+            HostContext.AppHost.RawHttpHandlers.Add(MiniProfilerHandler.MatchesRequest);
+        }
 
         /// <summary>
         /// Creates and starts a new MiniProfiler for the root <paramref name="url"/>, filtering <see cref="Timing"/> steps to <paramref name="level"/>.
