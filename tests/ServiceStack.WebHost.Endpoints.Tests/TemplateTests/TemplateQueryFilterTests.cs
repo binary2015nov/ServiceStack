@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using ServiceStack.Templates;
+using ServiceStack.Text;
 using ServiceStack.VirtualPath;
 
 namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
@@ -13,22 +17,30 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
             {
                 Args =
                 {
+                    [TemplateConstants.DefaultDateFormat] = "yyyy/MM/dd",
                     ["numbers"] = new[] { 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 },
                     ["products"] = TemplateQueryData.Products,
                     ["customers"] = TemplateQueryData.Customers,
                     ["digits"] = new[]{ "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" },
                     ["strings"] = new[] { "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" },
+                    ["words"] = new[]{"cherry", "apple", "blueberry"},
+                    ["doubles"] = new[]{ 1.7, 2.3, 1.9, 4.1, 2.9 },
+                    ["anagrams"] = new[]{ "from   ", " salt", " earn ", "  last   ", " near ", " form  " },
+                    ["comparer"] = new CaseInsensitiveComparer(),
+                    ["anagramComparer"] = new AnagramEqualityComparer(),
                 }
             };
             optionalArgs.Each((key, val) => context.Args[key] = val);
             return context.Init();
         }
 
+        [SetUp]
+        public void Setup() => context = CreateContext();
+        private TemplateContext context;
+
         [Test]
         public void Linq01() // alternative with clean whitespace sensitive string argument syntax:
         {
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 Numbers < 5:
 {{ numbers | where('it < 5') | select: { it }\n }}").NormalizeNewLines(), 
@@ -46,8 +58,6 @@ Numbers < 5:
         [Test]
         public void Linq02() // alternative with clean whitespace sensitive string argument syntax:
         {
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 Sold out products:
 {{ products 
@@ -68,8 +78,6 @@ Perth Pasties is sold out!
         [Test]
         public void Linq03()
         {
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 In-stock products that cost more than 3.00:
 {{ products 
@@ -89,11 +97,6 @@ Aniseed Syrup is in stock and costs more than 3.00.
         [Test]
         public void Linq04()
         {
-            var context = CreateContext(new Dictionary<string, object>
-            {
-                {TemplateConstants.DefaultDateFormat, "yyyy/MM/dd"}
-            });
-            
             context.VirtualFiles.WriteFile("customer.html", @"
 Customer {{ it.CustomerId }} {{ it.CompanyName | raw }}
 {{ it.Orders | selectPartial: order }}");
@@ -126,8 +129,6 @@ Customer TRAIH Trail's Head Gourmet Provisioners
         [Test]
         public void Linq05()
         {
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 Short digits:
 {{ digits 
@@ -148,8 +149,6 @@ The word nine is shorter than its value.
         [Test]
         public void Linq06()
         {
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 Numbers + 1:
 {{ numbers | select: { it | incr }\n }}
@@ -173,8 +172,6 @@ Numbers + 1:
         [Test]
         public void Linq07()
         {
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 Product Names:
 {{ products | select: { it.ProductName | raw }\n }}
@@ -193,8 +190,6 @@ Chef Anton's Gumbo Mix
         [Test]
         public void Linq08()
         {
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 Number strings:
 {{ numbers | select: { strings[it] }\n }}
@@ -218,12 +213,8 @@ zero
         [Test]
         public void Linq09()
         {
-            var context = CreateContext(new Dictionary<string, object>
-            {
-                {"words", new[]{ "aPPLE", "BlUeBeRrY", "cHeRry" }}
-            });
-            
             Assert.That(context.EvaluateTemplate(@"
+{{ ['aPPLE', 'BlUeBeRrY', 'cHeRry'] | assignTo: words }}
 {{ words | select: Uppercase: { it | upper }, Lowercase: { it | lower }\n }}
 ").NormalizeNewLines(),
                 
@@ -237,8 +228,6 @@ Uppercase: CHERRY, Lowercase: cherry
         [Test]
         public void Linq10()
         {
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 {{ numbers | select: The digit { strings[it] } is { 'even' | if (isEven(it)) | otherwise('odd') }.\n }}
 ").NormalizeNewLines(),
@@ -260,8 +249,6 @@ The digit zero is even.
         [Test]
         public void Linq11()
         {
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 Product Info:
 {{ products | select: { it.ProductName | raw } is in the category { it.Category } and costs { it.UnitPrice | currency } per unit.\n }}
@@ -278,8 +265,6 @@ Aniseed Syrup is in the category Condiments and costs $10.00 per unit.
         [Test]
         public void Linq12()
         {
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 Number: In-place?
 {{ numbers | select: { it }: { it | equals(index) | lower }\n }}
@@ -303,8 +288,6 @@ Number: In-place?
         [Test]
         public void Linq13()
         {
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 Numbers < 5:
 {{ numbers
@@ -326,13 +309,9 @@ zero
         [Test]
         public void Linq14()
         {
-            var context = CreateContext(new Dictionary<string, object>
-            {
-                {"numbersA", new[]{ 0, 2, 4, 5, 6, 8, 9 }},
-                {"numbersB", new[]{ 1, 3, 5, 7, 8 }},
-            });
-            
             Assert.That(context.EvaluateTemplate(@"
+{{ [0, 2, 4, 5, 6, 8, 9] | assignTo: numbersA }}
+{{ [1, 3, 5, 7, 8] | assignTo: numbersB }}
 Pairs where a < b:
 {{ numbersA | zip(numbersB)
    | let({ a: 'it[0]', b: 'it[1]' })  
@@ -365,8 +344,6 @@ Pairs where a < b:
         [Test]
         public void Linq15()
         {
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 {{ customers | zip: it.Orders
    | let({ c: 'it[0]', o: 'it[1]' })
@@ -385,8 +362,6 @@ Pairs where a < b:
         [Test]
         public void Linq16()
         {
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 {{ customers | zip: it.Orders
    | let({ c: 'it[0]', o: 'it[1]' })
@@ -406,8 +381,6 @@ Pairs where a < b:
         [Test]
         public void Linq17()
         {
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 {{ customers | zip: it.Orders
    | let({ c: 'it[0]', o: 'it[1]' })
@@ -427,8 +400,6 @@ Pairs where a < b:
         [Test]
         public void Linq18()
         {
-            var context = CreateContext();
-
             var template = @"
 {{ '1997-01-01' | assignTo: cutoffDate }}
 {{ customers 
@@ -464,8 +435,6 @@ Pairs where a < b:
         [Test]
         public void Linq19()
         {
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 {{ customers 
    | let({ cust: 'it', custIndex: 'index' })
@@ -491,8 +460,6 @@ Customer #2 has an order with OrderID 10926
         [Test]
         public void Linq20()
         {
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 First 3 numbers:
 {{ numbers | take(3) | select: { it }\n }}
@@ -509,8 +476,6 @@ First 3 numbers:
         [Test]
         public void Linq21()
         {
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 First 3 orders in WA:
 {{ customers | zip: it.Orders 
@@ -531,8 +496,6 @@ First 3 orders in WA:
         [Test]
         public void Linq22()
         {
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 All but first 4 numbers:
 {{ numbers | skip(4) | select: { it }\n }}
@@ -552,8 +515,6 @@ All but first 4 numbers:
         [Test]
         public void Linq23()
         {
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 All but first 2 orders in WA:
 {{ customers | zip: it.Orders
@@ -589,8 +550,6 @@ All but first 2 orders in WA:
         [Test]
         public void Linq24()
         { 
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 First numbers less than 6:
 {{ numbers 
@@ -610,8 +569,6 @@ First numbers less than 6:
         [Test]
         public void Linq25()
         { 
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 First numbers not less than their position:
 {{ numbers 
@@ -629,8 +586,6 @@ First numbers not less than their position:
         [Test]
         public void Linq26()
         { 
-            var context = CreateContext();
-            
             Assert.That(context.EvaluateTemplate(@"
 All elements starting from first element divisible by 3:
 {{ numbers 
@@ -650,5 +605,1419 @@ All elements starting from first element divisible by 3:
 ".NormalizeNewLines()));
         }
         
+        [Test]
+        public void Linq27()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+All elements starting from first element less than its position:
+{{ numbers 
+   | skipWhile: it >= index 
+   | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+All elements starting from first element less than its position:
+1
+3
+9
+8
+6
+7
+2
+0
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq28()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+The sorted list of words:
+{{ words 
+   | orderBy: it 
+   | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+The sorted list of words:
+apple
+blueberry
+cherry
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq29()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+The sorted list of words (by length):
+{{ words 
+   | orderBy: it.Length 
+   | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+The sorted list of words (by length):
+apple
+cherry
+blueberry
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq30()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ products 
+   | orderBy: it.ProductName 
+   | select: { it | jsv }\n }}
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+{ProductId:17,ProductName:Alice Mutton,Category:Meat/Poultry,UnitPrice:39,UnitsInStock:0}
+{ProductId:3,ProductName:Aniseed Syrup,Category:Condiments,UnitPrice:10,UnitsInStock:13}
+{ProductId:40,ProductName:Boston Crab Meat,Category:Seafood,UnitPrice:18.4,UnitsInStock:123}
+{ProductId:60,ProductName:Camembert Pierrot,Category:Dairy Products,UnitPrice:34,UnitsInStock:19}
+{ProductId:18,ProductName:Carnarvon Tigers,Category:Seafood,UnitPrice:62.5,UnitsInStock:42}
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq31()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ ['aPPLE', 'AbAcUs', 'bRaNcH', 'BlUeBeRrY', 'ClOvEr', 'cHeRry'] | assignTo: words }}
+{{ words 
+   | orderBy('it', { comparer }) 
+   | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+AbAcUs
+aPPLE
+BlUeBeRrY
+bRaNcH
+cHeRry
+ClOvEr
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq32()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+The doubles from highest to lowest:
+{{ doubles 
+   | orderByDescending: it 
+   | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+The doubles from highest to lowest:
+4.1
+2.9
+2.3
+1.9
+1.7
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq33()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ products 
+   | orderByDescending: it.UnitsInStock
+   | select: { it | jsv }\n }}
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+{ProductId:75,ProductName:Rhönbräu Klosterbier,Category:Beverages,UnitPrice:7.75,UnitsInStock:125}
+{ProductId:40,ProductName:Boston Crab Meat,Category:Seafood,UnitPrice:18.4,UnitsInStock:123}
+{ProductId:6,ProductName:Grandma's Boysenberry Spread,Category:Condiments,UnitPrice:25,UnitsInStock:120}
+{ProductId:55,ProductName:Pâté chinois,Category:Meat/Poultry,UnitPrice:24,UnitsInStock:115}
+{ProductId:61,ProductName:Sirop d'érable,Category:Condiments,UnitPrice:28.5,UnitsInStock:113}
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq34()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ ['aPPLE', 'AbAcUs', 'bRaNcH', 'BlUeBeRrY', 'ClOvEr', 'cHeRry'] | assignTo: words }}
+{{ words 
+   | orderByDescending('it', { comparer }) 
+   | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+ClOvEr
+cHeRry
+bRaNcH
+BlUeBeRrY
+aPPLE
+AbAcUs
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq35()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+Sorted digits:
+{{ digits 
+   | orderBy: it.length
+   | thenBy: it
+   | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+Sorted digits:
+one
+six
+two
+five
+four
+nine
+zero
+eight
+seven
+three
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq36()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ ['aPPLE', 'AbAcUs', 'bRaNcH', 'BlUeBeRrY', 'ClOvEr', 'cHeRry'] | assignTo: words }}
+{{ words 
+   | orderBy: it.length
+   | thenBy('it', { comparer }) 
+   | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+aPPLE
+AbAcUs
+bRaNcH
+cHeRry
+ClOvEr
+BlUeBeRrY
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq37()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ products 
+   | orderBy: it.Category
+   | thenByDescending: it.UnitPrice
+   | select: { it | jsv }\n }}
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+{ProductId:38,ProductName:Côte de Blaye,Category:Beverages,UnitPrice:263.5,UnitsInStock:17}
+{ProductId:43,ProductName:Ipoh Coffee,Category:Beverages,UnitPrice:46,UnitsInStock:17}
+{ProductId:2,ProductName:Chang,Category:Beverages,UnitPrice:19,UnitsInStock:17}
+{ProductId:1,ProductName:Chai,Category:Beverages,UnitPrice:18,UnitsInStock:39}
+{ProductId:35,ProductName:Steeleye Stout,Category:Beverages,UnitPrice:18,UnitsInStock:20}
+{ProductId:39,ProductName:Chartreuse verte,Category:Beverages,UnitPrice:18,UnitsInStock:69}
+{ProductId:76,ProductName:Lakkalikööri,Category:Beverages,UnitPrice:18,UnitsInStock:57}
+{ProductId:70,ProductName:Outback Lager,Category:Beverages,UnitPrice:15,UnitsInStock:15}
+{ProductId:34,ProductName:Sasquatch Ale,Category:Beverages,UnitPrice:14,UnitsInStock:111}
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq38()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ ['aPPLE', 'AbAcUs', 'bRaNcH', 'BlUeBeRrY', 'ClOvEr', 'cHeRry'] | assignTo: words }}
+{{ words 
+   | orderBy: it.length
+   | thenByDescending('it', { comparer }) 
+   | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+aPPLE
+ClOvEr
+cHeRry
+bRaNcH
+AbAcUs
+BlUeBeRrY
+".NormalizeNewLines()));
+        }
+         
+        [Test]
+        public void Linq39()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+A backwards list of the digits with a second character of 'i':
+{{ digits 
+   | where: it[1] = 'i'
+   | reverse
+   | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+A backwards list of the digits with a second character of 'i':
+nine
+eight
+six
+five
+".NormalizeNewLines()));
+        }
+
+        [Test]
+        public void Linq40()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ numbers 
+   | groupBy: mod(it,5)
+   | let({ remainder: 'it.Key', numbers: 'it' })
+   | select: Numbers with a remainder of { remainder } when divided by 5:\n{ numbers | select('{it}\n') } }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+Numbers with a remainder of 0 when divided by 5:
+5
+0
+Numbers with a remainder of 4 when divided by 5:
+4
+9
+Numbers with a remainder of 1 when divided by 5:
+1
+6
+Numbers with a remainder of 3 when divided by 5:
+3
+8
+Numbers with a remainder of 2 when divided by 5:
+7
+2
+".NormalizeNewLines()));
+        }
+
+        [Test]
+        public void Linq41()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ ['blueberry', 'chimpanzee', 'abacus', 'banana', 'apple', 'cheese'] | assignTo: words }}
+{{ words 
+   | groupBy: it[0]
+   | let({ firstLetter: 'it.Key', words: 'it' })
+   | select: Words that start with the letter '{firstLetter}':\n{ words | select('{it}\n') } }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+Words that start with the letter 'b':
+blueberry
+banana
+Words that start with the letter 'c':
+chimpanzee
+cheese
+Words that start with the letter 'a':
+abacus
+apple
+".NormalizeNewLines()));
+        }
+
+        [Test]
+        public void Linq42()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ products 
+   | groupBy: it.Category
+   | let({ category: 'it.Key', products: 'it' })
+   | select: {category}:\n{ products | select('{it | jsv}\n') } }}
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+Beverages:
+{ProductId:1,ProductName:Chai,Category:Beverages,UnitPrice:18,UnitsInStock:39}
+{ProductId:2,ProductName:Chang,Category:Beverages,UnitPrice:19,UnitsInStock:17}
+{ProductId:24,ProductName:Guaraná Fantástica,Category:Beverages,UnitPrice:4.5,UnitsInStock:20}
+{ProductId:34,ProductName:Sasquatch Ale,Category:Beverages,UnitPrice:14,UnitsInStock:111}
+{ProductId:35,ProductName:Steeleye Stout,Category:Beverages,UnitPrice:18,UnitsInStock:20}
+{ProductId:38,ProductName:Côte de Blaye,Category:Beverages,UnitPrice:263.5,UnitsInStock:17}
+{ProductId:39,ProductName:Chartreuse verte,Category:Beverages,UnitPrice:18,UnitsInStock:69}
+{ProductId:43,ProductName:Ipoh Coffee,Category:Beverages,UnitPrice:46,UnitsInStock:17}
+{ProductId:67,ProductName:Laughing Lumberjack Lager,Category:Beverages,UnitPrice:14,UnitsInStock:52}
+{ProductId:70,ProductName:Outback Lager,Category:Beverages,UnitPrice:15,UnitsInStock:15}
+{ProductId:75,ProductName:Rhönbräu Klosterbier,Category:Beverages,UnitPrice:7.75,UnitsInStock:125}
+{ProductId:76,ProductName:Lakkalikööri,Category:Beverages,UnitPrice:18,UnitsInStock:57}
+Condiments:
+{ProductId:3,ProductName:Aniseed Syrup,Category:Condiments,UnitPrice:10,UnitsInStock:13}
+{ProductId:4,ProductName:Chef Anton's Cajun Seasoning,Category:Condiments,UnitPrice:22,UnitsInStock:53}
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq43()
+        { 
+            context.VirtualFiles.WriteFile("month-orders.html", @"
+{{ year }}
+{{ monthGroups | select: { indent }{ month }\n{ 2 | indents }{ orders | jsv }\n }}");
+            
+            Assert.That(context.EvaluateTemplate(@"
+{{ customers 
+   | let({ 
+        companyName: 'it.CompanyName', 
+        yearGroups: ""map (
+                        groupBy(it.Orders, 'it.OrderDate.Year'),
+                        '{ 
+                            year: it.Key, 
+                            monthGroups: map (
+                                groupBy(it, `it.OrderDate.Month`),
+                                `{ month: it.Key, orders: it }`
+                            ) 
+                        }'
+                    )"" 
+     })
+   | select: \n# { companyName | raw }{ yearGroups | selectPartial('month-orders') } 
+}}
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+# Alfreds Futterkiste
+1997
+	8
+		[{OrderId:10643,OrderDate:1997-08-25,Total:814.5}]
+	10
+		[{OrderId:10692,OrderDate:1997-10-03,Total:878},{OrderId:10702,OrderDate:1997-10-13,Total:330}]
+
+1998
+	1
+		[{OrderId:10835,OrderDate:1998-01-15,Total:845.8}]
+	3
+		[{OrderId:10952,OrderDate:1998-03-16,Total:471.2}]
+	4
+		[{OrderId:11011,OrderDate:1998-04-09,Total:933.5}]
+
+# Ana Trujillo Emparedados y helados
+1996
+	9
+		[{OrderId:10308,OrderDate:1996-09-18,Total:88.8}]
+".NormalizeNewLines()));
+        }
+ 
+        public class AnagramEqualityComparer : IEqualityComparer<string> 
+        {
+            public bool Equals(string x, string y) => GetCanonicalString(x) == GetCanonicalString(y);
+            public int GetHashCode(string obj) => GetCanonicalString(obj).GetHashCode();
+            private string GetCanonicalString(string word) 
+            {
+                var wordChars = word.ToCharArray();
+                Array.Sort(wordChars);
+                return new string(wordChars);
+            }
+        }
+        
+        [Test]
+        public void Linq44()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ anagrams 
+   | groupBy('trim(it)', { comparer: anagramComparer })
+   | select: { it | json }\n 
+}}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+[""from   "","" form  ""]
+["" salt"",""  last   ""]
+["" earn "","" near ""]
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq45()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ anagrams 
+   | groupBy('trim(it)', { map: 'upper(it)', comparer: anagramComparer })
+   | select: { it | json }\n 
+}}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+[""FROM   "","" FORM  ""]
+["" SALT"",""  LAST   ""]
+["" EARN "","" NEAR ""]
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq46()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [2, 2, 3, 5, 5] | assignTo: factorsOf300 }}
+Prime factors of 300:
+{{ factorsOf300 | distinct | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+Prime factors of 300:
+2
+3
+5
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq47()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+Category names:
+{{ products 
+   | map: it.Category 
+   | distinct
+   | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+Category names:
+Beverages
+Condiments
+Produce
+Meat/Poultry
+Seafood
+Dairy Products
+Confections
+Grains/Cereals
+".NormalizeNewLines()));
+        }
+         
+        [Test]
+        public void Linq48()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [ 0, 2, 4, 5, 6, 8, 9 ] | assignTo: numbersA }}
+{{ [ 1, 3, 5, 7, 8 ] | assignTo: numbersB }}
+Unique numbers from both arrays:
+{{ numbersA | union(numbersB) | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+Unique numbers from both arrays:
+0
+2
+4
+5
+6
+8
+9
+1
+3
+7
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq49()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ products  
+   | map: it.ProductName[0] 
+   | assignTo: productFirstChars }}
+{{ customers 
+   | map: it.CompanyName[0] 
+   | assignTo: customerFirstChars }}
+Unique first letters from Product names and Customer names:
+{{ productFirstChars 
+   | union(customerFirstChars) 
+   | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+Unique first letters from Product names and Customer names:
+C
+A
+G
+U
+N
+M
+I
+Q
+K
+T
+P
+S
+R
+B
+J
+Z
+V
+F
+E
+W
+L
+O
+D
+H
+".NormalizeNewLines()));
+        }
+
+        [Test]
+        public void Linq50()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [ 0, 2, 4, 5, 6, 8, 9 ] | assignTo: numbersA }}
+{{ [ 1, 3, 5, 7, 8 ] | assignTo: numbersB }}
+Common numbers shared by both arrays:
+{{ numbersA | intersect(numbersB) | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+Common numbers shared by both arrays:
+5
+8
+".NormalizeNewLines()));
+        }
+        
+        [Test]
+        public void Linq51()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ products  
+   | map: it.ProductName[0] 
+   | assignTo: productFirstChars }}
+{{ customers 
+   | map: it.CompanyName[0] 
+   | assignTo: customerFirstChars }}
+Common first letters from Product names and Customer names:
+{{ productFirstChars 
+   | intersect(customerFirstChars) 
+   | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+Common first letters from Product names and Customer names:
+C
+A
+G
+N
+M
+I
+Q
+K
+T
+P
+S
+R
+B
+V
+F
+E
+W
+L
+O
+".NormalizeNewLines()));
+        }
+ 
+        [Test]
+        public void Linq52()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [ 0, 2, 4, 5, 6, 8, 9 ] | assignTo: numbersA }}
+{{ [ 1, 3, 5, 7, 8 ] | assignTo: numbersB }}
+Numbers in first array but not second array:
+{{ numbersA | except(numbersB) | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+Numbers in first array but not second array:
+0
+2
+4
+6
+9
+".NormalizeNewLines()));
+        }
+         
+        [Test]
+        public void Linq53()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ products  
+   | map: it.ProductName[0] 
+   | assignTo: productFirstChars }}
+{{ customers 
+   | map: it.CompanyName[0] 
+   | assignTo: customerFirstChars }}
+First letters from Product names, but not from Customer names:
+{{ productFirstChars 
+   | except(customerFirstChars) 
+   | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+First letters from Product names, but not from Customer names:
+U
+J
+Z
+".NormalizeNewLines()));
+        }
+ 
+        [Test]
+        public void Linq54()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [ 1.7, 2.3, 1.9, 4.1, 2.9 ] | assignTo: doubles }}
+Every other double from highest to lowest:
+{{ doubles 
+   | orderByDescending: it
+   | step({ by: 2 }) 
+   | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+Every other double from highest to lowest:
+4.1
+2.3
+1.7
+".NormalizeNewLines()));
+        }
+ 
+        [Test]
+        public void Linq55()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [ 'cherry', 'apple', 'blueberry' ] | assignTo: words }}
+The sorted word list:
+{{ words
+   | orderBy: it 
+   | toList 
+   | select: { it }\n }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+The sorted word list:
+apple
+blueberry
+cherry
+".NormalizeNewLines()));
+        }
+ 
+        [Test]
+        public void Linq56()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [{name:'Alice', score:50}, {name: 'Bob', score:40}, {name:'Cathy', score:45}] | assignTo: scoreRecords }}
+Bob's score: 
+{{ scoreRecords 
+   | toDictionary: it.name
+   | map: it['Bob']
+   | select: { it['name'] } = { it['score'] }
+}} 
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+Bob's score: 
+Bob = 40
+".NormalizeNewLines()));
+        }
+ 
+        [Test]
+        public void Linq57()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [null, 1.0, 'two', 3, 'four', 5, 'six', 7.0] | assignTo: numbers }}
+Numbers stored as doubles:
+{{ numbers 
+   | of({ type: 'Double' })
+   | select: { it | format('#.0') }\n }} 
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+Numbers stored as doubles:
+1.0
+7.0
+".NormalizeNewLines()));
+        }
+  
+        [Test]
+        public void Linq58()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ products
+   | where: it.ProductId = 12 
+   | first
+   | select: { it | jsv } }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+{ProductId:12,ProductName:Queso Manchego La Pastora,Category:Dairy Products,UnitPrice:38,UnitsInStock:86}
+".NormalizeNewLines()));
+        }
+  
+        [Test]
+        public void Linq59()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'] | assignTo: strings }}
+{{ strings
+   | first: it[0] = 'o'
+   | select: A string starting with 'o': { it } }}
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+A string starting with 'o': one
+".NormalizeNewLines()));
+        }
+    
+        [Test]
+        public void Linq61()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [] | assignTo: numbers }}
+{{ numbers | first | select: { it | otherwise('null') } }} 
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+null
+".NormalizeNewLines()));
+        }
+    
+        [Test]
+        public void Linq62()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ products 
+   | first: it.ProductId = 789 
+   | select: Product 789 exists: { it | otherwise('false') } }} 
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+Product 789 exists: false
+".NormalizeNewLines()));
+        }
+    
+        [Test]
+        public void Linq64()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ] | assignTo: numbers }} 
+{{ numbers
+   | where: it > 5
+   | elementAt(1) 
+   | select: Second number > 5: { it } }} 
+").NormalizeNewLines(),
+                
+                Is.EqualTo(@"
+Second number > 5: 8
+".NormalizeNewLines()));
+        }
+    
+        [Test]
+        public void Linq65()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ range(100,50)
+   | select: The number {it} is { 'even' | if(isEven(it)) | otherwise('odd') }.\n }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+The number 100 is even.
+The number 101 is odd.
+The number 102 is even.
+The number 103 is odd.
+The number 104 is even.
+The number 105 is odd.
+The number 106 is even.
+The number 107 is odd.
+The number 108 is even.
+The number 109 is odd.
+The number 110 is even.
+".NormalizeNewLines()));
+        }
+    
+        [Test]
+        public void Linq66()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ 10 | itemsOf(7) | select: {it}\n }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+7
+7
+7
+7
+7
+7
+7
+7
+7
+7
+".NormalizeNewLines()));
+        }
+    
+        [Test]
+        public void Linq67()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ ['believe', 'relief', 'receipt', 'field'] | assignTo: words }}
+{{ words 
+   | any: contains(it, 'ei')
+   | select: There is a word that contains in the list that contains 'ei': { it | lower } }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+There is a word that contains in the list that contains 'ei': true".NormalizeNewLines()));
+        }
+     
+        [Test]
+        public void Linq69()
+        {
+            Assert.That(context.EvaluateTemplate(@"
+{{ products 
+   | groupBy: it.Category
+   | where: any(it, 'it.UnitsInStock = 0')
+   | let({ category: 'it.Key', products: 'it' }) 
+   | select: { category }\n{ products | jsv }\n }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+Condiments
+[{ProductId:3,ProductName:Aniseed Syrup,Category:Condiments,UnitPrice:10,UnitsInStock:13},{ProductId:4,ProductName:Chef Anton's Cajun Seasoning,Category:Condiments,UnitPrice:22,UnitsInStock:53}
+".NormalizeNewLines()));
+        }
+    
+        [Test]
+        public void Linq70()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [1, 11, 3, 19, 41, 65, 19] | assignTo: numbers }}
+{{ numbers 
+   | all: isOdd(it)
+   | select: The list contains only odd numbers: { it | lower } }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+The list contains only odd numbers: true".NormalizeNewLines()));
+        }
+     
+        [Test]
+        public void Linq72()
+        {
+            Assert.That(context.EvaluateTemplate(@"
+{{ products 
+   | groupBy: it.Category
+   | where: all(it, 'it.UnitsInStock > 0')
+   | let({ category: 'it.Key', products: 'it' }) 
+   | select: { category }\n{ products | jsv }\n }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+Beverages
+[{ProductId:1,ProductName:Chai,Category:Beverages,UnitPrice:18,UnitsInStock:39},{ProductId:2,ProductName:Chang,Category:Beverages,UnitPrice:19,UnitsInStock:17}
+".NormalizeNewLines()));
+        }
+     
+        [Test]
+        public void Linq73()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [2, 2, 3, 5, 5] | assignTo: factorsOf300 }}
+{{ factorsOf300 | distinct | count | select: There are {it} unique factors of 300. }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+There are 3 unique factors of 300.".NormalizeNewLines()));
+        }
+     
+        [Test]
+        public void Linq74()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [5, 4, 1, 3, 9, 8, 6, 7, 2, 0] | assignTo: numbers }}
+{{ numbers 
+   | count: isOdd(it) 
+   | select: There are {it} odd numbers in the list. }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+There are 5 odd numbers in the list.".NormalizeNewLines()));
+        }
+     
+        [Test]
+        public void Linq76()
+        {
+            Assert.That(context.EvaluateTemplate(@"
+{{ customers 
+   | let({ customerId: 'it.CustomerId', ordersCount: 'count(it.Orders)' }) 
+   | select: {customerId}, {ordersCount}\n }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+ALFKI, 6
+ANATR, 4
+ANTON, 7
+AROUT, 13
+BERGS, 18
+BLAUS, 7
+BLONP, 11
+".NormalizeNewLines()));
+        }
+     
+        [Test]
+        public void Linq77()
+        {
+            Assert.That(context.EvaluateTemplate(@"
+{{ products 
+   | groupBy: it.Category
+   | let({ category: 'it.Key', productCount: 'count(it)' }) 
+   | select: {category}, {productCount}\n }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+Beverages, 12
+Condiments, 12
+Produce, 5
+Meat/Poultry, 6
+Seafood, 12
+Dairy Products, 10
+Confections, 13
+Grains/Cereals, 7
+".NormalizeNewLines()));
+        }
+      
+        [Test]
+        public void Linq78()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [5, 4, 1, 3, 9, 8, 6, 7, 2, 0] | assignTo: numbers }}
+{{ numbers | sum | select: The sum of the numbers is {it}. }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+The sum of the numbers is 45.".NormalizeNewLines()));
+        }
+      
+        [Test]
+        public void Linq79()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [ 'cherry', 'apple', 'blueberry'] | assignTo: words }}
+{{ words
+   | sum: it.Length 
+   | select: There are a total of {it} characters in these words. }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+There are a total of 20 characters in these words.".NormalizeNewLines()));
+        }
+     
+        [Test]
+        public void Linq80()
+        {
+            Assert.That(context.EvaluateTemplate(@"
+{{ products 
+   | groupBy: it.Category
+   | let({ category: 'it.Key', totalUnitsInStock: 'sum(it, `it.UnitsInStock`)' }) 
+   | select: {category}, {totalUnitsInStock}\n }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+Beverages, 559
+Condiments, 507
+Produce, 100
+Meat/Poultry, 165
+Seafood, 701
+Dairy Products, 393
+Confections, 386
+Grains/Cereals, 308
+".NormalizeNewLines()));
+        }
+       
+        [Test]
+        public void Linq81()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [5, 4, 1, 3, 9, 8, 6, 7, 2, 0] | assignTo: numbers }}
+{{ numbers | min | select: The minimum number is {it}. }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+The minimum number is 0.".NormalizeNewLines()));
+        }
+       
+        [Test]
+        public void Linq82()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [ 'cherry', 'apple', 'blueberry' ] | assignTo: words }}
+{{ words
+   | min: it.Length 
+   | select: The shortest word is {it} characters long. }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+The shortest word is 5 characters long.".NormalizeNewLines()));
+        }
+      
+        [Test]
+        public void Linq83()
+        {
+            Assert.That(context.EvaluateTemplate(@"
+{{ products 
+   | groupBy: it.Category
+   | let({ category: 'it.Key', cheapestPrice: 'min(it, `it.UnitPrice`)' }) 
+   | select: {category}, {cheapestPrice}\n }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+Beverages, 4.5
+Condiments, 10
+Produce, 10
+Meat/Poultry, 7.45
+Seafood, 6
+Dairy Products, 2.5
+Confections, 9.2
+Grains/Cereals, 7
+".NormalizeNewLines()));
+        }
+      
+        [Test]
+        public void Linq84()
+        {
+            Assert.That(context.EvaluateTemplate(@"
+{{ products 
+   | groupBy: it.Category
+   | let({ 
+        g: 'it',
+        minPrice: 'min(g, `it.UnitPrice`)', 
+        category: 'g.Key', 
+        cheapestProducts: 'where(g, `it.UnitPrice = minPrice`)' 
+     })
+   | select: { category }\n{ cheapestProducts | jsv }\n }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+Beverages
+[{ProductId:24,ProductName:Guaraná Fantástica,Category:Beverages,UnitPrice:4.5,UnitsInStock:20}]
+Condiments
+[{ProductId:3,ProductName:Aniseed Syrup,Category:Condiments,UnitPrice:10,UnitsInStock:13}]
+Produce
+[{ProductId:74,ProductName:Longlife Tofu,Category:Produce,UnitPrice:10,UnitsInStock:4}]
+Meat/Poultry
+[{ProductId:54,ProductName:Tourtière,Category:Meat/Poultry,UnitPrice:7.45,UnitsInStock:21}]
+Seafood
+[{ProductId:13,ProductName:Konbu,Category:Seafood,UnitPrice:6,UnitsInStock:24}]
+Dairy Products
+[{ProductId:33,ProductName:Geitost,Category:Dairy Products,UnitPrice:2.5,UnitsInStock:112}]
+Confections
+[{ProductId:19,ProductName:Teatime Chocolate Biscuits,Category:Confections,UnitPrice:9.2,UnitsInStock:25}]
+Grains/Cereals
+[{ProductId:52,ProductName:Filo Mix,Category:Grains/Cereals,UnitPrice:7,UnitsInStock:38}]
+".NormalizeNewLines()));
+        }
+       
+        [Test]
+        public void Linq85()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [5, 4, 1, 3, 9, 8, 6, 7, 2, 0] | assignTo: numbers }}
+{{ numbers | max | select: The maximum number is {it}. }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+The maximum number is 9.".NormalizeNewLines()));
+        }
+       
+        [Test]
+        public void Linq86()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [ 'cherry', 'apple', 'blueberry' ] | assignTo: words }}
+{{ words
+   | max: it.Length 
+   | select: The longest word is {it} characters long. }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+The longest word is 9 characters long.".NormalizeNewLines()));
+        }
+      
+        [Test]
+        public void Linq87()
+        {
+            Assert.That(context.EvaluateTemplate(@"
+{{ products 
+   | groupBy: it.Category
+   | let({ category: 'it.Key', mostExpensivePrice: 'max(it, `it.UnitPrice`)' }) 
+   | select: Category: {category}, MaximumPrice: {mostExpensivePrice}\n }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+Category: Beverages, MaximumPrice: 263.5
+Category: Condiments, MaximumPrice: 43.9
+Category: Produce, MaximumPrice: 53
+Category: Meat/Poultry, MaximumPrice: 123.79
+Category: Seafood, MaximumPrice: 62.5
+Category: Dairy Products, MaximumPrice: 55
+Category: Confections, MaximumPrice: 81
+Category: Grains/Cereals, MaximumPrice: 38
+".NormalizeNewLines()));
+        }
+      
+        [Test]
+        public void Linq88()
+        {
+            Assert.That(context.EvaluateTemplate(@"
+{{ products 
+   | groupBy: it.Category
+   | let({ 
+        g: 'it',
+        maxPrice: 'max(g, `it.UnitPrice`)', 
+        category: 'g.Key', 
+        mostExpensiveProducts: 'where(g, `it.UnitPrice = maxPrice`)' 
+     })
+   | select: { category }\n{ mostExpensiveProducts | jsv }\n }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+Beverages
+[{ProductId:38,ProductName:Côte de Blaye,Category:Beverages,UnitPrice:263.5,UnitsInStock:17}]
+Condiments
+[{ProductId:63,ProductName:Vegie-spread,Category:Condiments,UnitPrice:43.9,UnitsInStock:24}]
+Produce
+[{ProductId:51,ProductName:Manjimup Dried Apples,Category:Produce,UnitPrice:53,UnitsInStock:20}]
+Meat/Poultry
+[{ProductId:29,ProductName:Thüringer Rostbratwurst,Category:Meat/Poultry,UnitPrice:123.79,UnitsInStock:0}]
+Seafood
+[{ProductId:18,ProductName:Carnarvon Tigers,Category:Seafood,UnitPrice:62.5,UnitsInStock:42}]
+Dairy Products
+[{ProductId:59,ProductName:Raclette Courdavault,Category:Dairy Products,UnitPrice:55,UnitsInStock:79}]
+Confections
+[{ProductId:20,ProductName:Sir Rodney's Marmalade,Category:Confections,UnitPrice:81,UnitsInStock:40}]
+Grains/Cereals
+[{ProductId:56,ProductName:Gnocchi di nonna Alice,Category:Grains/Cereals,UnitPrice:38,UnitsInStock:21}]
+".NormalizeNewLines()));
+        }
+       
+        [Test]
+        public void Linq89()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [5, 4, 1, 3, 9, 8, 6, 7, 2, 0] | assignTo: numbers }}
+{{ numbers | average | select: The average number is {it}. }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+The average number is 4.5.".NormalizeNewLines()));
+        }
+       
+        [Test]
+        public void Linq90()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [ 'cherry', 'apple', 'blueberry' ] | assignTo: words }}
+{{ words
+   | average: it.Length 
+   | select: The average word length is {it} characters. }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+The average word length is 6.66666666666667 characters.".NormalizeNewLines()));
+        }
+      
+        [Test]
+        public void Linq91()
+        {
+            Assert.That(context.EvaluateTemplate(@"
+{{ products 
+   | groupBy: it.Category
+   | let({ category: 'it.Key', averagePrice: 'average(it, `it.UnitPrice`)' }) 
+   | select: Category: {category}, AveragePrice: {averagePrice}\n }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+Category: Beverages, AveragePrice: 37.9791666666667
+Category: Condiments, AveragePrice: 23.0625
+Category: Produce, AveragePrice: 32.37
+Category: Meat/Poultry, AveragePrice: 54.0066666666667
+Category: Seafood, AveragePrice: 20.6825
+Category: Dairy Products, AveragePrice: 28.73
+Category: Confections, AveragePrice: 25.16
+Category: Grains/Cereals, AveragePrice: 20.25
+".NormalizeNewLines()));
+        }
+       
+        [Test]
+        public void Linq92()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [1.7, 2.3, 1.9, 4.1, 2.9] | assignTo: doubles }}
+{{ doubles 
+   | reduce: multiply(accumulator, it)
+   | select: Total product of all numbers: { it | format('#.####') }. }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+Total product of all numbers: 88.3308".NormalizeNewLines()));
+        }
+       
+        [Test]
+        public void Linq93()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [20, 10, 40, 50, 10, 70, 30] | assignTo: attemptedWithdrawals }}
+{{ attemptedWithdrawals 
+   | reduce('iif(lessThan(balance, nextWithdrawal), balance, subtract(balance, nextWithdrawal))', 
+            { initialValue: 100.0, it: 'nextWithdrawal', accumulator: 'balance' })
+   | select: Ending balance: { it }. }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+Ending balance: 20".NormalizeNewLines()));
+        }
+       
+        [Test]
+        public void Linq94()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [0, 2, 4, 5, 6, 8, 9] | assignTo: numbersA }}
+{{ [1, 3, 5, 7, 8] | assignTo: numbersB }}
+All numbers from both arrays:
+{{ numbersA | concat(numbersB) | select: {it}\n }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+All numbers from both arrays:
+0
+2
+4
+5
+6
+8
+9
+1
+3
+5
+7
+8
+".NormalizeNewLines()));
+        }
+       
+        [Test]
+        public void Linq95()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ customers | map('it.CompanyName') | assignTo: customerNames }}
+{{ products | map('it.ProductName') | assignTo: productNames }}
+Customer and product names:
+{{ customerNames | concat(productNames) | select: { it | raw }\n }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+Customer and product names:
+Alfreds Futterkiste
+Ana Trujillo Emparedados y helados
+Antonio Moreno Taquería
+Around the Horn
+Berglunds snabbköp
+Blauer See Delikatessen
+".NormalizeNewLines()));
+        }
+       
+        [Test]
+        public void Linq96()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [ 'cherry', 'apple', 'blueberry' ] | assignTo: wordsA }}
+{{ [ 'cherry', 'apple', 'blueberry' ] | assignTo: wordsB }}
+{{ wordsA | equivalentTo(wordsB) | select: The sequences match: { it | lower } }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+The sequences match: true".NormalizeNewLines()));
+        }
+       
+        [Test]
+        public void linq97()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [ 'cherry', 'apple', 'blueberry' ] | assignTo: wordsA }}
+{{ [ 'apple', 'blueberry', 'cherry' ] | assignTo: wordsB }}
+{{ wordsA | equivalentTo(wordsB) | select: The sequences match: { it | lower } }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+The sequences match: false".NormalizeNewLines()));
+        }
+
+        [Test]
+        public void Linq99()
+        { 
+            Assert.That(context.EvaluateTemplate(@"
+{{ [5, 4, 1, 3, 9, 8, 6, 7, 2, 0] | assignTo: numbers }}
+{{ 0 | assignTo: i }}
+{{ numbers | let({ i: 'incr(i)' }) | select: v = {index | incr}, i = {i}\n }} 
+").NormalizeNewLines(),
+                
+                Does.StartWith(@"
+v = 1, i = 1
+v = 2, i = 2
+v = 3, i = 3
+v = 4, i = 4
+v = 5, i = 5
+v = 6, i = 6
+v = 7, i = 7
+v = 8, i = 8
+v = 9, i = 9
+v = 10, i = 10
+".NormalizeNewLines()));
+        }
+       
+        [Test]
+        public void Linq100()
+        {
+            // lowNumbers is assigned the result not a reusable query
+            Assert.That(context.EvaluateTemplate(@"
+{{ [5, 4, 1, 3, 9, 8, 6, 7, 2, 0] | assignTo: numbers }}
+{{ numbers 
+   | where: it <= 3
+   | assignTo: lowNumbers }}
+First run numbers <= 3:
+{{ lowNumbers | select: {it}\n }}
+{{ 10 | times | do: assign('numbers[index]', -numbers[index]) }}
+Second run numbers <= 3:
+{{ lowNumbers | select: {it}\n }}
+Contents of numbers:
+{{ numbers | select: {it}\n }}
+").NormalizeNewLines(),
+
+                Does.StartWith(@"
+First run numbers <= 3:
+1
+3
+2
+0
+
+
+Second run numbers <= 3:
+1
+3
+2
+0
+
+Contents of numbers:
+-5
+-4
+-1
+-3
+-9
+-8
+-6
+-7
+-2
+0
+".NormalizeNewLines()));
+        }
+
     }
 }

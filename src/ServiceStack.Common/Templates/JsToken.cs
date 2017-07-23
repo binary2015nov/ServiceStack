@@ -118,7 +118,9 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
 
     public abstract class JsUnaryOperator : JsOperator
     {
-        public abstract bool Evaluate(object target);
+        public abstract object Evaluate(object target);
+        public static JsUnaryOperator GetUnaryOperator(JsBinding op) => 
+            op == JsSubtraction.Operator ? JsMinus.Operator : null;
     }
     public abstract class JsBooleanOperand : JsOperator
     {
@@ -205,7 +207,7 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
         public static JsNot Operator = new JsNot();
         private JsNot(){}
         public override string Token => "!";
-        public override bool Evaluate(object target) => !TemplateDefaultFilters.isTrue(target);
+        public override object Evaluate(object target) => !TemplateDefaultFilters.isTrue(target);
     }
     public class JsBitwiseOr : JsBinaryOperator
     {
@@ -242,6 +244,15 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
         public static JsDivision Operator = new JsDivision();
         private JsDivision(){}
         public override string Token => "\\";
+    }
+    public class JsMinus : JsUnaryOperator
+    {
+        public static JsMinus Operator = new JsMinus();
+        private JsMinus(){}
+        public override string Token => "-";
+        public override object Evaluate(object target) => target == null 
+            ? 0 
+            : (target.ConvertTo<double>() * -1).ConvertTo(target.GetType());
     }
 
     public class JsArray : JsToken, IEnumerable<object>
@@ -404,21 +415,6 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsBindingExpressionChar(this char c) => c == '.' || c == '(' || c == '[';
 
-        public static bool IsBinding(this JsExpression cmd)
-        {
-            var i = 0;
-            char c;
-            var isBinding = false;
-            while (i < cmd.Name.Length && 
-                   (IsValidVarNameChar(c = cmd.Name.GetChar(i)) || (isBinding = (c == '.' || c == '[' || c.IsWhiteSpace()))))
-            {
-                if (isBinding)
-                    return true;
-                i++;
-            }
-            return false;
-        }
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static StringSegment AdvancePastWhitespace(this StringSegment literal)
         {
@@ -455,7 +451,7 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
             literal = literal.AdvancePastWhitespace();
 
             var firstChar = literal.GetChar(0);
-            if (firstChar == '\'' || firstChar == '"')
+            if (firstChar == '\'' || firstChar == '"' || firstChar == '`')
             {
                 i = 1;
                 while (i < literal.Length && (literal.GetChar(i) != firstChar || literal.GetChar(i - 1) == '\\'))
@@ -740,7 +736,25 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
         private string originalString;
         public string OriginalString => originalString ?? (originalString = Original.HasValue ? Original.Value : null);
 
+        private bool? isBinding = null;
+        public bool IsBinding => (bool)(isBinding ?? (isBinding = DetectBinding(this)));
+
         public virtual int IndexOfMethodEnd(StringSegment commandString, int pos) => pos;
+
+        private static bool DetectBinding(JsExpression cmd)
+        {
+            var i = 0;
+            char c;
+            var isBinding = false;
+            while (i < cmd.Name.Length && 
+                   ((c = cmd.Name.GetChar(i)).IsValidVarNameChar() || (isBinding = (c == '.' || c == '[' || c.IsWhiteSpace()))))
+            {
+                if (isBinding)
+                    return true;
+                i++;
+            }
+            return false;
+        }
         
         //Output different format for debugging to verify command was parsed correctly
         public virtual string ToDebugString()
@@ -827,6 +841,7 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
 
             var inDoubleQuotes = false;
             var inSingleQuotes = false;
+            var inBackTickQuotes = false;
             var inBrackets = false;
 
             var endBlockPos = commandsString.Length;
@@ -852,15 +867,23 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
                             inSingleQuotes = false;
                         continue;
                     }
-                    if (c == '"')
+                    if (inBackTickQuotes)
                     {
-                        inDoubleQuotes = true;
+                        if (c == '`')
+                            inBackTickQuotes = false;
                         continue;
                     }
-                    if (c == '\'')
+                    switch (c)
                     {
-                        inSingleQuotes = true;
-                        continue;
+                        case '"':
+                            inDoubleQuotes = true;
+                            continue;
+                        case '\'':
+                            inSingleQuotes = true;
+                            continue;
+                        case '`':
+                            inBackTickQuotes = true;
+                            continue;
                     }
 
                     if (c.IsOperatorChar() && // don't take precedence over '|' seperator 
@@ -974,6 +997,7 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
 
             var inDoubleQuotes = false;
             var inSingleQuotes = false;
+            var inBackTickQuotes = false;
             var inBrackets = 0;
             var inParens = 0;
             var inBraces = 0;
@@ -992,6 +1016,12 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
                 {
                     if (c == '\'')
                         inSingleQuotes = false;
+                    continue;
+                }
+                if (inBackTickQuotes)
+                {
+                    if (c == '`')
+                        inBackTickQuotes = false;
                     continue;
                 }
                 if (inBrackets > 0)
@@ -1026,6 +1056,9 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
                         continue;
                     case '\'':
                         inSingleQuotes = true;
+                        continue;
+                    case '`':
+                        inBackTickQuotes = true;
                         continue;
                     case '[':
                         inBrackets++;
@@ -1065,6 +1098,7 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
         {
             var inDoubleQuotes = false;
             var inSingleQuotes = false;
+            var inBackTickQuotes = false;
             var inBrackets = 0;
             var inBraces = 0;
             var lastPos = 0;
@@ -1085,6 +1119,12 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
                 {
                     if (c == '\'')
                         inSingleQuotes = false;
+                    continue;
+                }
+                if (inBackTickQuotes)
+                {
+                    if (c == '`')
+                        inBackTickQuotes = false;
                     continue;
                 }
                 if (inBrackets > 0)
@@ -1120,6 +1160,9 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
                         continue;
                     case '\'':
                         inSingleQuotes = true;
+                        continue;
+                    case '`':
+                        inBackTickQuotes = true;
                         continue;
                     case '[':
                         inBrackets++;

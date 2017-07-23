@@ -151,20 +151,53 @@ namespace ServiceStack.Templates
             return pageParams ?? new Dictionary<string, object>();
         }
 
-        public static IEnumerable AssertEnumerable(this object items, string filterName)
+        public static object AssertNoCircularDeps(this object value)
         {
-            var enumItems = items as IEnumerable;
-            if (enumItems == null && items != null)
+            if (value != null && TypeSerializer.HasCircularReferences(value))
+                throw new NotSupportedException($"Cannot serialize type '{value.GetType().Name}' with cyclical dependencies");
+            return value;
+        }
+
+        public static IEnumerable<object> AssertEnumerable(this object items, string filterName)
+        {
+            var enumObjects = items as IEnumerable<object>;
+            if (enumObjects == null && items != null)
+            {
+                if (items is IEnumerable enumItems)
+                {
+                    var to = new List<object>();
+                    foreach (var item in enumItems)
+                    {
+                        to.Add(item);
+                    }
+                    return to;
+                }
+                
                 throw new ArgumentException(
                     $"{filterName} expects an IEnumerable but received a '{items.GetType().Name}' instead");
+            }
 
-            return enumItems ?? TypeConstants.EmptyObjectArray;
+            return enumObjects ?? TypeConstants.EmptyObjectArray;
+        }
+
+        public static string AssertExpression(this TemplateScopeContext scope, string filterName, object expression)
+        {
+            if (!(expression is string literal)) 
+                throw new NotSupportedException($"'{nameof(filterName)}' in '{scope.Page.VirtualPath}' requires a string Expression but received a '{expression?.GetType()?.Name}' instead");
+            return literal;
         }
 
         public static Dictionary<string, object> GetParamsWithItemBinding(this TemplateScopeContext scope, string filterName, object scopedParams, out string itemBinding) =>
             GetParamsWithItemBinding(scope, filterName, null, scopedParams, out itemBinding);
 
         public static Dictionary<string, object> GetParamsWithItemBinding(this TemplateScopeContext scope, string filterName, TemplatePage page, object scopedParams, out string itemBinding)
+        {
+            var scopeParams = scope.GetParamsWithItemBindingOnly(filterName, page, scopedParams, out itemBinding);
+            scopeParams.Each((key, val) => scope.ScopedParams[key] = val);
+            return scopeParams;
+        }
+
+        public static Dictionary<string, object> GetParamsWithItemBindingOnly(this TemplateScopeContext scope, string filterName, TemplatePage page, object scopedParams, out string itemBinding)
         {
             var pageParams = scope.AssertOptions(filterName, scopedParams);
             itemBinding = pageParams.TryGetValue("it", out object bindingName) && bindingName is string binding
@@ -181,9 +214,14 @@ namespace ServiceStack.Templates
             return pageParams;
         }
 
-        public static void AddItemToScope(this TemplateScopeContext scope, string itemBinding, object item, int index)
+        public static TemplateScopeContext AddItemToScope(this TemplateScopeContext scope, string itemBinding, object item, int index)
         {
             scope.ScopedParams[TemplateConstants.Index] = index;
+            return scope.AddItemToScope(itemBinding, item);
+        }
+
+        public static TemplateScopeContext AddItemToScope(this TemplateScopeContext scope, string itemBinding, object item)
+        {
             scope.ScopedParams[itemBinding] = item;
 
             var explodeBindings = item as Dictionary<string, object>;
@@ -194,6 +232,7 @@ namespace ServiceStack.Templates
                     scope.ScopedParams[entry.Key] = entry.Value;
                 }
             }
+            return scope;
         }
 
         public static T GetValueOrEvaluateBinding<T>(this TemplateScopeContext scope, object valueOrBinding) =>

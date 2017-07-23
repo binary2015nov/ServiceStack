@@ -44,7 +44,7 @@ namespace ServiceStack.Templates
                     to.Add(new PageStringFragment(block));
                 
                 var varStartPos = pos + 2;
-                var varEndPos = text.IndexOfNextCharNotInQuotes(varStartPos, '|', '}');
+                var varEndPos = text.IndexOfNextCharNotInObjects(varStartPos, '|', '}');
                 var initialExpr = text.Subsegment(varStartPos, varEndPos - varStartPos).Trim();
                 if (varEndPos == -1 || varEndPos >= text.Length)
                     throw new ArgumentException($"Invalid Server HTML Template at '{text.SubstringWithElipsis(0, 50)}'", nameof(text));
@@ -96,11 +96,16 @@ namespace ServiceStack.Templates
             return to;
         }
 
-        internal static int IndexOfNextCharNotInQuotes(this StringSegment text, int varStartPos, char c1, char c2)
+        internal static int IndexOfNextCharNotInObjects(this StringSegment text, int varStartPos, char c1, char c2)
         {
             var inDoubleQuotes = false;
             var inSingleQuotes = false;
+            var inBackTickQuotes = false;
 
+            var inBrackets = 0;
+            var inParens = 0;
+            var inBraces = 0;
+            
             for (var i = varStartPos; i < text.Length; i++)
             {
                 var c = text.GetChar(i);
@@ -119,15 +124,57 @@ namespace ServiceStack.Templates
                         inSingleQuotes = false;
                     continue;
                 }
-                if (c == '"')
+                if (inBackTickQuotes)
                 {
-                    inDoubleQuotes = true;
+                    if (c == '`')
+                        inBackTickQuotes = false;
                     continue;
                 }
-                if (c == '\'')
+                if (inBrackets > 0)
                 {
-                    inSingleQuotes = true;
+                    if (c == '[')
+                        ++inBrackets;
+                    if (c == ']')
+                        --inBrackets;
                     continue;
+                }
+                if (inBraces > 0)
+                {
+                    if (c == '{')
+                        ++inBraces;
+                    if (c == '}')
+                        --inBraces;
+                    continue;
+                }
+                if (inParens > 0)
+                {
+                    if (c == '(')
+                        ++inParens;
+                    if (c == ')')
+                        --inParens;
+                    continue;
+                }
+                
+                switch (c)
+                {
+                    case '"':
+                        inDoubleQuotes = true;
+                        continue;
+                    case '\'':
+                        inSingleQuotes = true;
+                        continue;
+                    case '`':
+                        inBackTickQuotes = true;
+                        continue;
+                    case '[':
+                        inBrackets++;
+                        continue;
+                    case '{':
+                        inBraces++;
+                        continue;
+                    case '(':
+                        inParens++;
+                        continue;
                 }
 
                 if (c == c1 || c == c2)
@@ -149,7 +196,15 @@ namespace ServiceStack.Templates
         {
             var scope = Expression.Parameter(typeof(TemplateScopeContext), "scope");
             var param = Expression.Parameter(typeof(object), "instance");
-            Expression body = Expression.Convert(param, type);
+            var body = CreateBindingExpression(type, expr, scope, param);
+
+            body = Expression.Convert(body, typeof(object));
+            return Expression.Lambda<Func<TemplateScopeContext, object, object>>(body, scope, param).Compile();
+        }
+
+        private static Expression CreateBindingExpression(Type type, StringSegment expr, ParameterExpression scope, ParameterExpression instance)
+        {
+            Expression body = Expression.Convert(instance, type);
 
             var currType = type;
 
@@ -160,32 +215,40 @@ namespace ServiceStack.Templates
                 try
                 {
                     if (member.IndexOf('(') >= 0)
-                        throw new BindingExpressionException($"Calling methods in '{expr}' is not allowed in binding expressions, use a filter instead.", member.Value, expr.Value);
-                    
+                        throw new BindingExpressionException(
+                            $"Calling methods in '{expr}' is not allowed in binding expressions, use a filter instead.",
+                            member.Value, expr.Value);
+
                     var indexerPos = member.IndexOf('[');
                     if (indexerPos >= 0)
                     {
                         var prop = member.LeftPart('[');
                         var indexer = member.RightPart('[');
                         indexer.ParseNextToken(out object value, out JsBinding binding);
-                        
+
                         if (binding is JsExpression)
-                            throw new BindingExpressionException($"Only constant binding expressions are supported: '{expr}'", member.Value, expr.Value);
+                            throw new BindingExpressionException($"Only constant binding expressions are supported: '{expr}'",
+                                member.Value, expr.Value);
 
                         var valueExpr = binding != null
                             ? (Expression) Expression.Call(
-                                typeof(TemplatePageUtils).GetStaticMethod(nameof(EvaluateBinding)), 
+                                typeof(TemplatePageUtils).GetStaticMethod(nameof(EvaluateBinding)),
                                 scope,
                                 Expression.Constant(binding))
                             : Expression.Constant(value);
-                        
-                        if (type.IsArray)
+
+                        if (currType == typeof(string))
+                        {
+                            body = CreateStringIndexExpression(body, binding, scope, valueExpr, ref currType);
+                        }
+                        else if (currType.IsArray)
                         {
                             if (binding != null)
                             {
                                 var evalAsInt = typeof(TemplatePageUtils).GetStaticMethod(nameof(EvaluateBindingAs))
                                     .MakeGenericMethod(typeof(int));
-                                body = Expression.ArrayIndex(body, Expression.Call(evalAsInt, scope, Expression.Constant(binding)));
+                                body = Expression.ArrayIndex(body,
+                                    Expression.Call(evalAsInt, scope, Expression.Constant(binding)));
                             }
                             else
                             {
@@ -196,6 +259,18 @@ namespace ServiceStack.Templates
                         {
                             var pi = AssertProperty(currType, "Item", expr);
                             currType = pi.PropertyType;
+
+                            if (binding != null)
+                            {
+                                var indexType = pi.GetGetMethod()?.GetParameters().FirstOrDefault()?.ParameterType;
+                                if (indexType != typeof(object))
+                                {
+                                    var evalAsInt = typeof(TemplatePageUtils).GetStaticMethod(nameof(EvaluateBindingAs))
+                                        .MakeGenericMethod(indexType);
+                                    valueExpr = Expression.Call(evalAsInt, scope, Expression.Constant(binding));
+                                }
+                            }
+
                             body = Expression.Property(body, "Item", valueExpr);
                         }
                         else
@@ -203,29 +278,102 @@ namespace ServiceStack.Templates
                             var pi = AssertProperty(currType, prop.Value, expr);
                             currType = pi.PropertyType;
                             body = Expression.PropertyOrField(body, prop.Value);
-                        
-                            var indexMethod = currType.GetMethod("get_Item", new[]{ value.GetType() });
-                            body = Expression.Call(body, indexMethod, valueExpr);
+
+                            if (currType == typeof(string))
+                            {
+                                body = CreateStringIndexExpression(body, binding, scope, valueExpr, ref currType);
+                            }
+                            else
+                            {
+                                var indexMethod = currType.GetMethod("get_Item", new[] {value.GetType()});
+                                body = Expression.Call(body, indexMethod, valueExpr);
+                                currType = indexMethod.ReturnType;
+                            }
                         }
                     }
                     else
                     {
                         if (depth >= 1)
-                            body = Expression.PropertyOrField(body, member.Value);
+                        {
+                            var memberName = member.Value;
+                            if (typeof(IDictionary).IsAssignableFromType(currType))
+                            {
+                                var pi = AssertProperty(currType, "Item", expr);
+                                currType = pi.PropertyType;
+                                body = Expression.Property(body, "Item", Expression.Constant(memberName));
+                            }
+                            else
+                            {
+                                body = Expression.PropertyOrField(body, memberName);
+                                var pi = currType.GetProperty(memberName);
+                                if (pi != null)
+                                {
+                                    currType = pi.PropertyType;
+                                }
+                                else
+                                {
+                                    var fi = currType.GetFieldInfo(memberName);
+                                    if (fi != null)
+                                        currType = fi.FieldType;
+                                }
+                                
+                            }
+                        }
                     }
-    
+
                     depth++;
                 }
-                catch (BindingExpressionException) { throw; }
+                catch (BindingExpressionException)
+                {
+                    throw;
+                }
                 catch (Exception e)
                 {
-                    throw new BindingExpressionException($"Could not compile '{member}' from expression '{expr}'", member.Value, expr.Value, e);
+                    throw new BindingExpressionException($"Could not compile '{member}' from expression '{expr}'", member.Value,
+                        expr.Value, e);
                 }
             }
+            return body;
+        }
 
-            body = Expression.Convert(body, typeof(object));
+        public static Action<TemplateScopeContext, object, object> CompileAssign(Type type, StringSegment expr)
+        {
+            var scope = Expression.Parameter(typeof(TemplateScopeContext), "scope");
+            var instance = Expression.Parameter(typeof(object), "instance");
+            var valueToAssign = Expression.Parameter(typeof(object), "valueToAssign");
 
-            return Expression.Lambda<Func<TemplateScopeContext, object, object>>(body, scope, param).Compile();
+            var body = CreateBindingExpression(type, expr, scope, instance);
+            if (body is IndexExpression propItemExpr)
+            {
+                var mi = propItemExpr.Indexer.GetSetMethod();
+                var indexExpr = propItemExpr.Arguments[0];
+                body = Expression.Call(propItemExpr.Object, mi, indexExpr, valueToAssign);
+            }
+            else
+            {
+                throw new BindingExpressionException($"Assignment expression for '{expr}' not supported yet", "valueToAssign", expr.Value);
+            }
+
+            return Expression.Lambda<Action<TemplateScopeContext, object, object>>(body, scope, instance, valueToAssign).Compile();
+        }
+
+        private static Expression CreateStringIndexExpression(Expression body, JsBinding binding, ParameterExpression scope,
+            Expression valueExpr, ref Type currType)
+        {
+            body = Expression.Call(body, typeof(string).GetMethod("ToCharArray", Type.EmptyTypes));
+            currType = typeof(char[]);
+
+            if (binding != null)
+            {
+                var evalAsInt = typeof(TemplatePageUtils).GetStaticMethod(nameof(EvaluateBindingAs))
+                    .MakeGenericMethod(typeof(int));
+                body = Expression.ArrayIndex(body, Expression.Call(evalAsInt, scope, Expression.Constant(binding)));
+            }
+            else
+            {
+                body = Expression.ArrayIndex(body, valueExpr);
+            }
+            return body;
         }
 
         public static object EvaluateBinding(TemplateScopeContext scope, JsBinding binding)

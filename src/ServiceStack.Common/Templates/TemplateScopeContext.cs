@@ -1,7 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using ServiceStack.Text;
+
+#if NETSTANDARD1_3
+using Microsoft.Extensions.Primitives;
+#endif
 
 namespace ServiceStack.Templates
 {
@@ -87,7 +93,30 @@ namespace ServiceStack.Templates
 
         public static object EvaluateToken(this TemplateScopeContext scope, JsToken token)
         {
-            return scope.PageResult.EvaluateToken(scope, token);
+            var result = scope.PageResult.EvaluateToken(scope, token);
+            return result;
+        }
+
+        public static object Evaluate(this TemplateScopeContext scope, object value, JsToken token)
+        {
+            var result = token != null
+                ? scope.PageResult.EvaluateToken(scope, token)
+                : scope.PageResult.EvaluateAnyBindings(value, scope);
+            return result;
+        }
+
+        public static void InvokeAssignExpression(this TemplateScopeContext scope, string assignExpr, object target, object value)
+        {
+            var fn = scope.Context.GetAssignExpression(target.GetType(), assignExpr.ToStringSegment());
+
+            try
+            {
+                fn(scope, target, value);
+            }
+            catch (Exception ex)
+            {
+                throw new BindingExpressionException($"Could not evaluate assign expression '{assignExpr}'", null, assignExpr, ex);
+            }
         }
     }
 }
