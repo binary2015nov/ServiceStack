@@ -150,9 +150,9 @@ namespace ServiceStack.Testing
         public void AddSessionCookies()
         {
             var permSessionId = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
-            this.Cookies[SessionFeature.PermanentSessionId] = new Cookie(SessionFeature.PermanentSessionId, permSessionId);
+            this.Cookies[Keywords.PermanentSessionId] = new Cookie(Keywords.PermanentSessionId, permSessionId);
             var sessionId = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
-            this.Cookies[SessionFeature.SessionId] = new Cookie(SessionFeature.SessionId, sessionId);
+            this.Cookies[Keywords.SessionId] = new Cookie(Keywords.SessionId, sessionId);
         }
 
         public Uri UrlReferrer => null;

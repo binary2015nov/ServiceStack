@@ -79,7 +79,7 @@ namespace ServiceStack.Admin
             if (RequestLogger == null)
                 throw new Exception("No IRequestLogger is registered");
 
-            if (!HostContext.DebugMode)
+            if (!HostContext.Config.DebugMode)
             {
                 RequiredRoleAttribute.AssertRequiredRoles(Request, RequestLogger.RequiredRoles);
             }

@@ -83,9 +83,7 @@ namespace ServiceStack
         /// <param name="requiredRoles"></param>
         public static void AssertRequiredRoles(IRequest req, params string[] requiredRoles)
         {
-            if (requiredRoles.IsEmpty()) return;
-
-            if (HostContext.HasValidAuthSecret(req))
+            if (requiredRoles.IsEmpty() || HostContext.HasValidAuthSecret(req))
                 return;
 
             var session = req.GetSession();
@@ -116,10 +114,7 @@ namespace ServiceStack
 
         public static bool HasRequiredRoles(IRequest req, string[] requiredRoles)
         {
-            if (requiredRoles.IsEmpty())
-                return true;
-
-            if (HostContext.HasValidAuthSecret(req))
+            if (requiredRoles.IsEmpty() || HostContext.HasValidAuthSecret(req))
                 return true;
 
             var session = req.GetSession();

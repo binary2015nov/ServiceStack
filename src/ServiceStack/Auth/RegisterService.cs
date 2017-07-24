@@ -7,62 +7,6 @@ using ServiceStack.Web;
 
 namespace ServiceStack.Auth
 {
-    public class FullRegistrationValidator : RegistrationValidator
-    {
-        public FullRegistrationValidator() { RuleSet(ApplyTo.Post, () => RuleFor(x => x.DisplayName).NotEmpty()); }
-    }
-
-    public class RegistrationValidator : AbstractValidator<Register>
-    {
-        public RegistrationValidator()
-        {
-            RuleSet(
-                ApplyTo.Post,
-                () =>
-                {
-                    RuleFor(x => x.Password).NotEmpty();
-                    RuleFor(x => x.UserName).NotEmpty().When(x => x.Email.IsNullOrEmpty());
-                    RuleFor(x => x.Email).NotEmpty().EmailAddress().When(x => x.UserName.IsNullOrEmpty());
-                    RuleFor(x => x.UserName)
-                        .Must(x =>
-                        {
-                            var authRepo = HostContext.AppHost.GetAuthRepository(base.Request);
-                            using (authRepo as IDisposable)
-                            {
-                                return authRepo.GetUserAuthByUserName(x) == null;
-                            }
-                        })
-                        .WithErrorCode("AlreadyExists")
-                        .WithMessage(ErrorMessages.UsernameAlreadyExists)
-                        .When(x => !x.UserName.IsNullOrEmpty());
-                    RuleFor(x => x.Email)
-                        .Must(x =>
-                        {
-                            var authRepo = HostContext.AppHost.GetAuthRepository(base.Request);
-                            using (authRepo as IDisposable)
-                            {
-                                return x.IsNullOrEmpty() || authRepo.GetUserAuthByUserName(x) == null;
-                            }
-                        })
-                        .WithErrorCode("AlreadyExists")
-                        .WithMessage(ErrorMessages.EmailAlreadyExists)
-                        .When(x => !x.Email.IsNullOrEmpty());
-                });
-            RuleSet(
-                ApplyTo.Put,
-                () =>
-                {
-                    RuleFor(x => x.UserName).NotEmpty();
-                    RuleFor(x => x.Email).NotEmpty();
-                });
-        }
-    }
-
-    [Obsolete("Use normal RegistrationFeature and have your IAuthRepository implement ICustomUserAuth instead")]
-    [DefaultRequest(typeof(Register))]
-    public class RegisterService<TUserAuth> : RegisterService
-        where TUserAuth : class, IUserAuth { }
-
     [DefaultRequest(typeof(Register))]
     public class RegisterService : Service
     {
@@ -112,7 +56,7 @@ namespace ServiceStack.Auth
                     : authRepo.UpdateUserAuth(existingUser, newUserAuth, request.Password);
             }
 
-            if (request.AutoLogin.GetValueOrDefault())
+            if (request.AutoLogin)
             {
                 using (var authService = base.ResolveService<AuthenticateService>())
                 {
@@ -143,7 +87,7 @@ namespace ServiceStack.Auth
 
             if (registerNewUser)
             {
-                if (!request.AutoLogin.GetValueOrDefault())
+                if (!request.AutoLogin)
                     session.PopulateSession(user, new List<IAuthTokens>());
 
                 session.OnRegistered(Request, session, this);
@@ -218,6 +162,57 @@ namespace ServiceStack.Auth
                     UserId = existingUser.Id.ToString(CultureInfo.InvariantCulture),
                 };
             }
+        }
+    }
+
+    public class FullRegistrationValidator : RegistrationValidator
+    {
+        public FullRegistrationValidator() { RuleSet(ApplyTo.Post, () => RuleFor(x => x.DisplayName).NotEmpty()); }
+    }
+
+    public class RegistrationValidator : AbstractValidator<Register>
+    {
+        public RegistrationValidator()
+        {
+            RuleSet(
+                ApplyTo.Post,
+                () =>
+                {
+                    RuleFor(x => x.Password).NotEmpty();
+                    RuleFor(x => x.UserName).NotEmpty().When(x => x.Email.IsNullOrEmpty());
+                    RuleFor(x => x.Email).NotEmpty().EmailAddress().When(x => x.UserName.IsNullOrEmpty());
+                    RuleFor(x => x.UserName)
+                        .Must(x =>
+                        {
+                            var authRepo = HostContext.AppHost.GetAuthRepository(base.Request);
+                            using (authRepo as IDisposable)
+                            {
+                                return authRepo.GetUserAuthByUserName(x) == null;
+                            }
+                        })
+                        .WithErrorCode("AlreadyExists")
+                        .WithMessage(ErrorMessages.UsernameAlreadyExists)
+                        .When(x => !x.UserName.IsNullOrEmpty());
+                    RuleFor(x => x.Email)
+                        .Must(x =>
+                        {
+                            var authRepo = HostContext.AppHost.GetAuthRepository(base.Request);
+                            using (authRepo as IDisposable)
+                            {
+                                return x.IsNullOrEmpty() || authRepo.GetUserAuthByUserName(x) == null;
+                            }
+                        })
+                        .WithErrorCode("AlreadyExists")
+                        .WithMessage(ErrorMessages.EmailAlreadyExists)
+                        .When(x => !x.Email.IsNullOrEmpty());
+                });
+            RuleSet(
+                ApplyTo.Put,
+                () =>
+                {
+                    RuleFor(x => x.UserName).NotEmpty();
+                    RuleFor(x => x.Email).NotEmpty();
+                });
         }
     }
 }

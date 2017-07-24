@@ -275,7 +275,7 @@ namespace ServiceStack.Host.Handlers
         public static RequestInfoResponse GetRequestInfo(IRequest httpReq)
         {
             var session = httpReq.GetSession();
-            var allowResponse = HostContext.DebugMode || HostContext.HasValidAuthSecret(httpReq) || session != null && session.Roles.Contains("admin");
+            var allowResponse = HostContext.Config.DebugMode || HostContext.HasValidAuthSecret(httpReq) || session != null && session.Roles.Contains("admin");
             if (!allowResponse)          
                 return null;
             

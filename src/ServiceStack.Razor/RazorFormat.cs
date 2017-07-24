@@ -216,7 +216,7 @@ namespace ServiceStack.Razor
         {
             return new RazorViewManager(this, VirtualFileSources)
             {
-                IncludeDebugInformation = HostContext.DebugMode,
+                IncludeDebugInformation = HostContext.Config.DebugMode,
                 CompileFilter = CompileFilter,
                 CheckLastModifiedForChanges = CheckLastModifiedForChanges.GetValueOrDefault(),
             };

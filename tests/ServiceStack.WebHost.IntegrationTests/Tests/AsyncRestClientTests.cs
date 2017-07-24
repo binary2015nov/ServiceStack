@@ -8,8 +8,6 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
     public abstract class AsyncRestClientTests
     {
-        private const string ListeningOn = Constant.ServiceStackBaseUri;
-
         protected abstract IRestClientAsync CreateServiceClient();
 
         [Test]
@@ -106,7 +104,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             protected override IRestClientAsync CreateServiceClient()
             {
-                return new JsonServiceClient(ListeningOn);
+                return new JsonServiceClient(Constant.ServiceStackBaseUri);
             }
         }
 
@@ -115,7 +113,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             protected override IRestClientAsync CreateServiceClient()
             {
-                return new JsvServiceClient(ListeningOn);
+                return new JsvServiceClient(Constant.ServiceStackBaseUri);
             }
         }
 
@@ -124,7 +122,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             protected override IRestClientAsync CreateServiceClient()
             {
-                return new XmlServiceClient(ListeningOn);
+                return new XmlServiceClient(Constant.ServiceStackBaseUri);
             }
         }
     }

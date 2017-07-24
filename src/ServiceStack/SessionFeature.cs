@@ -2,20 +2,13 @@ using System;
 using System.Web;
 using ServiceStack.Auth;
 using ServiceStack.Caching;
+using ServiceStack.MiniProfiler.Helpers;
 using ServiceStack.Web;
 
 namespace ServiceStack
 {
     public class SessionFeature : IPlugin
     {
-        public const string SessionId = "ss-id";
-        public const string PermanentSessionId = "ss-pid";
-        public const string SessionOptionsKey = "ss-opt";
-        public const string XUserAuthId = HttpHeaders.XUserAuthId;
-
-        [Obsolete("Use Keywords.Session")]
-        public const string RequestItemsSessionKey = "__session";
-
         public static TimeSpan DefaultSessionExpiry = TimeSpan.FromDays(7 * 2); //2 weeks
         public static TimeSpan DefaultPermanentSessionExpiry = TimeSpan.FromDays(7 * 4); //4 weeks
 
@@ -26,12 +19,12 @@ namespace ServiceStack
             set { sessionFn = value; }
         }
 
+        [Obsolete("Removing rarely used feature, if needed override OnSessionFilter() and return null if invalid session")]
+        public static bool VerifyCachedSessionId = false;
+
         public TimeSpan? SessionExpiry { get; set; }
         public TimeSpan? SessionBagExpiry { get; set; }
         public TimeSpan? PermanentSessionExpiry { get; set; }
-
-        [Obsolete("Removing rarely used feature, if needed override OnSessionFilter() and return null if invalid session")]
-        public static bool VerifyCachedSessionId = false;
 
         public void Register(IAppHost appHost)
         {
@@ -41,15 +34,16 @@ namespace ServiceStack
 
         public static void AddSessionIdToRequestFilter(IRequest req, IResponse res, object requestDto)
         {
-            if (req.PopulateFromRequestIfHasSessionId(requestDto)) return;
+            if (req.PopulateFromRequestIfHasSessionId(requestDto))
+                return;
 
-            if (req.GetTemporarySessionId() == null)
+            if (req.GetTemporarySessionId().IsNullOrEmpty())
             {
-                res.CreateTemporarySessionId(req);
+                req.CreateTemporarySessionId(res);
             }
-            if (req.GetPermanentSessionId() == null)
+            if (req.GetPermanentSessionId().IsNullOrEmpty())
             {
-                res.CreatePermanentSessionId(req);
+                req.CreatePermanentSessionId(res);
             }
         }
 
@@ -60,13 +54,13 @@ namespace ServiceStack
             if (httpRes == null)
                 httpRes = httpReq.Response;
 
-            return httpRes.CreateSessionIds(httpReq);
+            return httpReq.CreateSessionIds(httpRes);
         }
 
-        public static string GetSessionKey(IRequest httpReq = null)
+        public static string GetSessionKey(IRequest request)
         {
-            var sessionId = httpReq.GetSessionId();
-            return sessionId == null ? null : GetSessionKey(sessionId);
+            var sessionId = request.GetSessionId();
+            return GetSessionKey(sessionId);
         }
 
         public static string GetSessionKey(string sessionId)
@@ -79,7 +73,7 @@ namespace ServiceStack
             if (httpReq == null)
                 httpReq = HostContext.GetCurrentRequest();
 
-            var iSession = httpReq.GetSession(reload:false);
+            var iSession = httpReq.GetSession();
             if (iSession is T)
                 return (T)iSession;
 

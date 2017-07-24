@@ -483,7 +483,7 @@ namespace ServiceStack.Razor
         {
             var req = this.Request;
             if (req.GetSessionId() == null)
-                req.Response.CreateSessionIds(req);
+                req.CreateSessionIds(req.Response);
             return req.GetSession(reload);
         }
 
@@ -499,10 +499,7 @@ namespace ServiceStack.Razor
 
         public string SessionKey
         {
-            get
-            {
-                return SessionFeature.GetSessionKey();
-            }
+            get { return SessionFeature.GetSessionKey(Request); }
         }
 
         public void ClearSession()

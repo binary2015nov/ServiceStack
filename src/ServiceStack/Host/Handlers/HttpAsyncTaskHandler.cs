@@ -13,11 +13,15 @@ namespace ServiceStack.Host.Handlers
 {
     public abstract class HttpAsyncTaskHandler : IHttpAsyncHandler, IServiceStackHandler
     {
-        internal static readonly ILog Log = LogManager.GetLogger(typeof(HttpAsyncTaskHandler));
+        protected static ILog Log = LogManager.GetLogger(typeof(HttpAsyncTaskHandler));
+
+        private Type[] ProcessRequestArgTypes = new[] { typeof(IRequest), typeof(IResponse), typeof(string) };
 
         public string RequestName { get; set; }
 
-        private Type[] ProcessRequestArgTypes = new[] {typeof(IRequest), typeof(IResponse), typeof(string)};
+        public IRequest Request { get; set; }
+
+        public IResponse Response { get; set; }
 
         public virtual bool RunAsAsync()
         {
@@ -50,7 +54,7 @@ namespace ServiceStack.Host.Handlers
 
         private void RememberLastRequestInfo(string operationName, string pathInfo)
         {
-            if (HostContext.DebugMode)
+            if (HostContext.Config.DebugMode)
             {
                 RequestInfoHandler.LastRequestInfo = new RequestHandlerInfo
                 {

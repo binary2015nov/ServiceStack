@@ -512,7 +512,7 @@ namespace ServiceStack
 
             // For some exception types, we'll need to extract additional information in debug mode
             // (for example, so people can fix errors in their pages).
-            if (HostContext.DebugMode)
+            if (HostContext.Config.DebugMode)
             {
 #if !NETSTANDARD1_6
                 var compileEx = ex as HttpCompileException;
@@ -533,7 +533,7 @@ namespace ServiceStack
                 {
                     ErrorCode = ex.ToErrorCode(),
                     Message = ex.Message,
-                    StackTrace = HostContext.DebugMode ? ex.StackTrace : null,
+                    StackTrace = HostContext.Config.DebugMode ? ex.StackTrace : null,
                     Errors = errors
                 }
             };

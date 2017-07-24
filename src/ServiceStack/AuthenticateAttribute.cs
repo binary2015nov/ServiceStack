@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Specialized;
 using System.Linq;
 using ServiceStack.Auth;
 using ServiceStack.Web;
@@ -51,20 +50,20 @@ namespace ServiceStack
 
         public override void Execute(IRequest req, IResponse res, object requestDto)
         {
-            if (AuthenticateService.AuthProviders == null)
-                throw new InvalidOperationException(
-                    "The AuthService must be initialized by calling AuthService.Init to use an authenticate attribute");
-
             if (HostContext.HasValidAuthSecret(req))
                 return;
 
+            if (AuthenticateService.AuthProviders.Length == 0)
+                throw new InvalidOperationException(
+                    "The AuthenticateService must be initialized by calling AuthenticateService.Init to use an authenticate attribute");
+  
             var matchingOAuthConfigs = AuthenticateService.AuthProviders.Where(x =>
                 this.Provider.IsNullOrEmpty()
                 || x.Provider == this.Provider).ToList();
 
             if (matchingOAuthConfigs.Count == 0)
             {
-                res.WriteError(req, requestDto, $"No OAuth Configs found matching {this.Provider ?? "any"} provider");
+                res.WriteError(req, requestDto, $"No Auth Provider found matching {this.Provider ?? "any"} provider");
                 res.EndRequest();
                 return;
             }

@@ -31,7 +31,7 @@ namespace ServiceStack.Host.Handlers
                     : $"Error: {responseStatus.Message ?? responseStatus.ErrorCode}\n");
             }
 
-            if (HostContext.DebugMode)
+            if (HostContext.Config.DebugMode)
             {
                 sb.AppendLine("Handler for Request not found (404):\n")
                     .AppendLine("  Request.HttpMethod: " + request.Verb)

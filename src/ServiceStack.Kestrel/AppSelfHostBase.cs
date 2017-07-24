@@ -2,19 +2,18 @@
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using ServiceStack.Logging;
 using ServiceStack.NetCore;
 using ServiceStack.Text;
 using ServiceStack.Host;
 using ServiceStack.Host.Handlers;
+using ServiceStack.Host.NetCore;
+using ServiceStack.Web;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using ServiceStack.Host.NetCore;
-using ServiceStack.Web;
 
 namespace ServiceStack
 {

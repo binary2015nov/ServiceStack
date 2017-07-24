@@ -62,10 +62,10 @@ namespace ServiceStack
             }
         }
 
-        public ISession GetOrCreateSession(IRequest httpReq, IResponse httpRes)
+        public ISession GetOrCreateSession(IRequest req, IResponse res)
         {
-            var sessionId = httpReq.GetSessionId()
-                ?? httpRes.CreateSessionIds(httpReq);
+            var sessionId = req.GetSessionId()
+                ?? req.CreateSessionIds(res);
 
             return new SessionCacheClient(cacheClient, sessionId);
         }

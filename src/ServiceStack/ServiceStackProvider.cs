@@ -218,7 +218,7 @@ namespace ServiceStack
         {
             var req = this.Request;
             if (req.GetSessionId() == null)
-                req.Response.CreateSessionIds(req);
+                req.CreateSessionIds(req.Response);
             return req.GetSession(reload);
         }
 

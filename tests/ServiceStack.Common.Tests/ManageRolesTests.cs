@@ -16,7 +16,7 @@ namespace ServiceStack.Common.Tests
     [TestFixture]
     public class ManageRolesTests
     {
-        private static Register CreateNewUserRegistration(bool? autoLogin = null)
+        private static Register CreateNewUserRegistration(bool autoLogin = false)
         {
             var userId = Environment.TickCount % 10000;
 

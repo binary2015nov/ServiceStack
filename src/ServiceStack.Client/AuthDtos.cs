@@ -17,7 +17,7 @@ namespace ServiceStack
         [DataMember(Order = 4)] public string oauth_verifier { get; set; }
         [DataMember(Order = 5)] public string UserName { get; set; }
         [DataMember(Order = 6)] public string Password { get; set; }
-        [DataMember(Order = 7)] public bool? RememberMe { get; set; }
+        [DataMember(Order = 7)] public bool RememberMe { get; set; }
         [DataMember(Order = 8)] public string Continue { get; set; }
 
         // digest auth
@@ -65,8 +65,8 @@ namespace ServiceStack
         [DataMember(Order = 4)] public string DisplayName { get; set; }
         [DataMember(Order = 5)] public string Email { get; set; }
         [DataMember(Order = 6)] public string Password { get; set; }
-        [DataMember(Order = 7)] public bool? AutoLogin { get; set; }
         [DataMember(Order = 8)] public string Continue { get; set; }
+        [DataMember(Order = 7)] public bool AutoLogin { get; set; }
     }
 
     [DataContract]

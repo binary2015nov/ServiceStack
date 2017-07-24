@@ -876,10 +876,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                     RememberMe = true,
                 });
 
-                var permId = client.GetCookieValues()[SessionFeature.PermanentSessionId];
+                var permId = client.GetCookieValues()[Keywords.PermanentSessionId];
                 Assert.That(permId, Is.Not.EqualTo(lastPermId));
 
-                var ssOpt = client.GetCookieValues()[SessionFeature.SessionOptionsKey];
+                var ssOpt = client.GetCookieValues()[Keywords.SessionOptionsKey];
                 Assert.That(ssOpt, Is.Not.Null);
 
                 lastPermId = permId;

@@ -206,17 +206,15 @@ namespace ServiceStack
         /// </summary>
         public static object GetItem(this IRequest httpReq, string key)
         {
-            if (httpReq == null) return null;
-
             object value;
             httpReq.Items.TryGetValue(key, out value);
             return value;
         }
 
 #if !NETSTANDARD1_6
-        public static RequestBaseWrapper ToHttpRequestBase(this IRequest httpReq)
+        public static RequestBaseWrapper ToHttpRequestBase(this IRequest request)
         {
-            return new RequestBaseWrapper((IHttpRequest)httpReq);
+            return new RequestBaseWrapper((IHttpRequest)request);
         }
 #endif
 
@@ -227,9 +225,9 @@ namespace ServiceStack
             httpReq.RequestAttributes |= RequestAttributes.InProcess;
         }
 
-        public static bool IsInProcessRequest(this IRequest httpReq)
+        public static bool IsInProcessRequest(this IRequest request)
         {
-            return (RequestAttributes.InProcess & httpReq?.RequestAttributes) == RequestAttributes.InProcess;
+            return (RequestAttributes.InProcess & request?.RequestAttributes) == RequestAttributes.InProcess;
         }
 
         public static void ReleaseIfInProcessRequest(this IRequest httpReq)

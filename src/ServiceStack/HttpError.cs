@@ -8,7 +8,9 @@ namespace ServiceStack
 {
     public class HttpError : Exception, IHttpError, IResponseStatusConvertible, IHasErrorCode
     {
-        public HttpError() : this(null) { }
+        public HttpError() 
+            : this(string.Empty)
+        { }
 
         public HttpError(string message)
             : this(HttpStatusCode.InternalServerError, message)

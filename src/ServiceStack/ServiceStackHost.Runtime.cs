@@ -617,10 +617,10 @@ namespace ServiceStack
         public virtual bool AllowSetCookie(IRequest req, string cookieName)
         {
             if (!Config.AllowSessionCookies)
-                return cookieName != SessionFeature.SessionId
-                    && cookieName != SessionFeature.PermanentSessionId
-                    && cookieName != SessionFeature.SessionOptionsKey
-                    && cookieName != SessionFeature.XUserAuthId;
+                return cookieName != Keywords.SessionId
+                    && cookieName != Keywords.PermanentSessionId
+                    && cookieName != Keywords.SessionOptionsKey
+                    && cookieName != HttpHeaders.XUserAuthId;
 
             return true;
         }

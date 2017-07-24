@@ -18,7 +18,7 @@ namespace ServiceStack.Metadata
 
         public string RenderRow(string operationName)
         {
-            var show = HostContext.DebugMode //Show in DebugMode
+            var show = HostContext.Config.DebugMode //Show in DebugMode
                 && !MetadataConfig.AlwaysHideInMetadata(operationName); //Hide When [Restrict(VisibilityTo = None)]
 
             // use a fully qualified path if WebHostUrl is set
@@ -187,7 +187,7 @@ namespace ServiceStack.Metadata
 
             var errorCount = HostContext.AppHost.StartUpErrors.Count;
             var plural = errorCount > 1 ? "s" : "";
-            var startupErrors = HostContext.DebugMode && errorCount > 0
+            var startupErrors = HostContext.Config.DebugMode && errorCount > 0
                 ? $"<div class='error-popup'><a href='?debug=requestinfo'>Review {errorCount} Error{plural} on Startup</a></div>"
                 : "";
 

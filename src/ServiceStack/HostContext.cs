@@ -65,8 +65,6 @@ namespace ServiceStack
 
         public static string ServiceName => AssertAppHost().ServiceName;
 
-        public static bool DebugMode => AppHost?.Config?.DebugMode == true;
-
         public static bool StrictMode => AppHost?.Config?.StrictMode == true;
 
         public static bool TestMode

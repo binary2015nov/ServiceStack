@@ -114,7 +114,7 @@ namespace ServiceStack
 
                 var url = Request.GetBaseUrl()
                     .CombineWith(Request.PathInfo)
-                    .AddQueryParam("ssopt", Request.GetItemOrCookie(SessionFeature.SessionOptionsKey))
+                    .AddQueryParam("ssopt", Request.GetItemOrCookie(Keywords.SessionOptionsKey))
                     .AddQueryParam("sspid", Request.GetPermanentSessionId())
                     .AddQueryParam("ssid", Request.GetTemporarySessionId());
 
@@ -159,11 +159,11 @@ namespace ServiceStack
                 }
                 if (request.sspid != null)
                 {
-                    httpRes.Cookies.AddPermanentCookie(SessionFeature.PermanentSessionId, request.sspid);
+                    httpRes.Cookies.AddPermanentCookie(Keywords.PermanentSessionId, request.sspid);
                 }
                 if (request.ssid != null)
                 {
-                    httpRes.Cookies.AddSessionCookie(SessionFeature.SessionId, request.ssid,
+                    httpRes.Cookies.AddSessionCookie(Keywords.SessionId, request.ssid,
                         (HostContext.Config.OnlySendSessionCookiesSecurely && Request.IsSecureConnection));
                 }
             }

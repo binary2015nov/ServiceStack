@@ -68,7 +68,7 @@ namespace ServiceStack.WebHost.IntegrationTests
         public void ClearSession()
         {
             userSession = null;
-            this.Cache.Remove(SessionFeature.GetSessionKey());
+            this.Cache.Remove(SessionFeature.GetSessionKey(HostContext.GetCurrentRequest()));
         }
     }
 }

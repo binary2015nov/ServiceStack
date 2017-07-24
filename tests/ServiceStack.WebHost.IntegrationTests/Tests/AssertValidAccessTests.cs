@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Net;
 using NUnit.Framework;
-using ServiceStack.Auth;
 using ServiceStack.Text;
 using ServiceStack.WebHost.IntegrationTests.Services;
 
@@ -11,54 +10,17 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     [TestFixture]
     public class AssertValidAccessTests : AuthTestsBase
     {
-        protected Register register;
-
-        [OneTimeSetUp]
+       [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
-            Tracer.Default = new ConsoleTracer();
-            register = CreateAdminUser();
-        }
-
-        [OneTimeTearDown]
-        public void TestFixtureTearDown()
-        {
-            Tracer.Default = new NullTracer();
-        }
-
-        public string RoleName1 = "Role1";
-        public string RoleName2 = "Role2";
-        public const string ContentManager = "ContentManager";
-        public const string ContentPermission = "ContentPermission";
-
-        public string Permission1 = "Permission1";
-        public string Permission2 = "Permission2";
-
-        public Register RegisterNewUser(bool? autoLogin = null)
-        {
-            var userId = Environment.TickCount % 10000;
-
-            var newUserRegistration = new Register
-            {
-                UserName = "UserName" + userId,
-                DisplayName = "DisplayName" + userId,
-                Email = "user{0}@sf.com".Fmt(userId),
-                FirstName = "FirstName" + userId,
-                LastName = "LastName" + userId,
-                Password = "Password" + userId,
-                AutoLogin = autoLogin,
-            };
-
-            ServiceClient.Send(newUserRegistration);
-
-            return newUserRegistration;
+            Register = CreateAdminUser();
         }
 
         [Test]
-        public void Authenticationg_does_return_session_cookies()
+        public void Authentication_does_return_session_cookies()
         {
-            var client = AuthenticateWithAdminUser();
-            Assert.That(client.CookieContainer.Count, Is.GreaterThan(0));
+            var jsonServiceClient = AuthenticateWithAdminUser();
+            Assert.That(jsonServiceClient.CookieContainer.Count, Is.GreaterThan(0));
         }
 
         [Test]
@@ -68,13 +30,13 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
             try
             {
-                var response = ServiceClient.Send(
-                new AssignRoles
-                {
-                    UserName = newUser.UserName,
-                    Roles = { RoleName1, RoleName2 },
-                    Permissions = { Permission1, Permission2 }
-                });
+                ServiceClient.Send(
+                    new AssignRoles
+                    {
+                        UserName = newUser.UserName,
+                        Roles = { RoleName1, RoleName2 },
+                        Permissions = { Permission1, Permission2 }
+                    });
 
                 Assert.Fail("Should not be allowed");
             }
@@ -249,7 +211,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             try
             {
-                BaseUri.AppendPath("requiresadmin").GetStringFromUrl();
+                Constant.ServiceStackBaseUri.AppendPath("requiresadmin").GetStringFromUrl();
 
                 Assert.Fail("Should not allow access to protected resource");
             }
@@ -265,7 +227,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_access_Admin_service_with_AuthSecret()
         {
-            BaseUri.AppendPath("requiresadmin")
+            Constant.ServiceStackBaseUri.AppendPath("requiresadmin")
                 .AddQueryParam("authsecret", AuthSecret).GetStringFromUrl();
         }
 
