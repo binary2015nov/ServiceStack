@@ -24,8 +24,6 @@ namespace ServiceStack.Templates
         public string IndexPage { get; set; } = "index";
 
         public string DefaultLayoutPage { get; set; } = "_layout";
-        
-        public string LayoutVarName { get; set; } = "layout";
 
         public ITemplatePages Pages { get; set; }
 
@@ -39,7 +37,7 @@ namespace ServiceStack.Templates
 
         public List<Type> ScanTypes { get; set; } = new List<Type>();
 
-        public List<Assembly> ScanAssemblies{ get; set; } = new List<Assembly>();
+        public List<Assembly> ScanAssemblies { get; set; } = new List<Assembly>();
 
         public IContainer Container { get; set; } = new SimpleContainer();
         
@@ -47,7 +45,7 @@ namespace ServiceStack.Templates
 
         public List<TemplateFilter> TemplateFilters { get; } = new List<TemplateFilter>();
 
-        public List<TemplateCode> CodePages { get; } = new List<TemplateCode>();
+        public Dictionary<string, Type> CodePages { get; } = new Dictionary<string, Type>();
         
         public HashSet<string> ExcludeFiltersNamed { get; } = new HashSet<string>();
 
@@ -59,6 +57,8 @@ namespace ServiceStack.Templates
 
         public ConcurrentDictionary<string, Action<TemplateScopeContext, object, object>> AssignExpressionCache { get; } = new ConcurrentDictionary<string, Action<TemplateScopeContext, object, object>>();
 
+        public ConcurrentDictionary<Type, Tuple<MethodInfo, MethodInvoker>> CodePageInvokers { get; } = new ConcurrentDictionary<Type, Tuple<MethodInfo, MethodInvoker>>();
+        
         /// <summary>
         /// Available transformers that can transform context filter stream outputs
         /// </summary>
@@ -79,6 +79,23 @@ namespace ServiceStack.Templates
 
         public TemplatePage OneTimePage(string contents, string ext=null) 
             => Pages.OneTimePage(contents, ext ?? PageFormats.First().Extension);
+
+        public TemplateCodePage GetCodePage(string virtualPath)
+        {
+            var santizePath = virtualPath.Replace('\\','/').TrimPrefixes("/").LastLeftPart('.');
+
+            var isIndexPage = santizePath == string.Empty || santizePath.EndsWith("/");
+            var lookupPath = !isIndexPage
+                ? santizePath
+                : santizePath + IndexPage;
+            
+            if (!CodePages.TryGetValue(lookupPath, out Type type)) 
+                return null;
+            
+            var instance = (TemplateCodePage) Container.Resolve(type);
+            instance.Init();
+            return instance;
+        }
 
         public TemplateContext()
         {
@@ -125,22 +142,7 @@ namespace ServiceStack.Templates
                 InitFilter(filter);
             }
 
-            foreach (var page in CodePages)
-            {
-                InitCodePage(page);
-            }
-
             return this;
-        }
-
-        internal void InitCodePage(TemplateCode page)
-        {
-            if (page.Context == null)
-                page.Context = this;
-            if (page.Pages == null)
-                page.Pages = Pages;
-
-            page.Init();
         }
 
         internal void InitFilter(TemplateFilter filter)
@@ -154,18 +156,25 @@ namespace ServiceStack.Templates
 
         public TemplateContext ScanType(Type type)
         {
-            if (typeof(TemplateFilter).IsAssignableFromType(type))
+            if (!type.IsAbstract())
             {
-                Container.AddSingleton(type);
-                var filter = (TemplateFilter)Container.Resolve(type);
-                TemplateFilters.Add(filter);
+                if (typeof(TemplateFilter).IsAssignableFromType(type))
+                {
+                    Container.AddSingleton(type);
+                    var filter = (TemplateFilter)Container.Resolve(type);
+                    TemplateFilters.Add(filter);
+                }
+                else if (typeof(TemplateCodePage).IsAssignableFromType(type))
+                {
+                    Container.AddTransient(type);
+                    var pageAttr = type.FirstAttribute<PageAttribute>();
+                    if (pageAttr?.VirtualPath != null)
+                    {
+                        CodePages[pageAttr.VirtualPath] = type;
+                    }
+                }
             }
-            else if (typeof(TemplateCode).IsAssignableFromType(type))
-            {
-                Container.AddSingleton(type);
-                var codePage = (TemplateCode)Container.Resolve(type);
-                CodePages.Add(codePage);
-            }
+            
             return this;
         }
 

@@ -85,7 +85,23 @@ namespace ServiceStack.Templates
                 var originalText = text.Subsegment(pos, length);
                 lastPos = pos + length;
 
-                to.Add(new PageVariableFragment(originalText, initialValue, initialBinding, filterCommands));
+                var varFragment = new PageVariableFragment(originalText, initialValue, initialBinding, filterCommands);
+                to.Add(varFragment);
+
+                var newLineLen = literal.StartsWith("\n")
+                    ? 1
+                    : literal.StartsWith("\r\n")
+                        ? 2
+                        : 0;
+                if (newLineLen > 0)
+                {
+                    var lastExpr = varFragment.FilterExpressions?.LastOrDefault();
+                    var filterName = lastExpr?.NameString ?? varFragment?.InitialExpression?.NameString;
+                    if (filterName != null && TemplateConfig.RemoveNewLineAfterFiltersNamed.Contains(filterName))
+                    {
+                        lastPos += newLineLen;
+                    }
+                }
             }
 
             if (lastPos != text.Length)

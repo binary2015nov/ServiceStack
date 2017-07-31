@@ -19,6 +19,13 @@ namespace ServiceStack.Templates
         ContextBlock,
     }
 
+    public interface IResultInstruction {}
+    public class IgnoreResult : IResultInstruction
+    {
+        internal static readonly IgnoreResult Value = new IgnoreResult();
+        private IgnoreResult(){}
+    }
+
     public class TemplateFilter
     {
         public TemplateContext Context { get; set; }
@@ -224,7 +231,7 @@ namespace ServiceStack.Templates
         {
             scope.ScopedParams[itemBinding] = item;
 
-            var explodeBindings = item as Dictionary<string, object>;
+            var explodeBindings = item as ScopeVars;
             if (explodeBindings != null)
             {
                 foreach (var entry in explodeBindings)

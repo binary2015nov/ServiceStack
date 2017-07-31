@@ -13,13 +13,6 @@ namespace ServiceStack.Templates
 {
     // ReSharper disable InconsistentNaming
     
-    public interface IResultInstruction {}
-    public class IgnoreResult : IResultInstruction
-    {
-        internal static readonly IgnoreResult Value = new IgnoreResult();
-        private IgnoreResult(){}
-    }
-
     public class TemplateDefaultFilters : TemplateFilter
     {
         public static TemplateDefaultFilters Instance = new TemplateDefaultFilters();
@@ -52,14 +45,13 @@ namespace ServiceStack.Templates
 
         public string appSetting(string name) =>  Context.AppSettings.GetString(name);
 
-        public static double applyToNumbers(double lhs, double rhs, Func<double, double, double> fn) => fn(lhs, rhs);
-        public double add(double lhs, double rhs) => applyToNumbers(lhs, rhs, (x, y) => x + y);
-        public double sub(double lhs, double rhs) => applyToNumbers(lhs, rhs, (x, y) => x - y);
-        public double subtract(double lhs, double rhs) => applyToNumbers(lhs, rhs, (x, y) => x - y);
-        public double mul(double lhs, double rhs) => applyToNumbers(lhs, rhs, (x, y) => x * y);
-        public double multiply(double lhs, double rhs) => applyToNumbers(lhs, rhs, (x, y) => x * y);
-        public double div(double lhs, double rhs) => applyToNumbers(lhs, rhs, (x, y) => x / y);
-        public double divide(double lhs, double rhs) => applyToNumbers(lhs, rhs, (x, y) => x / y);
+        public double add(double lhs, double rhs) => lhs + rhs;
+        public double sub(double lhs, double rhs) => lhs - rhs;
+        public double subtract(double lhs, double rhs) => lhs - rhs;
+        public double mul(double lhs, double rhs) => lhs * rhs;
+        public double multiply(double lhs, double rhs) => lhs * rhs;
+        public double div(double lhs, double rhs) => lhs / rhs;
+        public double divide(double lhs, double rhs) => lhs / rhs;
 
         public long incr(long value) => value + 1; 
         public long increment(long value) => value + 1; 
@@ -176,6 +168,12 @@ namespace ServiceStack.Templates
         [HandleUnknownValue]
         public object truthy(object test, object returnIfTruthy) => !isFalsey(test) ? returnIfTruthy : null;
 
+        [HandleUnknownValue]
+        public bool isNull(object test) => test == null;
+
+        [HandleUnknownValue]
+        public bool isNotNull(object test) => test != null;
+
         public bool or(object lhs, object rhs) => isTrue(lhs) || isTrue(rhs);
         public bool and(object lhs, object rhs) => isTrue(lhs) && isTrue(rhs);
 
@@ -219,6 +217,7 @@ namespace ServiceStack.Templates
         }
 
         public object echo(object value) => value;
+        public IRawString pass(string target) => ("{{ " + target + " }}").ToRawString();
 
         public IEnumerable join(IEnumerable<object> values) => join(values, ",");
         public IEnumerable join(IEnumerable<object> values, string delimiter) => values.Map(x => x.ToString()).Join(delimiter);
@@ -301,7 +300,7 @@ namespace ServiceStack.Templates
             {
                 var scopedParams = scope.GetParamsWithItemBindingOnly(nameof(let), null, scopeBindings, out string itemBinding);
 
-                var to = new List<Dictionary<string, object>>();
+                var to = new List<ScopeVars>();
                 var i = 0;
                 foreach (var item in objs)
                 {
@@ -309,7 +308,7 @@ namespace ServiceStack.Templates
                     scope.ScopedParams[itemBinding] = item;
 
                     // Copy over previous let bindings into new let bindings
-                    var itemBindings = new Dictionary<string, object>();
+                    var itemBindings = new ScopeVars();
                     if (item is object[] tuple)
                     {
                         foreach (var a in tuple)
@@ -948,11 +947,49 @@ namespace ServiceStack.Templates
         public IEnumerable<object> intersect(IEnumerable<object> target, IEnumerable<object> items) => target.Intersect(items);
         public IEnumerable<object> except(IEnumerable<object> target, IEnumerable<object> items) => target.Except(items);
         public bool equivalentTo(IEnumerable<object> target, IEnumerable<object> items) => target.EquivalentTo(items);
+
+        public object get(object target, object key)
+        {
+            if (target == null)
+                return null;
+            
+            if (target is IDictionary d)
+            {
+                if (d.Contains(key))
+                    return d[key];
+            }
+            else if (target is object[] a)
+            {
+                var index = key.ConvertTo<int>();
+                return index < a.Length
+                    ? a[index]
+                    : null;
+            }
+            else if (target is IList l)
+            {
+                var index = key.ConvertTo<int>();
+                return index < l.Count
+                    ? l[index]
+                    : null;
+            }
+            else if (target is IEnumerable e)
+            {
+                var index = key.ConvertTo<int>();
+                var i = 0;
+                foreach (var value in e)
+                {
+                    if (i++ == index)
+                        return value;
+                }
+            }
+            
+            throw new NotSupportedException($"'{nameof(get)}' expects a collection but received a '{target.GetType().Name}'");
+        }
         
         public object map(TemplateScopeContext scope, object items, object expression) => map(scope, items, expression, null);
         public object map(TemplateScopeContext scope, object target, object expression, object scopeOptions) 
         {
-            var literal = scope.AssertExpression(nameof(groupBy), expression);
+            var literal = scope.AssertExpression(nameof(map), expression);
             var scopedParams = scope.GetParamsWithItemBinding(nameof(map), scopeOptions, out string itemBinding);
 
             literal.ToStringSegment().ParseNextToken(out object value, out JsBinding binding);
@@ -966,10 +1003,60 @@ namespace ServiceStack.Templates
             var result = scope.AddItemToScope(itemBinding, target).Evaluate(value, binding);
             return result;
         }
+
+        public object scopeVars(object target)
+        {
+            if (target == null)
+                return null;
+            
+            if (target is IDictionary<string, object> g)
+                return new ScopeVars(g);
+            
+            if (target is IDictionary d)
+            {
+                var to = new ScopeVars();
+                foreach (var key in d.Keys)
+                {
+                    to[key.ToString()] = d[key];
+                }
+                return to;
+            }
+
+            if (target is IEnumerable<KeyValuePair<string, object>> kvps)
+            {
+                var to = new ScopeVars();
+                foreach (var item in kvps)
+                {
+                    to[item.Key] = item.Value;
+                }
+                return to;
+            }
+
+            if (target is IEnumerable e)
+            {
+                var to = new List<object>();
+
+                foreach (var item in e)
+                {
+                    var toItem = item is IDictionary
+                        ? scopeVars(item)
+                        : item;
+
+                    to.Add(toItem);
+                }
+
+                return to;
+            }
+
+            throw new NotSupportedException($"'{nameof(scopeVars)}' expects a Dictionary but received a '{target.GetType().Name}'");
+        }
         
         public Task select(TemplateScopeContext scope, object target, object selectTemplate) => select(scope, target, selectTemplate, null);
         public async Task select(TemplateScopeContext scope, object target, object selectTemplate, object scopeOptions) 
         {
+            if (target == null)
+                return;
+            
             var scopedParams = scope.GetParamsWithItemBinding(nameof(select), scopeOptions, out string itemBinding);
             var template = JsonTypeSerializer.Unescape(selectTemplate.ToString());
             var itemScope = scope.CreateScopedContext(template, scopedParams);
@@ -993,6 +1080,9 @@ namespace ServiceStack.Templates
         public Task selectPartial(TemplateScopeContext scope, object target, string pageName) => selectPartial(scope, target, pageName, null); 
         public async Task selectPartial(TemplateScopeContext scope, object target, string pageName, object scopedParams) 
         {
+            if (target == null)
+                return;
+            
             var page = await scope.Context.GetPage(pageName).Init();
             var pageParams = scope.GetParamsWithItemBinding(nameof(selectPartial), page, scopedParams, out string itemBinding);
 
@@ -1006,7 +1096,7 @@ namespace ServiceStack.Templates
                     await scope.WritePageAsync(page, pageParams);
                 }
             }
-            else if (target != null)
+            else
             {
                 scope.AddItemToScope(itemBinding, target);
                 await scope.WritePageAsync(page, pageParams);

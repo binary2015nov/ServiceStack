@@ -27,8 +27,23 @@ namespace ServiceStack.Templates
         }
     }
 
+    public class ScopeVars : Dictionary<string, object>
+    {
+        public ScopeVars() {}
+        public ScopeVars(IDictionary<string, object> dictionary) : base(dictionary) {}
+        public ScopeVars(IDictionary<string, object> dictionary, IEqualityComparer<string> comparer) : base(dictionary, comparer) {}
+        public ScopeVars(IEqualityComparer<string> comparer) : base(comparer) {}
+        public ScopeVars(int capacity) : base(capacity) {}
+        public ScopeVars(int capacity, IEqualityComparer<string> comparer) : base(capacity, comparer) {}
+    }
+
     public static class TemplateScopeContextUtils
     {
+        public static object GetValue(this TemplateScopeContext scope, string name)
+        {
+            return scope.PageResult.GetValue(name, scope);
+        }
+        
         public static TemplateScopeContext CreateScopedContext(this TemplateScopeContext scope, string template, Dictionary<string, object> scopeParams = null, bool cachePage=true)
         {
             TemplatePage dynamicPage = null;
