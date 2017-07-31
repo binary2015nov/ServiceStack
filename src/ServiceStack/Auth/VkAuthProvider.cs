@@ -99,7 +99,7 @@ namespace ServiceStack.Auth {
 
                 string accessTokeUrl = $"{AccessTokenUrl}?client_id={ApplicationId}&client_secret={SecureKey}&code={code}&redirect_uri={CallbackUrl.UrlEncode()}";
 
-                string contents = AccessTokenUrlFilter(this, accessTokeUrl).GetStringFromUrl("*/*", RequestFilter);
+                string contents = AccessTokenUrlFilter(this, accessTokeUrl).GetStringFromUrl(accept: "*/*", requestFilter: RequestFilter);
 
                 var authInfo = JsonObject.Parse(contents);
 
@@ -136,7 +136,8 @@ namespace ServiceStack.Auth {
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
-        private string EnsureLatestCode(string code) {
+        private string EnsureLatestCode(string code)
+        {
             int idx = code.LastIndexOf(",", StringComparison.Ordinal);
             if (idx > 0) {
                 code = code.Substring(idx);
@@ -144,8 +145,13 @@ namespace ServiceStack.Auth {
             return code;
         }
 
-        protected virtual void RequestFilter(HttpWebRequest request) {
-            request.SetUserAgent(ServiceClientBase.DefaultUserAgent);
+        protected virtual void RequestFilter(HttpWebRequest request)
+        {
+#if NET45 || NET40
+            request.UserAgent = ServiceClientBase.DefaultUserAgent;
+#else
+            request.Headers[HttpRequestHeader.UserAgent] = ServiceClientBase.DefaultUserAgent;
+#endif
         }
 
         protected override void LoadUserAuthInfo(AuthUserSession userSession, IAuthTokens tokens, Dictionary<string, string> authInfo) {

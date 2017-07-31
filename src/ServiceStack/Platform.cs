@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using ServiceStack.Configuration;
-using ServiceStack.Platforms;
 using ServiceStack.Web;
 
 namespace ServiceStack

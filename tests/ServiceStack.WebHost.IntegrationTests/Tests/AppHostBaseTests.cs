@@ -11,7 +11,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_download_metadata_page()
         {
-            var html = Constant.ServiceStackBaseUri.CombineWith("metadata").GetStringFromUrl();
+            var html = Constant.ServiceStackBaseUri.CombineWith("metadata").GetHtmlFromUrl();
             Assert.That(html.Contains("The following operations are supported."));
         }
 

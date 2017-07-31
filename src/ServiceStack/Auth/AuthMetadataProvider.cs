@@ -66,7 +66,7 @@ namespace ServiceStack.Auth
                 var ignore = url.GetBytesFromUrl(
                     requestFilter: req =>
                     {
-                        req.SetUserAgent("ServiceStack");
+                        req.Headers[HttpRequestHeader.UserAgent] = "ServiceStack";
 #if !NETSTANDARD1_6
                         req.AllowAutoRedirect = false; //Missing in .NET Core
 #endif

@@ -15,7 +15,7 @@ namespace Funq
         /// Initializes the exception with the service that could not be resolved.
         /// </summary>
         public ResolutionException(Type missingServiceType)
-            : base(String.Format(
+            : base(string.Format(
                 CultureInfo.CurrentCulture,
                 ServiceStack.ResourceDesigner.Resources.ResolutionException_MissingType,
                 missingServiceType.FullName))
@@ -25,7 +25,7 @@ namespace Funq
         /// Initializes the exception with the service (and its name) that could not be resolved.
         /// </summary>
         public ResolutionException(Type missingServiceType, string missingServiceName)
-            : base(String.Format(
+            : base(string.Format(
                 CultureInfo.CurrentCulture,
                 ServiceStack.ResourceDesigner.Resources.ResolutionException_MissingNamedType,
                 missingServiceType.FullName, missingServiceName))

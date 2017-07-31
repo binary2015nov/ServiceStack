@@ -86,28 +86,6 @@ namespace ServiceStack
             : base(serviceName, handlerPath, assembliesWithServices)
         { threadPoolManager = new ThreadPoolManager(poolSize); }
 
-
-        private bool disposed = false;
-        protected override void Dispose(bool disposing)
-        {
-            if (disposed) return;
-
-            lock (this)
-            {
-                if (disposed) return;
-
-                if (disposing)
-                {
-                    threadPoolManager.Dispose();
-                }
-
-                // new shared cleanup logic
-                disposed = true;
-
-                base.Dispose(disposing);
-            }
-        }
-
         private bool IsListening => this.IsStarted && this.Listener != null && this.Listener.IsListening;
 
         // Loop here to begin processing of new requests.
@@ -181,6 +159,28 @@ namespace ServiceStack
 
                 threadPoolManager.Free();
             }).Start();
+        }
+
+        private bool disposed = false;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposed) return;
+
+            lock (this)
+            {
+                if (disposed) return;
+
+                if (disposing)
+                {
+                    threadPoolManager.Dispose();
+                }
+
+                // new shared cleanup logic
+                disposed = true;
+
+                base.Dispose(disposing);
+            }
         }
     }
 }

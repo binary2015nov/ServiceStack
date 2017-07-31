@@ -747,7 +747,7 @@ namespace RazorRockstars.Console.Files
         [Test]
         public void Can_GET_GetReqstar_View()
         {
-            var html = "{0}/reqstars/1".Fmt(Host).GetStringFromUrl(accept: "text/html");
+            var html = "{0}/reqstars/1".Fmt(Host).GetHtmlFromUrl();
             html.Print();
             Assert.That(html, Does.Contain("<!--view:GetReqstar.cshtml-->"));
             Assert.That(html, Does.Contain("<!--template:HtmlReport.cshtml-->"));

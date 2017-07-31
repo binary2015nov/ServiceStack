@@ -9,7 +9,7 @@ using System.Web.Configuration;
 using System.Xml.Linq;
 using ServiceStack.Configuration;
 
-namespace ServiceStack.Platforms
+namespace ServiceStack
 {
     public partial class PlatformNet : Platform
     {

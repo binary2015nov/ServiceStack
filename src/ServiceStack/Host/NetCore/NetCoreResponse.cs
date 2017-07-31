@@ -84,7 +84,7 @@ namespace ServiceStack.Host.NetCore
             if (bytes.Length > 0)
                 hasResponseBody = true;
             
-            if (Platforms.PlatformNetCore.HostInstance.Config?.DisableChunkedEncoding == true)
+            if (PlatformNetCore.HostInstance.Config?.DisableChunkedEncoding == true)
                  response.ContentLength = bytes.Length;
 
             response.Body.Write(bytes, 0, bytes.Length);

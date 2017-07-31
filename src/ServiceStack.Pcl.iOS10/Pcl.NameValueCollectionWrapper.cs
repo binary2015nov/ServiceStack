@@ -68,7 +68,7 @@ namespace ServiceStack.Pcl
                 }
                 if (sb.Length > 0)
                     sb.Length--;
-                return StringBuilderCache.ReturnAndFree(sb);
+                return StringBuilderCache.Retrieve(sb);
             }
         }
 
@@ -336,7 +336,7 @@ namespace ServiceStack
                 AppendKeyValue(sb, key, values);
             }
 
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
 
         public static string ToFormUrlEncoded(this NameValueCollection queryParams)
@@ -348,7 +348,7 @@ namespace ServiceStack
                 AppendKeyValue(sb, key, values);
             }
 
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
 
         private static void AppendKeyValue(StringBuilder sb, string key, string[] values)

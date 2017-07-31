@@ -125,7 +125,7 @@ namespace RazorRockstars.Console.Files
             url.Print();
             try
             {
-                var text = url.GetStringFromUrl(AcceptContentType, responseFilter: r =>
+                var text = url.GetStringFromUrl(contentType: AcceptContentType, responseFilter: r =>
                 {
                     if (r.StatusCode != statusCode)
                         Assert.Fail("'{0}' returned {1} expected {2}".Fmt(url, r.StatusCode, statusCode));

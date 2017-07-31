@@ -881,7 +881,7 @@ namespace ServiceStack
             }
         }
 
-        protected WebRequest PrepareWebRequest(string httpMethod, string requestUri, object request, Action<HttpWebRequest> sendRequestAction)
+        protected WebRequest PrepareWebRequest(string httpMethod, string urlString, object request, Action<WebRequest> sendRequestAction)
         {
             if (httpMethod == null)
                 throw new ArgumentNullException(nameof(httpMethod));
@@ -893,12 +893,11 @@ namespace ServiceStack
                 var queryString = QueryStringSerializer.SerializeToString(request);
                 if (!string.IsNullOrEmpty(queryString))
                 {
-                    requestUri += "?" + queryString;
+                    urlString += "?" + queryString;
                 }
             }
 
-            var client = PclExport.Instance.CreateWebRequest(requestUri,
-                emulateHttpViaPost: EmulateHttpViaPost);
+            var client = PclExport.Instance.CreateWebRequest(urlString);
 
             try
             {
@@ -909,11 +908,21 @@ namespace ServiceStack
 #if !SL5
                 if (Proxy != null) client.Proxy = Proxy;
 #endif
-                PclExport.Instance.Config(client,
-                    allowAutoRedirect: AllowAutoRedirect,
-                    timeout: this.Timeout,
-                    readWriteTimeout: ReadWriteTimeout,
-                    userAgent: UserAgent);
+
+#if NET45 || NET40
+
+                client.UserAgent = UserAgent;
+                client.AllowAutoRedirect = AllowAutoRedirect;
+                if (Timeout.HasValue) 
+                    client.Timeout = (int)Timeout.Value.TotalMilliseconds;
+                if (ReadWriteTimeout.HasValue)
+                client.ReadWriteTimeout = (int)ReadWriteTimeout.Value.TotalMilliseconds;
+
+#else
+
+                client.Headers[HttpRequestHeader.UserAgent] = userAgent;
+
+#endif
 
                 if (this.authInfo != null && !string.IsNullOrEmpty(this.UserName))
                     client.AddAuthInfo(this.UserName, this.Password, authInfo);
@@ -923,11 +932,6 @@ namespace ServiceStack
                     client.Credentials = this.Credentials;
                 else if (this.AlwaysSendBasicAuthHeader)
                     client.AddBasicAuth(this.UserName, this.Password);
-
-                if (!DisableAutoCompression)
-                {
-                    PclExport.Instance.AddCompression(client);
-                }
 
                 if (StoreCookies)
                 {
@@ -948,7 +952,7 @@ namespace ServiceStack
             }
             catch (AuthenticationException ex)
             {
-                throw WebRequestUtils.CreateCustomException(requestUri, ex) ?? ex;
+                throw WebRequestUtils.CreateCustomException(urlString, ex) ?? ex;
             }
             return client;
         }
@@ -1741,7 +1745,7 @@ namespace ServiceStack
 
             try
             {
-                var webRequest = createWebRequest();
+                var webRequest = (HttpWebRequest)createWebRequest();
                 webRequest.UploadFile(fileToUpload, fileName, mimeType);
                 var webResponse = PclExport.Instance.GetResponse(webRequest);
                 return HandleResponse<TResponse>(webResponse);
@@ -1759,7 +1763,7 @@ namespace ServiceStack
                     createWebRequest,
                     c =>
                     {
-                        c.UploadFile(fileToUpload, fileName, mimeType);
+                        ((HttpWebRequest)c).UploadFile(fileToUpload, fileName, mimeType);
                         return PclExport.Instance.GetResponse(c);
                     },
                     out response))
@@ -2117,11 +2121,6 @@ namespace ServiceStack
 
             cookies.SetCookie(new Uri(baseUri), "ss-tok", token,
                 expiresAt: DateTime.UtcNow.Add(TimeSpan.FromDays(365 * 20)));
-        }
-
-        public static void SetUserAgent(this HttpWebRequest req, string userAgent)
-        {
-            PclExport.Instance.SetUserAgent(req, userAgent);
         }
     }
 

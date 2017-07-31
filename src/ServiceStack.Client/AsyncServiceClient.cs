@@ -240,8 +240,15 @@ namespace ServiceStack
 
             PclExportClient.Instance.AddHeader(client, Headers);
 
+#if NET45 || NET40
+
+            client.UserAgent = UserAgent;
+
+#else
             //EmulateHttpViaPost is also forced for SL5 clients sending non GET/POST requests
-            PclExport.Instance.Config(client, userAgent: UserAgent);
+            client.Headers[HttpRequestHeader.UserAgent] = UserAgent;
+
+#endif
 
             if (this.authInfo != null && !string.IsNullOrEmpty(this.UserName))
                 client.AddAuthInfo(this.UserName, this.Password, authInfo);

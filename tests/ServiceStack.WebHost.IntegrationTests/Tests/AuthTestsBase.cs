@@ -1,7 +1,6 @@
 using System;
 using System.Net;
 using NUnit.Framework;
-using ServiceStack.Text;
 
 namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
@@ -15,35 +14,31 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         public string Permission1 = "Permission1";
         public string Permission2 = "Permission2";
 
-        public const string AdminEmail = "admin@servicestack.com";
-        public const string AuthSecret = "secretz";
-        private const string AdminPassword = "E8828A3E26884CE0B345D0D2DFED358A";
-
-        protected Register Register;
+        protected Register AdminRegister;
 
         private JsonServiceClient serviceClient;
         public JsonServiceClient ServiceClient => serviceClient ?? (serviceClient = new JsonServiceClient(Constant.ServiceStackBaseUri));
 
         public Register CreateAdminUser()
         {
-            Register = new Register
+            AdminRegister = new Register
             {
                 UserName = "Admin",
                 DisplayName = "The Admin User",
-                Email = AdminEmail, //this email is automatically assigned as Admin in Web.Config
+                Email = Constant.AdminEmail, //this email is automatically assigned as Admin in Web.Config
                 FirstName = "Admin",
                 LastName = "User",
-                Password = AdminPassword,
+                Password = Constant.AdminPassword,
             };
             try
             {
-                ServiceClient.Send(Register);
+                ServiceClient.Send(AdminRegister);
             }
             catch (WebServiceException ex)
             {
                 ("Error while creating Admin User: " + ex.Message).Print();
             }
-            return Register;
+            return AdminRegister;
         }
 
         public Register RegisterNewUser(bool autoLogin = false)
@@ -84,8 +79,8 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             var serviceClient = new JsonServiceClient(Constant.ServiceStackBaseUri);
             serviceClient.Send(new Authenticate
             {
-                UserName = Register.UserName,
-                Password = Register.Password,
+                UserName = AdminRegister.UserName,
+                Password = AdminRegister.Password,
                 RememberMe = true,
             });
 

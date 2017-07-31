@@ -26,7 +26,6 @@ using ServiceStack.Host.Handlers;
 using ServiceStack.IO;
 using ServiceStack.Logging;
 using ServiceStack.Messaging;
-using ServiceStack.Platforms;
 using ServiceStack.Redis;
 using ServiceStack.VirtualPath;
 using ServiceStack.Web;

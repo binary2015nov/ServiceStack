@@ -8,7 +8,6 @@ using ServiceStack.Host;
 using ServiceStack.Host.Handlers;
 using ServiceStack.Host.NetCore;
 using ServiceStack.Web;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -22,7 +21,7 @@ namespace ServiceStack
         protected AppSelfHostBase(string serviceName, params Assembly[] assembliesWithServices)
             : base(serviceName, assembliesWithServices) 
         {
-            Platforms.PlatformNetCore.HostInstance = this;
+            PlatformNetCore.HostInstance = this;
         }
 
         IApplicationBuilder app;
@@ -141,7 +140,7 @@ namespace ServiceStack
         /// </summary>
         public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env) {}
 
-        public static AppSelfHostBase HostInstance => (AppSelfHostBase)Platforms.PlatformNetCore.HostInstance;
+        public static AppSelfHostBase HostInstance => (AppSelfHostBase)PlatformNetCore.HostInstance;
 
         protected class Startup
         {

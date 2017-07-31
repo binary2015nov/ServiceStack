@@ -96,9 +96,8 @@ namespace ServiceStack
             webReq.ContentType = httpReq.ContentType;
             webReq.Accept = httpReq.Accept;
 
-            PclExport.Instance.SetUserAgent(webReq, httpReq.UserAgent);
-
-#if NET45
+#if NET45 ||NET40
+            webReq.UserAgent = httpReq.UserAgent;
             webReq.Referer = httpReq.UrlReferrer?.ToString();
             webReq.ServicePoint.Expect100Continue = false;
 
@@ -109,6 +108,9 @@ namespace ServiceStack
             var ifModifiedSince = httpReq.GetIfModifiedSince();
             if (ifModifiedSince != null)
                 webReq.IfModifiedSince = ifModifiedSince.Value;
+#else
+            webReq.Headers[HttpRequestHeader.UserAgent] = httpReq.UserAgent;
+
 #endif
 
             foreach (var header in httpReq.Headers.AllKeys)

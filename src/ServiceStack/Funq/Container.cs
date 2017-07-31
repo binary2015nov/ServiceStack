@@ -6,12 +6,9 @@ using ServiceStack.Web;
 
 namespace Funq
 {
-    public interface IHasContainer
-    {
-        Container Container { get; }
-    }
-
-    /// <include file='Container.xdoc' path='docs/doc[@for="Container"]/*'/>
+    /// <summary>
+    /// Main container class for components, supporting container hierarchies and lifetime management of<see cref="IDisposable"/> instances.
+    /// </summary>
     public partial class Container : IDisposable
     {
         Dictionary<ServiceKey, ServiceEntry> services = new Dictionary<ServiceKey, ServiceEntry>();
@@ -29,11 +26,13 @@ namespace Funq
         Stack<Container> childContainers = new Stack<Container>();
         Container parent;
 
-        /// <include file='Container.xdoc' path='docs/doc[@for="Container.ctor"]/*'/>
+        /// <summary>
+        /// Initializes a new empty container.
+        /// </summary>
         public Container()
         {
             services[new ServiceKey(typeof(Func<Container, Container>), null)] =
-                new ServiceEntry<Container, Func<Container, Container>>((Func<Container, Container>)(c => c))
+                new ServiceEntry<Container, Func<Container, Container>>(c => c)
                 {
                     Container = this,
                     Instance = this,
@@ -42,13 +41,19 @@ namespace Funq
                 };
         }
 
-        /// <include file='Container.xdoc' path='docs/doc[@for="Container.DefaultOwner"]/*'/>
+        /// <summary>
+        /// Default owner for new registrations. <see cref="Owner.Container"/> by default.
+        /// </summary>
         public Owner DefaultOwner { get; set; }
 
-        /// <include file='Container.xdoc' path='docs/doc[@for="Container.DefaultReuse"]/*'/>
+        /// <summary>
+        /// Default reuse scope for new registrations. <see cref="ReuseScope.Hierarchy"/> by default.
+        /// </summary>
         public ReuseScope DefaultReuse { get; set; }
 
-        /// <include file='Container.xdoc' path='docs/doc[@for="Container.CreateChildContainer"]/*'/>
+        /// <summary>
+        /// Creates a child container of the current one, which exposes its current service registration to the new child container.
+        /// </summary>
         public Container CreateChildContainer()
         {
             var child = InstantiateChildContainer();
@@ -60,53 +65,23 @@ namespace Funq
         {
             return new Container { parent = this };
         }
-
-        private bool hasDisposed = false;
-
-        /// <include file='Container.xdoc' path='docs/doc[@for="Container.Dispose"]/*'/>
-        public virtual void Dispose()
-        {
-            if (hasDisposed)
-                return;
-
-            hasDisposed = true;
-            
-            lock (disposables)
-            {
-                while (disposables.Count > 0)
-                {
-                    var wr = disposables.Pop();
-                    var disposable = (IDisposable)wr.Target;
-                    if (wr.IsAlive)
-                        disposable.Dispose();
-                }
-            }
-
-            lock (childContainers)
-            {
-                while (childContainers.Count > 0)
-                {
-                    childContainers.Pop().Dispose();
-                }
-            }
-
-            foreach (var serviceEntry in services.Values)
-            {
-                var disposable = serviceEntry.GetInstance() as IDisposable;
-                if (disposable != null && !(disposable is Container))
-                {
-                    disposable.Dispose();
-                }
-            }
-        }
-
-        /// <include file='Container.xdoc' path='docs/doc[@for="Container.Register(instance)"]/*'/>
+      
+        /// <summary>
+        /// Registers a service instance with the container. This instance will have <see cref="Owner.External"/> and 
+        /// <see cref="ReuseScope.Hierarchy"/> behavior.
+        /// </summary>
+        /// <param name = "instance"> Service instance to use.</param>
         public void Register<TService>(TService instance)
         {
             Register(null, instance);
         }
 
-        /// <include file='Container.xdoc' path='docs/doc[@for="Container.Register(name,instance)"]/*'/>
+        /// <summary>
+        /// Registers a named service instance with the container. This instance
+        /// will have <see cref="Owner.External"/> and <see cref="ReuseScope.Hierarchy"/> behavior.
+        /// </summary >
+        /// <param name= "name"> Name of the service to register.</param>
+        /// <param name = "instance"> Service instance to use.</param>        
         public void Register<TService>(string name, TService instance)
         {
             var entry = RegisterImpl<TService, Func<Container, TService>>(name, null);
@@ -115,7 +90,6 @@ namespace Funq
             entry.ReusedWithin(ReuseScope.Hierarchy).OwnedBy(Owner.External);
             entry.InitializeInstance(instance);
         }
-
 
         private ServiceEntry<TService, TFunc> RegisterImpl<TService, TFunc>(string name, TFunc factory)
         {
@@ -373,6 +347,7 @@ namespace Funq
         }
 
         #endregion
+
         internal void TrackDisposable(object instance)
         {
             lock (disposables) disposables.Push(new WeakReference(instance));
@@ -504,5 +479,54 @@ namespace Funq
         {
             GetEntry<TService, TFunc>(name, true);
         }
+
+        private bool disposed = false;
+
+        /// <summary>
+        /// Disposes the container and all instances owned by it (<see cref="Owner.Container"/>), as well as all child containers 
+        /// created through <see cref="CreateChildContainer"/>.
+        /// </summary>
+        public virtual void Dispose()
+        {
+            if (disposed)
+                return;
+
+            disposed = true;
+
+            lock (disposables)
+            {
+                while (disposables.Count > 0)
+                {
+                    var wr = disposables.Pop();
+                    var disposable = (IDisposable)wr.Target;
+                    if (wr.IsAlive)
+                        disposable.Dispose();
+                }
+            }
+
+            lock (childContainers)
+            {
+                while (childContainers.Count > 0)
+                {
+                    childContainers.Pop().Dispose();
+                }
+            }
+
+            foreach (var serviceEntry in services.Values)
+            {
+                if (serviceEntry.Owner != Owner.Container)
+                    continue;
+                var disposable = serviceEntry.GetInstance() as IDisposable;
+                if (disposable != null && !(disposable is Container))
+                {
+                    disposable.Dispose();
+                }
+            }
+        }
+    }
+
+    public interface IHasContainer
+    {
+        Container Container { get; }
     }
 }

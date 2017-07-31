@@ -3,7 +3,7 @@
 using System.IO;
 using ServiceStack.Configuration;
 
-namespace ServiceStack.Platforms
+namespace ServiceStack
 {
     public partial class PlatformNetCore : Platform
     {
@@ -83,7 +83,6 @@ namespace ServiceStack.Platforms
             }
             return defaultValue;
         }
-
     }
 }
 

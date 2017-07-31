@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 
-namespace ServiceStack.Platforms
+namespace ServiceStack
 {
     public partial class PlatformNet : Platform
     {

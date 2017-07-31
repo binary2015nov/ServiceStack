@@ -1,54 +1,10 @@
-#if !NETFX_CORE
 using System;
 using System.Text;
 
 namespace ServiceStack.Logging
 {
-    /// <summary>
-    /// StringBuilderLog writes to shared StringBuffer.
-    /// Made public so its testable
-    /// </summary>
-    public class StringBuilderLogFactory : ILogFactory
-    {
-        private StringBuilder sb;
-        private readonly bool debugEnabled;
-
-        public StringBuilderLogFactory(bool debugEnabled = true)
-        {
-            sb = new StringBuilder();
-            this.debugEnabled = debugEnabled;
-        }
-
-        public ILog GetLogger(Type type)
-        {
-            return new StringBuilderLog(type, sb) { IsDebugEnabled = debugEnabled };
-        }
-
-        public ILog GetLogger(string typeName)
-        {
-            return new StringBuilderLog(typeName, sb) { IsDebugEnabled = debugEnabled };
-        }
-
-        public string GetLogs()
-        {
-            lock (sb)
-                return sb.ToString();
-        }
-
-        public void ClearLogs()
-        {
-            lock (sb)
-                sb.Remove(0, sb.Length - 1);
-        }
-    }
-
     public class StringBuilderLog : ILog
     {
-        const string DEBUG = "DEBUG: ";
-        const string ERROR = "ERROR: ";
-        const string FATAL = "FATAL: ";
-        const string INFO = "INFO: ";
-        const string WARN = "WARN: ";
         private readonly StringBuilder logs;
 
         public StringBuilderLog(string type, StringBuilder logs)
@@ -105,78 +61,77 @@ namespace ServiceStack.Logging
 
         public void Debug(object message, Exception exception)
         {
-            Log(DEBUG + message, exception);
+            Log(LogLevels.Debug + message, exception);
         }
 
         public void Debug(object message)
         {
-            Log(DEBUG + message);
+            Log(LogLevels.Debug + message);
         }
 
         public void DebugFormat(string format, params object[] args)
         {
-            LogFormat(DEBUG + format, args);
+            LogFormat(LogLevels.Debug + format, args);
         }
 
         public void Error(object message, Exception exception)
         {
-            Log(ERROR + message, exception);
+            Log(LogLevels.Error + message, exception);
         }
 
         public void Error(object message)
         {
-            Log(ERROR + message);
+            Log(LogLevels.Error + message);
         }
 
         public void ErrorFormat(string format, params object[] args)
         {
-            LogFormat(ERROR + format, args);
+            LogFormat(LogLevels.Error + format, args);
         }
 
         public void Fatal(object message, Exception exception)
         {
-            Log(FATAL + message, exception);
+            Log(LogLevels.Fatal + message, exception);
         }
 
         public void Fatal(object message)
         {
-            Log(FATAL + message);
+            Log(LogLevels.Fatal + message);
         }
 
         public void FatalFormat(string format, params object[] args)
         {
-            LogFormat(FATAL + format, args);
+            LogFormat(LogLevels.Fatal + format, args);
         }
 
         public void Info(object message, Exception exception)
         {
-            Log(INFO + message, exception);
+            Log(LogLevels.Info + message, exception);
         }
 
         public void Info(object message)
         {
-            Log(INFO + message);
+            Log(LogLevels.Info + message);
         }
 
         public void InfoFormat(string format, params object[] args)
         {
-            LogFormat(INFO + format, args);
+            LogFormat(LogLevels.Info + format, args);
         }
 
         public void Warn(object message, Exception exception)
         {
-            Log(WARN + message, exception);
+            Log(LogLevels.Warn + message, exception);
         }
 
         public void Warn(object message)
         {
-            Log(WARN + message);
+            Log(LogLevels.Warn + message);
         }
 
         public void WarnFormat(string format, params object[] args)
         {
-            LogFormat(WARN + format, args);
+            LogFormat(LogLevels.Warn + format, args);
         }
     }
 }
-#endif

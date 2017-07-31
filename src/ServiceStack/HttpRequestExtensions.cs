@@ -781,7 +781,7 @@ namespace ServiceStack
             return httpReq.GetItem("Template") as string;
         }
 
-        public static string ResolveAbsoluteUrl(this IRequest httpReq, string virtualPath=null)
+        public static string ResolveAbsoluteUrl(this IRequest httpReq, string virtualPath = null)
         {
             return HostContext.ResolveAbsoluteUrl(virtualPath ?? "~".CombineWith(httpReq.RawUrl), httpReq);
         }

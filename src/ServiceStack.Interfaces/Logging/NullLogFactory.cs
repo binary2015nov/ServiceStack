@@ -11,19 +11,19 @@ namespace ServiceStack.Logging
     {
         private readonly bool debugEnabled;
 
-        public NullLogFactory(bool debugEnabled=false)
+        public NullLogFactory(bool debugEnabled = false)
         {
             this.debugEnabled = debugEnabled;
         }
 
         public ILog GetLogger(Type type)
         {
-			return new NullDebugLogger(type) { IsDebugEnabled = debugEnabled };
+			return new NullLogger(type) { IsDebugEnabled = debugEnabled };
         }
 
         public ILog GetLogger(string typeName)
         {
-            return new NullDebugLogger(typeName) { IsDebugEnabled = debugEnabled };
+            return new NullLogger(typeName) { IsDebugEnabled = debugEnabled };
         }
     }
 }

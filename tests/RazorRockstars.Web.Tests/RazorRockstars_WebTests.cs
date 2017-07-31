@@ -62,7 +62,7 @@ namespace RazorRockstars.Web.Tests
             try
             {
                 Debug.WriteLine(url);
-                var text = url.GetStringFromUrl(AcceptContentType, responseFilter: r => {
+                var text = url.GetStringFromUrl(accept: AcceptContentType, responseFilter: r => {
                     if (r.StatusCode != HttpStatusCode.OK)
                         Assert.Fail(url + " did not return 200 OK");
                 });

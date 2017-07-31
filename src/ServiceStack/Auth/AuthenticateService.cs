@@ -70,9 +70,9 @@ namespace ServiceStack.Auth
 
         public object Post(Authenticate request)
         {
-            var validationResponse = ValidateFn?.Invoke(this, Request.Verb, request);
-            if (validationResponse != null)
-                return validationResponse;
+            var validationRes = ValidateFn?.Invoke(this, Request.Verb, request);
+            if (validationRes != null)
+                return validationRes;
 
             if (AuthProviders == null || AuthProviders.Length == 0)
                 throw new Exception("No auth providers have been registered in your app host.");

@@ -13,7 +13,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
        [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
-            Register = CreateAdminUser();
+            AdminRegister = CreateAdminUser();
         }
 
         [Test]
@@ -228,7 +228,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         public void Can_access_Admin_service_with_AuthSecret()
         {
             Constant.ServiceStackBaseUri.AppendPath("requiresadmin")
-                .AddQueryParam("authsecret", AuthSecret).GetStringFromUrl();
+                .AddQueryParam("authsecret", Constant.AuthSecret).GetStringFromUrl();
         }
 
     }

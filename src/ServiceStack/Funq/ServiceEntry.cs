@@ -1,5 +1,4 @@
-﻿
-namespace Funq
+﻿namespace Funq
 {
     public class ServiceEntry : IRegistration
     {

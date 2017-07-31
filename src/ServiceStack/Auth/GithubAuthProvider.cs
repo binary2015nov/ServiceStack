@@ -45,7 +45,7 @@ namespace ServiceStack.Auth
 
                 var url = VerifyAccessTokenUrl.Fmt(ClientId, request.AccessToken);
                 var json = url.GetJsonFromUrl(requestFilter: httpReq => {
-                    PclExport.Instance.SetUserAgent(httpReq, ServiceClientBase.DefaultUserAgent);
+                    httpReq.Headers[HttpRequestHeader.UserAgent] = ServiceClientBase.DefaultUserAgent;
                     httpReq.AddBasicAuth(ClientId, ClientSecret);
                 });
 

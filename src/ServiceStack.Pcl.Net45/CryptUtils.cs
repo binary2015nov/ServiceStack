@@ -613,7 +613,7 @@ namespace ServiceStack
             }
 
             sb.Append("</RSAKeyValue>");
-            var xml = StringBuilderCache.ReturnAndFree(sb);
+            var xml = StringBuilderCache.Retrieve(sb);
             return xml;
         }
     }

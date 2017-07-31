@@ -17,13 +17,13 @@ namespace ServiceStack
             : base(serviceName, assembliesWithServices)
         { }
 
-        public override string ResolveAbsoluteUrl(string virtualPath, IRequest httpReq)
+        public override string ResolveAbsoluteUrl(string virtualPath, IRequest request)
         {
-            if (httpReq == null)
+            if (request == null)
                 return (Config.WebHostUrl ?? "/").CombineWith(virtualPath.TrimStart('~'));
 
             virtualPath = virtualPath.SanitizedVirtualPath();
-            return httpReq.GetAbsoluteUrl(virtualPath);
+            return request.GetAbsoluteUrl(virtualPath);
         }
 
         public override string ResolvePhysicalPath(string virtualPath, IRequest httpReq)

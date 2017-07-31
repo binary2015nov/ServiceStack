@@ -24,21 +24,15 @@ namespace ServiceStack
     {
         internal static HttpWebRequest CreateHttpWebRequest(this AsyncServiceClient client, string requestUri)
         {
-            var webRequest = PclExport.Instance.CreateWebRequest(requestUri, 
-                emulateHttpViaPost:client.EmulateHttpViaPost);
+            var webRequest = PclExport.Instance.CreateWebRequest(requestUri);
 
-            PclExport.Instance.Config(webRequest);
             client.CancelAsyncFn = webRequest.Abort;
-
             if (client.StoreCookies)
             {
                 PclExportClient.Instance.SetCookieContainer(webRequest, client);
             }
-
-            if (!client.DisableAutoCompression)
-            {
-                PclExport.Instance.AddCompression(webRequest);
-            }
+            if (client.DisableAutoCompression)          
+                client.Headers.Remove(HttpRequestHeader.AcceptEncoding.ToString());
 
             return webRequest;
         }
@@ -103,7 +97,7 @@ namespace ServiceStack
             return stream.WriteAsync(buffer, offset, count, CancellationToken.None);
         }
 
-#if ! (PCL || NETSTANDARD1_1 || NETSTANDARD1_6)
+#if !(PCL || NETSTANDARD1_1 || NETSTANDARD1_6)
         public static Task<int> ReadAsync(this Stream stream, byte[] buffer, int offset, int count, CancellationToken token)
         {
             return token.IsCancellationRequested

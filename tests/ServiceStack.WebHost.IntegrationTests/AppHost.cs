@@ -22,7 +22,6 @@ using ServiceStack.Text;
 using ServiceStack.Validation;
 using ServiceStack.Web;
 using ServiceStack.WebHost.IntegrationTests.Services;
-using ServiceStack.WebHost.IntegrationTests.Tests;
 
 namespace ServiceStack.WebHost.IntegrationTests
 {
@@ -32,11 +31,11 @@ namespace ServiceStack.WebHost.IntegrationTests
 
         public AppHost() : base("ServiceStack WebHost IntegrationTests", typeof(AppHost).Assembly)
         {
-            JsConfig.EmitCamelCaseNames = true;
-            Config.AdminAuthSecret = AuthTestsBase.AuthSecret;
+            //JsConfig.EmitCamelCaseNames = true;
+            Config.AdminAuthSecret = Constant.AuthSecret;
             Config.ApiVersion = "0.2.0";
             Config.DebugMode = true;
-
+            
             //Show StackTraces for easier debugging
             //var onlyEnableFeatures = Feature.All.Remove(Feature.Jsv | Feature.Soap);
             //Config.EnableFeatures = onlyEnableFeatures;       
@@ -93,7 +92,7 @@ namespace ServiceStack.WebHost.IntegrationTests
                 });
 
             container.Register<ICacheClient>(new MemoryCacheClient());
-            //container.Register<ICacheClient>(new BasicRedisClientManager());
+            //container.AdminRegister<ICacheClient>(new BasicRedisClientManager());
 
             ConfigureAuth(container);
 

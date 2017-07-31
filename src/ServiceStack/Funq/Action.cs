@@ -1,23 +1,26 @@
-﻿
-namespace Funq
+﻿namespace Funq
 {
-#if CF20
+    #if CF20
+
 	/// <summary>
-	/// Encapsulates a method that has one parameter and returns a value of the 
-	///  type specified by the <typeparamref name="TResult"/> parameter.
+	/// Encapsulates a method that has one parameters and does not return a value.
 	/// </summary>
 	public delegate void Action<T>(T arg);
+
 	/// <summary>
-	/// Encapsulates a method that has two parameters.
+	/// Encapsulates a method that has two parameters and does not return a value.
 	/// </summary>
 	public delegate void Action<T1, T2>(T1 arg1, T2 arg2);
+
 	/// <summary>
-	/// Encapsulates a method that has three parameters.
+	/// Encapsulates a method that has three parameters and does not return a value..
 	/// </summary>
 	public delegate void Action<T1, T2, T3>(T1 arg1, T2 arg2, T3 arg3);
+
 	/// <summary>
-	/// Encapsulates a method that has four parameters.
+	/// Encapsulates a method that has four parameters and does not return a value.
 	/// </summary>
 	public delegate void Action<T1, T2, T3, T4>(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
-#endif
+    
+    #endif
 }

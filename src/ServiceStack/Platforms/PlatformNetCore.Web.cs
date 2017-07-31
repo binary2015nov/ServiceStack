@@ -322,13 +322,4 @@ namespace System.Web.UI
     }
 }
 
-
-namespace ServiceStack.Platforms
-{
-    public partial class PlatformNetCore : Platform
-    {
-
-    }
-}
-
 #endif

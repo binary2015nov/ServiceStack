@@ -20,6 +20,7 @@ namespace ServiceStack
         public HostConfig()
         {
             WsdlServiceNamespace = DefaultWsdlNamespace;
+            DebugMode = GetType().GetAssembly().IsDebugBuild();
             ApiVersion = "1.0";
             EmbeddedResourceSources = new List<Assembly> { GetType().GetAssembly() };
             EmbeddedResourceTreatAsFiles = new HashSet<string>();

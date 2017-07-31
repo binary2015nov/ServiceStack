@@ -86,7 +86,6 @@ namespace ServiceStack.AuthWeb.Tests
         }
     }
 
-
     [Route("/rockstars")]
     [Route("/rockstars/aged/{Age}")]
     [Route("/rockstars/delete/{Delete}")]

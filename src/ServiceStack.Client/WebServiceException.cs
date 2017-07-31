@@ -13,8 +13,7 @@ namespace ServiceStack
 #if !(NETFX_CORE || WP || SL5 || PCL || NETSTANDARD1_1 || NETSTANDARD1_6)
     [Serializable]
 #endif
-    public class WebServiceException
-        : Exception, IHasStatusCode, IHasStatusDescription, IResponseStatusConvertible
+    public class WebServiceException : Exception, IHasStatusCode, IHasStatusDescription, IResponseStatusConvertible
     {
         public static ILog log = LogManager.GetLogger(typeof(WebServiceException));
 

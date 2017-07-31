@@ -26,20 +26,24 @@ namespace ServiceStack.Templates
         public async Task includeUrl(TemplateScopeContext scope, string url, object options)
         {
             var scopedParams = scope.AssertOptions(nameof(includeUrl), options);
+            var dataType = scopedParams.TryGetValue("dataType", out object value) ? ConvertDataTypeToContentType((string)value) : null;
 
             var webReq = (HttpWebRequest)WebRequest.Create(url);
-            var dataType = scopedParams.TryGetValue("dataType", out object value)
-                ? ConvertDataTypeToContentType((string)value)
-                : null;
 
             if (scopedParams.TryGetValue("method", out value))
                 webReq.Method = (string)value;
             if (scopedParams.TryGetValue("contentType", out value) || dataType != null)
-                webReq.ContentType = (string)value ?? dataType;            
-            if (scopedParams.TryGetValue("accept", out value) || dataType != null) 
-                webReq.Accept = (string)value ?? dataType;            
+                webReq.ContentType = (string)value ?? dataType;
+            if (scopedParams.TryGetValue("accept", out value) || dataType != null)
+                webReq.Accept = (string)value ?? dataType;
             if (scopedParams.TryGetValue("userAgent", out value))
-                PclExport.Instance.SetUserAgent(webReq, (string)value);
+            {
+#if NET45 || NET40
+                webReq.UserAgent = value.ToString();
+#else
+            webReq.Headers[HttpRequestHeader.UserAgent] = value.ToString();
+#endif
+            }
 
             if (scopedParams.TryRemove("data", out object data))
             {

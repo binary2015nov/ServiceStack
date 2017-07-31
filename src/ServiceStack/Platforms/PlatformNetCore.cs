@@ -183,15 +183,6 @@ namespace ServiceStack.Html
             return html?.HttpRequest;
         }
     }
-
-}
-
-namespace ServiceStack.Platforms
-{
-    public partial class PlatformNetCore : Platform
-    {
-
-    }
 }
 
 #endif

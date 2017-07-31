@@ -4,22 +4,21 @@ namespace ServiceStack.Logging
 {
     /// <summary>
     /// Default logger is to System.Diagnostics.Debug.Print
-    /// 
     /// Made public so its testable
     /// </summary>
-    public class NullDebugLogger : ILog
+    public class NullLogger : ILog
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DebugLogger"/> class.
         /// </summary>
-        public NullDebugLogger(string type)
+        public NullLogger(string type)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DebugLogger"/> class.
         /// </summary>
-		public NullDebugLogger(Type type)
+		public NullLogger(Type type)
         {
         }
 

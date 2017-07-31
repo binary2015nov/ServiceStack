@@ -1,14 +1,12 @@
 ﻿// Copyright (c) ServiceStack, Inc. All Rights Reserved.
 // License: https://raw.github.com/ServiceStack/ServiceStack/master/license.txt
 
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Funq;
@@ -24,11 +22,11 @@ using ServiceStack.Logging;
 using ServiceStack.Messaging;
 using ServiceStack.Metadata;
 using ServiceStack.NativeTypes;
+using ServiceStack.Redis;
 using ServiceStack.Serialization;
 using ServiceStack.Text;
 using ServiceStack.VirtualPath;
 using ServiceStack.Web;
-using ServiceStack.Redis;
 
 namespace ServiceStack
 {
@@ -55,7 +53,7 @@ namespace ServiceStack
             ServiceName = serviceName;
             RootPath = "~".MapServerPath();
             ServiceAssemblies = assembliesWithServices;
-            Config = new HostConfig { DebugMode = GetType().GetAssembly().IsDebugBuild() };
+            Config = new HostConfig();
             AppSettings = new AppSettings();
             Container = new Container { DefaultOwner = Owner.External };
             ContentTypes = Host.ContentTypes.Default;

@@ -2,48 +2,41 @@
 
 namespace Funq
 {
-    internal sealed class ServiceKey
+    sealed class ServiceKey : IEquatable<ServiceKey>
     {
-        int hash;
+        private int hashCode;
+
+        public Type FactoryType { get; private set; }
+
+        public string ServiceName { get; private set; }
 
         public ServiceKey(Type factoryType, string serviceName)
         {
             FactoryType = factoryType;
-            Name = serviceName;
-
-            hash = factoryType.GetHashCode();
+            ServiceName = serviceName;
+            this.hashCode = factoryType.GetHashCode();
             if (serviceName != null)
-                hash ^= serviceName.GetHashCode();
+                hashCode ^= serviceName.GetHashCode();
         }
-
-        public Type FactoryType;
-        public string Name;
 
         #region Equality
 
         public bool Equals(ServiceKey other)
         {
-            return ServiceKey.Equals(this, other);
+            if (other == null)
+                return false;
+
+            return this.FactoryType == other.FactoryType && this.ServiceName == other.ServiceName;
         }
 
         public override bool Equals(object obj)
         {
-            return ServiceKey.Equals(this, obj as ServiceKey);
-        }
-
-        public static bool Equals(ServiceKey obj1, ServiceKey obj2)
-        {
-            if (Object.Equals(null, obj1) ||
-                Object.Equals(null, obj2))
-                return false;
-
-            return obj1.FactoryType == obj2.FactoryType &&
-                obj1.Name == obj2.Name;
+            return this.Equals(obj as ServiceKey);
         }
 
         public override int GetHashCode()
         {
-            return hash;
+            return hashCode;
         }
 
         #endregion

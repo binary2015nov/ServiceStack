@@ -14,7 +14,7 @@ namespace ServiceStack.WebHost.IntegrationTests
         {
             base.OnAuthenticated(authService, session, tokens, authInfo);
 
-            if (session.Email == AuthTestsBase.AdminEmail)
+            if (session.Email == Constant.AdminEmail)
             {
                 var authRepo = authService.TryResolve<IAuthRepository>();
                 var userAuth = authRepo.GetUserAuth(session, tokens);

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using ServiceStack;
-using ServiceStack.Common;
 
 namespace Funq
 {
@@ -15,11 +14,10 @@ namespace Funq
         /// <summary>
         /// The Func delegate that creates instances of the service.
         /// </summary>
-        public TFunc Factory;
+        public TFunc Factory { get; private set; }
 
         /// <summary>
-        /// The cached service instance if the scope is <see cref="ReuseScope.Hierarchy"/> or 
-        /// <see cref="ReuseScope.Container"/>.
+        /// The cached service instance if the scope is <see cref="ReuseScope.Hierarchy"/> or <see cref="ReuseScope.Container"/>.
         /// </summary>
         TService instance;
         internal TService Instance
@@ -74,8 +72,6 @@ namespace Funq
                 Initializer(Container, instance);
         }
 
-
-
         public IReusedOwned InitializedBy(Action<Container, TService> initializer)
         {
             this.Initializer = initializer;
@@ -107,16 +103,16 @@ namespace Funq
 
         internal class AquiredLock : IDisposable
         {
-            private readonly object syncRoot;
+            private readonly object syncObj;
 
-            public AquiredLock(object syncRoot)
+            public AquiredLock(object syncObj)
             {
-                Monitor.Enter(this.syncRoot = syncRoot);
+                Monitor.Enter(this.syncObj = syncObj);
             }
 
             public void Dispose()
             {
-                Monitor.Exit(syncRoot);
+                Monitor.Exit(syncObj);
             }
         }
     }

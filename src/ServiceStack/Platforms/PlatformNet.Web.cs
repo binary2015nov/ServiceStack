@@ -5,7 +5,7 @@ using System.Net;
 using System.Web;
 using ServiceStack.Web;
 
-namespace ServiceStack.Platforms
+namespace ServiceStack
 {
     public partial class PlatformNet : Platform
     {

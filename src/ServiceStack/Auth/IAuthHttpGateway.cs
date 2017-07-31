@@ -113,8 +113,7 @@ namespace ServiceStack.Auth
 
             var url = GithubUserUrl.Fmt(accessToken);
 
-            var json = url.GetJsonFromUrl(
-                httpReq => PclExport.Instance.SetUserAgent(httpReq, ServiceClientBase.DefaultUserAgent));
+            var json = url.GetJsonFromUrl(httpReq => httpReq.Headers[HttpRequestHeader.UserAgent] = ServiceClientBase.DefaultUserAgent);
 
             return json;
         }
@@ -126,8 +125,7 @@ namespace ServiceStack.Auth
 
             var url = GithubUserEmailsUrl.Fmt(accessToken);
 
-            var json = url.GetJsonFromUrl(
-                httpReq => PclExport.Instance.SetUserAgent(httpReq, ServiceClientBase.DefaultUserAgent));
+            var json = url.GetJsonFromUrl(httpReq => httpReq.Headers[HttpRequestHeader.UserAgent] = ServiceClientBase.DefaultUserAgent);
 
             return json;
         }

@@ -171,21 +171,27 @@ namespace ServiceStack
             return Environment.GetEnvironmentVariable(name);
         }
 
-        public override void WriteLine(string line)
+        /// <Summary>
+        /// Writes a message followed by a line terminator, to the Console output stream.
+        /// </Summay>
+        /// <exception cref="System.IO.IOException">An I/O error occurred.</exception>
+        public override void WriteLine(string message)
         {
-            Console.WriteLine(line);
+            Console.WriteLine(message);
         }
 
+        /// <summary>
+        /// Writes a formatted message followed by a line terminator, to the Console output stream.    
+        /// </summary>
+        /// <param name="format">A composite format string (see Remarks) that contains text intermixed with zero or more format items,
+        /// which correspond to objects in the args array.</param>
+        /// <param name="args">An object array that contains zero or more objects to format.</param>
+        /// <exception cref="System.IO.IOException">An I/O error occurred.</exception>
+        /// <exception cref="System.ArgumentNullException">The format or args is null.</exception>
+        /// <exception cref="System.FormatException">The format specification in format is invalid.</exception>
         public override void WriteLine(string format, params object[] args)
         {
             Console.WriteLine(format, args);
-        }
-
-        public override void AddCompression(WebRequest webReq)
-        {
-            var httpReq = (HttpWebRequest)webReq;
-            httpReq.Headers.Add(HttpRequestHeader.AcceptEncoding, "gzip,deflate");
-            httpReq.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
         }
 
         public override Stream GetRequestStream(WebRequest webRequest)
@@ -471,17 +477,11 @@ namespace ServiceStack
             return null;
         }
 
-        public override void InitHttpWebRequest(HttpWebRequest httpReq,
-            long? contentLength = null, bool allowAutoRedirect = true, bool keepAlive = true)
+        public override HttpWebRequest CreateWebRequest(string urlString)
         {
-            httpReq.UserAgent = Env.ServerUserAgent;
-            httpReq.AllowAutoRedirect = allowAutoRedirect;
-            httpReq.KeepAlive = keepAlive;
-
-            if (contentLength != null)
-            {
-                httpReq.ContentLength = contentLength.Value;
-            }
+            var webReq = base.CreateWebRequest(urlString);
+            webReq.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            return webReq;
         }
 
         public override void CloseStream(Stream stream)
@@ -506,26 +506,6 @@ namespace ServiceStack
         public override void EndThreadAffinity()
         {
             Thread.EndThreadAffinity();
-        }
-
-        public override void Config(HttpWebRequest req,
-            bool? allowAutoRedirect = null,
-            TimeSpan? timeout = null,
-            TimeSpan? readWriteTimeout = null,
-            string userAgent = null,
-            bool? preAuthenticate = null)
-        {
-            req.MaximumResponseHeadersLength = int.MaxValue; //throws "The message length limit was exceeded" exception
-            if (allowAutoRedirect.HasValue) req.AllowAutoRedirect = allowAutoRedirect.Value;
-            if (readWriteTimeout.HasValue) req.ReadWriteTimeout = (int)readWriteTimeout.Value.TotalMilliseconds;
-            if (timeout.HasValue) req.Timeout = (int)timeout.Value.TotalMilliseconds;
-            if (userAgent != null) req.UserAgent = userAgent;
-            if (preAuthenticate.HasValue) req.PreAuthenticate = preAuthenticate.Value;
-        }
-
-        public override void SetUserAgent(HttpWebRequest httpReq, string value)
-        {
-            httpReq.UserAgent = value;
         }
 
         public override void SetContentLength(HttpWebRequest httpReq, long value)
@@ -954,16 +934,16 @@ namespace ServiceStack
     public static class PclExportExt
     {
         //HttpUtils
-        public static WebResponse PostFileToUrl(this string url,
+        public static WebResponse PostFileToUrl(this string urlString,
             FileInfo uploadFileInfo, string uploadFileMimeType,
             string accept = null,
             Action<HttpWebRequest> requestFilter = null)
         {
-            var webReq = (HttpWebRequest)WebRequest.Create(url);
+            var webReq = (HttpWebRequest)WebRequest.Create(urlString);
             using (var fileStream = uploadFileInfo.OpenRead())
             {
                 var fileName = uploadFileInfo.Name;
-
+                webReq.AllowAutoRedirect = false;
                 webReq.UploadFile(fileStream, fileName, uploadFileMimeType, accept: accept, requestFilter: requestFilter, method: "POST");
             }
 
@@ -992,13 +972,13 @@ namespace ServiceStack
             return webReq.GetResponse();
         }
 
-        public static WebResponse UploadFile(this WebRequest webRequest,
+        public static WebResponse UploadFile(this HttpWebRequest webRequest,
             FileInfo uploadFileInfo, string uploadFileMimeType)
         {
             using (var fileStream = uploadFileInfo.OpenRead())
             {
                 var fileName = uploadFileInfo.Name;
-
+                webRequest.AllowAutoRedirect = false;
                 webRequest.UploadFile(fileStream, fileName, uploadFileMimeType);
             }
 

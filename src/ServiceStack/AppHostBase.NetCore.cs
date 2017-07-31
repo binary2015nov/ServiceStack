@@ -25,7 +25,7 @@ namespace ServiceStack
     {
         protected AppHostBase(string serviceName, params Assembly[] assembliesWithServices) : base(serviceName, assembliesWithServices) 
         {
-            Platforms.PlatformNetCore.HostInstance = this;
+            PlatformNetCore.HostInstance = this;
         }
 
         IApplicationBuilder app;

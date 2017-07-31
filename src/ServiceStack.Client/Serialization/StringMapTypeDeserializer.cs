@@ -15,7 +15,7 @@ namespace ServiceStack.Serialization
     /// </summary>
     public class StringMapTypeDeserializer
     {
-        private static ILog Log = LogManager.GetLogger(typeof(StringMapTypeDeserializer));
+        private static ITracer Log = new ConsoleTracer();
 
         internal class PropertySerializerEntry
         {
@@ -33,11 +33,6 @@ namespace ServiceStack.Serialization
         private readonly Type type;
         private readonly Dictionary<string, PropertySerializerEntry> propertySetterMap
             = new Dictionary<string, PropertySerializerEntry>(PclExport.Instance.InvariantComparerIgnoreCase);
-
-        internal StringMapTypeDeserializer(Type type, ILog log) : this(type)
-        {
-            Log = log;
-        }
 
         public ParseStringDelegate GetParseFn(Type propertyType)
         {
@@ -158,14 +153,14 @@ namespace ServiceStack.Serialization
                     if (ignoredWarningsOnPropertyNames == null ||
                         !ignoredWarningsOnPropertyNames.Contains(ignoredProperty))
                     {
-                        Log.WarnFormat("Property '{0}' does not exist on type '{1}'", ignoredProperty, type.FullName);
+                        Log.WriteWarning("Property '{0}' does not exist on type '{1}'", ignoredProperty, type.FullName);
                     }
                     return instance;
                 }
 
                 if (propertySerializerEntry.PropertySetFn == null)
                 {
-                    Log.WarnFormat("Could not set value of read-only property '{0}' on type '{1}'", propertyName,
+                    Log.WriteWarning("Could not set value of read-only property '{0}' on type '{1}'", propertyName,
                                     type.FullName);
                     return instance;
                 }
@@ -179,7 +174,7 @@ namespace ServiceStack.Serialization
                 var value = propertySerializerEntry.PropertyParseStringFn(propertyTextValue);
                 if (value == null)
                 {
-                    Log.WarnFormat("Could not create instance on '{0}' for property '{1}' with text value '{2}'",
+                    Log.WriteWarning("Could not create instance on '{0}' for property '{1}' with text value '{2}'",
                                     instance, propertyName, propertyTextValue);
                     return instance;
                 }
