@@ -68,6 +68,8 @@ namespace ServiceStack.Templates
         
         public bool RenderExpressionExceptions { get; set; }
 
+        public Func<PageVariableFragment, byte[]> OnUnhandledExpression { get; set; } = DefaultOnUnhandledExpression;
+
         public TemplatePage GetPage(string virtualPath)
         {
             var page = Pages.GetPage(virtualPath);
@@ -102,15 +104,18 @@ namespace ServiceStack.Templates
             Pages = new TemplatePages(this);
             PageFormats.Add(new HtmlPageFormat());
             TemplateFilters.Add(new TemplateDefaultFilters());
-            FilterTransformers["htmlencode"] = HtmlPageFormat.HtmlEncodeTransformer;
+            FilterTransformers[TemplateConstants.HtmlEncode] = HtmlPageFormat.HtmlEncodeTransformer;
 
+            Args[TemplateConstants.MaxQuota] = 10000;
             Args[TemplateConstants.DefaultCulture] = CultureInfo.CurrentCulture;
             Args[TemplateConstants.DefaultDateFormat] = "yyyy-MM-dd";
             Args[TemplateConstants.DefaultDateTimeFormat] = "u";
+            Args[TemplateConstants.DefaultTimeFormat] = "h\\:mm\\:ss";
             Args[TemplateConstants.DefaultCacheExpiry] = TimeSpan.FromHours(1);
             Args[TemplateConstants.DefaultIndent] = "\t";
             Args[TemplateConstants.DefaultNewLine] = Environment.NewLine;
             Args[TemplateConstants.DefaultJsConfig] = "excludetypeinfo";
+            Args[TemplateConstants.DefaultStringComparison] = StringComparison.Ordinal;
         }
 
         public bool HasInit { get; private set; }
@@ -211,6 +216,8 @@ namespace ServiceStack.Templates
 
             return fn;
         }
+
+        protected static byte[] DefaultOnUnhandledExpression(PageVariableFragment var) => var.OriginalTextBytes;
 
         public void Dispose()
         {

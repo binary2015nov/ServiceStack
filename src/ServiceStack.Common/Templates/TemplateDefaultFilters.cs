@@ -27,6 +27,7 @@ namespace ServiceStack.Templates
         public string spaces(int count) => padLeft("", count, ' ');
         public string newLine() => Context.Args[TemplateConstants.DefaultNewLine] as string;
         public string newLines(int count) => repeat(newLine(), count);
+        public string newLine(string target) => target + newLine();
 
         public IRawString raw(object value)
         {
@@ -64,9 +65,6 @@ namespace ServiceStack.Templates
         public long mod(long value, long divisor) => 
             value % divisor; 
 
-        public bool isEven(int value) => value % 2 == 0;
-        public bool isOdd(int value) => !isEven(value);
-
         public string currency(decimal decimalValue) => currency(decimalValue, null); //required to support 1/2 vars
         public string currency(decimal decimalValue, string culture)
         {
@@ -85,40 +83,83 @@ namespace ServiceStack.Templates
         public object dateFormat(DateTime dateValue) =>  dateValue.ToString((string)Context.Args[TemplateConstants.DefaultDateFormat]);
         public object dateFormat(DateTime dateValue, string format) => dateValue.ToString(format ?? throw new ArgumentNullException(nameof(format)));
         public object dateTimeFormat(DateTime dateValue) =>  dateValue.ToString((string)Context.Args[TemplateConstants.DefaultDateTimeFormat]);
+        public object timeFormat(TimeSpan timeValue) =>  timeValue.ToString((string)Context.Args[TemplateConstants.DefaultTimeFormat]);
+        public object timeFormat(TimeSpan timeValue, string format) =>  timeValue.ToString(format);
 
-        public string humanize(string varName) => varName.SplitCamelCase().Replace('_',' ').ToTitleCase();
-        public string titleCase(string varName) => varName.ToTitleCase();
-        public string pascalCase(string varName) => varName.ToPascalCase();
-        public string camelCase(string varName) => varName.ToCamelCase();
+        public string humanize(string text) => text.SplitCamelCase().Replace('_',' ').ToTitleCase();
+        public string titleCase(string text) => text.ToTitleCase();
+        public string pascalCase(string text) => text.ToPascalCase();
+        public string camelCase(string text) => text.ToCamelCase();
 
-        public string lower(string varName) => varName?.ToLower();
-        public string upper(string varName) => varName?.ToUpper();
+        public string lower(string text) => text?.ToLower();
+        public string upper(string text) => text?.ToUpper();
 
-        public string substring(string varName, int startIndex) => varName.SafeSubstring(startIndex);
-        public string substring(string varName, int startIndex, int length) => varName.SafeSubstring(startIndex, length);
+        public string substring(string text, int startIndex) => text.SafeSubstring(startIndex);
+        public string substring(string text, int startIndex, int length) => text.SafeSubstring(startIndex, length);
+
+        public string substringWithElipsis(string text, int length) => text.SubstringWithElipsis(0, length);
+        public string substringWithElipsis(string text, int startIndex, int length) => text.SubstringWithElipsis(startIndex, length);
+
+        public string leftPart(string text, string needle) => text.LeftPart(needle);
+        public string rightPart(string text, string needle) => text.RightPart(needle);
+        public string lastLeftPart(string text, string needle) => text.LastLeftPart(needle);
+        public string lastRightPart(string text, string needle) => text.LastRightPart(needle);
+
+        public int indexOf(string text, string needle) => text.IndexOf(needle, (StringComparison)Context.Args[TemplateConstants.DefaultStringComparison]);
+        public int indexOf(string text, string needle, int startIndex) => text.IndexOf(needle, startIndex, (StringComparison)Context.Args[TemplateConstants.DefaultStringComparison]);
+        public int lastIndexOf(string text, string needle) => text.LastIndexOf(needle, (StringComparison)Context.Args[TemplateConstants.DefaultStringComparison]);
+        public int lastIndexOf(string text, string needle, int startIndex) => text.LastIndexOf(needle, startIndex, (StringComparison)Context.Args[TemplateConstants.DefaultStringComparison]);
+
+        public int compareTo(string text, string other) => string.Compare(text, other, (StringComparison)Context.Args[TemplateConstants.DefaultStringComparison]);
+
+        public bool startsWith(string text, string needle) => text?.StartsWith(needle) == true;
+        public bool endsWith(string text, string needle) => text?.EndsWith(needle) == true;
+
+        public string replace(string text, string oldValue, string newValue) => text.Replace(oldValue, newValue);
+        
 
         public string trimStart(string text) => text?.TrimStart();
         public string trimEnd(string text) => text?.TrimEnd();
         public string trim(string text) => text?.Trim();
 
-        public string padLeft(string text, int totalWidth) => text?.PadLeft(totalWidth);
-        public string padLeft(string text, int totalWidth, char padChar) => text?.PadLeft(totalWidth, padChar);
-        public string padRight(string text, int totalWidth) => text?.PadRight(totalWidth);
-        public string padRight(string text, int totalWidth, char padChar) => text?.PadRight(totalWidth, padChar);
+        public string padLeft(string text, int totalWidth) => text?.PadLeft(AssertWithinMaxQuota(totalWidth));
+        public string padLeft(string text, int totalWidth, char padChar) => text?.PadLeft(AssertWithinMaxQuota(totalWidth), padChar);
+        public string padRight(string text, int totalWidth) => text?.PadRight(AssertWithinMaxQuota(totalWidth));
+        public string padRight(string text, int totalWidth, char padChar) => text?.PadRight(AssertWithinMaxQuota(totalWidth), padChar);
 
-        public string repeating(int times, string text) => repeat(text, times);
+        public string[] splitOnFirst(string text, string needle) => text.SplitOnFirst(needle);
+        public string[] splitOnLast(string text, string needle) => text.SplitOnLast(needle);
+        public string[] split(string stringList) => split(stringList, ',');
+        public string[] split(string stringList, char delimiter) => stringList.Split(delimiter);
+
+        public string append(string target, string suffix) => target + suffix;
+        public string appendLine(string target) => target + newLine();
+
+        public string addPath(string target, string pathToAppend) => target.AppendPath(pathToAppend);
+        public string addPaths(string target, IEnumerable pathsToAppend) => 
+            target.AppendPath(pathsToAppend.Map(x => x.ToString()).ToArray());
+
+        public string addQueryString(string url, object urlParams) => 
+            urlParams.AssertOptions(nameof(addQueryString)).Aggregate(url, (current, entry) => current.AddQueryParam(entry.Key, entry.Value));
+        
+        public string addHashParams(string url, object urlParams) => 
+            urlParams.AssertOptions(nameof(addHashParams)).Aggregate(url, (current, entry) => current.AddHashParam(entry.Key, entry.Value));
+        
+        public string repeating(int times, string text) => repeat(text, AssertWithinMaxQuota(times));
         public string repeat(string text, int times)
         {
+            AssertWithinMaxQuota(times);
             var sb = StringBuilderCache.Allocate();
             for (var i = 0; i < times; i++)
             {
                 sb.Append(text);
             }
-            return StringBuilderCache.Retrieve(sb);
+            return StringBuilderCache.ReturnAndFree(sb);
         }
 
         public List<object> itemsOf(int count, object target)
         {
+            AssertWithinMaxQuota(count);
             var to = new List<object>();
             for (var i = 0; i < count; i++)
             {
@@ -126,9 +167,16 @@ namespace ServiceStack.Templates
             }
             return to;
         }
+
+        public object times(int count) => AssertWithinMaxQuota(count).Times().ToList();
+        public object range(int count) => Enumerable.Range(0, AssertWithinMaxQuota(count));
+        public object range(int start, int count) => Enumerable.Range(start, AssertWithinMaxQuota(count));
+
+        public bool isEven(int value) => value % 2 == 0;
+        public bool isOdd(int value) => !isEven(value);
         
         public static bool isTrue(object target) => target is bool b && b;
-        public static bool isFalsey(object target)
+        public static bool isFalsy(object target)
         {
             if (target == null || target == JsNull.Value)
                 return true;
@@ -157,16 +205,16 @@ namespace ServiceStack.Templates
         public object otherwise(object returnTaget, object elseReturn) => returnTaget ?? elseReturn;
 
         [HandleUnknownValue]
-        public object ifFalsey(object returnTarget, object test) => isFalsey(test) ? returnTarget : null;
+        public object ifFalsy(object returnTarget, object test) => isFalsy(test) ? returnTarget : null;
 
         [HandleUnknownValue]
-        public object ifTruthy(object returnTarget, object test) => !isFalsey(test) ? returnTarget : null;
+        public object ifTruthy(object returnTarget, object test) => !isFalsy(test) ? returnTarget : null;
         
         [HandleUnknownValue]
-        public object falsy(object test, object returnIfFalsy) => isFalsey(test) ? returnIfFalsy : null;
+        public object falsy(object test, object returnIfFalsy) => isFalsy(test) ? returnIfFalsy : null;
 
         [HandleUnknownValue]
-        public object truthy(object test, object returnIfTruthy) => !isFalsey(test) ? returnIfTruthy : null;
+        public object truthy(object test, object returnIfTruthy) => !isFalsy(test) ? returnIfTruthy : null;
 
         [HandleUnknownValue]
         public bool isNull(object test) => test == null;
@@ -222,23 +270,6 @@ namespace ServiceStack.Templates
         public IEnumerable join(IEnumerable<object> values) => join(values, ",");
         public IEnumerable join(IEnumerable<object> values, string delimiter) => values.Map(x => x.ToString()).Join(delimiter);
 
-        public string[] split(string stringList) => split(stringList, ',');
-        public string[] split(string stringList, char delimiter) => stringList.Split(delimiter);
-
-        public string append(string target, string suffix) => target + suffix;
-        public string appendLine(string target) => target + newLine();
-        public string newLine(string target) => target + newLine();
-
-        public string addPath(string target, string pathToAppend) => target.AppendPath(pathToAppend);
-        public string addPaths(string target, IEnumerable pathsToAppend) => 
-            target.AppendPaths(pathsToAppend.Map(x => x.ToString()).ToArray());
-
-        public string addQueryString(string url, object urlParams) => 
-            urlParams.AssertOptions(nameof(addQueryString)).Aggregate(url, (current, entry) => current.AddQueryParam(entry.Key, entry.Value));
-        
-        public string addHashParams(string url, object urlParams) => 
-            urlParams.AssertOptions(nameof(addHashParams)).Aggregate(url, (current, entry) => current.AddHashParam(entry.Key, entry.Value));
-        
         public IEnumerable<object> reverse(TemplateScopeContext scope, IEnumerable<object> original) => original.Reverse();
 
         public IEnumerable<object> take(TemplateScopeContext scope, IEnumerable<object> original, object countOrBinding) => 
@@ -326,7 +357,9 @@ namespace ServiceStack.Templates
                     foreach (var entry in scopedParams)
                     {
                         var bindTo = entry.Key;
-                        var bindToLiteral = (string)entry.Value;
+                        if (!(entry.Value is string bindToLiteral))
+                            throw new NotSupportedException($"'{nameof(let)}' in '{scope.Page.VirtualPath}' expects a string Expression for its value but received '{entry.Value}' instead");
+                        
                         bindToLiteral.ToStringSegment().ParseNextToken(out object value, out JsBinding binding);
                         var bindValue = scope.Evaluate(value, binding);
                         scope.ScopedParams[bindTo] = bindValue;
@@ -362,10 +395,10 @@ namespace ServiceStack.Templates
             return value;
         }
 
-        public Task assignTo(TemplateScopeContext scope, object value, string argName) //from filter
+        public object assignTo(TemplateScopeContext scope, object value, string argName) //from filter
         {
             scope.ScopedParams[argName] = value;
-            return TypeConstants.EmptyTask;
+            return IgnoreResult.Value;
         }
 
         public Task assignTo(TemplateScopeContext scope, string argName) //from context filter
@@ -474,9 +507,14 @@ namespace ServiceStack.Templates
             throw new NotSupportedException($"'{nameof(contains)}' requires a string or IEnumerable but received a '{target.GetType()?.Name}' instead");
         }
 
-        public object times(int count) => count.Times().ToList();
-        public object range(int count) => Enumerable.Range(0, count);
-        public object range(int start, int count) => Enumerable.Range(start, count);
+        public int AssertWithinMaxQuota(int value)
+        {
+            var maxQuota = (int) Context.Args[TemplateConstants.MaxQuota]; 
+            if (value > maxQuota)
+                throw new NotSupportedException($"{value} exceeds Max Quota of {maxQuota}");
+
+            return value;
+        }
 
         public Dictionary<object, object> toDictionary(TemplateScopeContext scope, object target, object expression) => toDictionary(scope, target, expression, null);
         public Dictionary<object, object> toDictionary(TemplateScopeContext scope, object target, object expression, object scopeOptions)
@@ -489,6 +527,8 @@ namespace ServiceStack.Templates
             
             return items.ToDictionary(item => scope.AddItemToScope(itemBinding, item).Evaluate(value, binding));
         }
+
+        public IRawString typeName(object target) => (target?.GetType().Name ?? "null").ToRawString();
 
         public IEnumerable of(TemplateScopeContext scope, IEnumerable target, object scopeOptions)
         {

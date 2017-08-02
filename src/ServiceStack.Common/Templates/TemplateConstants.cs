@@ -4,10 +4,14 @@ namespace ServiceStack.Templates
     {
         public const string DefaultDateFormat = nameof(DefaultDateFormat);
         public const string DefaultDateTimeFormat = nameof(DefaultDateTimeFormat);
+        public const string DefaultTimeFormat = nameof(DefaultTimeFormat);
         public const string DefaultCulture = nameof(DefaultCulture);
         public const string DefaultIndent = nameof(DefaultIndent);
         public const string DefaultNewLine = nameof(DefaultNewLine);
         public const string DefaultJsConfig = nameof(DefaultJsConfig);
+        public const string DefaultStringComparison = nameof(DefaultStringComparison);
+        public const string MaxQuota = nameof(MaxQuota);
+        public const string HtmlEncode = "htmlencode";
         public const string Model = "model";
         public const string Page = "page";
         public const string Partial = "partial";

@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.UI;
 using NUnit.Framework;
+using ServiceStack.Caching;
 using ServiceStack.Templates;
 using ServiceStack.Text;
 using ServiceStack.VirtualPath;
@@ -244,6 +246,9 @@ Brackets in Layout < & >
             public string echo(string text) => $"{text} {text}";
             public double squared(double value) => value * value;
             public string greetArg(string key) => $"Hello {Context.Args[key]}";
+            
+            public ICacheClient Cache { get; set; }
+            public string fromCache(string key) => Cache.Get<string>(key);
         }
 
         [Test]
@@ -254,26 +259,32 @@ Brackets in Layout < & >
                 Args =
                 {
                     ["contextArg"] = "foo"
-                },                
+                },
+                TemplateFilters = { new MyFilter() }
             }.Init();
             
-            var output = new PageResult(context.OneTimePage("<h1>{{ 'hello' | echo }}</h1>"))
+            var output = context.EvaluateTemplate("<p>{{ 'contextArg' | greetArg }}</p>"); 
+            Assert.That(output, Is.EqualTo("<p>Hello foo</p>"));
+
+            output = context.EvaluateTemplate("<p>{{ 10 | squared }}</p>");
+            Assert.That(output, Is.EqualTo("<p>100</p>"));
+            
+            output = new PageResult(context.OneTimePage("<p>{{ 'hello' | echo }}</p>"))
             {
                 TemplateFilters = { new MyFilter() }
             }.Result;
-            Assert.That(output, Is.EqualTo("<h1>hello hello</h1>"));
+            Assert.That(output, Is.EqualTo("<p>hello hello</p>"));
 
-            output = new PageResult(context.OneTimePage("<h1>{{ 10 | squared }}</h1>"))
+            context = new TemplateContext
             {
-                TemplateFilters = {new MyFilter()}
-            }.Result;
-            Assert.That(output, Is.EqualTo("<h1>100</h1>"));
-
-            output = new PageResult(context.OneTimePage("<h1>{{ 'contextArg' | greetArg }}</h1>"))
-            {
-                TemplateFilters = {new MyFilter()}
-            }.Result;
-            Assert.That(output, Is.EqualTo("<h1>Hello foo</h1>"));
+                ScanTypes = { typeof(MyFilter) },
+            };
+            context.Container.AddSingleton<ICacheClient>(() => new MemoryCacheClient());
+            context.Container.Resolve<ICacheClient>().Set("key", "foo");
+            context.Init();
+            
+            output = context.EvaluateTemplate("<p>{{ 'key' | fromCache }}</p>");
+            Assert.That(output, Is.EqualTo("<p>foo</p>"));
         }
 
         [Test]
@@ -753,15 +764,15 @@ model.Dictionary['map-key'].Object.AltNested.Field | lower = 'dictionary altnest
         {
             var context = new TemplateContext().Init();
             
-            Assert.That(new PageResult(context.OneTimePage("{{ 'undefined value' | ifFalsey(undefined) }}")).Result, Is.EqualTo("undefined value"));
-            Assert.That(new PageResult(context.OneTimePage("{{ 'null value'      | ifFalsey(null) }}")).Result, Is.EqualTo("null value"));
-            Assert.That(new PageResult(context.OneTimePage("{{ 'empty string'    | ifFalsey('') }}")).Result, Is.EqualTo("empty string"));
-            Assert.That(new PageResult(context.OneTimePage("{{ 'false value'     | ifFalsey(false) }}")).Result, Is.EqualTo("false value"));
-            Assert.That(new PageResult(context.OneTimePage("{{ 0                 | ifFalsey(0) }}")).Result, Is.EqualTo("0"));
+            Assert.That(new PageResult(context.OneTimePage("{{ 'undefined value' | ifFalsy(undefined) }}")).Result, Is.EqualTo("undefined value"));
+            Assert.That(new PageResult(context.OneTimePage("{{ 'null value'      | ifFalsy(null) }}")).Result, Is.EqualTo("null value"));
+            Assert.That(new PageResult(context.OneTimePage("{{ 'empty string'    | ifFalsy('') }}")).Result, Is.EqualTo("empty string"));
+            Assert.That(new PageResult(context.OneTimePage("{{ 'false value'     | ifFalsy(false) }}")).Result, Is.EqualTo("false value"));
+            Assert.That(new PageResult(context.OneTimePage("{{ 0                 | ifFalsy(0) }}")).Result, Is.EqualTo("0"));
 
-            Assert.That(new PageResult(context.OneTimePage("{{ 'true value'      | ifFalsey(true) }}")).Result, Is.EqualTo(""));
-            Assert.That(new PageResult(context.OneTimePage("{{ 'whitespace'      | ifFalsey(' ') }}")).Result, Is.EqualTo(""));
-            Assert.That(new PageResult(context.OneTimePage("{{ 'one value'       | ifFalsey(1) }}")).Result, Is.EqualTo(""));
+            Assert.That(new PageResult(context.OneTimePage("{{ 'true value'      | ifFalsy(true) }}")).Result, Is.EqualTo(""));
+            Assert.That(new PageResult(context.OneTimePage("{{ 'whitespace'      | ifFalsy(' ') }}")).Result, Is.EqualTo(""));
+            Assert.That(new PageResult(context.OneTimePage("{{ 'one value'       | ifFalsy(1) }}")).Result, Is.EqualTo(""));
             
             Assert.That(new PageResult(context.OneTimePage("{{ 'undefined value' | ifTruthy(undefined) }}")).Result, Is.EqualTo(""));
             Assert.That(new PageResult(context.OneTimePage("{{ 'null value'      | ifTruthy(null) }}")).Result, Is.EqualTo(""));
@@ -839,6 +850,83 @@ model.Dictionary['map-key'].Object.AltNested.Field | lower = 'dictionary altnest
             var output = context.EvaluateTemplate("The time is now:{{ pass: now | dateFormat('HH:mm:ss') }}");
             Assert.That(output, Is.EqualTo("The time is now:{{ now | dateFormat('HH:mm:ss') }}"));
         }
+
+        [Test]
+        public void Does_escape_quotes_in_strings()
+        {
+            var context = new TemplateContext().Init();
+
+            Assert.That(context.EvaluateTemplate("{{ \"string \\\"in\\\" quotes\" | raw }}"), Is.EqualTo("string \"in\" quotes"));
+            Assert.That(context.EvaluateTemplate("{{ 'string \\'in\\' quotes' | raw }}"), Is.EqualTo("string 'in' quotes"));
+            Assert.That(context.EvaluateTemplate("{{ `string \\`in\\` quotes` | raw }}"), Is.EqualTo("string `in` quotes"));
+        }
+
+        [Test]
+        public void Does_not_exceed_MaxQuota()
+        {
+            //times / range / itemsOf / repeat / repeating / padLeft / padRight
+            
+            var context = new TemplateContext().Init();
+
+            Assert.Throws<TargetInvocationException>(() => context.EvaluateTemplate("{{ 10001 | times }}"));
+            Assert.Throws<TargetInvocationException>(() => context.EvaluateTemplate("{{ range(10001) }}"));
+            Assert.Throws<TargetInvocationException>(() => context.EvaluateTemplate("{{ range(1,10001) }}"));
+            Assert.Throws<TargetInvocationException>(() => context.EvaluateTemplate("{{ 10001 | itemsOf(1) }}"));
+            Assert.Throws<TargetInvocationException>(() => context.EvaluateTemplate("{{ 'text' | repeat(10001) }}"));
+            Assert.Throws<TargetInvocationException>(() => context.EvaluateTemplate("{{ 10001 | repeating('text') }}"));
+            Assert.Throws<TargetInvocationException>(() => context.EvaluateTemplate("{{ 'text' | padLeft(10001) }}"));
+            Assert.Throws<TargetInvocationException>(() => context.EvaluateTemplate("{{ 'text' | padLeft(10001,'.') }}"));
+            Assert.Throws<TargetInvocationException>(() => context.EvaluateTemplate("{{ 'text' | padRight(10001) }}"));
+            Assert.Throws<TargetInvocationException>(() => context.EvaluateTemplate("{{ 'text' | padRight(10001,'.') }}"));
+        }
+
+        [Test]
+        public void Can_exceute_filters_in_let_binding()
+        {
+            var context = new TemplateContext().Init();
+
+            var output = context.EvaluateTemplate(
+            @"{{ [{name:'Alice',score:50},{name:'Bob',score:40}] | assignTo:scoreRecords }}
+{{ scoreRecords 
+   | let({ name: `it['name']`, score: `it['score']`, i:`incr(index)` })
+   | select: {i}) {name} = {score}\n }}");
+            
+            Assert.That(output.NormalizeNewLines(), Is.EqualTo(@"
+1) Alice = 50
+2) Bob = 40
+".NormalizeNewLines()));
+        }
+
+        [Test]
+        public void Can_use_map_to_transform_lists_into_dictionaries()
+        {
+            var context = new TemplateContext().Init();
+
+            var output = context.EvaluateTemplate(@"{{ [[1,-1],[2,-2],[3,-3]] | assignTo:coords }}
+{{ coords 
+   | map('{ x: it[0], y: it[1] }')
+   | scopeVars
+   | select: {index | incr}. ({x}, {y})\n
+}}");
+            
+            Assert.That(output.NormalizeNewLines(), Is.EqualTo(@"
+1. (1, -1)
+2. (2, -2)
+3. (3, -3)
+".NormalizeNewLines()));
+        }
+
+        [Test]
+        public void Can_control_whats_emitted_on_Unhandled_expression()
+        {
+            var context = new TemplateContext().Init();
+
+            Assert.That(context.EvaluateTemplate("{{ unknownArg | lower }}"), Is.EqualTo("{{ unknownArg | lower }}"));
+
+            context.OnUnhandledExpression = var => null;
+            Assert.That(context.EvaluateTemplate("{{ unknownArg | lower }}"), Is.EqualTo(""));
+        }
+
     }
 
     public static class TestUtils
