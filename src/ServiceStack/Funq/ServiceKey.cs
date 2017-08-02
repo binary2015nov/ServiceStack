@@ -4,19 +4,16 @@ namespace Funq
 {
     sealed class ServiceKey : IEquatable<ServiceKey>
     {
-        private int hashCode;
+        public Type FactoryType { get; set; }
 
-        public Type FactoryType { get; private set; }
+        public string ServiceName { get; set; }
 
-        public string ServiceName { get; private set; }
+        public ServiceKey() { }
 
         public ServiceKey(Type factoryType, string serviceName)
         {
             FactoryType = factoryType;
-            ServiceName = serviceName;
-            this.hashCode = factoryType.GetHashCode();
-            if (serviceName != null)
-                hashCode ^= serviceName.GetHashCode();
+            ServiceName = serviceName;          
         }
 
         #region Equality
@@ -36,6 +33,9 @@ namespace Funq
 
         public override int GetHashCode()
         {
+            var hashCode = FactoryType.GetHashCode();
+            if (ServiceName != null)
+                hashCode ^= ServiceName.GetHashCode();
             return hashCode;
         }
 

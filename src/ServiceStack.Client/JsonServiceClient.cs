@@ -5,8 +5,7 @@ using ServiceStack.Web;
 
 namespace ServiceStack
 {
-    public class JsonServiceClient
-        : ServiceClientBase, IJsonServiceClient
+    public class JsonServiceClient : ServiceClientBase, IJsonServiceClient
     {
         public override string Format => "json";
 

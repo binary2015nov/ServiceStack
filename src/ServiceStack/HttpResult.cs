@@ -14,8 +14,7 @@ using ServiceStack.Web;
 
 namespace ServiceStack
 {
-    public class HttpResult
-        : IHttpResult, IStreamWriterAsync, IPartialWriterAsync, IDisposable
+    public class HttpResult : IHttpResult, IStreamWriterAsync, IPartialWriterAsync, IDisposable
     {
         public HttpResult()
             : this((object)null, null) { }

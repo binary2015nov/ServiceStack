@@ -2794,6 +2794,22 @@
             <param name="to">To.</param>
             <returns></returns>
         </member>
+        <member name="M:ServiceStack.StringExtensions.AppendPath(System.String,System.String)">
+            <summary>
+             Appends a copy of the specified urlComponent to the base URI.
+            </summary>
+            <param name="baseUriString">The base System.Uri, represented as a System.String.</param>
+            <param name="uriComponent">The uri component to add to the base System.Uri.</param>
+            <returns>A string representation for a System.Uri instance.</returns>
+        </member>
+        <member name="M:ServiceStack.StringExtensions.AppendPaths(System.String,System.String[])">
+            <summary>
+             Appends the url component elements in a specified System.String array to the base URI.
+            </summary>
+            <param name="baseUriString">The base System.Uri, represented as a System.String.</param>
+            <param name="uriComponents">An string array that contains the uri component elements to add to the base System.Uri.</param>
+            <returns>A string representation for a System.Uri instance.</returns>
+        </member>
         <member name="M:ServiceStack.StringExtensions.FastToUtf8Bytes(System.String)">
             <summary>
             Skip the encoding process for 'safe strings' 
@@ -2801,15 +2817,17 @@
             <param name="strVal"></param>
             <returns></returns>
         </member>
-        <member name="M:ServiceStack.StringExtensions.Fmt(System.String,System.Object)">
+        <member name="M:ServiceStack.StringExtensions.Fmt(System.String,System.Object[])">
             <summary>
-            Replaces one or more format items in a specified string with the string representation of a specified object.
+            Replaces the format item in a specified string with the string representation of a corresponding object in a specified array.
             </summary>
             <param name="format">A composite format string.</param>
-            <param name="arg0">The object to format.</param>
-            <returns>A copy of format in which any format items are replaced by the string representation of arg0.</returns>
-            <exception cref="T:System.ArgumentNullException">format is null.</exception>
-            <exception cref="T:System.FormatException">The format item in format is invalid.-or- The index of a format item is not zero.</exception>        
+            <param name="args">An object array that contains zero or more objects to format.</param>
+            <returns> A copy of format in which the format items have been replaced by the string representation 
+            of the corresponding objects in args.</returns>
+            <exception cref="T:System.ArgumentNullException">format or args is null.</exception>
+            <exception cref="T:System.FormatException">format is invalid.-or- The index of a format item is less than zero, or greater
+            than or equal to the length of the args array.</exception>
         </member>
         <member name="M:ServiceStack.StringExtensions.IsNullOrEmpty(System.String)">
             <summary>
@@ -2822,7 +2840,7 @@
             <summary>
             Prints a formatted message.
             </summary>
-            <param name="format">A composite format string (see Remarks) that contains text intermixed with zero or more format items,
+            <param name="format">A composite format string (see Remarks) that contains format intermixed with zero or more format items,
             which correspond to objects in the args array.</param>
             <param name="args">An object array that contains zero or more objects to format.</param>
         </member>

@@ -15,11 +15,11 @@ namespace ServiceStack
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
     public class RequiredRoleAttribute : AuthenticateAttribute
     {
-        public List<string> RequiredRoles { get; set; }
+        public string[] RequiredRoles { get; set; }
 
         public RequiredRoleAttribute(ApplyTo applyTo, params string[] roles)
         {
-            this.RequiredRoles = roles.ToList();
+            this.RequiredRoles = roles;
             this.ApplyTo = applyTo;
             this.Priority = (int)RequestFilterPriority.RequiredRole;
         }
@@ -30,76 +30,55 @@ namespace ServiceStack
 
         public override void Execute(IRequest req, IResponse res, object requestDto)
         {
-            if (HostContext.AppHost.HasValidAuthSecret(req))
-                return;
-
             base.Execute(req, res, requestDto); //first check if session is authenticated
-            if (res.IsClosed) return; //AuthenticateAttribute already closed the request (ie auth failed)
-
-            var session = req.GetSession();
-
-            var authRepo = HostContext.AppHost.GetAuthRepository(req);
-            using (authRepo as IDisposable)
+            if (res.IsClosed)
+                return; //AuthenticateAttribute already closed the request (ie auth failed)
+            try
             {
-                if (session != null && session.HasRole(RoleNames.Admin, authRepo))
-                    return;
-
-                if (HasAllRoles(req, session, authRepo)) return;
+                var authRepo = HostContext.AppHost.GetAuthRepository(req);
+                using (authRepo as IDisposable)
+                {
+                    AssertRequiredRoles(req, authRepo, RequiredRoles);
+                }
             }
-
-            if (DoHtmlRedirectIfConfigured(req, res)) return;
-
-            res.StatusCode = (int)HttpStatusCode.Forbidden;
-            res.StatusDescription = ErrorMessages.InvalidRole.Localize(req);
-            res.EndRequest();
+            catch
+            {
+                if (DoHtmlRedirectIfConfigured(req, res))
+                    return;
+                throw;
+            }
         }
 
-        public bool HasAllRoles(IRequest req, IAuthSession session, IAuthRepository authRepo)
+        public bool HasAllRoles(IRequest req, IAuthRepository authRepo)
         {
-            if (HasAllRoles(session, authRepo)) return true;
-
-            session.UpdateFromUserAuthRepo(req, authRepo);
-
-            if (HasAllRoles(session, authRepo))
+            try
             {
-                req.SaveSession(session);
+                AssertRequiredRoles(req, authRepo, RequiredRoles);
                 return true;
             }
-            return false;
-        }
-
-        public bool HasAllRoles(IAuthSession session, IAuthRepository authRepo)
-        {
-            if (session == null)
+            catch
+            {
                 return false;
-
-            return this.RequiredRoles.All(x => session.HasRole(x, authRepo));
+            }
         }
 
         /// <summary>
         /// Check all session is in all supplied roles otherwise a 401 HttpError is thrown
         /// </summary>
-        /// <param name="req"></param>
-        /// <param name="requiredRoles"></param>
-        public static void AssertRequiredRoles(IRequest req, params string[] requiredRoles)
+        public static void AssertRequiredRoles(IRequest req, IAuthRepository authRepo, params string[] requiredRoles)
         {
             if (requiredRoles.IsEmpty() || HostContext.HasValidAuthSecret(req))
                 return;
 
             var session = req.GetSession();
-
-            var authRepo = HostContext.AppHost.GetAuthRepository(req);
-            using (authRepo as IDisposable)
+            if (session != null)
             {
-                if (session != null)
-                {
-                    if (session.HasRole(RoleNames.Admin, authRepo))
-                        return;
-                    if (requiredRoles.All(x => session.HasRole(x, authRepo)))
-                        return;
+                if (session.HasRole(RoleNames.Admin, authRepo))
+                    return;
+                if (requiredRoles.All(x => session.HasRole(x, authRepo)))
+                    return;
 
-                    session.UpdateFromUserAuthRepo(req, authRepo);
-                }
+                session.UpdateFromUserAuthRepo(req);
             }
 
             if (session != null && requiredRoles.All(x => session.HasRole(x, authRepo)))
@@ -108,49 +87,20 @@ namespace ServiceStack
             var statusCode = session != null && session.IsAuthenticated
                 ? (int)HttpStatusCode.Forbidden
                 : (int)HttpStatusCode.Unauthorized;
-
             throw new HttpError(statusCode, ErrorMessages.InvalidRole);
         }
 
-        public static bool HasRequiredRoles(IRequest req, string[] requiredRoles)
+        public bool Equals(RequiredRoleAttribute other)
         {
-            if (requiredRoles.IsEmpty() || HostContext.HasValidAuthSecret(req))
-                return true;
+            if (other == null)
+                return false;
 
-            var session = req.GetSession();
-
-            var authRepo = HostContext.AppHost.GetAuthRepository(req);
-            using (authRepo as IDisposable)
-            {
-                if (session != null)
-                {
-                    if (session.HasRole(RoleNames.Admin, authRepo))
-                        return true;
-                    if (requiredRoles.All(x => session.HasRole(x, authRepo)))
-                        return true;
-
-                    session.UpdateFromUserAuthRepo(req);
-                }
-
-                if (session != null && requiredRoles.All(x => session.HasRole(x, authRepo)))
-                    return true;
-            }
-
-            return false;
+            return base.Equals(other) && Equals(RequiredRoles, other.RequiredRoles);
         }
 
-        protected bool Equals(RequiredRoleAttribute other)
+        public override bool Equals(object other)
         {
-            return base.Equals(other)
-                && Equals(RequiredRoles, other.RequiredRoles);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((RequiredRoleAttribute)obj);
+            return Equals(other as RequiredRoleAttribute);
         }
 
         public override int GetHashCode()
@@ -161,5 +111,4 @@ namespace ServiceStack
             }
         }
     }
-
 }

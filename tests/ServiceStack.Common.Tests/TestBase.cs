@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using ServiceStack.Host;
 using ServiceStack.Host.Handlers;
+using ServiceStack.Logging;
 using ServiceStack.Messaging;
 using ServiceStack.Testing;
 using ServiceStack.Text;
@@ -34,6 +35,7 @@ namespace ServiceStack.Common.Tests
             ServiceAssemblies = serviceAssemblies;
 
             this.AppHost = new BasicAppHost(serviceAssemblies).Init();
+            LogManager.LogFactory = new ConsoleLogFactory();
         }
 
         [OneTimeTearDown]
@@ -511,14 +513,13 @@ namespace ServiceStack.Common.Tests
                 var isError = responseStatus != null && responseStatus.ErrorCode != null;
                 if (isError)
                 {
-                    var webEx = new WebServiceException(responseStatus.Message)
+                    throw new WebServiceException(responseStatus.Message)
                     {
                         ResponseDto = response,
                         StatusCode = responseStatus.Errors != null && responseStatus.Errors.Count > 0
                             ? 400
                             : 500,
                     };
-                    throw webEx;
                 }
 
                 return (TResponse)response;
@@ -655,6 +656,7 @@ namespace ServiceStack.Common.Tests
             try
             {
                 response = httpHandler.GetResponse(httpReq, request);
+                response.PrintDump();
             }
             catch (Exception ex)
             {

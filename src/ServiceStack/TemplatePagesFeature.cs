@@ -162,7 +162,7 @@ namespace ServiceStack
     {
         public IRequest Request { get; set; }
 
-        public virtual IResolver GetResolver() => Service.GlobalResolver;
+        public virtual IResolver GetResolver() => Service.DefaultResolver;
 
         public virtual T TryResolve<T>()
         {
@@ -224,7 +224,7 @@ namespace ServiceStack
         {
             var req = this.Request;
             if (req.GetSessionId() == null)
-                req.Response.CreateSessionIds(req);
+                req.CreateSessionIds(req.Response);
             return req.GetSession(reload);
         }
 

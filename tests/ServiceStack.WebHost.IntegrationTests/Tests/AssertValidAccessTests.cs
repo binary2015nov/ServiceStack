@@ -10,7 +10,9 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     [TestFixture]
     public class AssertValidAccessTests : AuthTestsBase
     {
-       [OneTimeSetUp]
+        protected Register AdminRegister;
+
+        [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
             AdminRegister = CreateAdminUser();
@@ -19,12 +21,38 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Authentication_does_return_session_cookies()
         {
-            var jsonServiceClient = AuthenticateWithAdminUser();
+            var newUser = RegisterNewUser(autoLogin: false);
+
+            var jsonServiceClient = Login(newUser.UserName, newUser.Password);
             Assert.That(jsonServiceClient.CookieContainer.Count, Is.GreaterThan(0));
         }
 
         [Test]
-        public void Cannot_assign_roles_with_normal_user()
+        public void Cannot_assign_roles_and_permissions_when_unthenticate()
+        {
+            var newUser = RegisterNewUser(autoLogin: true);
+
+            try
+            {
+                var client = new JsonServiceClient(Constant.ServiceStackBaseUri);
+                client.Send(
+                    new AssignRoles
+                    {
+                        UserName = newUser.UserName,
+                        Roles = { RoleName1, RoleName2 },
+                        Permissions = { Permission1, Permission2 }
+                    });
+
+                Assert.Fail("Should not be allowed");
+            }
+            catch (WebServiceException webEx)
+            {
+                Assert.That(webEx.StatusCode, Is.EqualTo((int)HttpStatusCode.Unauthorized));
+            }
+        }
+
+        [Test]
+        public void Cannot_assign_roles_and_permissions_with_normal_user()
         {
             var newUser = RegisterNewUser(autoLogin: true);
 
@@ -43,8 +71,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             catch (WebServiceException webEx)
             {
                 Assert.That(webEx.StatusCode, Is.EqualTo((int)HttpStatusCode.Forbidden));
-                //StatusDescription is ignored in WebDevServer
-                //Assert.That(webEx.StatusDescription, Is.EqualTo("Invalid Role"));
+                Assert.That(webEx.StatusDescription, Is.EqualTo(ErrorMessages.InvalidRole));
             }
         }
 
@@ -53,7 +80,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             var newUser = RegisterNewUser();
 
-            var client = AuthenticateWithAdminUser();
+            var client = Login(AdminRegister.UserName, AdminRegister.Password);
 
             var response = client.Send(
                 new AssignRoles
@@ -70,11 +97,35 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         }
 
         [Test]
+        public void Cannot_Unassign_Roles_and_Permissions_when_unthenticate()
+        {
+            var newUser = RegisterNewUser(autoLogin: true);
+
+            try
+            {
+                var client = new JsonServiceClient(Constant.ServiceStackBaseUri);
+                client.Send(
+                    new AssignRoles
+                    {
+                        UserName = newUser.UserName,
+                        Roles = { RoleName1, RoleName2 },
+                        Permissions = { Permission1, Permission2 }
+                    });
+
+                Assert.Fail("Should not be allowed");
+            }
+            catch (WebServiceException webEx)
+            {
+                Assert.That(webEx.StatusCode, Is.EqualTo((int)HttpStatusCode.Unauthorized));
+            }
+        }
+
+        [Test]
         public void Can_UnAssign_Roles_and_Permissions_to_new_User()
         {
             var newUser = RegisterNewUser();
 
-            var client = AuthenticateWithAdminUser();
+            var client = Login(AdminRegister.UserName, AdminRegister.Password);
 
             client.Send(
             new AssignRoles
@@ -111,11 +162,10 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             catch (WebServiceException webEx)
             {
                 Assert.That(webEx.StatusCode, Is.EqualTo((int)HttpStatusCode.Forbidden));
-                //StatusDescription is ignored in WebDevServer
-                //Assert.That(webEx.StatusDescription, Is.EqualTo("Invalid Role"));
+                Assert.That(webEx.StatusDescription, Is.EqualTo(ErrorMessages.InvalidRole));
             }
 
-            var client = AuthenticateWithAdminUser();
+            var client = Login(AdminRegister.UserName, AdminRegister.Password);
 
             client.Send(
                 new AssignRoles
@@ -134,18 +184,17 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             catch (WebServiceException webEx)
             {
                 Assert.That(webEx.StatusCode, Is.EqualTo((int)HttpStatusCode.Forbidden));
-                //StatusDescription is ignored in WebDevServer
-                //Assert.That(webEx.StatusDescription, Is.EqualTo("Invalid Role"));
+                Assert.That(webEx.StatusDescription, Is.EqualTo(ErrorMessages.InvalidRole));
             }
 
             var assignResponse = client.Send(
                 new AssignRoles
                 {
                     UserName = newUser.UserName,
-                    Roles = new List<string> { ContentManager },
+                    Roles = new List<string> { Constant.ContentManager },
                 });
 
-            Assert.That(assignResponse.AllRoles, Is.EquivalentTo(new[] { RoleName1, ContentManager }));
+            Assert.That(assignResponse.AllRoles, Is.EquivalentTo(new[] { RoleName1, Constant.ContentManager }));
 
             var response = newUserClient.Send(new ContentManagerOnly());
 
@@ -153,7 +202,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         }
 
         [Test]
-        public void Can_only_access_ContentPermissionOnlyService_service_after_Assigned_Permission()
+        public void Can_only_access_ContentPermissionOnlyService_after_Assigned_Permission()
         {
             var newUser = RegisterNewUser(autoLogin: true);
 
@@ -165,11 +214,10 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             catch (WebServiceException webEx)
             {
                 Assert.That(webEx.StatusCode, Is.EqualTo((int)HttpStatusCode.Forbidden));
-                //StatusDescription is ignored in WebDevServer
-                //Assert.That(webEx.StatusDescription, Is.EqualTo("Invalid Permissions"));
+                Assert.That(webEx.StatusDescription, Is.EqualTo(ErrorMessages.InvalidPermission));
             }
 
-            var client = AuthenticateWithAdminUser();
+            var client = Login(AdminRegister.UserName, AdminRegister.Password);
 
             client.Send(
                 new AssignRoles
@@ -188,18 +236,17 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             catch (WebServiceException webEx)
             {
                 Assert.That(webEx.StatusCode, Is.EqualTo((int)HttpStatusCode.Forbidden));
-                //StatusDescription is ignored in WebDevServer
-                //Assert.That(webEx.StatusDescription, Is.EqualTo("Invalid Permissions"));
+                Assert.That(webEx.StatusDescription, Is.EqualTo(ErrorMessages.InvalidPermission));
             }
 
             var assignResponse = client.Send(
                 new AssignRoles
                 {
                     UserName = newUser.UserName,
-                    Permissions = new List<string> { ContentPermission },
+                    Permissions = new List<string> { Constant.ContentPermission },
                 });
 
-            Assert.That(assignResponse.AllPermissions, Is.EquivalentTo(new[] { RoleName1, ContentPermission }));
+            Assert.That(assignResponse.AllPermissions, Is.EquivalentTo(new[] { RoleName1, Constant.ContentPermission }));
 
             var response = newUserClient.Send(new ContentPermissionOnly());
 
@@ -212,7 +259,6 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             try
             {
                 Constant.ServiceStackBaseUri.AppendPath("requiresadmin").GetStringFromUrl();
-
                 Assert.Fail("Should not allow access to protected resource");
             }
             catch (Exception ex)
@@ -228,8 +274,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         public void Can_access_Admin_service_with_AuthSecret()
         {
             Constant.ServiceStackBaseUri.AppendPath("requiresadmin")
-                .AddQueryParam("authsecret", Constant.AuthSecret).GetStringFromUrl();
+                .AddQueryParam("authsecret", Constant.AuthSecret).GetStringFromUrl();           
         }
-
     }
 }

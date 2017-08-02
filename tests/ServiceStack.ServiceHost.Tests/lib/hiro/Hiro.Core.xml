@@ -223,7 +223,7 @@
             <summary>
             Creates a method on the given host type.
             </summary>
-            <param name="options">The method options object that describes the method to be created.</param>
+            <param name="options">The method options otherect that describes the method to be created.</param>
             <returns>A method definition.</returns>
         </member>
         <member name="T:Hiro.Compilers.MethodBuilderOptions">
@@ -331,7 +331,7 @@
             </summary>
             <param name="targetType">The targe type.</param>
             <param name="shouldBeVisible">A boolean flag that determines whether or not the method should be publicly visible.</param>
-            <param name="options">The <see cref="T:Hiro.Compilers.MethodBuilderOptions"/> object to be modified.</param>
+            <param name="options">The <see cref="T:Hiro.Compilers.MethodBuilderOptions"/> otherect to be modified.</param>
         </member>
         <member name="T:Hiro.Compilers.ServiceMapBuilder">
             <summary>
@@ -383,7 +383,7 @@
             <param name="module">The module that will host the singleton type.</param>
             <param name="singletonName">The name of the singleton.</param>
             <param name="typeAttributes">The type attributes that describes the singleton type.</param>
-            <param name="objectType">The object ty pe.</param>
+            <param name="otherectType">The otherect ty pe.</param>
             <returns>A <see cref="T:Mono.Cecil.TypeDefinition"/> that represents the singleton type.</returns>
         </member>
         <member name="M:Hiro.Compilers.SingletonEmitter.DefineNestedType(Mono.Cecil.ModuleDefinition,Mono.Cecil.TypeDefinition,Hiro.Interfaces.IDependency,Hiro.Interfaces.IImplementation,System.Collections.Generic.IDictionary{Hiro.Interfaces.IDependency,Hiro.Interfaces.IImplementation},Mono.Cecil.TypeReference,Mono.Cecil.TypeDefinition,Mono.Cecil.FieldDefinition)">
@@ -395,7 +395,7 @@
             <param name="dependency">The dependency that will be instantiated by the singleton.</param>
             <param name="implementation">The implementation that will instantiate the dependency.</param>
             <param name="serviceMap">The service map that contains the list of dependencies in the application.</param>
-            <param name="objectType">The object type.</param>
+            <param name="otherectType">The otherect type.</param>
             <param name="singletonType">The singleton type.</param>
             <param name="instanceField">The field that will hold the singleton instance.</param>
         </member>
@@ -872,7 +872,7 @@
         </member>
         <member name="T:Hiro.Interfaces.IContainerCompiler">
             <summary>
-            Represents a type that can convert <see cref="T:Hiro.Interfaces.IDependencyContainer"/> objects into a compiled assembly that contains an IOC container.
+            Represents a type that can convert <see cref="T:Hiro.Interfaces.IDependencyContainer"/> otherects into a compiled assembly that contains an IOC container.
             </summary>
         </member>
         <member name="M:Hiro.Interfaces.IContainerCompiler.Compile(Hiro.Interfaces.IDependencyContainer)">
@@ -1257,7 +1257,7 @@
             Determines which constructor implementation should be used from a given <see cref="T:Hiro.Interfaces.IDependencyContainer"/> instance.
             </summary>
             <param name="container">The dependency container that holds the current set of dependencies.</param>
-            <returns>An implementation that can instantiate the object associated with the constructor.</returns>
+            <returns>An implementation that can instantiate the otherect associated with the constructor.</returns>
         </member>
         <member name="M:Hiro.Resolvers.ConstructorResolver.ChooseConstructor(Hiro.Interfaces.IImplementation{System.Reflection.ConstructorInfo}@,System.Int32@,Hiro.Interfaces.IImplementation{System.Reflection.ConstructorInfo})">
             <summary>
@@ -1450,10 +1450,10 @@
         </member>
         <member name="M:Hiro.Dependency.Equals(System.Object)">
             <summary>
-            Determines whether or not the current object is equal to the <paramref name="obj">other object.</paramref>
+            Determines whether or not the current otherect is equal to the <paramref name="other">other otherect.</paramref>
             </summary>
-            <param name="obj">The object that will be compared with the current object.</param>
-            <returns><c>true</c> if the objects are equal; otherwise, it will return <c>false</c>.</returns>
+            <param name="other">The otherect that will be compared with the current otherect.</param>
+            <returns><c>true</c> if the otherects are equal; otherwise, it will return <c>false</c>.</returns>
         </member>
         <member name="M:Hiro.Dependency.ToString">
             <summary>
@@ -1615,7 +1615,7 @@
         </member>
         <member name="T:Hiro.InstanceContainer">
             <summary>
-            Represents a <see cref="T:Hiro.Containers.IMicroContainer"/> type that can store object references.
+            Represents a <see cref="T:Hiro.Containers.IMicroContainer"/> type that can store otherect references.
             </summary>
         </member>
         <member name="M:Hiro.InstanceContainer.#ctor(System.Type,System.String,System.Object)">
@@ -1636,19 +1636,19 @@
         </member>
         <member name="M:Hiro.InstanceContainer.GetAllInstances(System.Type)">
             <summary>
-            Returns all object instances that match the given <paramref name="serviceType"/>.
+            Returns all otherect instances that match the given <paramref name="serviceType"/>.
             </summary>
             <param name="serviceType">The service type to be instantiated.</param>
-            <returns>A list of objects that match the given service type</returns>
+            <returns>A list of otherects that match the given service type</returns>
         </member>
         <member name="M:Hiro.InstanceContainer.GetInstance(System.Type,System.String)">
             <summary>
-            Obtains an object instance that matches the given <paramref name="serviceType"/>
+            Obtains an otherect instance that matches the given <paramref name="serviceType"/>
             and <paramref name="key">service name</paramref>.
             </summary>
             <param name="serviceType">The service type to be instantiated.</param>
             <param name="key">The name of the service itself.</param>
-            <returns>An object instance that matches the given service description.</returns>
+            <returns>An otherect instance that matches the given service description.</returns>
         </member>
         <member name="P:Hiro.InstanceContainer.NextContainer">
             <summary>
@@ -1677,7 +1677,7 @@
             instance to the target <paramref name="methodDef">method definition</paramref>.
             </summary>
             <param name="methodDef">The <paramref name="methodDef"/> instance which will contain the local variable.</param>
-            <param name="localType">The object <see cref="T:System.Type">type</see> that describes the type of objects that will be stored by the local variable.</param>
+            <param name="localType">The otherect <see cref="T:System.Type">type</see> that describes the type of otherects that will be stored by the local variable.</param>
             <returns>A <see cref="T:Mono.Cecil.Cil.VariableDefinition"/> that represents the local variable itself.</returns>
         </member>
         <member name="M:Hiro.MethodDefinitionExtensions.AddLocal``1(Mono.Cecil.MethodDefinition)">
@@ -1685,7 +1685,7 @@
             Adds a <see cref="T:Mono.Cecil.Cil.VariableDefinition">local variable</see>
             instance to the target <paramref name="methodDef">method definition</paramref>.
             </summary>
-            <typeparam name="T">The object <see cref="T:System.Type">type</see> that describes the type of objects that will be stored by the local variable.</typeparam>
+            <typeparam name="T">The otherect <see cref="T:System.Type">type</see> that describes the type of otherects that will be stored by the local variable.</typeparam>
             <param name="methodDef">The <paramref name="methodDef"/> instance which will contain the local variable.</param>        
             <returns>A <see cref="T:Mono.Cecil.Cil.VariableDefinition"/> that represents the local variable itself.</returns>        
         </member>
@@ -1694,7 +1694,7 @@
             Adds a named <see cref="T:Mono.Cecil.Cil.VariableDefinition">local variable</see>
             instance to the target <paramref name="methodDef">method definition</paramref>.
             </summary>
-            <typeparam name="T">The object <see cref="T:System.Type">type</see> that describes the type of objects that will be stored by the local variable.</typeparam>
+            <typeparam name="T">The otherect <see cref="T:System.Type">type</see> that describes the type of otherects that will be stored by the local variable.</typeparam>
             <param name="methodDef">The <paramref name="methodDef"/> instance which will contain the local variable.</param>
             <param name="variableName">The name of the local variable.</param>
             <returns>A <see cref="T:Mono.Cecil.Cil.VariableDefinition"/> that represents the local variable itself.</returns>        
@@ -1706,7 +1706,7 @@
             </summary>
             <param name="method">The <paramref name="method"/> instance which will contain the local variable.</param>
             <param name="variableName">The name of the local variable.</param>
-            <param name="variableType">The object <see cref="T:System.Type">type</see> that describes the type of objects that will be stored by the local variable.</param>
+            <param name="variableType">The otherect <see cref="T:System.Type">type</see> that describes the type of otherects that will be stored by the local variable.</param>
             <returns></returns>
         </member>
         <member name="M:Hiro.MethodDefinitionExtensions.AddParameters(Mono.Cecil.MethodDefinition,System.Type[])">
@@ -1738,22 +1738,22 @@
         </member>
         <member name="M:Hiro.MicroContainerExtensions.GetInstance``1(Hiro.Containers.IMicroContainer)">
             <summary>
-            Obtains an object instance that matches the given service type
+            Obtains an otherect instance that matches the given service type
             and <paramref name="key">service name</paramref>.
             </summary>
             <typeparam name="T">The service type.</typeparam>
             <param name="container">The target container.</param>
-            <returns>An object instance that matches the given service description.</returns>
+            <returns>An otherect instance that matches the given service description.</returns>
         </member>
         <member name="M:Hiro.MicroContainerExtensions.GetInstance``1(Hiro.Containers.IMicroContainer,System.String)">
             <summary>
-            Obtains an object instance that matches the given service type
+            Obtains an otherect instance that matches the given service type
             and <paramref name="key">service name</paramref>.
             </summary>
             <typeparam name="T">The service type.</typeparam>
             /// <param name="container">The target container.</param>
             <param name="key">The name of the service itself.</param>
-            <returns>An object instance that matches the given service description.</returns>
+            <returns>An otherect instance that matches the given service description.</returns>
         </member>
         <member name="M:Hiro.MicroContainerExtensions.AddService``1(Hiro.Containers.IMicroContainer,``0)">
             <summary>
@@ -1796,7 +1796,7 @@
             </summary>
             <typeparam name="T">The type that holds the target constructor</typeparam>
             <param name="module">The <see cref="T:Mono.Cecil.ModuleDefinition"/> that will import the target constructor.</param>
-            <param name="constructorParameters">The list of <see cref="T:System.Type"/> objects that describe the signature of the constructor.</param>
+            <param name="constructorParameters">The list of <see cref="T:System.Type"/> otherects that describe the signature of the constructor.</param>
             <returns>A <see cref="T:Mono.Cecil.MethodReference"/> that represents the constructor itself.</returns>
         </member>
         <member name="M:Hiro.ModuleDefinitionExtensions.ImportMethod(Mono.Cecil.ModuleDefinition,System.String,System.Type)">
@@ -1825,7 +1825,7 @@
             into the <paramref name="module">target module</paramref>.
             </summary>
             <typeparam name="T">The target type that holds the target method.</typeparam>
-            <param name="parameterTypes">The list of <see cref="T:System.Type"/> objects that describe the method signature.</param>
+            <param name="parameterTypes">The list of <see cref="T:System.Type"/> otherects that describe the method signature.</param>
             <param name="module">The <see cref="T:Mono.Cecil.ModuleDefinition"/> instance that will import the actual method.</param>
             <param name="methodName">The name of the method being imported.</param>
             <returns>A <see cref="T:Mono.Cecil.MethodReference"/> that represents the method being imported.</returns>
@@ -1886,9 +1886,9 @@
         </member>
         <member name="M:Hiro.ServiceInfo.Equals(System.Object)">
             <summary>
-            Determines if the other object is equal to the current <see cref="T:Hiro.Interfaces.IServiceInfo"/> instance.
+            Determines if the other otherect is equal to the current <see cref="T:Hiro.Interfaces.IServiceInfo"/> instance.
             </summary>
-            <param name="obj">The other object that will be used in the comparison.</param>
+            <param name="other">The other otherect that will be used in the comparison.</param>
             <returns>Returns <c>true</c> if both instances have the same service name, implement the same service type and have the same arguments; otherwise, it will return <c>false</c>.</returns>
         </member>
         <member name="M:Hiro.ServiceInfo.GetHashCode">

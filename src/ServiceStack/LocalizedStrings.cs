@@ -2,35 +2,35 @@
 {
     public static class Keywords
     {
-        public static string Callback = "callback";
-        public static string Format = "format";
-        public static string AuthSecret = "authsecret";
-        public static string RequestInfo = "requestinfo";
-        public static string Debug = "debug";
-        public static string Version = "version";
-        public static string VersionAbbr = "v";
-        public static string Ignore = "ignore";
-        public static string IgnorePlaceHolder = "_";
-        public static string Bare = "bare";
-        public static string SoapMessage = "SoapMessage";
-        public static string Route = "__route";
-        public static string InvokeVerb = "__verb";
-        public static string DbInfo = "__dbinfo";
-        public static string CacheInfo = "__cacheinfo";
-        public static string ApiKey = "__apikey";
-        public static string ApiKeyParam = "apikey";
-        public static string Session = "__session";
-        public static string JsConfig = "jsconfig";
-        public static string SessionId = "ss-id";
-        public static string PermanentSessionId = "ss-pid";
-        public static string SessionOptionsKey = "ss-opt";
-        public static string TokenCookie = "ss-tok";
-        public static string HasPreAuthenticated = "__haspreauth";
-        public static string HasLogged = "_logged";
-        public static string DidAuthenticate = "__didauth";
-        public static string IRequest = "__irequest";
-        public static string RequestDuration = "_requestDurationStopwatch";
-        public static string Code = "code";
+        public const string Callback = "callback";
+        public const string Format = "format";
+        public const string AuthSecret = "authsecret";
+        public const string RequestInfo = "requestinfo";
+        public const string Debug = "debug";
+        public const string Version = "version";
+        public const string VersionAbbr = "v";
+        public const string Ignore = "ignore";
+        public const string IgnorePlaceHolder = "_";
+        public const string Bare = "bare";
+        public const string SoapMessage = "SoapMessage";
+        public const string Route = "__route";
+        public const string InvokeVerb = "__verb";
+        public const string DbInfo = "__dbinfo";
+        public const string CacheInfo = "__cacheinfo";
+        public const string ApiKey = "__apikey";
+        public const string ApiKeyParam = "apikey";
+        public const string Session = "__session";
+        public const string JsConfig = "jsconfig";
+        public const string SessionId = "ss-id";
+        public const string PermanentSessionId = "ss-pid";
+        public const string SessionOptionsKey = "ss-opt";
+        public const string TokenCookie = "ss-tok";
+        public const string HasPreAuthenticated = "__haspreauth";
+        public const string HasLogged = "_logged";
+        public const string DidAuthenticate = "__didauth";
+        public const string IRequest = "__irequest";
+        public const string RequestDuration = "_requestDurationStopwatch";
+        public const string Code = "code";
     }
 
     public static class LocalizedStrings
@@ -47,61 +47,61 @@
     public static class ErrorMessages
     {
         //Auth Errors
-        public static string UnknownAuthProviderFmt = "No configuration was added for OAuth provider '{0}'";
+        public const string UnknownAuthProviderFmt = "No configuration was added for OAuth provider '{0}'";
+               
+        public const string InvalidBasicAuthCredentials = "Invalid BasicAuth Credentials";
+        public const string WindowsAuthFailed = "Windows Auth Failed";
+        public const string NotAuthenticated = "Not Authenticated";
+        public const string InvalidUsernameOrPassword = "Invalid UserName or Password";
+        public const string UsernameOrEmailRequired = "UserName or Email is required";
+        public const string UserAccountLocked = "This account has been locked";
+        public const string IllegalUsername = "UserName contains invalid characters";
+        public const string ShouldNotRegisterAuthSession = "AuthSession's are rehydrated from ICacheClient and should not be registered in IOC's when not in HostContext.TestMode";
+        public const string ApiKeyRequiresSecureConnection = "Sending ApiKey over insecure connection forbidden when RequireSecureConnection=true";
+        public const string JwtRequiresSecureConnection = "Sending JWT over insecure connection forbidden when RequireSecureConnection=true";
+        public const string InvalidSignature = "Invalid Signature";
+        public const string TokenInvalidated = "Token has been invalidated";
+        public const string TokenExpired = "Token has expired";
+        public const string TokenInvalid = "Token is invalid";
+        public const string RefreshTokenInvalid = "RefreshToken is Invalid";
 
-        public static string InvalidBasicAuthCredentials = "Invalid BasicAuth Credentials";
-        public static string WindowsAuthFailed = "Windows Auth Failed";
-        public static string NotAuthenticated = "Not Authenticated";
-        public static string InvalidUsernameOrPassword = "Invalid UserName or Password";
-        public static string UsernameOrEmailRequired = "UserName or Email is required";
-        public static string UserAccountLocked = "This account has been locked";
-        public static string IllegalUsername = "UserName contains invalid characters";
-        public static string ShouldNotRegisterAuthSession = "AuthSession's are rehydrated from ICacheClient and should not be registered in IOC's when not in HostContext.TestMode";
-        public static string ApiKeyRequiresSecureConnection = "Sending ApiKey over insecure connection forbidden when RequireSecureConnection=true";
-        public static string JwtRequiresSecureConnection = "Sending JWT over insecure connection forbidden when RequireSecureConnection=true";
-        public static string InvalidSignature = "Invalid Signature";
-        public static string TokenInvalidated = "Token has been invalidated";
-        public static string TokenExpired = "Token has expired";
-        public static string TokenInvalid = "Token is invalid";
-        public static string RefreshTokenInvalid = "RefreshToken is Invalid";
-
-        public static string InvalidRole = "Invalid Role";
-        public static string InvalidPermission = "Invalid Permission";
+        public const string InvalidRole = "Invalid Role";
+        public const string InvalidPermission = "Invalid Permission";
 
         //Register
-        public static string UserNotExists = "User does not exist";
-        public static string AuthRepositoryNotExists = "No IAuthRepository registered or failed to resolve. Check your IoC registrations.";
-        public static string UsernameAlreadyExists = "Username already exists";
-        public static string EmailAlreadyExists = "Email already exists";
+        public const string UserNotExists = "User does not exist";
+        public const string AuthRepositoryNotExists = "No IAuthRepository registered or failed to resolve. Check your IoC registrations.";
+        public const string UsernameAlreadyExists = "Username already exists";
+        public const string EmailAlreadyExists = "Email already exists";
 
         //AuthRepo
-        public static string UserAlreadyExistsTemplate1 = "User '{0}' already exists";
-        public static string EmailAlreadyExistsTemplate1 = "Email '{0}' already exists";
+        public const string UserAlreadyExistsTemplate1 = "User '{0}' already exists";
+        public const string EmailAlreadyExistsTemplate1 = "Email '{0}' already exists";
 
 
         //StaticFileHandler
-        public static string FileNotExistsFmt = "Static File '{0}' not found";
+        public const string FileNotExistsFmt = "Static File '{0}' not found";
 
         //Server Events
-        public static string SubscriptionNotExistsFmt = "Subscription '{0}' does not exist";
-        public static string SubscriptionForbiddenFmt = "Access to Subscription '{0}' is forbidden";
+        public const string SubscriptionNotExistsFmt = "Subscription '{0}' does not exist";
+        public const string SubscriptionForbiddenFmt = "Access to Subscription '{0}' is forbidden";
 
         //Validation
-        public static string RequestAlreadyProcessedFmt = "Request '{0}' has already been processed";
+        public const string RequestAlreadyProcessedFmt = "Request '{0}' has already been processed";
 
         //Hosts
-        public static string OnlyAllowedInAspNetHosts = "Only ASP.NET Requests accessible via Singletons are supported";
-        public static string HostDoesNotSupportSingletonRequest = "This AppHost does not support accessing the current Request via a Singleton";
+        public const string OnlyAllowedInAspNetHosts = "Only ASP.NET Requests accessible via Singletons are supported";
+        public const string HostDoesNotSupportSingletonRequest = "This AppHost does not support accessing the current Request via a Singleton";
 
         //Invalid State
-        public static string ConstructorNotFoundForType = "Constructor not found for Type '{0}'";
-        public static string ServiceNotFoundForType = "Service not found for Type '{0}'";
-        public static string CacheFeatureMustBeEnabled = "HttpCacheFeature Plugin must be registered to use {0}";
+        public const string ConstructorNotFoundForType = "Constructor not found for Type '{0}'";
+        public const string ServiceNotFoundForType = "Service not found for Type '{0}'";
+        public const string CacheFeatureMustBeEnabled = "HttpCacheFeature Plugin must be registered to use {0}";
     }
 
     public static class HelpMessages
     {
-        public static string NativeTypesDtoOptionsTip =
+        public const string NativeTypesDtoOptionsTip =
             "To override a DTO option, remove \"{0}\" prefix before updating";
     }
 

@@ -2,20 +2,18 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using ServiceStack.Text;
 
 namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
     [Explicit, TestFixture]
     public class LoadTests
     {
-        string BaseUrl = "http://localhost:50000/api/";
         private int BytesSize = 333930;
 
         [Test]
         public void Can_download_sync_pdf()
         {
-            var client = new ImagingService(BaseUrl);
+            var client = new ImagingService(Constant.ServiceStackBaseUri);
 
             var pdfBytes = client.GetBytes("/sample.pdf");
 
@@ -27,7 +25,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public async Task Can_download_async_pdf()
         {
-            var client = new ImagingService(BaseUrl);
+            var client = new ImagingService(Constant.ServiceStackBaseUri);
 
             var pdfBytes = await client.GetBytesAsync("/sample.pdf");
 
@@ -41,7 +39,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             const int NoOfTimes = 1000;
 
-            var client = new ImagingService(BaseUrl);
+            var client = new ImagingService(Constant.ServiceStackBaseUri);
 
             var fetchTasks = new List<Task>();
 
@@ -87,8 +85,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
     public class ImagingServiceWithHighTimeout : ImagingService
     {
-        public ImagingServiceWithHighTimeout(string url)
-            : base(url)
+        public ImagingServiceWithHighTimeout(string url) : base(url)
         {
             Timeout = new TimeSpan(0, 3, 0);
         }

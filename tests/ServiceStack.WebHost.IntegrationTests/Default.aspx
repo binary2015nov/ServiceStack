@@ -1,4 +1,5 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="ServiceStack.WebHost.IntegrationTests.Default" %>
+<%@ Import Namespace="ServiceStack" %>
 <%@ Import Namespace="ServiceStack.Html" %>
 <%@ Import Namespace="ServiceStack.Text" %>
 <!DOCTYPE html>
@@ -17,7 +18,7 @@
     <!-- Le styles -->
     <link href="Content/bootstrap.css" rel="stylesheet" />
     <link href="Content/default.css" rel="stylesheet" />
-    <%=ServiceStack.MiniProfiler.Profiler.RenderIncludes().AsRaw() %>
+    <%= ServiceStack.MiniProfiler.Profiler.RenderIncludes().AsRaw() %>
 
     <script src="Content/js/jquery-1.7.1.min.js" type="text/javascript"></script>
     <script src="Content/js/underscore.min.js" type="text/javascript"></script>
@@ -35,9 +36,8 @@
     <div class="topbar">
       <div class="fill">
         <div class="container">
-          <a class="brand" href="/">Home</a>
           <ul class="nav">
-            <li class="active"><a href="#">Home</a></li>
+            <li class="active"><a href="/Default.aspx">Home</a></li>
             <li><a href="#about">About</a></li>
 		  	<li><a href="#contact">Contact</a></li>
 		  	<li><a href="api/auth/logout">Log Off</a></li>

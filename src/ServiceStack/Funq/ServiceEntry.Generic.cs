@@ -95,19 +95,19 @@ namespace Funq
 
         public IDisposable AquireLockIfNeeded()
         {
-            if (Reuse == ReuseScope.None || Reuse == ReuseScope.Request || Instance != null)
+            if (Reuse == ReuseScope.None || Reuse == ReuseScope.Request || Instance != null || !Monitor.TryEnter(this))
                 return null;
-
-            return new AquiredLock(this);
+           
+            return new AquiredLock(this);           
         }
 
-        internal class AquiredLock : IDisposable
+        class AquiredLock : IDisposable
         {
             private readonly object syncObj;
 
             public AquiredLock(object syncObj)
             {
-                Monitor.Enter(this.syncObj = syncObj);
+                this.syncObj = syncObj;
             }
 
             public void Dispose()

@@ -9,8 +9,7 @@ using ServiceStack.WebHost.IntegrationTests.Services;
 namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
     [TestFixture]
-    public class MovieServiceTests
-        : RestsTestBase
+    public class MovieServiceTests : RestsTestBase
     {
         public Movie NewMovie = new Movie
         {
@@ -61,8 +60,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         public void Can_create_new_Movie_from_FormData()
         {
             var formData = NewMovie.ToStringDictionary();
-
-            var response = ExecutePath(HttpMethods.Post, "/movies", null, formData, null);
+            var response = ExecutePath(HttpMethods.Post, "/movies", null, formData, null);          
             using (var db = DbFactory.Open())
             {
                 var lastInsertId = db.LastInsertId();
@@ -110,7 +108,5 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
                 Assert.That(response.ResponseStatus.ErrorCode, Is.EqualTo(typeof(NotImplementedException).Name));
             }
         }
-
     }
-
 }

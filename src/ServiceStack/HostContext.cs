@@ -147,16 +147,16 @@ namespace ServiceStack
             }
         }
 
-        public static T GetPlugin<T>() where T : class, IPlugin
+        public static TPlugin GetPlugin<TPlugin>() where TPlugin : class, IPlugin
         {
             var appHost = AppHost;
-            return appHost?.GetPlugin<T>();
+            return appHost?.GetPlugin<TPlugin>();
         }
 
-        public static bool HasPlugin<T>() where T : class, IPlugin
+        public static bool HasPlugin<TPlugin>() where TPlugin : class, IPlugin
         {
             var appHost = AppHost;
-            return appHost != null && appHost.HasPlugin<T>();
+            return appHost != null && appHost.HasPlugin<TPlugin>();
         }
 
         public static void Release(object service)

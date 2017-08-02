@@ -11,14 +11,14 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_download_metadata_page()
         {
-            var html = Constant.ServiceStackBaseUri.CombineWith("metadata").GetHtmlFromUrl();
+            var html = Constant.ServiceStackBaseUri.AppendPath("metadata").GetStringFromUrl();
             Assert.That(html.Contains("The following operations are supported."));
         }
 
         [Test]
         public void Can_download_webpage_html_page()
         {
-            var html = (Constant.AbsoluteBaseUri + "webpage.html").GetStringFromUrl();
+            var html = (Constant.AbsoluteBaseUri + "webpage.html").GetHtmlFromUrl();
             Assert.That(html.Contains("Default index ServiceStack.WebHost.Endpoints.Tests page"));
         }
 
@@ -32,7 +32,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Gets_403_on_page_with_non_whitelisted_extension()
         {
-            var webRes = Constant.ServiceStackBaseUri.CombineWith("webpage.forbidden").GetWebResponse();
+            var webRes = Constant.ServiceStackBaseUri.AppendPath("webpage.forbidden").GetWebResponse();
             Assert.That(webRes.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
         }
     }

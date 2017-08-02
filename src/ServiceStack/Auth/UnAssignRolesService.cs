@@ -4,13 +4,12 @@ using ServiceStack.Configuration;
 
 namespace ServiceStack.Auth
 {
+    [RequiredRole(RoleNames.Admin)]
     [DefaultRequest(typeof(UnAssignRoles))]
     public class UnAssignRolesService : Service
     {
         public object Post(UnAssignRoles request)
         {
-            RequiredRoleAttribute.AssertRequiredRoles(Request, RoleNames.Admin);
-
             request.UserName.ThrowIfNullOrEmpty();
 
             var authRepo = HostContext.AppHost.GetAuthRepository(base.Request);

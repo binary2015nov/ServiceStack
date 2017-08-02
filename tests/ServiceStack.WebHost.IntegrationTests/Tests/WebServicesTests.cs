@@ -39,7 +39,6 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             var client = CreateNewServiceClient();
             var response = client.Send<Rot13Response>(new Rot13 { Value = TestString });
-
             var expectedValue = TestString.ToRot13();
             Assert.That(response.Result, Is.EqualTo(expectedValue));
         }

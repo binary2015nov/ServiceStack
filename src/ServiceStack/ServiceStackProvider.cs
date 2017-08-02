@@ -82,7 +82,7 @@ namespace ServiceStack
             var userAuthRepo = HostContext.AppHost.GetAuthRepository(hasProvider.ServiceStackProvider.Request);
             using (userAuthRepo as IDisposable)
             {
-                var hasRoles = roleAttrs.All(x => x.HasAllRoles(httpReq, authSession, userAuthRepo));
+                var hasRoles = roleAttrs.All(x => x.HasAllRoles(httpReq, userAuthRepo));
                 if (!hasRoles)
                     return false;
 

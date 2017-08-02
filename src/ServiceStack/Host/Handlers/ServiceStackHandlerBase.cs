@@ -156,10 +156,10 @@ namespace ServiceStack.Host.Handlers
             }
             catch (Exception ex)
             {
-                var msg = $"Could not deserialize '{contentType}' request using {requestType}'\nError: {ex}";
+                var msg = $"Could not deserialize '{contentType}' requestDto using {requestType}'\nError: {ex}";
                 throw new SerializationException(msg, ex);
             }
-            return requestType.CreateInstance(); //Return an empty DTO, even for empty request bodies
+            return requestType.CreateInstance(); //Return an empty DTO, even for empty requestDto bodies
         }
 
         protected static object GetCustomRequestFromBinder(IRequest httpReq, Type requestType)
@@ -176,9 +176,9 @@ namespace ServiceStack.Host.Handlers
             return HostContext.Metadata.GetOperationType(operationName);
         }
 
-        protected static object ExecuteService(object request, IRequest httpReq)
+        protected static object ExecuteService(object requestDto, IRequest httpReq)
         {
-            return HostContext.ExecuteService(request, httpReq);
+            return HostContext.ExecuteService(requestDto, httpReq);
         }
 
         protected static void AssertOperationExists(string operationName, Type type)

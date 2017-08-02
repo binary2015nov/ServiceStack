@@ -8,8 +8,8 @@
 //------------------------------------------------------------------------------
 
 namespace ServiceStack.WebHost.IntegrationTests {
-    
-    
+       
     public partial class Default {
+
     }
 }

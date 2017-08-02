@@ -31,7 +31,7 @@ namespace ServiceStack.WebHost.IntegrationTests
 
         public AppHost() : base("ServiceStack WebHost IntegrationTests", typeof(AppHost).Assembly)
         {
-            //JsConfig.EmitCamelCaseNames = true;
+            JsConfig.EmitCamelCaseNames = true;
             Config.AdminAuthSecret = Constant.AuthSecret;
             Config.ApiVersion = "0.2.0";
             Config.DebugMode = true;

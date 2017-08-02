@@ -98,7 +98,7 @@ namespace ServiceStack.Common.Tests.OAuth
             var request = registrationService.Request;
             HostContext.Container.Register(userAuth);
 
-            RequiredRoleAttribute.AssertRequiredRoles(request, RoleNames.Admin);
+            RequiredRoleAttribute.AssertRequiredRoles(request, HostContext.AppHost.GetAuthRepository(request), RoleNames.Admin);
 
             Assert.That(!request.Response.IsClosed);
         }

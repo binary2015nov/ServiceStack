@@ -214,7 +214,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
         [Test]
         public void Does_execute_RockstarPageView()
         {
-            var html = Config.ListeningOn.AppendPath("rockstar-pages", "1").GetStringFromUrl();
+            var html = Config.ListeningOn.AppendPaths("rockstar-pages", "1").GetStringFromUrl();
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <body id=root>
@@ -231,7 +231,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
         [Test]
         public void Does_execute_RockstarPageView_with_custom_layout()
         {
-            var html = Config.ListeningOn.AppendPath("rockstar-pages", "1").AddQueryParam("layout", "custom_layout").GetStringFromUrl();
+            var html = Config.ListeningOn.AppendPaths("rockstar-pages", "1").AddQueryParam("layout", "custom_layout").GetStringFromUrl();
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <body id=custom>

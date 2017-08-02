@@ -6,22 +6,18 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
     public class AuthTestsBase
     {
-        public string RoleName1 = "Role1";
-        public string RoleName2 = "Role2";
-        public const string ContentManager = "ContentManager";
-        public const string ContentPermission = "ContentPermission";
+        public const string RoleName1 = "Role1";
+        public const string RoleName2 = "Role2";
 
-        public string Permission1 = "Permission1";
-        public string Permission2 = "Permission2";
-
-        protected Register AdminRegister;
+        public const string Permission1 = "Permission1";
+        public const string Permission2 = "Permission2";
 
         private JsonServiceClient serviceClient;
         public JsonServiceClient ServiceClient => serviceClient ?? (serviceClient = new JsonServiceClient(Constant.ServiceStackBaseUri));
 
         public Register CreateAdminUser()
         {
-            AdminRegister = new Register
+            var adminRegister = new Register
             {
                 UserName = "Admin",
                 DisplayName = "The Admin User",
@@ -32,13 +28,13 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             };
             try
             {
-                ServiceClient.Send(AdminRegister);
+                ServiceClient.Send(adminRegister);
             }
             catch (WebServiceException ex)
             {
                 ("Error while creating Admin User: " + ex.Message).Print();
             }
-            return AdminRegister;
+            return adminRegister;
         }
 
         public Register RegisterNewUser(bool autoLogin = false)
@@ -72,19 +68,6 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             });
 
             return client;
-        }
-
-        public JsonServiceClient AuthenticateWithAdminUser()
-        {
-            var serviceClient = new JsonServiceClient(Constant.ServiceStackBaseUri);
-            serviceClient.Send(new Authenticate
-            {
-                UserName = AdminRegister.UserName,
-                Password = AdminRegister.Password,
-                RememberMe = true,
-            });
-
-            return serviceClient;
         }
 
         protected void AssertUnAuthorized(WebServiceException webEx)

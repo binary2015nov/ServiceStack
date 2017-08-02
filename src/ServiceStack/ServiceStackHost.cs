@@ -776,14 +776,14 @@ namespace ServiceStack
         /// Looks for first plugin of this type in Plugins.
         /// Reflection performance penalty.
         /// </summary>
-        public T GetPlugin<T>() where T : class, IPlugin
+        public TPlugin GetPlugin<TPlugin>() where TPlugin : class, IPlugin
         {
-            return Plugins.FirstOrDefault(x => x is T) as T;
+            return Plugins.FirstOrDefault(x => x is TPlugin) as TPlugin;
         }
 
-        public bool HasPlugin<T>() where T : class, IPlugin
+        public bool HasPlugin<TPlugin>() where TPlugin : class, IPlugin
         {
-            return Plugins.FirstOrDefault(x => x is T) != null;
+            return Plugins.FirstOrDefault(x => x is TPlugin) != null;
         }
 
         public virtual IServiceRunner<TRequest> CreateServiceRunner<TRequest>(ActionContext actionContext)

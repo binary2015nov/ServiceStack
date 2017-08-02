@@ -81,7 +81,7 @@ namespace ServiceStack.Admin
 
             if (!HostContext.Config.DebugMode)
             {
-                RequiredRoleAttribute.AssertRequiredRoles(Request, RequestLogger.RequiredRoles);
+                RequiredRoleAttribute.AssertRequiredRoles(Request, AuthRepository, RequestLogger.RequiredRoles);
             }
 
             if (request.EnableSessionTracking.HasValue)

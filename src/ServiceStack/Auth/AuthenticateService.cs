@@ -1,23 +1,9 @@
 using System;
-using System.Configuration;
 using System.Linq;
-using System.Net;
 using ServiceStack.Web;
 
 namespace ServiceStack.Auth
 {
-    /// <summary>
-    /// Inject logic into existing services by introspecting the request and injecting your own
-    /// validation logic. Exceptions thrown will have the same behaviour as if the service threw it.
-    /// 
-    /// If a non-null object is returned the request will short-circuit and return that response.
-    /// </summary>
-    /// <param name="service">The instance of the service</param>
-    /// <param name="httpMethod">GET,POST,PUT,DELETE</param>
-    /// <param name="requestDto"></param>
-    /// <returns>Response DTO; non-null will short-circuit execution and return that response</returns>
-    public delegate object ValidateFn(IServiceBase service, string httpMethod, object requestDto);
-
     [DefaultRequest(typeof(Authenticate))]
     public class AuthenticateService : Service
     {  
@@ -70,15 +56,12 @@ namespace ServiceStack.Auth
 
         public object Post(Authenticate request)
         {
-            var validationRes = ValidateFn?.Invoke(this, Request.Verb, request);
-            if (validationRes != null)
-                return validationRes;
+            var validateRes = ValidateFn?.Invoke(this, Request.Verb, request);
+            if (validateRes != null)
+                return validateRes;
 
             if (AuthProviders == null || AuthProviders.Length == 0)
                 throw new Exception("No auth providers have been registered in your app host.");
-
-            if (request.RememberMe)         
-                Request.AddSessionOptions(SessionOptions.Permanent);           
 
             var provider = request.provider ?? AuthProviders[0].Provider;
             if (provider == AuthProviderCatagery.CredentialsAliasProvider)
@@ -87,6 +70,9 @@ namespace ServiceStack.Auth
             var authProvider = GetAuthProvider(provider);
             if (authProvider == null)
                 throw HttpError.NotFound(ErrorMessages.UnknownAuthProviderFmt.Fmt(provider.SafeInput()));
+
+            if (request.RememberMe)
+                Request.AddSessionOptions(SessionOptions.Permanent);
 
             if (AuthProviderCatagery.LogoutAction.EqualsIgnoreCase(request.provider))
                 return authProvider.Logout(this, request);
@@ -258,9 +244,9 @@ namespace ServiceStack.Auth
 
         public object Delete(Authenticate request)
         {
-            var response = ValidateFn?.Invoke(this, HttpMethods.Delete, request);
-            if (response != null)
-                return response;
+            var validateRes = ValidateFn?.Invoke(this, HttpMethods.Delete, request);
+            if (validateRes != null)
+                return validateRes;
 
             this.RemoveSession();
 

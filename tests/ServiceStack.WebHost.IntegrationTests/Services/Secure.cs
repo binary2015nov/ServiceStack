@@ -143,7 +143,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 
         public object Any(RequiresRoleInService request)
         {
-            RequiredRoleAttribute.AssertRequiredRoles(Request, request.Role ?? RoleNames.Admin);
+            RequiredRoleAttribute.AssertRequiredRoles(Request, AuthRepository, request.Role ?? RoleNames.Admin);
 
             return request;
         }

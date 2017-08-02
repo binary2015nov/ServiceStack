@@ -15,36 +15,6 @@ namespace ServiceStack.Host
         object Execute(IRequest request, IService service, object requestDto);
     }
 
-    //public class ServiceRequestExec<TService, TRequest> : IServiceExec
-    //{
-    //    public object Execute(IRequest requestContext, object instance, object request)
-    //    {
-    //        return ServiceExec<TService>.Execute(requestContext, instance, request,
-    //            typeof(TRequest).GetOperationName());
-    //    }
-    //}
-
-    //public static class ServiceExecExtensions
-    //{
-    //    public static IEnumerable<MethodInfo> GetActions(this Type serviceType)
-    //    {
-    //        foreach (var mi in serviceType.GetMethods(BindingFlags.Public | BindingFlags.Instance))
-    //        {
-    //            if (mi.GetParameters().Length != 1)
-    //                continue;
-
-    //            var actionName = mi.Name.ToUpper();
-    //            if (!HttpMethods.AllVerbs.Contains(actionName) && 
-    //                actionName != ActionContext.AnyAction &&
-    //                !HttpMethods.AllVerbs.Any(verb => ContentTypes.KnownFormats.Any(format => actionName.EqualsIgnoreCase(verb + format))) &&
-    //                !ContentTypes.KnownFormats.Any(format => actionName.EqualsIgnoreCase(ActionContext.AnyAction + format)))
-    //                continue;
-
-    //            yield return mi;
-    //        }
-    //    }
-    //}
-
     public class ServiceExec<TService> : IServiceExec
         where TService : IService
     {

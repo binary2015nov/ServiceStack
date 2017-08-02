@@ -32,7 +32,7 @@ function getModelChain(model, chain) {
 function getDtoChain(model, modelsAlreadyProcessed) {
     modelsAlreadyProcessed = modelsAlreadyProcessed || {};
     modelsAlreadyProcessed[model.id] = true;
-    var obj = {};
+    var other = {};
     
     if (model === undefined || model === null) {
         return {};
@@ -46,13 +46,13 @@ function getDtoChain(model, modelsAlreadyProcessed) {
         }
             
         if (candidate !== undefined && !modelsAlreadyProcessed[candidate.id]) {
-            obj[key] = getDtoChain(candidate, modelsAlreadyProcessed);
+            other[key] = getDtoChain(candidate, modelsAlreadyProcessed);
         } else {
-            obj[key] = toSwaggerType(prop);
+            other[key] = toSwaggerType(prop);
         }
     });
 
-    return obj;
+    return other;
 }
 
 function toSwaggerType(prop) {
@@ -103,8 +103,8 @@ function syntaxHighlight(json) {
     });
 }
 
-function notUndefinedNullOrZeroLength(obj) {
-    return obj !== undefined && obj !== null && obj.length > 0;
+function notUndefinedNullOrZeroLength(other) {
+    return other !== undefined && other !== null && other.length > 0;
 }
 
 %>
@@ -178,11 +178,11 @@ function notUndefinedNullOrZeroLength(obj) {
                 %{ parametersDescription(a) }
             % }
                 
-            % var requestClassType = _.findWhere(a.parameters, { paramType: 'body' });   
-            % if (requestClassType !== undefined && requestClassType.type !== undefined) {      
-            %   var requestClassModel = currentData.models[requestClassType.type];
+            % var requestDtoClassType = _.findWhere(a.parameters, { paramType: 'body' });   
+            % if (requestDtoClassType !== undefined && requestDtoClassType.type !== undefined) {      
+            %   var requestDtoClassModel = currentData.models[requestDtoClassType.type];
                 <h3>Request Class</h3>
-                %{ classDescription({ nickname: a.nickname, models: getModelChain(requestClassModel) }) }
+                %{ classDescription({ nickname: a.nickname, models: getModelChain(requestDtoClassModel) }) }
             % }
 
             

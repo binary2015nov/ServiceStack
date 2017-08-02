@@ -395,7 +395,6 @@ namespace ServiceStack.Host
 
             var handlerFn = GetService(requestType);
             var response = appHost.OnAfterExecute(req, requestDto, handlerFn(req, requestDto));
-
             return response;
         }
 

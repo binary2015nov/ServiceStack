@@ -73,21 +73,12 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
                     Log.DebugFormat("Status Code : {0}", errorResponse.StatusCode);
                     Log.DebugFormat("Status Description : {0}", errorResponse.StatusDescription);
 
-                    try
+                    using (var stream = errorResponse.GetResponseStream())
                     {
-                        using (var stream = errorResponse.GetResponseStream())
-                        {
-                            var response = ContentTypes.Default.DeserializeFromStream(contentType, typeof(T), stream);
-                            return (T)response;
-                        }
-                    }
-                    catch (WebException)
-                    {
-                        // Oh, well, we tried
-                        throw;
-                    }
+                        var response = ContentTypes.Default.DeserializeFromStream(contentType, typeof(T), stream);
+                        return (T)response;
+                    }         
                 }
-
                 throw;
             }
         }
@@ -174,6 +165,5 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             }
             return result;
         }
-
     }
 }

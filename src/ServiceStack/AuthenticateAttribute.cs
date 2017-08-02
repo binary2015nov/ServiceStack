@@ -115,24 +115,24 @@ namespace ServiceStack
             return "?" + queryStringCollection.ToFormUrlEncoded();
         }
 
-        protected bool Equals(AuthenticateAttribute other)
+        public bool Equals(AuthenticateAttribute other)
         {
-            return base.Equals(other) && string.Equals(Provider, other.Provider) && string.Equals(HtmlRedirect, other.HtmlRedirect);
+            if (other == null)
+                return false;
+
+            return string.Equals(Provider, other.Provider) && string.Equals(HtmlRedirect, other.HtmlRedirect);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object other)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((AuthenticateAttribute)obj);
+            return Equals(other as AuthenticateAttribute);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                var hashCode = base.GetHashCode();
+                var hashCode = GetType().Name.GetHashCode();
                 hashCode = (hashCode * 397) ^ (Provider?.GetHashCode() ?? 0);
                 hashCode = (hashCode * 397) ^ (HtmlRedirect?.GetHashCode() ?? 0);
                 return hashCode;

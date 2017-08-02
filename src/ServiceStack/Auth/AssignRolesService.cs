@@ -4,16 +4,15 @@ using ServiceStack.Configuration;
 
 namespace ServiceStack.Auth
 {
+    [RequiredRole(RoleNames.Admin)]
     [DefaultRequest(typeof(AssignRoles))]
     public class AssignRolesService : Service
     {
         public object Post(AssignRoles request)
         {
-            RequiredRoleAttribute.AssertRequiredRoles(Request, RoleNames.Admin);
-
             request.UserName.ThrowIfNullOrEmpty();
 
-            var authRepo = HostContext.AppHost.GetAuthRepository(base.Request);
+            var authRepo = AuthRepository;
             using (authRepo as IDisposable)
             {
                 var userAuth = authRepo.GetUserAuthByUserName(request.UserName);

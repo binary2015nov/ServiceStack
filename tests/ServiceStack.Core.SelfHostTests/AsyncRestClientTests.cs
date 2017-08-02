@@ -94,7 +94,7 @@ namespace RestFiles.Tests
         [Test]
         public void Can_WebRequest_POST_upload_file_to_save_new_file_and_create_new_Directory()
         {
-            var webRequest = WebRequest.Create(WebServiceHostUrl + "files/UploadedFiles/");
+            var webRequest = WebRequest.CreateHttp(WebServiceHostUrl + "files/UploadedFiles/");
 
             var fileToUpload = new FileInfo(FilesRootDir + "TESTUPLOAD.txt");
             using (var stream = fileToUpload.OpenRead())

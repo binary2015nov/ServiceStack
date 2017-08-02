@@ -40,18 +40,18 @@ namespace ServiceStack.Host
             {
                 requiresContext.Request = requestContext;
             }
-            return service;
+            return service;      
         }
 
         public virtual void BeforeEachRequest(IRequest req, TRequest request)
         {
             var requestLogger = AppHost.TryResolve<IRequestLogger>();
+
             if (requestLogger != null)
             {
                 req.SetItem(Keywords.RequestDuration, Stopwatch.StartNew());
-            }
-            
-            OnBeforeExecute(req, request);
+            }          
+            OnBeforeExecute(req, request);      
         }
 
         public virtual object AfterEachRequest(IRequest req, TRequest request, object response)
@@ -88,7 +88,6 @@ namespace ServiceStack.Host
                 }
 
                 var response = AfterEachRequest(req, requestDto, ServiceAction(instance, requestDto));
-
                 if (HostContext.StrictMode)
                 {
                     if (response != null && response.GetType().IsValueType())
@@ -244,5 +243,4 @@ namespace ServiceStack.Host
                 : Execute(requestContext, instance, (TRequest)request);
         }
     }
-
 }

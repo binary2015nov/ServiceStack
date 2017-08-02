@@ -67,13 +67,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             appHost = new AppHost();
             var dirPath = ClearFolders();
 
-            Directory.CreateDirectory(dirPath.AppendPath("mount1", "dir1"));
-            File.WriteAllText(dirPath.AppendPath("mount1", "file.txt"), "MOUNT1");
-            File.WriteAllText(dirPath.AppendPath("mount1", "dir1", "nested-file.txt"), "NESTED MOUNT1");
+            Directory.CreateDirectory(dirPath.AppendPaths("mount1", "dir1"));
+            File.WriteAllText(dirPath.AppendPaths("mount1", "file.txt"), "MOUNT1");
+            File.WriteAllText(dirPath.AppendPaths("mount1", "dir1", "nested-file.txt"), "NESTED MOUNT1");
 
-            Directory.CreateDirectory(dirPath.AppendPath("mount2", "dir2"));
-            File.WriteAllText(dirPath.AppendPath("mount2", "file.txt"), "MOUNT2");
-            File.WriteAllText(dirPath.AppendPath("mount2", "dir2", "nested-file.txt"), "NESTED MOUNT2");
+            Directory.CreateDirectory(dirPath.AppendPaths("mount2", "dir2"));
+            File.WriteAllText(dirPath.AppendPaths("mount2", "file.txt"), "MOUNT2");
+            File.WriteAllText(dirPath.AppendPaths("mount2", "dir2", "nested-file.txt"), "NESTED MOUNT2");
 
             appHost
                 .Init()
@@ -141,11 +141,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_resolve_mapped_files_directly()
         {
-            var url = Config.ListeningOn.AppendPath("vfs1", "file.txt");
+            var url = Config.ListeningOn.AppendPaths("vfs1", "file.txt");
             var contents = url.GetStringFromUrl();
             Assert.That(contents, Is.EqualTo("MOUNT1"));
 
-            contents = Config.ListeningOn.AppendPath("vfs2", "dir2", "nested-file.txt").GetStringFromUrl();
+            contents = Config.ListeningOn.AppendPaths("vfs2", "dir2", "nested-file.txt").GetStringFromUrl();
             Assert.That(contents, Is.EqualTo("NESTED MOUNT2"));
         }
     }

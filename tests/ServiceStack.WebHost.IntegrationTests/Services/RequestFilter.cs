@@ -1,5 +1,4 @@
 using System.Runtime.Serialization;
-using ServiceStack.Web;
 
 namespace ServiceStack.WebHost.IntegrationTests.Services
 {
@@ -23,11 +22,9 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 		public string Value { get; set; }
 	}
 
-	public class StatusCodeService : Service, IRequiresRequest
+	public class StatusCodeService : Service
 	{
-		new public IRequest RequestContext { get; set; }
-
-        public object Any(RequestFilter request)
+		public object Any(RequestFilter request)
 		{
 			return new RequestFilterResponse();
 		}

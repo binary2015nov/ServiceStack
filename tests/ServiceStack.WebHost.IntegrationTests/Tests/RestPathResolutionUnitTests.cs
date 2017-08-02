@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using ServiceStack.Common.Tests;
-using ServiceStack.Web;
 using ServiceStack.WebHost.IntegrationTests.Services;
 
 namespace ServiceStack.WebHost.IntegrationTests.Tests
@@ -136,6 +135,5 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             var request2 = (VerbMatch2)GetRequest(HttpMethods.Patch, "/verbmatch/arg");
             Assert.That(request2.Name, Is.EqualTo("arg"));
         }
-
     }
 }

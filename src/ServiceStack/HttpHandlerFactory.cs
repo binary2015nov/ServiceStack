@@ -156,6 +156,7 @@ namespace ServiceStack
 
             string location = appHost.Config.HandlerFactoryPath;
             string pathInfo = httpReq.PathInfo;
+            string physicalPath = httpReq.GetPhysicalPath();
 
             //Default Request /
             if (pathInfo.IsNullOrEmpty() || pathInfo == "/")
@@ -166,7 +167,7 @@ namespace ServiceStack
                     string contentType;
                     var sanitizedPath = RestHandler.GetSanitizedPathInfo(pathInfo, out contentType);
 
-                    var restPath = appHost.Config.FallbackRestPath(httpReq.HttpMethod, sanitizedPath, httpReq.GetPhysicalPath());
+                    var restPath = appHost.Config.FallbackRestPath(httpReq.HttpMethod, sanitizedPath, physicalPath);
                     if (restPath != null)
                     {
                         return new RestHandler { RestPath = restPath, RequestName = restPath.RequestType.GetOperationName(), ResponseContentType = contentType };
@@ -174,7 +175,7 @@ namespace ServiceStack
                 }
 
                 //e.g. CatchAllHandler to Process Markdown files
-                var catchAllHandler = GetCatchAllHandlerIfAny(httpReq.HttpMethod, pathInfo, httpReq.GetPhysicalPath());
+                var catchAllHandler = GetCatchAllHandlerIfAny(httpReq.HttpMethod, pathInfo, physicalPath);
                 if (catchAllHandler != null) return catchAllHandler;
 
                 if (location == null)
@@ -182,21 +183,20 @@ namespace ServiceStack
 
                 return NonRootModeDefaultHttpHandler;
             }
-            return GetHandlerForPathInfo(httpReq.HttpMethod, pathInfo, pathInfo, httpReq.GetPhysicalPath()) ?? NotFoundHttpHandler;
+            return GetHandlerForPathInfo(httpReq.HttpMethod, pathInfo, pathInfo, physicalPath) ?? NotFoundHttpHandler;
         }
 
         public static IHttpHandler GetHandlerForPathInfo(string httpMethod, string pathInfo, string requestPath, string filePath)
         {
             var appHost = HostContext.AppHost;
 
-            var pathParts = pathInfo.TrimStart('/').Split('/');
+            var pathParts = pathInfo.Trim('/').Split('/');
             if (pathParts.Length == 0) return NotFoundHttpHandler;
 
             string contentType;
             var restPath = RestHandler.FindMatchingRestPath(httpMethod, pathInfo, out contentType);
             if (restPath != null)
                 return new RestHandler { RestPath = restPath, RequestName = restPath.RequestType.GetOperationName(), ResponseContentType = contentType };
-
             var existingFile = pathParts[0].ToLower();
             var matchesRootDirOrFile = appHost.Config.DebugMode
                 ? appHost.VirtualFileSources.FileExists(existingFile) ||
