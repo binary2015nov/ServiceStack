@@ -34,7 +34,7 @@ namespace ServiceStack.Common.Tests
             ServiceClientBaseUri = serviceClientBaseUri;
             ServiceAssemblies = serviceAssemblies;
 
-            this.AppHost = new BasicAppHost(serviceAssemblies).Init();
+            this.AppHost = new MockAppHost(serviceAssemblies).Init();
             LogManager.LogFactory = new ConsoleLogFactory();
         }
 
@@ -656,7 +656,6 @@ namespace ServiceStack.Common.Tests
             try
             {
                 response = httpHandler.GetResponse(httpReq, request);
-                response.PrintDump();
             }
             catch (Exception ex)
             {

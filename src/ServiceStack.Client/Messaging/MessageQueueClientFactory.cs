@@ -18,7 +18,7 @@ namespace ServiceStack.Messaging
 
         public event EventHandler<EventArgs> MessageReceived;
 
-        void InvokeMessageReceived(EventArgs e)
+        private void InvokeMessageReceived(EventArgs e)
         {
             var received = MessageReceived;
             received?.Invoke(this, e);

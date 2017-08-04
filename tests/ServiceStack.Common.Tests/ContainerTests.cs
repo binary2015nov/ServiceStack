@@ -59,7 +59,7 @@ namespace ServiceStack.Common.Tests
         [Test]
         public void Can_use_NetCore_APIs_to_register_dependencies()
         {
-            using (var appHost = new BasicAppHost().Init())
+            using (var appHost = new MockAppHost().Init())
             {
                 var services = appHost.Container;
 
@@ -82,7 +82,7 @@ namespace ServiceStack.Common.Tests
         [Test]
         public void CreateInstance_throws_on_missing_dependency()
         {
-            using (var appHost = new BasicAppHost().Init())
+            using (var appHost = new MockAppHost().Init())
             {
                 var services = appHost.Container;
                 services.AddTransient<IFoo, Foo>();

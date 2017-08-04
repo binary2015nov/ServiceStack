@@ -35,15 +35,6 @@ namespace ServiceStack.Reflection
             return lambda.Compile();
         }
 
-        private static Expression[] CreateParameterExpressions(MethodInfo method, Expression argumentsParameter)
-        {
-            return method.GetParameters().Select((parameter, index) =>
-                Expression.Convert(
-                    Expression.ArrayIndex(argumentsParameter, Expression.Constant(index)),
-                    parameter.ParameterType)).ToArray();
-        }
-
-
         public delegate void LateBoundVoid(object target, object[] arguments);
 
         public static LateBoundVoid CreateVoid(MethodInfo method)
@@ -62,6 +53,14 @@ namespace ServiceStack.Reflection
                 argumentsParameter);
 
             return lambda.Compile();
+        }
+
+        private static Expression[] CreateParameterExpressions(MethodInfo method, Expression argumentsParameter)
+        {
+            return method.GetParameters().Select((parameter, index) =>
+                Expression.Convert(
+                    Expression.ArrayIndex(argumentsParameter, Expression.Constant(index)),
+                    parameter.ParameterType) as Expression).ToArray();
         }
     }
 }

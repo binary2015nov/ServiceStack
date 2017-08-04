@@ -16,7 +16,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
-            appHost = new BasicAppHost(GetType().GetAssembly()).Init();
+            appHost = new MockAppHost(GetType().GetAssembly()).Init();
             HostContext.CatchAllHandlers.Add(new PredefinedRoutesFeature().ProcessRequest);
             HostContext.CatchAllHandlers.Add(new MetadataFeature().ProcessRequest);
         }

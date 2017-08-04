@@ -67,7 +67,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
             }
         }
 
-        class AppHost : BasicAppHost
+        class AppHost : MockAppHost
         {
             public AppHost() : base(typeof(AppHost).GetAssembly()) {}
         }

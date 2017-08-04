@@ -13,7 +13,7 @@ namespace ServiceStack.ServiceHost.Tests
         [Test]
         public void Can_register_all_services_in_an_assembly()
         {
-            using (var appHost = new BasicAppHost(typeof(BasicService).Assembly).Init())
+            using (var appHost = new MockAppHost(typeof(BasicService).Assembly).Init())
             {
                 var container = appHost.Container;
                 var serviceController = appHost.ServiceController;
@@ -31,7 +31,7 @@ namespace ServiceStack.ServiceHost.Tests
         [Test]
         public void Can_override_service_creation_with_custom_implementation()
         {
-            using (var appHost = new BasicAppHost(typeof(BasicService).Assembly).Init())
+            using (var appHost = new MockAppHost(typeof(BasicService).Assembly).Init())
             {
                 var container = appHost.Container;
                 var serviceController = appHost.ServiceController;
@@ -63,7 +63,7 @@ namespace ServiceStack.ServiceHost.Tests
         [Test]
         public void Can_inject_RequestContext_for_IRequiresRequestContext_services()
         {
-            using (var appHost = new BasicAppHost(typeof(RequiresService).Assembly).Init())
+            using (var appHost = new MockAppHost(typeof(RequiresService).Assembly).Init())
             {
                 var serviceController = appHost.ServiceController;
 
@@ -78,7 +78,7 @@ namespace ServiceStack.ServiceHost.Tests
         [Test]
         public void Generic_Service_should_not_get_registered_with_generic_parameter()
         {
-            using (var appHost = new BasicAppHost(typeof(GenericService<>).Assembly).Init())
+            using (var appHost = new MockAppHost(typeof(GenericService<>).Assembly).Init())
             {
                 // We should definately *not* be able to call the generic service with a "T" request object :)
                 var requestType = typeof(GenericService<>).GetGenericArguments()[0];
@@ -91,7 +91,7 @@ namespace ServiceStack.ServiceHost.Tests
         [Test]
         public void Generic_service_with_recursive_ceneric_type_should_not_get_registered()
         {
-            using (var appHost = new BasicAppHost
+            using (var appHost = new MockAppHost
             {
                 UseServiceController = x =>
                     new ServiceController(x, () => new[] {
@@ -110,7 +110,7 @@ namespace ServiceStack.ServiceHost.Tests
         [Test]
         public void Generic_service_can_be_registered_with_closed_types()
         {
-            using (var appHost = new BasicAppHost
+            using (var appHost = new MockAppHost
             {
                 UseServiceController = x => new ServiceController(x, () => new[]
                 {

@@ -3,7 +3,6 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using NUnit.Framework;
-using ServiceStack.Text;
 
 namespace ServiceStack.Common.Tests
 {

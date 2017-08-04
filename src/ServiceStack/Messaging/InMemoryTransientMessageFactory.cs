@@ -5,8 +5,7 @@ using ServiceStack.Logging;
 
 namespace ServiceStack.Messaging
 {
-    public class InMemoryTransientMessageFactory
-        : IMessageFactory
+    public class InMemoryTransientMessageFactory : IMessageFactory
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(InMemoryTransientMessageFactory));
         private readonly InMemoryTransientMessageService  transientMessageService;

@@ -47,20 +47,20 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     //        }
     //    }
 
-    //    AppHost appHost;
+    //    AppHost AppHost;
 
     //    [OneTimeSetUp]
     //    public void OnTestFixtureSetUp()
     //    {
-    //        appHost = new AppHost();
-    //        appHost.Init();
-    //        appHost.Start(ListeningOn);
+    //        AppHost = new AppHost();
+    //        AppHost.Init();
+    //        AppHost.Start(ListeningOn);
     //    }
 
     //    [OneTimeTearDown]
     //    public void OnTestFixtureTearDown()
     //    {
-    //        appHost.Dispose();
+    //        AppHost.Dispose();
     //        EndpointHost.ExceptionHandler = null;
     //    }
 

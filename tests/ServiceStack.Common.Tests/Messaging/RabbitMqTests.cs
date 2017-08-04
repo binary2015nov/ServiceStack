@@ -1,5 +1,4 @@
-﻿#if !NETCORE_SUPPORT
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -8,43 +7,18 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
 using ServiceStack.Messaging;
 using ServiceStack.RabbitMq;
-using ServiceStack.Text;
 
 namespace ServiceStack.Common.Tests.Messaging
 {
-    public class HelloRabbit
-    {
-        public string Name { get; set; }
-    }
-
     [TestFixture, Explicit]
     public class RabbitMqTests
     {
-        private readonly ConnectionFactory mqFactory = new ConnectionFactory { HostName = "localhost" };
         private const string Exchange = "mq:tests";
-        private const string ExchangeDlq = "mq:tests.dlq";
         private const string ExchangeTopic = "mq:tests.topic";
         private const string ExchangeFanout = "mq:tests.fanout";
+        private const string ExchangeDlq = "mq:tests.dlq";
 
-        [OneTimeSetUp]
-        public void TestFixtureSetUp()
-        {
-            using (IConnection connection = mqFactory.CreateConnection())
-            using (IModel channel = connection.CreateModel())
-            {
-                channel.RegisterDirectExchange(Exchange);
-                channel.RegisterDlqExchange(ExchangeDlq);
-                channel.RegisterTopicExchange(ExchangeTopic);
-
-                RegisterQueue(channel, QueueNames<HelloRabbit>.In);
-                RegisterQueue(channel, QueueNames<HelloRabbit>.Priority);
-                RegisterDlq(channel, QueueNames<HelloRabbit>.Dlq);
-                RegisterTopic(channel, QueueNames<HelloRabbit>.Out);
-                RegisterQueue(channel, QueueNames<HelloRabbit>.In, exchange: ExchangeTopic);
-
-                channel.PurgeQueue<HelloRabbit>();
-            }
-        }
+        private readonly ConnectionFactory mqFactory = new ConnectionFactory { HostName = "localhost" };
 
         public static void RegisterQueue(IModel channel, string queueName, string exchange = Exchange)
         {
@@ -77,6 +51,34 @@ namespace ServiceStack.Common.Tests.Messaging
             catch (Exception ex)
             {
                 "Error ExchangeDelete(): {0}".Print(ex.Message);
+            }
+        }
+
+        private void PublishHelloRabbit(IModel channel, string text = "World!")
+        {
+            byte[] payload = new HelloRabbit { Name = text }.ToJson().ToUtf8Bytes();
+            var props = channel.CreateBasicProperties();
+            props.Persistent = true;
+            channel.BasicPublish(Exchange, QueueNames<HelloRabbit>.In, props, payload);
+        }
+
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
+        {
+            using (IConnection connection = mqFactory.CreateConnection())
+            using (IModel channel = connection.CreateModel())
+            {
+                channel.RegisterDirectExchange(Exchange);
+                channel.RegisterDlqExchange(ExchangeDlq);
+                channel.RegisterTopicExchange(ExchangeTopic);
+
+                RegisterQueue(channel, QueueNames<HelloRabbit>.In);
+                RegisterQueue(channel, QueueNames<HelloRabbit>.Priority);
+                RegisterDlq(channel, QueueNames<HelloRabbit>.Dlq);
+                RegisterTopic(channel, QueueNames<HelloRabbit>.Out);
+                RegisterQueue(channel, QueueNames<HelloRabbit>.In, exchange: ExchangeTopic);
+
+                channel.PurgeQueue<HelloRabbit>();
             }
         }
 
@@ -187,14 +189,6 @@ namespace ServiceStack.Common.Tests.Messaging
                 basicGetMsg = channel.BasicGet(QueueNames<HelloRabbit>.Priority, noAck: true);
                 Assert.That(basicGetMsg, Is.Null);
             }
-        }
-
-        private static void PublishHelloRabbit(IModel channel, string text = "World!")
-        {
-            byte[] payload = new HelloRabbit { Name = text }.ToJson().ToUtf8Bytes();
-            var props = channel.CreateBasicProperties();
-            props.Persistent = true;
-            channel.BasicPublish(Exchange, QueueNames<HelloRabbit>.In, props, payload);
         }
 
         [Test]
@@ -368,7 +362,6 @@ namespace ServiceStack.Common.Tests.Messaging
                 channel.DeleteQueue<Hello>();
                 channel.DeleteQueue<HelloRabbit>();
                 channel.DeleteQueue<HelloResponse>();
-                channel.DeleteQueue<Incr>();
                 channel.DeleteQueue<AnyTestMq>();
                 channel.DeleteQueue<AnyTestMqResponse>();
                 channel.DeleteQueue<PostTestMq>();
@@ -382,14 +375,4 @@ namespace ServiceStack.Common.Tests.Messaging
             }
         }
     }
-
-    //Dummy messages to delete Queue's created else where.
-    public class AlwaysThrows { }
-    public class Hello { }
-    public class HelloResponse { }
-    public class Reverse { }
-    public class Rot13 { }
-    public class Wait { }
-
 }
-#endif

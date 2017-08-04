@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using ServiceStack.Text;
 
 #if NETSTANDARD1_3
@@ -471,7 +472,7 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
 
                 if (hasEscapeChar)
                 {
-                    var sb = StringBuilderCache.Allocate();
+                    var sb = new StringBuilder();
                     for (var j = 0; j < str.Length; j++)
                     {
                         // strip the back-slash used to escape quote char in strings
@@ -479,7 +480,7 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
                         if (ch != '\\' || (j + 1 >= str.Length || str[j + 1] != firstChar))
                             sb.Append(ch);
                     }
-                    value = StringBuilderCache.ReturnAndFree(sb);
+                    value = sb.ToString();
                 }
                 
                 return literal.Advance(i + 1);

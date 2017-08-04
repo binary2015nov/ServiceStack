@@ -388,7 +388,6 @@ namespace ServiceStack.Host
         {
             req.Dto = requestDto;
             var requestType = requestDto.GetType();
-            req.OperationName = requestType.Name;
 
             if (appHost.Config.EnableAccessRestrictions)
                 AssertServiceRestrictions(requestType, req.RequestAttributes);

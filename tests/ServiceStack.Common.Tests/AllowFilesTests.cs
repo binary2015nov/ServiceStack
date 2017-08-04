@@ -10,7 +10,7 @@ namespace ServiceStack.Common.Tests
         [Test]
         public void Does_allow_valid_FilePaths()
         {
-            using (new BasicAppHost
+            using (new MockAppHost
             {
                 ConfigFilter = config =>
                 {

@@ -44,7 +44,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
-            appHost = new BasicAppHost()
+            appHost = new MockAppHost()
                 .Init();
         }
 

@@ -46,11 +46,6 @@ using System.Collections.Specialized;
 //namespace System.Collections.Specialized
 namespace ServiceStack.Pcl
 {
-    using System;
-    using System.Net;
-    using System.Text;
-    using ServiceStack.Text;
-
     public class HttpUtility
     {
         private sealed class HttpQSCollection : NameValueCollection
@@ -80,9 +75,9 @@ namespace ServiceStack.Pcl
         public static NameValueCollection ParseQueryString(string query, Encoding encoding)
         {
             if (query == null)
-                throw new ArgumentNullException("query");
+                throw new ArgumentNullException(nameof(query));
             if (encoding == null)
-                throw new ArgumentNullException("encoding");
+                throw new ArgumentNullException(nameof(encoding));
             if (query.Length == 0 || (query.Length == 1 && query[0] == '?'))
                 return new HttpQSCollection();
             if (query[0] == '?')
@@ -163,7 +158,7 @@ namespace ServiceStack
 
         public NameValueCollectionWrapper(NameValueCollection data)
         {
-            this.data = data;
+            this.data = data ?? new NameValueCollection();
         }
 
         public IEnumerator GetEnumerator()

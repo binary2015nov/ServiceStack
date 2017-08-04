@@ -18,7 +18,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		[OneTimeSetUp]
 		public void InferRoutes()
 		{
-            appHost = new BasicAppHost().Init();
+            appHost = new MockAppHost().Init();
             
             RouteNamingConvention.PropertyNamesToMatch.Add("Key");
 			RouteNamingConvention.AttributeNamesToMatch.Add(typeof(KeyAttribute).Name);

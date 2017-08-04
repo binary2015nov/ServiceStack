@@ -851,8 +851,7 @@ namespace ServiceStack
 
         public static RequestAttributes GetAttributes(this IRequest request)
         {
-            if (HostContext.Config.DebugMode
-                && request.QueryString != null) //Mock<IHttpRequest>
+            if (HostContext.Config.DebugMode && request.QueryString != null) //Mock<IHttpRequest>
             {
                 var simulate = request.QueryString["simulate"];
                 if (simulate != null)

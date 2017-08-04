@@ -16,7 +16,7 @@ namespace ServiceStack.ServiceHost.Tests
         [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
-            appHost = new BasicAppHost().Init();
+            appHost = new MockAppHost().Init();
         }
 
         [OneTimeTearDown]

@@ -18,7 +18,7 @@ namespace ServiceStack.ServiceHost.Tests.Routes
                 .AddAttributes(new RouteAttribute("/custom/NewApiRequestDto"))
                 .AddAttributes(new RouteAttribute("/custom/NewApiRequestDto/get-only", "GET"));
 
-            using (var appHost = new BasicAppHost(typeof(NewApiRestServiceWithAllVerbsImplemented).Assembly).Init())
+            using (var appHost = new MockAppHost(typeof(NewApiRestServiceWithAllVerbsImplemented).Assembly).Init())
             {
                 var allVerbs = appHost.RestPaths.First(x => x.Path == "/custom/NewApiRequestDto");
                 Assert.That(allVerbs.AllowsAllVerbs);

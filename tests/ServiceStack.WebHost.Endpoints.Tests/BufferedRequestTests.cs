@@ -135,7 +135,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             appHost.UseBufferredStream = false;
 
             var response = client.Send(request);
-            //Debug.WriteLine(appHost.LastRequestBody);
+            //Debug.WriteLine(AppHost.LastRequestBody);
 
             Assert.That(response.Data, Is.EqualTo(request.Data));
 

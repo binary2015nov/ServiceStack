@@ -30,7 +30,7 @@ namespace ServiceStack.ServiceHost.Tests.Formats
             var json = "~/AppData/ALFKI.json".MapProjectPath().ReadAllText();
             response = JsonSerializer.DeserializeFromString<CustomerDetailsResponse>(json);
 
-            appHost = new BasicAppHost
+            appHost = new MockAppHost
             {
                 Plugins = { new MarkdownFormat() },
                 ConfigFilter = config =>

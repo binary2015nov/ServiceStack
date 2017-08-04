@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ServiceStack.Common;
 using ServiceStack.Text;
 
 namespace ServiceStack.Common.Tests.Models
@@ -212,7 +211,7 @@ namespace ServiceStack.Common.Tests.Models
 
         public override string ToString()
         {
-            return String.Format("{0} {1}", this.Name, this.ExternalRef);
+            return "{0} {1}".Fmt(this.Name, this.ExternalRef);
         }
     }
 

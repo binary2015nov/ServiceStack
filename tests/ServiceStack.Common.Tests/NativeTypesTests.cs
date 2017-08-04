@@ -17,7 +17,7 @@ namespace ServiceStack.Common.Tests
         [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
-            appHost = new BasicAppHost(typeof(Dto).Assembly, typeof(TypesCSharp).Assembly)
+            appHost = new MockAppHost(typeof(Dto).Assembly, typeof(TypesCSharp).Assembly)
                 {
                     TestMode = true,
                     Plugins = { new NativeTypesFeature() },

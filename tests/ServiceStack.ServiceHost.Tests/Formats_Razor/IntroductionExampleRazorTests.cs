@@ -33,7 +33,7 @@ namespace ServiceStack.ServiceHost.Tests.Formats_Razor
         [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
-            appHost = new BasicAppHost().Init();
+            appHost = new MockAppHost().Init();
             this.products = new List<Product> {
                 new Product("Pen", 1.99m),
                 new Product("Glass", 9.99m),

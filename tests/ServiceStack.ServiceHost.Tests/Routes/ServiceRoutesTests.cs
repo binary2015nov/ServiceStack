@@ -13,7 +13,7 @@ namespace ServiceStack.ServiceHost.Tests.Routes
         [SetUp]
         public void TestFixtureSetUp()
         {
-            appHost = new BasicAppHost().Init();
+            appHost = new MockAppHost().Init();
         }
 
         [TearDown]

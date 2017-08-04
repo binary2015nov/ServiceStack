@@ -243,7 +243,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_map_Exception_to_StatusCode()
         {
-            using (new BasicAppHost
+            using (new MockAppHost
             {
                 ConfigFilter = c =>
                 {
@@ -260,7 +260,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_map_Exception_to_ErrorCode()
         {
-            using (new BasicAppHost().Init())
+            using (new MockAppHost().Init())
             {
                 Assert.That(new CustomErrorCodeException().ToErrorCode(), Is.EqualTo("CustomErrorCodeException"));
                 Assert.That(new CustomErrorCodeException { ErrorCode = "ERR401" }.ToErrorCode(), Is.EqualTo("ERR401"));

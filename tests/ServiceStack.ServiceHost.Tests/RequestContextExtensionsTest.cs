@@ -43,7 +43,7 @@ namespace ServiceStack.ServiceHost.Tests
 
         private static void CanOptimizeResult(string contentType, IPlugin pluginFormat)
         {
-            using (var appHost = new BasicAppHost().Init())
+            using (var appHost = new MockAppHost().Init())
             {
                 var dto = new TestDto { Name = "test" };
 

@@ -1,5 +1,4 @@
-﻿#if !NETCORE_SUPPORT
-using Funq;
+﻿using Funq;
 using NUnit.Framework;
 using ServiceStack.Auth;
 using ServiceStack.Host;
@@ -11,7 +10,7 @@ namespace ServiceStack.Common.Tests.OAuth
     [TestFixture]
     public class CredentialsServiceTests
     {
-        public class CredentialsTestAppHost : BasicAppHost
+        public class CredentialsTestAppHost : MockAppHost
         {
             public override void Configure(Container container)
             {
@@ -67,12 +66,11 @@ namespace ServiceStack.Common.Tests.OAuth
                 var errors = response.GetFieldErrors();
 
                 Assert.That(errors.Count, Is.EqualTo(2));
-                Assert.That(errors[0].ErrorCode, Is.EqualTo("NotEmpty"));
                 Assert.That(errors[0].FieldName, Is.EqualTo("UserName"));
+                Assert.That(errors[0].ErrorCode, Is.EqualTo("NotEmpty"));
                 Assert.That(errors[1].FieldName, Is.EqualTo("Password"));
                 Assert.That(errors[1].ErrorCode, Is.EqualTo("NotEmpty"));
             }
         }
     }
 }
-#endif

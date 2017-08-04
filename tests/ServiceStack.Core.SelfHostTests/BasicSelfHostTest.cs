@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Threading.Tasks;
 using Funq;
 using NUnit.Framework;
-using ServiceStack.Text;
 
 namespace ServiceStack.Core.SelfHostTests
 {
@@ -61,6 +54,5 @@ namespace ServiceStack.Core.SelfHostTests
 
             Assert.That(response.Result, Is.EqualTo("Hello, AppSelfHostBase!"));
         }
-
     }
 }

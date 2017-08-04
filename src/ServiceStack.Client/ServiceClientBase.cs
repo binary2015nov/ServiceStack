@@ -27,11 +27,10 @@ using ServiceStack.Text;
 
 namespace ServiceStack
 {
-
-    /**
-     * Need to provide async request options
-     * http://msdn.microsoft.com/en-us/library/86wf6409(VS.71).aspx
-     */
+    /// <summary>
+    /// Makes a client middleware to access remote web service. This is an abstract class.
+    /// Needs to provide async request options, http://msdn.microsoft.com/en-us/library/86wf6409(VS.71).aspx.
+    /// </summary>
     public abstract class ServiceClientBase : IServiceClient, IMessageProducer, IHasCookieContainer, IServiceClientMeta
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(ServiceClientBase));
@@ -80,6 +79,9 @@ namespace ServiceStack
 
         readonly AsyncServiceClient asyncClient;
 
+        /// <summary>
+        /// Initializes a new instance of the ServiceStack.ServiceClientBase class.
+        /// </summary>
         protected ServiceClientBase()
         {
             this.HttpMethod = DefaultHttpMethod;

@@ -1577,6 +1577,13 @@
             <param name="to">To.</param>
             <returns></returns>
         </member>
+        <member name="M:ServiceStack.StringExtensions.ToRot13(System.String)">
+            <summary>
+            Replaces the letter of the specified string with the letter 13 letters after it in the alphabet.
+            </summary>
+            <param name="value"> A string to replace.</param>
+            <returns>a Rot13 string.</returns>
+        </member>
         <member name="M:ServiceStack.StringExtensions.AppendPath(System.String,System.String)">
             <summary>
              Appends a copy of the specified urlComponent to the base URI.

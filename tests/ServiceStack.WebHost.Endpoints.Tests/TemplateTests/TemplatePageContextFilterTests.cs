@@ -334,7 +334,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
         [Test]
         public void Can_use_forEach_with_markdown()
         {
-            using (new BasicAppHost().Init())
+            using (new MockAppHost().Init())
             {
                 var context = new TemplatePagesFeature
                 {

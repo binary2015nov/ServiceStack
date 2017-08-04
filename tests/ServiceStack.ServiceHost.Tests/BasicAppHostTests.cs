@@ -9,7 +9,7 @@ namespace ServiceStack.ServiceHost.Tests
         [Test]
         public void Can_dispose_without_init()
         {
-            BasicAppHost appHost = new BasicAppHost();
+            MockAppHost appHost = new MockAppHost();
             appHost.Dispose();
         }
     }

@@ -131,7 +131,7 @@ namespace ServiceStack.Common.Tests
             Assert.That("/a".CombineWith("/some/", "other", "/path/"), Is.EqualTo("/a/some/other/path/"));
             Assert.That("/a".CombineWith("some", "other", "path/"), Is.EqualTo("/a/some/other/path/"));
 
-            Assert.That("".CombineWith("some", "other", "path/"), Is.EqualTo("some/other/path/"));
+            Assert.That("".CombineWith("some", "other", "path/"), Is.EqualTo("/some/other/path/"));
         }
 
         [Test]

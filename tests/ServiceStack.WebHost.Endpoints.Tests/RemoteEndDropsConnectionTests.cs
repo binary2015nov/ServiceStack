@@ -103,7 +103,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 				//Do nothing - we are expecting a time out
 			}
 
-			//Sleep to give the appHost the chance to log the problems so we can investigate
+			//Sleep to give the AppHost the chance to log the problems so we can investigate
 			Thread.Sleep(sleepMs * 2);
 
 			foreach (var pair in TestLogger.GetLogs())

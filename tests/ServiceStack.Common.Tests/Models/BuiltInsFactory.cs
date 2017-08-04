@@ -3,10 +3,9 @@ using NUnit.Framework;
 
 namespace ServiceStack.Common.Tests.Models
 {
-    public class BuiltInsFactory
-        : ModelFactoryBase<string>
+    public class BuiltInsFactory : ModelFactoryBase<string>
     {
-        readonly string[] StringValues = new[] {
+        readonly string[] numbers = new[] {
             "one", "two", "three", "four",
             "five", "six", "seven"
         };
@@ -18,8 +17,8 @@ namespace ServiceStack.Common.Tests.Models
 
         public override string CreateInstance(int i)
         {
-            return i < StringValues.Length
-                ? StringValues[i]
+            return i < numbers.Length
+                ? numbers[i]
                 : i.ToString();
         }
     }

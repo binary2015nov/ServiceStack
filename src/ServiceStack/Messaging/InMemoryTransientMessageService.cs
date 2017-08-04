@@ -3,10 +3,9 @@ using System;
 
 namespace ServiceStack.Messaging
 {
-    public class InMemoryTransientMessageService
-        : TransientMessageServiceBase
+    public class InMemoryTransientMessageService : TransientMessageServiceBase
     {
-        internal InMemoryTransientMessageFactory Factory { get; set; }
+        private InMemoryTransientMessageFactory Factory { get; set; }
 
         public InMemoryTransientMessageService()
             : this(null)
@@ -19,7 +18,7 @@ namespace ServiceStack.Messaging
             this.Factory.MqFactory.MessageReceived += factory_MessageReceived;
         }
 
-        void factory_MessageReceived(object sender, EventArgs e)
+        private void factory_MessageReceived(object sender, EventArgs e)
         {
             this.Start();
         }

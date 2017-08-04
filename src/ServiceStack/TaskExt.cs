@@ -55,5 +55,4 @@ namespace ServiceStack
             return (T)((Task)task).GetResult();
         }
     }
-
 }
