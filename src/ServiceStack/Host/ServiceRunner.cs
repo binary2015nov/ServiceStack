@@ -118,7 +118,7 @@ namespace ServiceStack.Host
                         }
 
                         response = task.GetResult();
-                        LogRequest(req, response);
+                        LogRequest(req, requestDto, response);
 
                         if (ResponseFilters != null)
                         {
@@ -141,7 +141,7 @@ namespace ServiceStack.Host
                 }
                 else
                 {
-                    LogRequest(req, response);
+                    LogRequest(req, requestDto, response);
                 }
 
                 var error = response as IHttpError;
@@ -184,7 +184,7 @@ namespace ServiceStack.Host
             }
         }
 
-        public virtual void LogRequest(IRequest req, object response)
+        private void LogRequest(IRequest req, object requestDto, object response)
         {
             var requestLogger = AppHost.TryResolve<IRequestLogger>();
             if (requestLogger != null && !req.Items.ContainsKey(Keywords.HasLogged))
@@ -193,7 +193,7 @@ namespace ServiceStack.Host
                 {
                     req.Items[Keywords.HasLogged] = true;
                     var stopWatch = req.GetItem(Keywords.RequestDuration) as Stopwatch;
-                    requestLogger.Log(req, req, response, stopWatch?.Elapsed ?? TimeSpan.Zero);
+                    requestLogger.Log(req, requestDto, response, stopWatch?.Elapsed ?? TimeSpan.Zero);
                 }
                 catch (Exception ex)
                 {

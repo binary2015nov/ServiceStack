@@ -21,6 +21,15 @@ namespace ServiceStack.Templates
         // methods without arguments can be used in bindings, e.g. {{ now | dateFormat }}
         public DateTime now() => DateTime.Now;
         public DateTime utcNow() => DateTime.UtcNow;
+
+        public DateTime addTicks(DateTime target, int count) => target.AddTicks(count);
+        public DateTime addMilliseconds(DateTime target, int count) => target.AddMilliseconds(count);
+        public DateTime addSeconds(DateTime target, int count) => target.AddSeconds(count);
+        public DateTime addMinutes(DateTime target, int count) => target.AddMinutes(count);
+        public DateTime addHours(DateTime target, int count) => target.AddHours(count);
+        public DateTime addDays(DateTime target, int count) => target.AddDays(count);
+        public DateTime addMonths(DateTime target, int count) => target.AddMonths(count);
+        public DateTime addYears(DateTime target, int count) => target.AddYears(count);
         
         public string indent() => Context.Args[TemplateConstants.DefaultIndent] as string;
         public string indents(int count) => repeat(Context.Args[TemplateConstants.DefaultIndent] as string, count);
@@ -63,8 +72,31 @@ namespace ServiceStack.Templates
         public long decrement(long value) => value - 1; 
         public long decrBy(long value, long by) => value - by; 
         public long decrementBy(long value, long by) => value - by;
-        public long mod(long value, long divisor) => 
-            value % divisor; 
+        public long mod(long value, long divisor) => value % divisor;
+
+        public double pi() => Math.PI;
+        public double e() => Math.E;
+        public double floor(double value) => Math.Floor(value);
+        public double ceiling(double value) => Math.Ceiling(value);
+        public double abs(double value) => Math.Abs(value);
+        public double acos(double value) => Math.Acos(value);
+        public double atan(double value) => Math.Atan(value);
+        public double atan2(double y, double x) => Math.Atan2(y, x);
+        public double cos(double value) => Math.Cos(value);
+        public double exp(double value) => Math.Exp(value);
+        public double log(double value) => Math.Log(value);
+        public double log(double a, double newBase) => Math.Log(a, newBase);
+        public double log10(double value) => Math.Log10(value);
+        public double pow(double x, double y) => Math.Pow(x, y);
+        public double round(double value) => Math.Round(value);
+        public double round(double value, int decimals) => Math.Round(value, decimals);
+        public int sign(double value) => Math.Sign(value);
+        public double sin(double value) => Math.Sin(value);
+        public double sinh(double value) => Math.Sinh(value);
+        public double sqrt(double value) => Math.Sqrt(value);
+        public double tan(double value) => Math.Tan(value);
+        public double tanh(double value) => Math.Tanh(value);
+        public double truncate(double value) => Math.Truncate(value);
 
         public string currency(decimal decimalValue) => currency(decimalValue, null); //required to support 1/2 vars
         public string currency(decimal decimalValue, string culture)
@@ -87,10 +119,30 @@ namespace ServiceStack.Templates
         public object timeFormat(TimeSpan timeValue) =>  timeValue.ToString((string)Context.Args[TemplateConstants.DefaultTimeFormat]);
         public object timeFormat(TimeSpan timeValue, string format) =>  timeValue.ToString(format);
 
-        public string humanize(string text) => text.SplitCamelCase().Replace('_',' ').ToTitleCase();
+        public string splitCase(string text) => text.SplitCamelCase().Replace('_',' ');
+        public string humanize(string text) => splitCase(text).ToTitleCase();
         public string titleCase(string text) => text.ToTitleCase();
         public string pascalCase(string text) => text.ToPascalCase();
         public string camelCase(string text) => text.ToCamelCase();
+
+        public string textStyle(string text, string headerStyle)
+        {
+            if (text == null) return null;
+            switch (headerStyle)
+            {
+                case "splitCase":
+                    return Instance.splitCase(text);
+                case "humanize":
+                    return Instance.humanize(text);
+                case "titleCase":
+                    return Instance.titleCase(text);
+                case "pascalCase":
+                    return Instance.pascalCase(text);
+                case "camelCase":
+                    return Instance.camelCase(text);
+            }
+            return text;
+        }
 
         public string lower(string text) => text?.ToLower();
         public string upper(string text) => text?.ToUpper();
@@ -132,6 +184,12 @@ namespace ServiceStack.Templates
         public string[] splitOnLast(string text, string needle) => text.SplitOnLast(needle);
         public string[] split(string stringList) => split(stringList, ',');
         public string[] split(string stringList, char delimiter) => stringList.Split(delimiter);
+
+        public Dictionary<string, string> parseKeyValueText(string target) => target?.ParseKeyValueText();
+        public Dictionary<string, string> parseKeyValueText(string target, string delimiter) => target?.ParseKeyValueText(delimiter);
+
+        public ICollection keys(IDictionary target) => target.Keys;
+        public ICollection values(IDictionary target) => target.Values;
 
         public string append(string target, string suffix) => target + suffix;
         public string appendLine(string target) => target + newLine();
@@ -241,6 +299,7 @@ namespace ServiceStack.Templates
         public bool lessThanEqual(object target, object other) => compareTo(target, other, i => i <= 0);
 
         //aliases
+        public bool not(bool target) => !target;
         public bool eq(object target, object other) => equals(target, other);
         public bool not(object target, object other) => notEquals(target, other);
         public bool gt(object target, object other) => greaterThan(target, other);
@@ -417,8 +476,11 @@ namespace ServiceStack.Templates
             var pageName = target.ToString();
             var pageParams = scope.AssertOptions(nameof(partial), scopedParams);
 
-            var page = await scope.Context.GetPage(pageName).Init();
-            await scope.WritePageAsync(page, pageParams);
+            scope.TryGetPage(pageName, out TemplatePage page, out TemplateCodePage codePage);
+            if (page != null)
+                await page.Init();
+     
+            await scope.WritePageAsync(page, codePage, pageParams);
         }
 
         public Task forEach(TemplateScopeContext scope, object target, object items) => forEach(scope, target, items, null);
@@ -711,6 +773,34 @@ namespace ServiceStack.Templates
             }
 
             return TypeConstants.EmptyTask;
+        }
+        
+        public object property(object target, string propertyName)
+        {
+            if (target == null)
+                return null;
+
+            var props = TypeProperties.Get(target.GetType());
+            var fn = props.GetPublicGetter(propertyName);
+            if (fn == null)
+                throw new NotSupportedException($"There is no public Property '{propertyName}' on Type '{target.GetType().Name}'");
+
+            var value = fn(target);
+            return value;
+        }
+
+        public object field(object target, string fieldName)
+        {
+            if (target == null)
+                return null;
+
+            var props = TypeFields.Get(target.GetType());
+            var fn = props.GetPublicGetter(fieldName);
+            if (fn == null)
+                throw new NotSupportedException($"There is no public Field '{fieldName}' on Type '{target.GetType().Name}'");
+
+            var value = fn(target);
+            return value;
         }
 
         public object first(TemplateScopeContext scope, object target) => target.AssertEnumerable(nameof(first)).FirstOrDefault();
@@ -1124,7 +1214,10 @@ namespace ServiceStack.Templates
             if (target == null)
                 return;
             
-            var page = await scope.Context.GetPage(pageName).Init();
+            scope.TryGetPage(pageName, out TemplatePage page, out TemplateCodePage codePage);
+            if (page != null)
+                await page.Init();
+            
             var pageParams = scope.GetParamsWithItemBinding(nameof(selectPartial), page, scopedParams, out string itemBinding);
 
             if (target is IEnumerable objs && !(target is IDictionary) && !(target is string))
@@ -1134,13 +1227,13 @@ namespace ServiceStack.Templates
                 foreach (var item in objs)
                 {
                     scope.AddItemToScope(itemBinding, item, i++);
-                    await scope.WritePageAsync(page, pageParams);
+                    await scope.WritePageAsync(page, codePage, pageParams);
                 }
             }
             else
             {
                 scope.AddItemToScope(itemBinding, target);
-                await scope.WritePageAsync(page, pageParams);
+                await scope.WritePageAsync(page, codePage, pageParams);
             }
         }
         
@@ -1198,5 +1291,74 @@ namespace ServiceStack.Templates
 
         public Task csv(TemplateScopeContext scope, object items) => scope.OutputStream.WriteAsync(items.ToCsv());
         public Task xml(TemplateScopeContext scope, object items) => scope.OutputStream.WriteAsync(items.ToXml());
+        
+        //html
+        public IRawString htmltable(TemplateScopeContext scope, object target) => htmltable(scope, target, null);
+        public IRawString htmltable(TemplateScopeContext scope, object target, object scopeOptions)
+        {
+            if (target is IDictionary<string, object> single)
+                target = new[] { single };
+            
+            var items = target.AssertEnumerable(nameof(htmltable));
+            var scopedParams = scope.AssertOptions(nameof(htmltable), scopeOptions);
+
+            scopedParams.TryGetValue("headerStyle", out object oHeaderStyle);
+            scopedParams.TryGetValue("headerTag", out object oHeaderTag);
+            var headerTag = oHeaderTag as string ?? "th";
+            var headerStyle = oHeaderStyle as string ?? "splitCase";
+
+            var sbHeader = StringBuilderCache.Allocate();
+            var sbRows = StringBuilderCacheAlt.Allocate();
+            List<string> keys = null;
+
+            foreach (var item in items)
+            {
+                if (item is IDictionary<string,object> d)
+                {
+                    if (keys == null)
+                    {
+                        keys = d.Keys.ToList();
+                        sbHeader.Append("<tr>");
+                        foreach (var key in keys)
+                        {
+                            sbHeader.Append('<').Append(headerTag).Append('>');
+                            sbHeader.Append(textStyle(key, headerStyle));
+                            sbHeader.Append("</").Append(headerTag).Append('>');
+                        }
+                        sbHeader.Append("</tr>");
+                    }
+
+                    sbRows.Append("<tr>");
+                    foreach (var key in keys)
+                    {
+                        var value = d[key];
+                        sbRows.Append("<td>").Append(value).Append("</td>");
+                    }
+                    sbRows.Append("</tr>");
+                }
+            }
+
+            var htmlHeaders = StringBuilderCache.ReturnAndFree(sbHeader);
+            var htmlRows = StringBuilderCacheAlt.ReturnAndFree(sbRows);
+
+            var sb = StringBuilderCache.Allocate();
+            sb.Append("<table");
+
+            if (scopedParams.TryGetValue("id", out object id))
+                sb.Append(" id=\"").Append(id).Append("\"");
+            if (scopedParams.TryGetValue("className", out object className))
+                sb.Append(" class=\"").Append(className).Append("\"");
+
+            sb.Append(">");
+            if (scopedParams.TryGetValue("caption", out object caption))
+                sb.Append("<caption>").Append(caption).Append("</caption>");
+            
+            sb.Append("<thead>").Append(htmlHeaders).Append("</thead>");
+            sb.Append("<tbody>").Append(htmlRows).Append("</tbody>");
+            sb.Append("</table>");
+
+            var html = StringBuilderCache.ReturnAndFree(sb);
+            return html.ToRawString();
+        }
     }
 }

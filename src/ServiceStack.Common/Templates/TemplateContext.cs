@@ -64,7 +64,7 @@ namespace ServiceStack.Templates
         /// </summary>
         public Dictionary<string, Func<Stream, Task<Stream>>> FilterTransformers { get; set; } = new Dictionary<string, Func<Stream, Task<Stream>>>();
 
-        public bool CheckForModifiedPages { get; set; } = false;
+        public TimeSpan? CheckForModifiedPagesAfter { get; set; }
         
         public bool RenderExpressionExceptions { get; set; }
 
@@ -77,6 +77,51 @@ namespace ServiceStack.Templates
                 throw new FileNotFoundException($"Page at path was not found: '{virtualPath}'");
 
             return page;
+        }
+
+        public void TryGetPage(string fromVirtualPath, string virtualPath, out TemplatePage page, out TemplateCodePage codePage)
+        {
+            var cp = GetCodePage(virtualPath);
+            if (cp != null)
+            {
+                codePage = cp;
+                page = null;
+                return;
+            }
+
+            var p = Pages.GetPage(virtualPath);
+            if (p != null)
+            {
+                page = p;
+                codePage = null;
+                return;
+            }
+            
+            var partentPath = fromVirtualPath;
+            while (!string.IsNullOrEmpty(partentPath = partentPath.LastLeftPart('/')))
+            {
+                var seekPath = partentPath.CombineWith(virtualPath);
+                cp = GetCodePage(seekPath);
+                if (cp != null)
+                {
+                    codePage = cp;
+                    page = null;
+                    return;
+                }
+                
+                p = Pages.GetPage(seekPath);
+                if (p != null)
+                {
+                    page = p;
+                    codePage = null;
+                    return;
+                }
+                
+                if (partentPath.IndexOf('/') == -1)
+                    break;
+            }
+            
+            throw new FileNotFoundException($"Page at path was not found: '{virtualPath}'");
         }
 
         public TemplatePage OneTimePage(string contents, string ext=null) 

@@ -88,6 +88,10 @@ namespace ServiceStack.Templates
         public PageResult(TemplateCodePage page) : this(page?.Format)
         {
             CodePage = page ?? throw new ArgumentNullException(nameof(page));
+
+            var hasRequest = (CodePage as IRequiresRequest)?.Request;
+            if (hasRequest != null)
+                Args[TemplateConstants.Request] = hasRequest;
         }
 
         public async Task WriteToAsync(Stream responseStream, CancellationToken token = default(CancellationToken))
@@ -790,6 +794,11 @@ namespace ServiceStack.Templates
 
         public object EvaluateToken(TemplateScopeContext scope, JsToken token)
         {
+            if (token is UnaryExpression u)
+            {
+                token = new JsConstant(u.Evaluate(scope));
+            }
+            
             return token is JsExpression expr && expr.Args.Count > 0
                 ? EvaluateMethod(expr, scope)
                 : EvaluateAnyBindings(token, scope);

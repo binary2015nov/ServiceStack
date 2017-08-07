@@ -107,7 +107,14 @@ namespace ServiceStack
                 Args = httpReq.GetUsefulTemplateParams(),
                 LayoutPage = layoutPage
             };
-            await result.WriteToAsync(httpRes.OutputStream);
+            try
+            {
+                await result.WriteToAsync(httpRes.OutputStream);
+            }
+            catch (Exception ex)
+            {
+                await page.Format.OnViewException(result, httpReq, ex);
+            }
         }
     }
 
@@ -133,7 +140,15 @@ namespace ServiceStack
                 Args = httpReq.GetUsefulTemplateParams(),
                 LayoutPage = layoutPage
             };
-            await result.WriteToAsync(httpRes.OutputStream);
+
+            try
+            {
+                await result.WriteToAsync(httpRes.OutputStream);
+            }
+            catch (Exception ex)
+            {
+                await page.Format.OnViewException(result, httpReq, ex);
+            }
         }
     }
 
@@ -273,7 +288,10 @@ namespace ServiceStack
             reqParams["PathInfo"] = request.PathInfo;
             reqParams["AbsoluteUri"] = request.AbsoluteUri;
             reqParams["Verb"] = request.Verb;
-            return reqParams.ToObjectDictionary();
+
+            var to = reqParams.ToObjectDictionary();
+            to[TemplateConstants.Request] = request;
+            return to;
         }
         
         public static TemplateCodePage GetCodePage(this IRequest request, string virtualPath)
