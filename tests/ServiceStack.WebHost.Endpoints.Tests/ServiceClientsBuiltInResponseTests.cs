@@ -123,7 +123,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new BufferedRequestAppHost { EnableRequestBodyTracking = true };
             appHost.Init();
-            appHost.Start(Config.AbsoluteBaseUri);
+            appHost.Start(Constant.AbsoluteBaseUri);
         }
 
         [OneTimeTearDown]
@@ -134,10 +134,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         protected static IRestClient[] RestClients = 
 		{
-			new JsonServiceClient(Config.AbsoluteBaseUri),
-			new JsonHttpClient(Config.AbsoluteBaseUri),
-			new XmlServiceClient(Config.AbsoluteBaseUri),
-			new JsvServiceClient(Config.AbsoluteBaseUri),
+			new JsonServiceClient(Constant.AbsoluteBaseUri),
+			new JsonHttpClient(Constant.AbsoluteBaseUri),
+			new XmlServiceClient(Constant.AbsoluteBaseUri),
+			new JsvServiceClient(Constant.AbsoluteBaseUri),
 		};
 
         protected static IServiceClient[] ServiceClients = 

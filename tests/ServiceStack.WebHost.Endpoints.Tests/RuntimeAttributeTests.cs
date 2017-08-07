@@ -44,7 +44,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new RuntimeAttributeAppHost()
                 .Init()
-                .Start(Config.ListeningOn);
+                .Start(Constant.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -99,7 +99,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_add_RequestFilter_attribute_in_Configure()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
 
             var response = client.Get(new RuntimeAttributes { Id = 1 });
 

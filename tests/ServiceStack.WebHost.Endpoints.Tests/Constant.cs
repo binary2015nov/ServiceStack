@@ -2,7 +2,7 @@
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
-    public class Config
+    public class Constant
     {
         public static readonly string ServiceStackBaseUri = Environment.GetEnvironmentVariable("CI_BASEURI") ?? "http://localhost:20000";
         public static readonly string AbsoluteBaseUri = ServiceStackBaseUri + "/";

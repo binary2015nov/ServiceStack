@@ -98,7 +98,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Config.ListeningOn);
+                .Start(Constant.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -107,7 +107,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_compress_RequestDto_responses()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
             var response = client.Post(new CompressData
             {
                 String = "Hello",
@@ -121,7 +121,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_compress_raw_String_responses()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
             var response = client.Post(new CompressString
             {
                 String = "foo",
@@ -133,7 +133,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_compress_raw_Bytes_responses()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
             var response = client.Post(new CompressBytes
             {
                 Bytes = "foo".ToUtf8Bytes(),
@@ -145,7 +145,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_not_compress_error_responses()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
 
             try
             {
@@ -163,7 +163,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_compress_using_ContenType_in_HttpResult()
         {
-            var url = Config.ListeningOn.CombineWith(new CompressDtoResult { Name = "foo" }.ToGetUrl());
+            var url = Constant.ListeningOn.CombineWith(new CompressDtoResult { Name = "foo" }.ToGetUrl());
 
             var xml = url.GetJsonFromUrl(responseFilter: res =>
             {
@@ -177,7 +177,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_compress_file_returned_in_HttpResult()
         {
-            var url = Config.ListeningOn.CombineWith("/compress/file.js");
+            var url = Constant.ListeningOn.CombineWith("/compress/file.js");
             var zipBytes = url.GetBytesFromUrl(
                 requestFilter: req =>
                 {
@@ -195,7 +195,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_compress_static_file_in_CompressFilesWithExtensions()
         {
-            var url = Config.ListeningOn.CombineWith("/file.css");
+            var url = Constant.ListeningOn.CombineWith("/file.css");
             var zipBytes = url.GetBytesFromUrl(
                 requestFilter: req =>
                 {
@@ -213,7 +213,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_compress_default_page_in_CompressFilesWithExtensions()
         {
-            var url = Config.ListeningOn.CombineWith("/default.html");
+            var url = Constant.ListeningOn.CombineWith("/default.html");
             var zipBytes = url.GetBytesFromUrl(
                 requestFilter: req =>
                 {

@@ -45,7 +45,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new EncodingTestsAppHost();
             appHost.Init();
-            appHost.Start(Config.AbsoluteBaseUri);
+            appHost.Start(Constant.AbsoluteBaseUri);
         }
 
         [OneTimeTearDown]
@@ -56,7 +56,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         private HelloWorldGreeting PerformRequest(string firstName, string lastName)
         {
-            var client = new JsonServiceClient(Config.ServiceStackBaseUri);
+            var client = new JsonServiceClient(Constant.ServiceStackBaseUri);
             var query = string.Format("/HelloWorld/Greeting/{0}?lastname={1}", firstName, lastName);
             return client.Get<HelloWorldGreeting>(query);
         }

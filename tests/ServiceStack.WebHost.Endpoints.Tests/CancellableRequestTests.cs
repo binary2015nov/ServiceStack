@@ -52,7 +52,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new CancellableRequestAppHost()
                 .Init()
-                .Start(Config.AbsoluteBaseUri);
+                .Start(Constant.AbsoluteBaseUri);
         }
 
         [OneTimeTearDown]
@@ -65,7 +65,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public async Task Can_Cancel_long_running_request()
         {
             var tag = Guid.NewGuid().ToString();
-            var client = new JsonServiceClient(Config.AbsoluteBaseUri) {
+            var client = new JsonServiceClient(Constant.AbsoluteBaseUri) {
                 RequestFilter = req => req.Headers[HttpHeaders.XTag] = tag
             };
 

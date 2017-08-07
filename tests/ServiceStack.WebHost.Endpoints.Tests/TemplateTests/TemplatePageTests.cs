@@ -135,7 +135,7 @@ title: We encode < & >
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Config.ListeningOn);
+                .Start(Constant.ListeningOn);
         }
 
         [OneTimeTearDown] public void OneTimeTearDown() => appHost.Dispose();
@@ -146,7 +146,7 @@ title: We encode < & >
         [Test]
         public void Request_for_partial_page_returns_complete_page_with_default_layout()
         {
-            var html = Config.ListeningOn.CombineWith("root-static-page.html")
+            var html = Constant.ListeningOn.CombineWith("root-static-page.html")
                 .GetStringFromUrl(accept: MimeTypes.Html);
 
             Assert.That(html, Does.StartWith("<html><head><title>"));
@@ -157,7 +157,7 @@ title: We encode < & >
         [Test]
         public void Request_for_noprefix_page_returns_alt_layout()
         {
-            var html = Config.ListeningOn.CombineWith("noprefix-page")
+            var html = Constant.ListeningOn.CombineWith("noprefix-page")
                 .GetStringFromUrl(accept: MimeTypes.Html);
 
             Assert.That(html, Does.StartWith("<html><head><title>"));
@@ -168,7 +168,7 @@ title: We encode < & >
         [Test]
         public void Request_for_variable_page_returns_complete_page_with_alt_layout()
         {
-            var html = Config.ListeningOn.CombineWith("variable-layout-page.html")
+            var html = Constant.ListeningOn.CombineWith("variable-layout-page.html")
                 .GetStringFromUrl(accept: MimeTypes.Html);
 
             Assert.That(html, Does.StartWith("<html><head><title>Variable Layout</title>"));
@@ -179,7 +179,7 @@ title: We encode < & >
         [Test]
         public void Request_for_htmlencode_pages_returns_htmlencoded_variables()
         {
-            var html = Config.ListeningOn.CombineWith("htmlencode-page.html")
+            var html = Constant.ListeningOn.CombineWith("htmlencode-page.html")
                 .GetStringFromUrl(accept: MimeTypes.Html);
 
             Assert.That(html, Does.StartWith("<html><head><title>We encode &lt; &amp; &gt;</title>"));
@@ -191,22 +191,22 @@ title: We encode < & >
         [Test]
         public void Request_for_dir_index_page_using_supported_conventions()
         {
-            var htmlOrig = Config.ListeningOn.CombineWith("dir/index.html")
+            var htmlOrig = Constant.ListeningOn.CombineWith("dir/index.html")
                 .GetStringFromUrl(accept: MimeTypes.Html);
             
             Assert.That(htmlOrig, Does.StartWith("<html><head><title>no prefix @ /dir</title>"));
             Assert.That(htmlOrig, Does.Contain("id='dir-alt-layout'"));
             Assert.That(htmlOrig, Does.Contain("<h1>/dir/noprefix page!</h1>"));
             
-            var html = Config.ListeningOn.CombineWith("dir/index")
+            var html = Constant.ListeningOn.CombineWith("dir/index")
                 .GetStringFromUrl(accept: MimeTypes.Html);
             Assert.That(html, Is.EqualTo(htmlOrig));
             
-            html = Config.ListeningOn.CombineWith("dir/")
+            html = Constant.ListeningOn.CombineWith("dir/")
                 .GetStringFromUrl(accept: MimeTypes.Html);
             Assert.That(html, Is.EqualTo(htmlOrig));
             
-            html = Config.ListeningOn.CombineWith("dir")
+            html = Constant.ListeningOn.CombineWith("dir")
                 .GetStringFromUrl(accept: MimeTypes.Html);
             Assert.That(html, Is.EqualTo(htmlOrig));
         }
@@ -215,13 +215,13 @@ title: We encode < & >
         [Test]
         public void Request_for_dir_index_page_without_trailing_slash_auto_redirects()
         {
-            Config.ListeningOn.CombineWith("dir")
+            Constant.ListeningOn.CombineWith("dir")
                 .GetStringFromUrl(accept: MimeTypes.Html, 
                     requestFilter: req => req.AllowAutoRedirect = false,
                     responseFilter: res =>
                     {
                         Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.MovedPermanently));
-                        Assert.That(res.Headers[HttpHeaders.Location], Is.EqualTo(Config.ListeningOn.CombineWith("dir/")));
+                        Assert.That(res.Headers[HttpHeaders.Location], Is.EqualTo(Constant.ListeningOn.CombineWith("dir/")));
                     });
         }
 #endif
@@ -231,7 +231,7 @@ title: We encode < & >
         {
             try
             {
-                Config.ListeningOn.CombineWith("_layout.html")
+                Constant.ListeningOn.CombineWith("_layout.html")
                     .GetStringFromUrl(accept: MimeTypes.Html);
                 
                 Assert.Fail("Should throw");
@@ -243,7 +243,7 @@ title: We encode < & >
             
             try
             {
-                Config.ListeningOn.CombineWith("_layout")
+                Constant.ListeningOn.CombineWith("_layout")
                     .GetStringFromUrl(accept: MimeTypes.Html);
                 
                 Assert.Fail("Should throw");
@@ -257,7 +257,7 @@ title: We encode < & >
         [Test]
         public void Request_for_existing_page_can_be_overridden_by_Service()
         {
-            var html = Config.ListeningOn.CombineWith("existing-page")
+            var html = Constant.ListeningOn.CombineWith("existing-page")
                 .GetStringFromUrl(accept: MimeTypes.Html);
 
             Assert.That(html, Does.StartWith("<html><head><title>Service Title</title>"));

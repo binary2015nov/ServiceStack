@@ -25,7 +25,6 @@ namespace ServiceStack.Host
     {
         private static ILog Logger = LogManager.GetLogger(typeof(ServiceController));
 
-        private const string ResponseDtoSuffix = "Response";
         private readonly ServiceStackHost appHost;
 
         public ServiceController(ServiceStackHost appHost) : this(appHost, appHost.ServiceAssemblies) { }
@@ -90,8 +89,10 @@ namespace ServiceStack.Host
             if (!serviceActionMap.TryGetValue(serviceType, out actionMap))
             {
                 var serviceExecDef = typeof(ServiceExec<>).MakeGenericType(serviceType);
-                var mi = serviceExecDef.GetProperty("ActionMap", BindingFlags.Public | BindingFlags.Static);
-                actionMap = mi.GetValue(null) as Dictionary<Type, List<ActionContext>>;
+                serviceExecDef.GetMethod("Reset", BindingFlags.Public | BindingFlags.Static).Invoke(null, new object[] { });
+
+                var property = serviceExecDef.GetProperty("ActionMap", BindingFlags.Public | BindingFlags.Static);
+                actionMap = property.GetValue(null) as Dictionary<Type, List<ActionContext>>;
 
                 var iserviceExec = (IServiceExec)serviceExecDef.CreateInstance();
                 foreach (var requestType in actionMap.Keys)
@@ -388,7 +389,7 @@ namespace ServiceStack.Host
         {
             req.Dto = requestDto;
             var requestType = requestDto.GetType();
-
+            req.OperationName = requestType.GetOperationName();
             if (appHost.Config.EnableAccessRestrictions)
                 AssertServiceRestrictions(requestType, req.RequestAttributes);
 

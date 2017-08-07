@@ -48,6 +48,11 @@
             Enable the authentication feature and configure the AuthService.
             </summary>
         </member>
+        <member name="P:ServiceStack.AuthFeature.SaveUserNamesInLowerCase">
+            <summary>
+            Should UserName or Emails be saved in AuthRepository in LowerCase
+            </summary>
+        </member>
         <member name="T:ServiceStack.Auth.IManageApiKeys">
             <summary>
             The Interface Auth Repositories need to implement to support API Keys
@@ -117,18 +122,6 @@
             <summary>
             Whether to allow API Keys in 'apikey' QueryString or FormData
             </summary>
-        </member>
-        <member name="T:ServiceStack.Auth.ValidateFn">
-            <summary>
-            Inject logic into existing services by introspecting the request and injecting your own
-            validation logic. Exceptions thrown will have the same behaviour as if the service threw it.
-            
-            If a non-null object is returned the request will short-circuit and return that response.
-            </summary>
-            <param name="service">The instance of the service</param>
-            <param name="httpMethod">GET,POST,PUT,DELETE</param>
-            <param name="requestDto"></param>
-            <returns>Response DTO; non-null will short-circuit execution and return that response</returns>
         </member>
         <member name="M:ServiceStack.Auth.AuthenticateService.Authenticate(ServiceStack.Authenticate)">
             <summary>
@@ -416,11 +409,6 @@
         <member name="M:ServiceStack.Auth.RegisterService.Post(ServiceStack.Register)">
             <summary>
             Create new Registration
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Auth.RegisterService.UpdateUserAuth(ServiceStack.Register)">
-            <summary>
-            Logic to update UserAuth from Registration info, not enabled on PUT because of security.
             </summary>
         </member>
         <member name="T:ServiceStack.Auth.SaltedHash">
@@ -5047,6 +5035,18 @@
             <typeparam name="T"></typeparam>
             <returns></returns>
         </member>
+        <member name="T:ServiceStack.ValidateFn">
+            <summary>
+            Inject logic into existing services by introspecting the request and injecting your own
+            validation logic. Exceptions thrown will have the same behaviour as if the service threw it.
+            
+            If a non-null object is returned the request will short-circuit and return that response.
+            </summary>
+            <param name="service">The instance of the service</param>
+            <param name="httpMethod">GET,POST,PUT,DELETE</param>
+            <param name="requestDto"></param>
+            <returns>Response DTO; non-null will short-circuit execution and return that response</returns>
+        </member>
         <member name="P:ServiceStack.Markdown.MarkdownViewBase.ViewEngine">
             <summary>
             Reference to MarkdownViewEngine
@@ -5549,6 +5549,11 @@
             By default Auth and Registration requests are hidden.
             </summary>
         </member>
+        <member name="P:ServiceStack.RequestLogsFeature.LimitToServiceRequests">
+            <summary>
+            Limit logging to only Service Requests
+            </summary>
+        </member>
         <member name="T:ServiceStack.RequiredPermissionAttribute">
             <summary>
             Indicates that the request dto, which is associated with this attribute,
@@ -5561,12 +5566,10 @@
             can only execute, if the user has specific roles.
             </summary>
         </member>
-        <member name="M:ServiceStack.RequiredRoleAttribute.AssertRequiredRoles(ServiceStack.Web.IRequest,System.String[])">
+        <member name="M:ServiceStack.RequiredRoleAttribute.AssertRequiredRoles(ServiceStack.Web.IRequest,ServiceStack.Auth.IAuthRepository,System.String[])">
             <summary>
             Check all session is in all supplied roles otherwise a 401 HttpError is thrown
             </summary>
-            <param name="req"></param>
-            <param name="requiredRoles"></param>
         </member>
         <member name="T:ServiceStack.RequiresAnyPermissionAttribute">
             <summary>

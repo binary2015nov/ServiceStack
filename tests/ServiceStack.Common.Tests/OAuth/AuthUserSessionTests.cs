@@ -50,6 +50,7 @@ namespace ServiceStack.Common.Tests.OAuth
         }
     }
 
+    [Explicit]
     public class OrmLiteSqlServerAuthUserSessionTests : AuthUserSessionTests
     {
         public override IUserAuthRepository CreateAuthRepo()

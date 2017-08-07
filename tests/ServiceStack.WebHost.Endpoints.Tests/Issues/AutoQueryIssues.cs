@@ -87,9 +87,9 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Issues
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Config.ListeningOn);
+                .Start(Constant.ListeningOn);
 
-            client = new JsonServiceClient(Config.ListeningOn);
+            client = new JsonServiceClient(Constant.ListeningOn);
         }
 
         [OneTimeTearDown]

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using ServiceStack.Text;
 using ServiceStack.Web;
 
 namespace ServiceStack.Host
@@ -15,7 +16,7 @@ namespace ServiceStack.Host
         object Execute(IRequest request, IService service, object requestDto);
     }
 
-    public class ServiceExec<TService> : IServiceExec
+    class ServiceExec<TService> : IServiceExec
         where TService : IService
     {
         private const string ResponseDtoSuffix = "Response";
@@ -24,7 +25,7 @@ namespace ServiceStack.Host
 
         private static Dictionary<string, InstanceExecFn> execMap;
 
-        static ServiceExec()
+        public static void Reset()
         {
             ActionMap = new Dictionary<Type, List<ActionContext>>();
             execMap = new Dictionary<string, InstanceExecFn>();
@@ -52,7 +53,17 @@ namespace ServiceStack.Host
                     actionCtx.ServiceAction = (service, request) =>
                                               mi.Invoke(service, new[] { request });
                 }
-
+                var returnMarker = requestType.GetTypeWithGenericTypeDefinitionOf(typeof(IReturn<>));
+                var responseType = returnMarker != null ?
+                    returnMarker.GetGenericArguments()[0]
+                    : mi.ReturnType != typeof(object) && mi.ReturnType != typeof(void) ?
+                      mi.ReturnType
+#if NETSTANDARD1_6
+                    : Type.GetType(requestType.FullName + ResponseDtoSuffix + "," + requestType.GetAssembly().GetName().Name);
+#else
+                    : AssemblyUtils.FindType(requestType.FullName + ResponseDtoSuffix);
+#endif
+                actionCtx.ResponseType = responseType;
                 var reqFilters = new List<IHasRequestFilter>();
                 var resFilters = new List<IHasResponseFilter>();
 

@@ -26,7 +26,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Issues
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Config.ListeningOn);
+                .Start(Constant.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -52,7 +52,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Issues
         [Test]
         public void Run_GET_dto_in_loop()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
 
             client.Get(new LeakRequest { Name = "warmup" });
 
@@ -76,7 +76,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Issues
         [Test]
         public void Run_GET_url_in_loop()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
 
             client.Get(new LeakRequest { Name = "warmup" });
 
@@ -100,7 +100,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Issues
         [Test]
         public void Run_GET_url_HttpWebResponse_in_loop()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
 
             client.Get(new LeakRequest { Name = "warmup" });
 

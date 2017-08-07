@@ -25,7 +25,6 @@ namespace ServiceStack
             EmbeddedResourceSources = new List<Assembly> { GetType().GetAssembly() };
             EmbeddedResourceTreatAsFiles = new HashSet<string>();
             EnableAccessRestrictions = true;
-            WebHostPhysicalPath = "~".MapServerPath();
             MetadataRedirectPath = null;
             DefaultContentType = null;
             PreferredContentTypes = new List<string> {
@@ -113,8 +112,7 @@ namespace ServiceStack
                 Keywords.IgnorePlaceHolder, Keywords.Version, Keywords.VersionAbbr, Keywords.Version.ToPascalCase(),
                 Keywords.ApiKeyParam, Keywords.Code,
             };
-            XmlWriterSettings = new XmlWriterSettings
-            {
+            XmlWriterSettings = new XmlWriterSettings {
                 Encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false),
             };
             FallbackRestPath = null;
@@ -123,11 +121,10 @@ namespace ServiceStack
             UseCamelCase = false;
             EnableOptimizations = false;
 #else
-                UseCamelCase = true;
-                EnableOptimizations = true;
+            UseCamelCase = true;
+            EnableOptimizations = true;
 #endif
             DisableChunkedEncoding = false;
-            Platform.Instance.InitHostConifg(this);
         }
 
         public string WsdlServiceNamespace { get; set; }

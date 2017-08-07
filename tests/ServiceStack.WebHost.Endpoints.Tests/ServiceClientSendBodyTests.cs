@@ -77,7 +77,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         public override IServiceClient CreateClient()
         {
-            return new JsonServiceClient(Config.ListeningOn);
+            return new JsonServiceClient(Constant.ListeningOn);
         }
     }
 
@@ -85,7 +85,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         public override IServiceClient CreateClient()
         {
-            return new JsonHttpClient(Config.ListeningOn);
+            return new JsonHttpClient(Constant.ListeningOn);
         }
     }
 
@@ -107,7 +107,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Config.ListeningOn);
+                .Start(Constant.ListeningOn);
         }
 
         [OneTimeTearDown]

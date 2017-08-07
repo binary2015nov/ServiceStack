@@ -50,7 +50,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Config.AbsoluteBaseUri);
+                .Start(Constant.AbsoluteBaseUri);
         }
 
         [OneTimeTearDown]
@@ -62,7 +62,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_get_service_with_default_content_type()
         {
-            var json = Config.AbsoluteBaseUri.CombineWith("hellojson", "World")
+            var json = Constant.AbsoluteBaseUri.CombineWith("hellojson", "World")
                 .GetStringFromUrl(accept: "text/html,*/*;q=0.9");
 
             Assert.That(json, Is.EqualTo("{\"Name\":\"Hello, World!\"}")

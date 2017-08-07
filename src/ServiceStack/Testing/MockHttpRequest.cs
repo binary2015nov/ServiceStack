@@ -32,12 +32,12 @@ namespace ServiceStack.Testing
             this.Response = new MockHttpResponse(this);
         }
 
-        public MockHttpRequest(string operationName, string httpMethod,
+        public MockHttpRequest(string requestName, string httpMethod,
             string contentType, string pathInfo,
             NameValueCollection queryString, Stream inputStream, NameValueCollection formData)
             : this()
         {
-            this.OperationName = operationName;
+            this.OperationName = requestName;
             this.HttpMethod = httpMethod;
             this.ContentType = contentType;
             this.ResponseContentType = contentType;

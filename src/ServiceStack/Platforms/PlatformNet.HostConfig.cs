@@ -17,6 +17,7 @@ namespace ServiceStack
 
         public override void InitHostConifg(HostConfig config)
         {
+            base.InitHostConifg(config);
             if (config.HandlerFactoryPath == null)
             {
                 InferHttpHandlerPath(config);

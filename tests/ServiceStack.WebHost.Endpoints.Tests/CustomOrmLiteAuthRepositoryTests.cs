@@ -155,7 +155,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Config.ListeningOn);
+                .Start(Constant.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -164,7 +164,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_resgiter_user_using_Custom_UserAuth_and_UserAuthDetails()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
 
             var response = client.Post(new Register
             {
@@ -182,7 +182,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_assign_roles_to_Custom_UserAuth()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
 
             client.Post(new Register
             {

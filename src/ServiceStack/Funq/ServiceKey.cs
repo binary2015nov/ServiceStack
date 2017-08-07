@@ -2,7 +2,7 @@
 
 namespace Funq
 {
-    sealed class ServiceKey : IEquatable<ServiceKey>
+    public sealed class ServiceKey : IEquatable<ServiceKey>
     {
         public Type FactoryType { get; set; }
 

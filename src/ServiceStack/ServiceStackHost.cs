@@ -48,10 +48,8 @@ namespace ServiceStack
 
         protected ServiceStackHost(string serviceName, params Assembly[] assembliesWithServices)
         {
-            HostContext.AppHost = this;
             CreateAt = DateTime.UtcNow;
             ServiceName = serviceName;
-            RootPath = "~".MapServerPath();
             ServiceAssemblies = assembliesWithServices;
             Config = new HostConfig();
             AppSettings = new AppSettings();
@@ -137,18 +135,23 @@ namespace ServiceStack
         public virtual ServiceStackHost Init()
         {
             InitAt = DateTime.UtcNow;
-
-            OnBeforeInit();
+            HostContext.AppHost = this;
+            Platform.Instance.InitHostConifg(Config);
+            RootPath = Config.WebHostPhysicalPath;
             Config.ServiceEndpointsMetadataConfig = ServiceEndpointsMetadataConfig.Create(Config.HandlerFactoryPath);
             JsonDataContractSerializer.Instance.UseBcl = Config.UseBclJsonSerializers;
             JsonDataContractSerializer.Instance.UseBcl = Config.UseBclJsonSerializers;
             AbstractVirtualFileBase.ScanSkipPaths = Config.ScanSkipPaths;
             ResourceVirtualDirectory.EmbeddedResourceTreatAsFiles = Config.EmbeddedResourceTreatAsFiles;
+
+            OnBeforeInit();
             Container.Register<IHashProvider>(c => new SaltedHash()).ReusedWithin(ReuseScope.None);
             if (Config.DebugMode)
             {
                 Plugins.Add(new RequestInfoFeature());
             }
+            Service.DefaultResolver = this;
+            ServiceController = ServiceController ?? CreateServiceController();
             try
             {
                 Configure(Container);
@@ -160,8 +163,6 @@ namespace ServiceStack
             ConfigurePlugins();
             try
             {
-                Service.DefaultResolver = this;
-                ServiceController = ServiceController ?? CreateServiceController();
                 ServiceController.Init();
             }
             catch (Exception ex)

@@ -349,7 +349,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new ReplyAllAppHost()
                 .Init()
-                .Start(Config.AbsoluteBaseUri);
+                .Start(Constant.AbsoluteBaseUri);
         }
 
         [OneTimeTearDown]
@@ -364,7 +364,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_send_single_HelloAll_request()
         {
-            var client = CreateClient(Config.AbsoluteBaseUri);
+            var client = CreateClient(Constant.AbsoluteBaseUri);
 
             var request = new HelloAll { Name = "Foo" };
             var response = client.Send(request);
@@ -374,7 +374,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public async Task Can_send_single_HelloAllAsync_request()
         {
-            var client = CreateClientAsync(Config.AbsoluteBaseUri);
+            var client = CreateClientAsync(Constant.AbsoluteBaseUri);
 
             var request = new HelloAllAsync { Name = "Foo" };
             var response = await client.SendAsync<HelloAllResponse>(request);
@@ -386,7 +386,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             ReplyAllService.TimesExecuted = 0;
 
-            var client = CreateClient(Config.AbsoluteBaseUri);
+            var client = CreateClient(Constant.AbsoluteBaseUri);
 
             var requests = new[]
             {
@@ -408,7 +408,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public async Task Can_send_multi_reply_HelloAllAsync_requests()
         {
-            var client = CreateClient(Config.AbsoluteBaseUri);
+            var client = CreateClient(Constant.AbsoluteBaseUri);
 
             var requests = new[]
             {
@@ -428,7 +428,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_send_multi_reply_HelloGet_requests()
         {
-            var client = new JsonServiceClient(Config.AbsoluteBaseUri)
+            var client = new JsonServiceClient(Constant.AbsoluteBaseUri)
             {
                 RequestFilter = req =>
                     req.Headers[HttpHeaders.XHttpMethodOverride] = HttpMethods.Get
@@ -454,7 +454,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_send_multi_HelloAllVoid()
         {
-            var client = CreateClient(Config.AbsoluteBaseUri);
+            var client = CreateClient(Constant.AbsoluteBaseUri);
 
             var requests = new[]
             {
@@ -469,7 +469,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_send_PublishAll_HelloAllVoid()
         {
-            var client = CreateClient(Config.AbsoluteBaseUri);
+            var client = CreateClient(Constant.AbsoluteBaseUri);
 
             var requests = new[]
             {
@@ -484,7 +484,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_send_multi_HelloAllVoidAsync()
         {
-            var client = CreateClient(Config.AbsoluteBaseUri);
+            var client = CreateClient(Constant.AbsoluteBaseUri);
 
             var requests = new[]
             {
@@ -499,7 +499,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public async Task Can_send_PublishAllAsync_HelloAllVoidAsync()
         {
-            var client = CreateClient(Config.AbsoluteBaseUri);
+            var client = CreateClient(Constant.AbsoluteBaseUri);
 
             var requests = new[]
             {
@@ -514,7 +514,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_send_single_HelloAllCustom_request()
         {
-            var client = CreateClient(Config.AbsoluteBaseUri);
+            var client = CreateClient(Constant.AbsoluteBaseUri);
 
             var request = new HelloAllCustom { Name = "Foo" };
             var response = client.Send(request);
@@ -524,7 +524,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_send_multi_reply_HelloAllCustom_requests()
         {
-            var client = CreateClient(Config.AbsoluteBaseUri);
+            var client = CreateClient(Constant.AbsoluteBaseUri);
 
             var requests = new[]
             {
@@ -544,7 +544,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public async Task Can_send_async_multi_reply_HelloAllCustom_requests()
         {
-            var client = CreateClient(Config.AbsoluteBaseUri);
+            var client = CreateClient(Constant.AbsoluteBaseUri);
 
             var requests = new[]
             {
@@ -564,7 +564,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_send_multi_oneway_HelloAllCustom_requests()
         {
-            var client = CreateClient(Config.AbsoluteBaseUri);
+            var client = CreateClient(Constant.AbsoluteBaseUri);
 
             var requests = new[]
             {
@@ -584,7 +584,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 db.DropAndCreateTable<HelloAllTransaction>();
             }
 
-            var client = CreateClient(Config.AbsoluteBaseUri);
+            var client = CreateClient(Constant.AbsoluteBaseUri);
 
             var names = new[] { "Foo", "Bar", "Baz" };
 
@@ -618,7 +618,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 db.DropAndCreateTable<HelloAllTransaction>();
             }
 
-            var client = CreateClient(Config.AbsoluteBaseUri);
+            var client = CreateClient(Constant.AbsoluteBaseUri);
             var requests = new[]
             {
                 new HelloAllTransaction { Name = "Foo" },
@@ -651,7 +651,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             {
                 redis.FlushAll();
 
-                var client = CreateClient(Config.AbsoluteBaseUri);
+                var client = CreateClient(Constant.AbsoluteBaseUri);
                 var requests = new[]
                 {
                     new Request { Id = 1, Name = "Foo" },
@@ -672,7 +672,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_not_repeat()
         {
-            var client = CreateClient(Config.AbsoluteBaseUri);
+            var client = CreateClient(Constant.AbsoluteBaseUri);
             var batch = new[] { new NoRepeat { Id = Guid.NewGuid() }, new NoRepeat { Id = Guid.NewGuid() } };
 
             var results = client.SendAll(batch);
@@ -683,7 +683,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_throw_WebServiceException_on_Error()
         {
-            var client = CreateClient(Config.AbsoluteBaseUri);
+            var client = CreateClient(Constant.AbsoluteBaseUri);
 
             var requests = new[]
             {
@@ -709,7 +709,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public async Task Does_throw_WebServiceException_on_Error_Async()
         {
-            var client = CreateClient(Config.AbsoluteBaseUri);
+            var client = CreateClient(Constant.AbsoluteBaseUri);
 
             var requests = new[]
             {

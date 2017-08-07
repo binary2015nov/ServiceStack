@@ -20,7 +20,10 @@ namespace ServiceStack
             return new HashSet<string>();
         }
 
-        public virtual void InitHostConifg(HostConfig config) {}
+        public virtual void InitHostConifg(HostConfig config)
+        {
+            config.WebHostPhysicalPath = "~".MapServerPath();
+        }
 
         public virtual string GetNullableAppSetting(string key)
         {

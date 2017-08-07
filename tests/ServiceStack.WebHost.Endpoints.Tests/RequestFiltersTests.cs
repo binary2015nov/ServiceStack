@@ -176,14 +176,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         RequestFiltersAppHostHttpListener appHost;
 
-        string ServiceClientBaseUri = Config.ListeningOn;
+        string ServiceClientBaseUri = Constant.ListeningOn;
 
         [OneTimeSetUp]
         public void OnTestFixtureSetUp()
         {
             appHost = new RequestFiltersAppHostHttpListener();
             appHost.Init();
-            appHost.Start(Config.ListeningOn);
+            appHost.Start(Constant.ListeningOn);
         }
 
         [OneTimeTearDown]

@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using ServiceStack.Text;
 
 namespace ServiceStack.Common.Tests
 {
-    [TestFixture,Explicit]
+    [TestFixture]
     public class PerfUtilsTests
     {
-        Random rand = new Random();
-
         [Test]
         public void Measure_unique_collections()
         {
+            Random rand = new Random();
             var set = new HashSet<int>();
             var avgMicroSecs = PerfUtils.Measure(
                 () => set.Add(rand.Next(0, 1000)), runForMs:2000);

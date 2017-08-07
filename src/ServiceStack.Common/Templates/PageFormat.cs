@@ -86,7 +86,7 @@ namespace ServiceStack.Templates
             }
             if (ContentType == MimeTypes.Html)
                 sb.AppendLine("</pre>");
-            var html = StringBuilderCache.ReturnAndFree(sb);
+            var html = StringBuilderCache.Retrieve(sb);
             await req.Response.OutputStream.WriteAsync(html);
         }
     }

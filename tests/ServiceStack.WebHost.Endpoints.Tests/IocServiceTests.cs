@@ -44,7 +44,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         public override IServiceClient CreateClient(ResetIoc request = null)
         {
-            var client = new JsonServiceClient(Config.AspNetServiceStackBaseUri);
+            var client = new JsonServiceClient(Constant.AspNetServiceStackBaseUri);
             client.Post(request ?? new ResetIoc());
             return client;
         }

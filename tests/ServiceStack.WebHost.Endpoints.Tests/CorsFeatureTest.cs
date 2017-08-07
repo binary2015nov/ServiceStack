@@ -58,7 +58,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new CorsFeatureAppHostHttpListener()
                 .Init()
-                .Start(Config.AbsoluteBaseUri);
+                .Start(Constant.AbsoluteBaseUri);
         }
 
         [OneTimeTearDown]
@@ -69,9 +69,9 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         static IRestClient[] RestClients = 
         {
-            new JsonServiceClient(Config.AbsoluteBaseUri),
-            new XmlServiceClient(Config.AbsoluteBaseUri),
-            new JsvServiceClient(Config.AbsoluteBaseUri)
+            new JsonServiceClient(Constant.AbsoluteBaseUri),
+            new XmlServiceClient(Constant.AbsoluteBaseUri),
+            new JsvServiceClient(Constant.AbsoluteBaseUri)
         };
 
         [Test, Explicit]
@@ -85,7 +85,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost.Config.GlobalResponseHeaders.Clear();
 
-            var response = RequestContextTests.GetResponseHeaders(Config.ServiceStackBaseUri + "/corsmethod");
+            var response = RequestContextTests.GetResponseHeaders(Constant.ServiceStackBaseUri + "/corsmethod");
             Assert.That(response[HttpHeaders.AllowOrigin], Is.EqualTo("http://localhost http://localhost2"));
             Assert.That(response[HttpHeaders.AllowMethods], Is.EqualTo("POST, GET"));
             Assert.That(response[HttpHeaders.AllowHeaders], Is.EqualTo("Type1, Type2"));
@@ -97,7 +97,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost.LoadPlugin(new CorsFeature { AutoHandleOptionsRequests = false });
 
-            var response = RequestContextTests.GetResponseHeaders(Config.ServiceStackBaseUri + "/globalcorsfeature");
+            var response = RequestContextTests.GetResponseHeaders(Constant.ServiceStackBaseUri + "/globalcorsfeature");
             Assert.That(response[HttpHeaders.AllowOrigin], Is.EqualTo(CorsFeature.DefaultOrigin));
             Assert.That(response[HttpHeaders.AllowMethods], Is.EqualTo(CorsFeature.DefaultMethods));
             Assert.False(response.ContainsKey(HttpHeaders.AllowCredentials));

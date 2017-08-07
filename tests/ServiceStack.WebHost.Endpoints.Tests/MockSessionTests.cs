@@ -121,9 +121,9 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_Mock_Session_in_RequestFilter_in_IntegrationTest()
         {
-            using (new AppHost().Init().Start(Config.AbsoluteBaseUri))
+            using (new AppHost().Init().Start(Constant.AbsoluteBaseUri))
             {
-                var client = new JsonServiceClient(Config.AbsoluteBaseUri);
+                var client = new JsonServiceClient(Constant.AbsoluteBaseUri);
                 var response = client.Get(new MockSessionTest());
 
                 Assert.That(response.UserAuthId, Is.EqualTo("1"));

@@ -66,7 +66,10 @@ namespace ServiceStack.Auth
                             Password = request.Password,
                             Continue = request.Continue
                         });                   
-                }     
+                }
+                if (authResponse is Exception)
+                    throw (Exception)authResponse;
+
                 var typedAuthResponse = authResponse as AuthenticateResponse;
                 if (typedAuthResponse != null)
                 {
@@ -78,8 +81,6 @@ namespace ServiceStack.Auth
                         UserId = user.Id.ToString(CultureInfo.InvariantCulture),
                     };
                 }
-                if (authResponse is Exception)
-                    throw (Exception)authResponse;
             }
             if (registerNewUser)
             {

@@ -90,7 +90,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         public CsvServiceClientTests()
         {
-            appHost = new AppHost().Init().Start(Config.ListeningOn);
+            appHost = new AppHost().Init().Start(Constant.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -121,14 +121,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_SendAll_CsvItem()
         {
-            var client = new CsvServiceClient(Config.ListeningOn);
+            var client = new CsvServiceClient(Constant.ListeningOn);
 
             var dtos = 3.Times(x => CreateCsvItem(x));
 
             var response = client.SendAll(dtos);
             Assert.That(response, Is.EquivalentTo(dtos));
 
-            response = Config.ListeningOn.CombineWith("csv/reply/CsvItem[]")
+            response = Constant.ListeningOn.CombineWith("csv/reply/CsvItem[]")
                 .PostCsvToUrl(dtos)
                 .FromCsv<List<CsvItem>>();
             Assert.That(response, Is.EquivalentTo(dtos));
@@ -137,20 +137,20 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_POST_CsvList()
         {
-            var client = new CsvServiceClient(Config.ListeningOn);
+            var client = new CsvServiceClient(Constant.ListeningOn);
 
             var dtos = 3.Times(x => CreateCsvItem(x));
 
             var response = client.Post(new CsvList(dtos));
             Assert.That(response, Is.EquivalentTo(dtos));
 
-            response = Config.ListeningOn.CombineWith("csvlist")
+            response = Constant.ListeningOn.CombineWith("csvlist")
                 .PostCsvToUrl(dtos)
                 .FromCsv<CsvList>();
             Assert.That(response, Is.EquivalentTo(dtos));
 
             var csv = dtos.ToCsv();
-            response = Config.ListeningOn.CombineWith("csvlist")
+            response = Constant.ListeningOn.CombineWith("csvlist")
                 .PostCsvToUrl(csv)
                 .FromCsv<CsvList>();
             Assert.That(response, Is.EquivalentTo(dtos));
@@ -159,7 +159,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_POST_CsvFirstEnumerable()
         {
-            var client = new CsvServiceClient(Config.ListeningOn);
+            var client = new CsvServiceClient(Constant.ListeningOn);
 
             var dto = new CsvFirstEnumerable
             {
@@ -173,7 +173,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             Assert.That(response.Name, Is.Null);
             Assert.That(response.Items, Is.EquivalentTo(dto.Items));
 
-            response = Config.ListeningOn.CombineWith("csvfirst")
+            response = Constant.ListeningOn.CombineWith("csvfirst")
                 .PostCsvToUrl(dto)
                 .FromCsv<CsvFirstEnumerable>();
             Assert.That(response.Id, Is.EqualTo(0));
@@ -184,7 +184,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_POST_CsvDto()
         {
-            var client = new CsvServiceClient(Config.ListeningOn);
+            var client = new CsvServiceClient(Constant.ListeningOn);
 
             var dto = new CsvDtoEnumerable
             {
@@ -198,7 +198,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             Assert.That(response.Name, Is.Null);
             Assert.That(response.Items, Is.EquivalentTo(dto.Items));
 
-            response = Config.ListeningOn.CombineWith("csvdto")
+            response = Constant.ListeningOn.CombineWith("csvdto")
                 .PostCsvToUrl(dto)
                 .FromCsv<CsvDtoEnumerable>();
             Assert.That(response.Id, Is.EqualTo(0));

@@ -18,7 +18,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new RouteAppHost();
             appHost.Init();
-            appHost.Start(Config.AbsoluteBaseUri);
+            appHost.Start(Constant.AbsoluteBaseUri);
         }
 
         [OneTimeTearDown]
@@ -30,7 +30,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_download_original_route()
         {
-            var response = Config.AbsoluteBaseUri.CombineWith("/custom/foo")
+            var response = Constant.AbsoluteBaseUri.CombineWith("/custom/foo")
                 .GetStringFromUrl(responseFilter: httpRes =>
                 {
                     httpRes.ContentType.Print();
@@ -43,7 +43,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_download_original_route_with_json_extension()
         {
-            var response = Config.AbsoluteBaseUri.CombineWith("/custom/foo.json")
+            var response = Constant.AbsoluteBaseUri.CombineWith("/custom/foo.json")
                 .GetStringFromUrl(responseFilter: httpRes =>
                 {
                     httpRes.ContentType.Print();
@@ -56,7 +56,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_process_plaintext_as_JSON()
         {
-            var response = Config.AbsoluteBaseUri.CombineWith("/custom")
+            var response = Constant.AbsoluteBaseUri.CombineWith("/custom")
                 .PostStringToUrl("{\"data\":\"foo\"}", 
                     contentType:MimeTypes.PlainText,
                     responseFilter: httpRes => 
@@ -71,7 +71,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_download_original_route_with_xml_extension()
         {
-            var response = Config.AbsoluteBaseUri.CombineWith("/custom/foo.xml")
+            var response = Constant.AbsoluteBaseUri.CombineWith("/custom/foo.xml")
                 .GetStringFromUrl(responseFilter: httpRes =>
                 {
                     httpRes.ContentType.Print();
@@ -84,7 +84,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_download_original_route_with_html_extension()
         {
-            var response = Config.AbsoluteBaseUri.CombineWith("/custom/foo.html")
+            var response = Constant.AbsoluteBaseUri.CombineWith("/custom/foo.html")
                 .GetStringFromUrl(responseFilter: httpRes =>
                 {
                     httpRes.ContentType.Print();
@@ -97,7 +97,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_download_original_route_with_csv_extension()
         {
-            var response = Config.AbsoluteBaseUri.CombineWith("/custom/foo.csv")
+            var response = Constant.AbsoluteBaseUri.CombineWith("/custom/foo.csv")
                 .GetStringFromUrl(responseFilter: httpRes =>
                 {
                     httpRes.ContentType.Print();
@@ -123,7 +123,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_download_route_with_dot_seperator()
         {
-            var response = Config.AbsoluteBaseUri.CombineWith("/customdot/id.data")
+            var response = Constant.AbsoluteBaseUri.CombineWith("/customdot/id.data")
                 .GetJsonFromUrl()
                 .FromJson<CustomRouteDot>();
 
@@ -134,7 +134,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_download_route_with_dot_seperator_and_extension()
         {
-            var response = Config.AbsoluteBaseUri.CombineWith("/pics/100x100/1.png")
+            var response = Constant.AbsoluteBaseUri.CombineWith("/pics/100x100/1.png")
                 .GetJsonFromUrl()
                 .FromJson<GetPngPic>();
 
@@ -145,7 +145,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_download_route_with_dot_seperator_and_extension_with_jsonserviceclient()
         {
-            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
+            var client = new JsonServiceClient(Constant.AbsoluteBaseUri);
             var request = new GetPngPic {
                 Id = "1",
                 Size = "100x100",
@@ -162,19 +162,19 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_populate_version_when_using_Version_Abbreviation()
         {
-            var response = Config.AbsoluteBaseUri.CombineWith("/versioned-request?v=1")
+            var response = Constant.AbsoluteBaseUri.CombineWith("/versioned-request?v=1")
                 .GetJsonFromUrl()
                 .FromJson<RequestWithVersion>();
 
             Assert.That(response.Version, Is.EqualTo(1));
 
-            response = Config.AbsoluteBaseUri.CombineWith("/versioned-request/1?v=2")
+            response = Constant.AbsoluteBaseUri.CombineWith("/versioned-request/1?v=2")
                 .GetJsonFromUrl()
                 .FromJson<RequestWithVersion>();
 
             Assert.That(response.Version, Is.EqualTo(2));
 
-            response = Config.AbsoluteBaseUri.CombineWith("/versioned-request/1?v=4&Version=3")
+            response = Constant.AbsoluteBaseUri.CombineWith("/versioned-request/1?v=4&Version=3")
                 .GetJsonFromUrl()
                 .FromJson<RequestWithVersion>();
 
@@ -269,7 +269,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new ModifiedRouteAppHost();
             appHost.Init();
-            appHost.Start(Config.AbsoluteBaseUri);
+            appHost.Start(Constant.AbsoluteBaseUri);
         }
 
         [OneTimeTearDown]
@@ -283,7 +283,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             try
             {
-                var notFound = Config.AbsoluteBaseUri.CombineWith("/modified/foo.csv")
+                var notFound = Constant.AbsoluteBaseUri.CombineWith("/modified/foo.csv")
                     .GetStringFromUrl();
                 Assert.Fail("Existing route should be modified");
             }
@@ -292,7 +292,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 Assert.That(ex.GetStatus(), Is.EqualTo(HttpStatusCode.NotFound));
             }
 
-            var response = Config.AbsoluteBaseUri.CombineWith("/api/modified/foo.csv")
+            var response = Constant.AbsoluteBaseUri.CombineWith("/api/modified/foo.csv")
                 .GetStringFromUrl();
 
             Assert.That(response, Is.EqualTo("Data\r\nfoo\r\n"));
@@ -353,11 +353,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             using (var appHost = new InvalidRoutesAppHost()
                 .Init()
-                .Start(Config.AbsoluteBaseUri))
+                .Start(Constant.AbsoluteBaseUri))
             {
                 try
                 {
-                    var json = Config.AbsoluteBaseUri.CombineWith("/unknownroute").GetJsonFromUrl();
+                    var json = Constant.AbsoluteBaseUri.CombineWith("/unknownroute").GetJsonFromUrl();
                     Assert.Fail("Should throw");
                 }
                 catch (WebException ex)
@@ -418,7 +418,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void RootPath_returns_BaseUrl()
         {
-            var url = Config.ServiceStackBaseUri;
+            var url = Constant.ServiceStackBaseUri;
             using (var appHost = new RouteInfoAppHost()
                 .Init()
                 .Start(url + "/"))
@@ -448,7 +448,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void ApiPath_returns_BaseUrl()
         {
-            var url = Config.AbsoluteBaseUri.AppendPath("api");
+            var url = Constant.AbsoluteBaseUri.AppendPath("api");
             using (var appHost = new RouteInfoAppHost()
                 .Init()
                 .Start(url + "/"))
@@ -478,7 +478,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void ApiV1Path_returns_BaseUrl()
         {
-            var url = Config.AbsoluteBaseUri.AppendPath("api").AppendPath("v1");
+            var url = Constant.AbsoluteBaseUri.AppendPath("api").AppendPath("v1");
             using (var appHost = new RouteInfoAppHost()
                 .Init()
                 .Start(url + "/"))

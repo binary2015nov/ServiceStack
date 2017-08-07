@@ -35,7 +35,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Config.ListeningOn);
+                .Start(Constant.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -44,7 +44,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void DefaultRedirectPath_RelativeUrl_does_resolve()
         {
-            var html = Config.ListeningOn.GetStringFromUrl();
+            var html = Constant.ListeningOn.GetStringFromUrl();
             Assert.That(html, Does.Contain("Default index"));
         }
     }

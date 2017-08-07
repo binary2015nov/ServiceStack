@@ -41,7 +41,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Config.ListeningOn);
+                .Start(Constant.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -50,7 +50,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_register_and_authenticate_with_exact_UserName()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
 
             var registerResponse = client.Post(new Register
             {
@@ -75,7 +75,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_register_and_login_using_different_cases()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
 
             var registerResponse = client.Post(new Register
             {
@@ -130,7 +130,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Config.ListeningOn);
+                .Start(Constant.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -139,7 +139,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_register_and_authenticate_with_exact_UserName()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
 
             var registerResponse = client.Post(new Register
             {
@@ -164,7 +164,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_register_and_login_using_different_cases_using_case_insensitive_fallback()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
 
             var registerResponse = client.Post(new Register
             {
@@ -222,7 +222,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Config.ListeningOn);
+                .Start(Constant.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -231,7 +231,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_register_and_authenticate_with_exact_UserName()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
 
             var registerResponse = client.Post(new Register
             {
@@ -256,7 +256,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_disable_non_index_fallback()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
 
             var registerResponse = client.Post(new Register
             {

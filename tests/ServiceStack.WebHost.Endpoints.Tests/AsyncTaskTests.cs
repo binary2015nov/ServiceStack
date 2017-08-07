@@ -17,7 +17,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AsyncTaskAppHost()
                 .Init()
-                .Start(Config.ListeningOn);
+                .Start(Constant.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -150,7 +150,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             protected override IServiceClient CreateServiceClient()
             {
-                return new JsonServiceClient(Config.ListeningOn);
+                return new JsonServiceClient(Constant.ListeningOn);
             }
         }
 
@@ -159,7 +159,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             protected override IServiceClient CreateServiceClient()
             {
-                return new JsonHttpClient(Config.ListeningOn);
+                return new JsonHttpClient(Constant.ListeningOn);
             }
         }
 
@@ -168,7 +168,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             protected override IServiceClient CreateServiceClient()
             {
-                return new JsvServiceClient(Config.ListeningOn);
+                return new JsvServiceClient(Constant.ListeningOn);
             }
         }
 
@@ -177,7 +177,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             protected override IServiceClient CreateServiceClient()
             {
-                return new XmlServiceClient(Config.ListeningOn);
+                return new XmlServiceClient(Constant.ListeningOn);
             }
         }
     }
@@ -342,7 +342,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AsyncTaskTests.AsyncTaskAppHost()
                 .Init()
-                .Start(Config.ListeningOn);
+                .Start(Constant.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -355,7 +355,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Load_test_GetFactorialSync_sync()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
 
             for (var i = 0; i < NoOfTimes; i++)
             {
@@ -370,7 +370,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Load_test_GetFactorialSync_HttpClient_sync()
         {
-            var client = new JsonHttpClient(Config.ListeningOn);
+            var client = new JsonHttpClient(Constant.ListeningOn);
 
             for (var i = 0; i < NoOfTimes; i++)
             {
@@ -385,7 +385,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public async Task Load_test_GetFactorialSync_async()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
 
             int i = 0;
 
@@ -405,7 +405,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public async Task Load_test_GetFactorialSync_HttpClient_async()
         {
-            var client = new JsonHttpClient(Config.ListeningOn);
+            var client = new JsonHttpClient(Constant.ListeningOn);
 
             int i = 0;
 
@@ -425,7 +425,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Load_test_GetFactorialGenericAsync_sync()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
 
             for (var i = 0; i < NoOfTimes; i++)
             {
@@ -440,7 +440,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public async Task Load_test_GetFactorialGenericAsync_async()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
 
             int i = 0;
 

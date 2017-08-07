@@ -56,7 +56,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
                 {
                     Args =
                     {
-                        ["baseUrl"] = Tests.Config.ListeningOn
+                        ["baseUrl"] = Tests.Constant.ListeningOn
                     }
                 });
             }
@@ -70,7 +70,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Config.ListeningOn);
+                .Start(Constant.ListeningOn);
         }
 
         [OneTimeTearDown]

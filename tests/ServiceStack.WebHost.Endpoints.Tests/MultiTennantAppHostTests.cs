@@ -59,7 +59,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new MultiTenantChangeDbAppHost()
                 .Init()
-                .Start(Config.AbsoluteBaseUri);
+                .Start(Constant.AbsoluteBaseUri);
         }
 
         [OneTimeTearDown]
@@ -71,7 +71,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_use_different_tenant_connections()
         {
-            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
+            var client = new JsonServiceClient(Constant.AbsoluteBaseUri);
 
             var response = client.Get(new GetTenant());
             Assert.That(response.Config.Company, Is.EqualTo("Masters inc."));
@@ -211,7 +211,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new MultiTenantCustomDbFactoryAppHost()
                 .Init()
-                .Start(Config.AbsoluteBaseUri);
+                .Start(Constant.AbsoluteBaseUri);
         }
 
         [OneTimeTearDown]
@@ -223,7 +223,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_use_different_tenant_connections()
         {
-            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
+            var client = new JsonServiceClient(Constant.AbsoluteBaseUri);
 
             var response = client.Get(new GetTenant());
             Assert.That(response.Config.Company, Is.EqualTo("Masters inc."));

@@ -83,12 +83,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
     {
         protected override IJsonServiceClient GetClient()
         {
-            return new JsonHttpClient(Config.ListeningOn);
+            return new JsonHttpClient(Constant.ListeningOn);
         }
 
         protected override IJsonServiceClient GetClientWithBasicAuthCredentials()
         {
-            return new JsonHttpClient(Config.ListeningOn)
+            return new JsonHttpClient(Constant.ListeningOn)
             {
                 UserName = Username,
                 Password = Password,
@@ -151,9 +151,9 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
 
         protected abstract JwtAuthProvider CreateJwtAuthProvider();
 
-        protected virtual IJsonServiceClient GetClient() => new JsonServiceClient(Config.ListeningOn);
+        protected virtual IJsonServiceClient GetClient() => new JsonServiceClient(Constant.ListeningOn);
 
-        protected virtual IJsonServiceClient GetClientWithBasicAuthCredentials() => new JsonServiceClient(Config.ListeningOn)
+        protected virtual IJsonServiceClient GetClientWithBasicAuthCredentials() => new JsonServiceClient(Constant.ListeningOn)
         {
             UserName = Username,
             Password = Password,
@@ -212,7 +212,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
                     JwtAuthProvider = CreateJwtAuthProvider()
                 }
                 .Init()
-                .Start(Config.ListeningOn);
+                .Start(Constant.ListeningOn);
         }
 
         [OneTimeTearDown]

@@ -60,7 +60,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Config.ListeningOn);
+                .Start(Constant.ListeningOn);
         }
 
         [OneTimeTearDown] public void OneTimeTearDown() => appHost.Dispose();
@@ -68,7 +68,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void GET_Html_Request_calls_GetHtml()
         {
-            var html = Config.ListeningOn.CombineWith("/content/1")
+            var html = Constant.ListeningOn.CombineWith("/content/1")
                 .GetStringFromUrl(accept: MimeTypes.Html);
 
             Assert.That(html, Does.Contain("<h1>GetHtml 1</h1>"));
@@ -77,7 +77,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void POST_Html_Request_calls_AnyHtml()
         {
-            var html = Config.ListeningOn.CombineWith("/content/1")
+            var html = Constant.ListeningOn.CombineWith("/content/1")
                 .PostStringToUrl(accept: MimeTypes.Html, requestBody: "");
 
             Assert.That(html, Does.Contain("<h1>AnyHtml 1</h1>"));
@@ -86,7 +86,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void GET_JSON_Request_calls_GetJson()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
 
             var response = client.Get<ContentRoute>(new ContentRoute { Id = 1 });
             Assert.That(response.Id, Is.EqualTo(1 + 1));
@@ -95,7 +95,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void POST_JSON_Request_calls_Any()
         {
-            var client = new JsonServiceClient(Config.ListeningOn);
+            var client = new JsonServiceClient(Constant.ListeningOn);
 
             var response = client.Post<ContentRoute>(new ContentRoute { Id = 1 });
             Assert.That(response.Id, Is.EqualTo(1));

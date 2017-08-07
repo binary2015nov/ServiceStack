@@ -145,7 +145,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     [TestFixture]
     public class ExceptionHandling2Tests
     {
-        private static string testUri = Config.ListeningOn;
+        private static string testUri = Constant.ListeningOn;
 
         AppHost appHost;
 
@@ -156,7 +156,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             {
                 appHost = new AppHost();
                 appHost.Init();
-                appHost.Start(Config.ListeningOn);
+                appHost.Start(Constant.ListeningOn);
                 appHost.Config.DebugMode = true;
             }
             catch (Exception ex)

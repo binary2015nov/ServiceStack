@@ -80,7 +80,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new SessionAppHost();
             appHost.Init();
-            appHost.Start(Config.AbsoluteBaseUri);
+            appHost.Start(Constant.AbsoluteBaseUri);
         }
 
         [OneTimeTearDown]
@@ -116,7 +116,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_increment_session_int_counter()
         {
-            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
+            var client = new JsonServiceClient(Constant.AbsoluteBaseUri);
 
             Assert.That(client.Get(new SessionIncr()).Counter, Is.EqualTo(1));
             Assert.That(client.Get(new SessionIncr()).Counter, Is.EqualTo(2));
@@ -125,8 +125,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Different_clients_have_different_session_int_counters()
         {
-            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
-            var altClient = new JsonServiceClient(Config.AbsoluteBaseUri);
+            var client = new JsonServiceClient(Constant.AbsoluteBaseUri);
+            var altClient = new JsonServiceClient(Constant.AbsoluteBaseUri);
 
             Assert.That(client.Get(new SessionIncr()).Counter, Is.EqualTo(1));
             Assert.That(client.Get(new SessionIncr()).Counter, Is.EqualTo(2));
@@ -136,7 +136,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_increment_session_cart_qty()
         {
-            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
+            var client = new JsonServiceClient(Constant.AbsoluteBaseUri);
             var request = new SessionCartIncr { CartId = Guid.NewGuid() };
 
             Assert.That(client.Get(request).Qty, Is.EqualTo(1));
@@ -146,8 +146,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Different_clients_have_different_session_cart_qty()
         {
-            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
-            var altClient = new JsonServiceClient(Config.AbsoluteBaseUri);
+            var client = new JsonServiceClient(Constant.AbsoluteBaseUri);
+            var altClient = new JsonServiceClient(Constant.AbsoluteBaseUri);
             var request = new SessionCartIncr { CartId = Guid.NewGuid() };
 
             Assert.That(client.Get(request).Qty, Is.EqualTo(1));
@@ -164,7 +164,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_increment_typed_session_tag()
         {
-            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
+            var client = new JsonServiceClient(Constant.AbsoluteBaseUri);
 
             Assert.That(Log(client.Get(new SessionTypedIncr())).Tag, Is.EqualTo(1));
             Assert.That(Log(client.Get(new SessionTypedIncr())).Tag, Is.EqualTo(2));
@@ -173,8 +173,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Different_clients_have_different_typed_session_tag()
         {
-            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
-            var altClient = new JsonServiceClient(Config.AbsoluteBaseUri);
+            var client = new JsonServiceClient(Constant.AbsoluteBaseUri);
+            var altClient = new JsonServiceClient(Constant.AbsoluteBaseUri);
 
             Assert.That(Log(client.Get(new SessionTypedIncr())).Tag, Is.EqualTo(1));
             Assert.That(Log(client.Get(new SessionTypedIncr())).Tag, Is.EqualTo(2));
@@ -188,14 +188,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_access_session_with_HTTP_Headers()
         {
-            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
+            var client = new JsonServiceClient(Constant.AbsoluteBaseUri);
             Assert.That(Log(client.Get(new SessionTypedIncr())).Tag, Is.EqualTo(1));
 
             var cookies = client.GetCookieValues();
             var sessionId = cookies["ss-id"];
             sessionId.Print();
 
-            var altClient = new JsonServiceClient(Config.AbsoluteBaseUri)
+            var altClient = new JsonServiceClient(Constant.AbsoluteBaseUri)
             {
                 Headers = {
                     { "X-ss-id", sessionId }
@@ -208,13 +208,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_access_session_with_QueryString()
         {
-            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
+            var client = new JsonServiceClient(Constant.AbsoluteBaseUri);
             Assert.That(Log(client.Get(new SessionTypedIncr())).Tag, Is.EqualTo(1));
 
             var cookies = client.GetCookieValues();
             var sessionId = cookies["ss-id"];
 
-            var response = Config.AbsoluteBaseUri
+            var response = Constant.AbsoluteBaseUri
                 .CombineWith(new SessionTypedIncr().ToGetUrl())
                 .AddQueryParam("ss-id", sessionId)
                 .GetJsonFromUrl()
@@ -226,22 +226,22 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_override_existing_session_with_QueryString()
         {
-            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
+            var client = new JsonServiceClient(Constant.AbsoluteBaseUri);
             Assert.That(Log(client.Get(new SessionTypedIncr())).Tag, Is.EqualTo(1));
 
             var cookies = client.GetCookieValues();
             var sessionId = cookies["ss-id"];
 
             var cookieContainer = new CookieContainer();
-            cookieContainer.Add(new Uri(Config.AbsoluteBaseUri),
+            cookieContainer.Add(new Uri(Constant.AbsoluteBaseUri),
                 new Cookie
                 {
                     Name = "ss-id",
                     Value = "some-other-id",
-                    Domain = new Uri(Config.AbsoluteBaseUri).Host,
+                    Domain = new Uri(Constant.AbsoluteBaseUri).Host,
                 });
 
-            var response = Config.AbsoluteBaseUri
+            var response = Constant.AbsoluteBaseUri
                 .CombineWith(new SessionTypedIncr().ToGetUrl())
                 .AddQueryParam("ss-id", sessionId)
                 .GetJsonFromUrl(req => req.CookieContainer = cookieContainer)

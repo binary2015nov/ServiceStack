@@ -16,7 +16,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new BufferedRequestAppHost();
             appHost.Init();
-            appHost.Start(Config.AbsoluteBaseUri);
+            appHost.Start(Constant.AbsoluteBaseUri);
         }
 
         [OneTimeTearDown]
@@ -31,7 +31,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             appHost.LastRequestBody = null;
             appHost.UseBufferredStream = true;
 
-            var client = new JsonServiceClient(Config.ServiceStackBaseUri);
+            var client = new JsonServiceClient(Constant.ServiceStackBaseUri);
             var request = new MyRequest { Data = "RequestData" };
             var response = client.Post(request);
 
@@ -45,7 +45,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             appHost.LastRequestBody = null;
             appHost.UseBufferredStream = false;
 
-            var client = new JsonServiceClient(Config.ServiceStackBaseUri);
+            var client = new JsonServiceClient(Constant.ServiceStackBaseUri);
             var request = new MyRequest { Data = "RequestData" };
 
             var response = client.Post(request);
@@ -60,7 +60,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             appHost.LastRequestBody = null;
             appHost.UseBufferredStream = false;
 
-            var client = new JsonServiceClient(Config.ServiceStackBaseUri);
+            var client = new JsonServiceClient(Constant.ServiceStackBaseUri);
             var request = new MyRequest { Data = "RequestData" };
 
             var response = client.Post(request);
@@ -85,7 +85,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new BufferedRequestAppHost { EnableRequestBodyTracking = true };
             appHost.Init();
-            appHost.Start(Config.AbsoluteBaseUri);
+            appHost.Start(Constant.AbsoluteBaseUri);
         }
 
         [OneTimeTearDown]
@@ -97,7 +97,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_see_RequestBody_in_RequestLogger_when_EnableRequestBodyTracking()
         {
-            var logBody = Run(new JsonServiceClient(Config.ServiceStackBaseUri));
+            var logBody = Run(new JsonServiceClient(Constant.ServiceStackBaseUri));
             Assert.That(appHost.LastRequestBody, Is.EqualTo(request.ToJson()));
             Assert.That(logBody, Is.EqualTo(request.ToJson()));
         }
@@ -109,7 +109,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             const string soap12start = @"<s:Envelope xmlns:s=""http://www.w3.org/2003/05/soap-envelope"" xmlns:a=""http://www.w3.org/2005/08/addressing""><s:Header><a:Action s:mustUnderstand=""1"">MyRequest</a:Action><a:MessageID>urn:uuid:";
             const string soap12end = "<Data>RequestData</Data></MyRequest></s:Body></s:Envelope>";
 
-            var logBody = Run(new Soap12ServiceClient(Config.ServiceStackBaseUri));
+            var logBody = Run(new Soap12ServiceClient(Constant.ServiceStackBaseUri));
 
             Assert.That(appHost.LastRequestBody, Does.StartWith(soap12start));
             Assert.That(appHost.LastRequestBody, Does.EndWith(soap12end));
@@ -122,7 +122,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             const string soap11 = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body><MyRequest xmlns=""http://schemas.servicestack.net/types"" xmlns:i=""http://www.w3.org/2001/XMLSchema-instance""><Data>RequestData</Data></MyRequest></s:Body></s:Envelope>";
 
-            var logBody = Run(new Soap11ServiceClient(Config.ServiceStackBaseUri));
+            var logBody = Run(new Soap11ServiceClient(Constant.ServiceStackBaseUri));
             Assert.That(appHost.LastRequestBody, Is.EqualTo(soap11));
             Assert.That(logBody, Is.EqualTo(soap11));
         }

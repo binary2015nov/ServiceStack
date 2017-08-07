@@ -10,7 +10,7 @@ using ServiceStack.Data;
 using ServiceStack.DataAnnotations;
 using ServiceStack.OrmLite;
 using ServiceStack.Text;
-using TestsConfig = ServiceStack.WebHost.Endpoints.Tests.Config;
+using TestsConfig = ServiceStack.WebHost.Endpoints.Tests.Constant;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
@@ -719,9 +719,9 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AutoQueryAppHost()
                 .Init()
-                .Start(Config.ListeningOn);
+                .Start(Constant.ListeningOn);
 
-            client = new JsonServiceClient(Config.ListeningOn);
+            client = new JsonServiceClient(Constant.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -744,7 +744,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public void RunFor10Mins()
         {
 #if NET45
-            Process.Start(Config.ListeningOn);
+            Process.Start(Constant.ListeningOn);
 #endif
             Thread.Sleep(TimeSpan.FromMinutes(10));
         }
@@ -806,7 +806,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_execute_Adhoc_query_alias()
         {
-            var response = Config.ListeningOn.CombineWith("adhoc")
+            var response = Constant.ListeningOn.CombineWith("adhoc")
                 .AddQueryParam("first_name", "Jimi")
                 .GetJsonFromUrl()
                 .FromJson<QueryResponse<Adhoc>>();
@@ -818,14 +818,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_execute_Adhoc_query_convention()
         {
-            var response = Config.ListeningOn.CombineWith("adhoc")
+            var response = Constant.ListeningOn.CombineWith("adhoc")
                 .AddQueryParam("last_name", "Hendrix")
                 .GetJsonFromUrl()
                 .FromJson<QueryResponse<Adhoc>>();
             Assert.That(response.Results.Count, Is.EqualTo(7));
 
             JsConfig.EmitLowercaseUnderscoreNames = true;
-            response = Config.ListeningOn.CombineWith("adhoc")
+            response = Constant.ListeningOn.CombineWith("adhoc")
                 .AddQueryParam("last_name", "Hendrix")
                 .GetJsonFromUrl()
                 .FromJson<QueryResponse<Adhoc>>();
@@ -898,7 +898,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_execute_implicit_equality_condition()
         {
-            var response = Config.ListeningOn.CombineWith("json/reply/QueryRockstars")
+            var response = Constant.ListeningOn.CombineWith("json/reply/QueryRockstars")
                 .AddQueryParam("FirstName", "Jim")
                 .AddQueryParam("LivingStatus", "Dead")
                 .AddQueryParam("Include", "Total")
@@ -913,7 +913,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_execute_multiple_conditions_with_same_param_name()
         {
-            var response = Config.ListeningOn.CombineWith("json/reply/QueryRockstars")
+            var response = Constant.ListeningOn.CombineWith("json/reply/QueryRockstars")
                 .AddQueryParam("FirstName", "Jim")
                 .AddQueryParam("FirstName", "Jim")
                 .AddQueryParam("Include", "Total")
@@ -924,7 +924,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             Assert.That(response.Results.Count, Is.EqualTo(1));
             Assert.That(response.Results[0].LastName, Is.EqualTo("Morrison"));
 
-            response = Config.ListeningOn.CombineWith("json/reply/QueryRockstars")
+            response = Constant.ListeningOn.CombineWith("json/reply/QueryRockstars")
                 .AddQueryParam("FirstNameStartsWith", "Jim")
                 .AddQueryParam("FirstNameStartsWith", "Jimi")
                 .AddQueryParam("Include", "Total")
@@ -939,7 +939,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_execute_implicit_IsNull_condition()
         {
-            var response = Config.ListeningOn.CombineWith("json/reply/QueryRockstars?DateDied=&Include=Total")
+            var response = Constant.ListeningOn.CombineWith("json/reply/QueryRockstars?DateDied=&Include=Total")
                 .GetJsonFromUrl()
                 .FromJson<QueryResponse<Rockstar>>();
 
@@ -1008,7 +1008,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_execute_IMPLICIT_query_with_JOIN_on_RockstarAlbums()
         {
-            var response = Config.ListeningOn.CombineWith("json/reply/QueryRockstarAlbumsImplicit")
+            var response = Constant.ListeningOn.CombineWith("json/reply/QueryRockstarAlbumsImplicit")
                 .AddQueryParam("Age", "27")
                 .AddQueryParam("Include", "Total")
                 .GetJsonFromUrl()
@@ -1021,7 +1021,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 "MTV Unplugged in New York"
             }));
 
-            response = Config.ListeningOn.CombineWith("json/reply/QueryRockstarAlbumsImplicit")
+            response = Constant.ListeningOn.CombineWith("json/reply/QueryRockstarAlbumsImplicit")
                 .AddQueryParam("RockstarAlbumName", "Nevermind")
                 .AddQueryParam("Include", "Total")
                 .GetJsonFromUrl()
@@ -1170,7 +1170,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var response = client.Get(new QueryOrRockstars { Age = 42, FirstName = "Jim" });
             Assert.That(response.Results.Count, Is.EqualTo(2));
 
-            response = Config.ListeningOn.CombineWith("OrRockstars")
+            response = Constant.ListeningOn.CombineWith("OrRockstars")
                 .AddQueryParam("Age", "27")
                 .AddQueryParam("FirstName", "Kurt")
                 .AddQueryParam("LastName", "Hendrix")
@@ -1199,7 +1199,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             });
             Assert.That(response.Results.Count, Is.EqualTo(2));
 
-            response = Config.ListeningOn.CombineWith("OrRockstarsFields")
+            response = Constant.ListeningOn.CombineWith("OrRockstarsFields")
                 .AddQueryParam("FirstName", "Kurt")
                 .AddQueryParam("LastName", "Hendrix")
                 .GetJsonFromUrl()
@@ -1210,7 +1210,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_execute_implicit_conventions()
         {
-            var baseUrl = Config.ListeningOn.CombineWith("json/reply/QueryRockstars");
+            var baseUrl = Constant.ListeningOn.CombineWith("json/reply/QueryRockstars");
 
             var response = baseUrl.AddQueryParam("AgeOlderThan", 42).AsJsonInto<Rockstar>();
             Assert.That(response.Results.Count, Is.EqualTo(3));
@@ -1247,7 +1247,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_execute_implicit_conventions_on_JOIN()
         {
-            var baseUrl = Config.ListeningOn.CombineWith("json/reply/QueryJoinedRockstarAlbums");
+            var baseUrl = Constant.ListeningOn.CombineWith("json/reply/QueryJoinedRockstarAlbums");
 
             var response = baseUrl.AddQueryParam("RockstarAlbumNameContains", "n").AsJsonInto<CustomRockstar>();
             Assert.That(response.Results.Count, Is.EqualTo(6));
@@ -1291,7 +1291,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_execute_where_SqlFilter()
         {
-            var baseUrl = Config.ListeningOn.CombineWith("json/reply/QueryRockstars");
+            var baseUrl = Constant.ListeningOn.CombineWith("json/reply/QueryRockstars");
 
             var response = baseUrl.AddQueryParam("_where", "Age > 42").AsJsonInto<Rockstar>();
             Assert.That(response.Results.Count, Is.EqualTo(3));
@@ -1364,7 +1364,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_execute_In_OR_Queries_with_implicit_conventions()
         {
-            var baseUrl = Config.ListeningOn.CombineWith("json/reply/QueryGetRockstarsDynamic");
+            var baseUrl = Constant.ListeningOn.CombineWith("json/reply/QueryGetRockstarsDynamic");
 
             QueryResponse<Rockstar> response;
             response = baseUrl.AddQueryParam("Ids", "1,2,3").AsJsonInto<Rockstar>();
@@ -1386,7 +1386,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var response = client.Get(new QueryMovies { Ratings = new[] {"G","PG-13"} });
             Assert.That(response.Results.Count, Is.EqualTo(5));
 
-            var url = Config.ListeningOn + "movies?ratings=G,PG-13";
+            var url = Constant.ListeningOn + "movies?ratings=G,PG-13";
             response = url.AsJsonInto<Movie>();
             Assert.That(response.Results.Count, Is.EqualTo(5));
 
@@ -1397,7 +1397,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             });
             Assert.That(response.Results.Count, Is.EqualTo(9));
 
-            url = Config.ListeningOn + "movies?ratings=G,PG-13&ids=1,2&imdbIds=tt0071562,tt0060196";
+            url = Constant.ListeningOn + "movies?ratings=G,PG-13&ids=1,2&imdbIds=tt0071562,tt0060196";
             response = url.AsJsonInto<Movie>();
             Assert.That(response.Results.Count, Is.EqualTo(9));
         }
@@ -1462,13 +1462,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 .ThenBy(x => x.ImdbId).Map(x => x.ImdbId);
             Assert.That(ids, Is.EqualTo(orderedIds));
 
-            var url = Config.ListeningOn + "movies/search?take=100&orderBy=Rating,ImdbId";
+            var url = Constant.ListeningOn + "movies/search?take=100&orderBy=Rating,ImdbId";
             movies = url.AsJsonInto<Movie>();
             ids = movies.Results.Map(x => x.ImdbId);
             orderedIds = movies.Results.OrderBy(x => x.Rating).ThenBy(x => x.ImdbId).Map(x => x.ImdbId);
             Assert.That(ids, Is.EqualTo(orderedIds));
 
-            url = Config.ListeningOn + "movies/search?take=100&orderByDesc=Rating,ImdbId";
+            url = Constant.ListeningOn + "movies/search?take=100&orderByDesc=Rating,ImdbId";
             movies = url.AsJsonInto<Movie>();
             ids = movies.Results.Map(x => x.ImdbId);
             orderedIds = movies.Results.OrderByDescending(x => x.Rating)
@@ -1479,19 +1479,19 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_consume_as_CSV()
         {
-            var url = Config.ListeningOn + "movies/search.csv?ratings=G,PG-13";
+            var url = Constant.ListeningOn + "movies/search.csv?ratings=G,PG-13";
             var csv = url.GetStringFromUrl();
             var headers = csv.SplitOnFirst('\n')[0].Trim();
             Assert.That(headers, Is.EqualTo("Id,ImdbId,Title,Rating,Score,Director,ReleaseDate,TagLine,Genres"));
             csv.Print();
 
-            url = Config.ListeningOn + "query/rockstars.csv?Age=27";
+            url = Constant.ListeningOn + "query/rockstars.csv?Age=27";
             csv = url.GetStringFromUrl();
             headers = csv.SplitOnFirst('\n')[0].Trim();
             Assert.That(headers, Is.EqualTo("Id,FirstName,LastName,Age,DateOfBirth,DateDied,LivingStatus"));
             csv.Print();
 
-            url = Config.ListeningOn + "customrockstars.csv";
+            url = Constant.ListeningOn + "customrockstars.csv";
             csv = url.GetStringFromUrl();
             headers = csv.SplitOnFirst('\n')[0].Trim();
             Assert.That(headers, Is.EqualTo("FirstName,LastName,Age,RockstarAlbumName,RockstarGenreName"));
@@ -1746,7 +1746,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_select_partial_list_of_fields()
         {
-            var response = Config.ListeningOn.CombineWith("json/reply/QueryRockstars")
+            var response = Constant.ListeningOn.CombineWith("json/reply/QueryRockstars")
                 .AddQueryParam("Age", "27")
                 .AddQueryParam("Fields", "Id,FirstName,Age")
                 .GetJsonFromUrl()
@@ -1765,7 +1765,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_select_partial_list_of_fields_case_insensitive()
         {
-            var response = Config.ListeningOn.CombineWith("json/reply/QueryRockstars")
+            var response = Constant.ListeningOn.CombineWith("json/reply/QueryRockstars")
                 .AddQueryParam("Age", "27")
                 .AddQueryParam("Fields", "id,firstname,age")
                 .GetJsonFromUrl()
@@ -1784,7 +1784,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_select_partial_list_of_fields_from_joined_table()
         {
-            var response = Config.ListeningOn.CombineWith("json/reply/QueryJoinedRockstarAlbums")
+            var response = Constant.ListeningOn.CombineWith("json/reply/QueryJoinedRockstarAlbums")
                 .AddQueryParam("Age", "27")
                 .AddQueryParam("fields", "FirstName,Age,RockstarAlbumName")
                 .GetJsonFromUrl()
@@ -1799,7 +1799,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_select_partial_list_of_fields_from_joined_table_case_insensitive()
         {
-            var response = Config.ListeningOn.CombineWith("json/reply/QueryJoinedRockstarAlbums")
+            var response = Constant.ListeningOn.CombineWith("json/reply/QueryJoinedRockstarAlbums")
                 .AddQueryParam("Age", "27")
                 .AddQueryParam("fields", "firstname,age,rockstaralbumname")
                 .GetJsonFromUrl()
