@@ -12,6 +12,8 @@ namespace ServiceStack.Common.Tests.OAuth
     {
         public class CredentialsTestAppHost : MockAppHost
         {
+            public CredentialsTestAppHost() : base(typeof(CredentialsServiceTests).GetAssembly()) {}
+
             public override void Configure(Container container)
             {
                 Plugins.Add(new AuthFeature(() => new AuthUserSession(),
