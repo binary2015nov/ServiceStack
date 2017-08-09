@@ -10,8 +10,8 @@ namespace ServiceStack.Common.Tests.Messaging
     [TestFixture]
     public abstract class MqServerAppHostTests
     {
-        private const string BaseUri = "http://localhost:1337/";
-        protected const string ListeningOn = "http://*:1337/";
+        private const string BaseUri = "http://localhost:56789";
+        protected const string ListeningOn = "http://*:56789/";
 
         protected ServiceStackHost AppHost;
         protected readonly TimeSpan MessageTimeout = TimeSpan.FromSeconds(60);

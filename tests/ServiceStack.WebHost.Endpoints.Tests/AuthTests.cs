@@ -295,8 +295,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
-    public class AuthAppHost
-        : AppSelfHostBase
+    public class AuthAppHost : AppSelfHostBase
     {
         private readonly string webHostUrl;
         private readonly Action<Container> configureFn;
@@ -1282,7 +1281,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var client = GetClientWithUserPassword();
             ((ServiceClientBase)client).AlwaysSendBasicAuthHeader = true;
             ((ServiceClientBase)client).ResponseFilter = x => headers = x.Headers;
-            var response = client.Send<CustomAuthAttrResponse>(new CustomAuthAttr() { Name = "Hi You" });
+            var response = client.Send<CustomAuthAttrResponse>(new CustomAuthAttr { Name = "Hi You" });
             Assert.That(response.Result, Is.EqualTo("Hi You"));
             Assert.That(
                 System.Text.RegularExpressions.Regex.Matches(headers["Set-Cookie"], "ss-id=").Count,

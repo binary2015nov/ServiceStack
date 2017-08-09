@@ -29,10 +29,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
 			public override void Configure(Container container)
 			{
-                HostContext.Config.GlobalResponseHeaders.Clear();
-
-				
-
 				this.GlobalRequestFilters.Add((req, res, dto) =>
 				{
 					var requestFilter = dto as RequestFilter;
@@ -64,17 +60,17 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			appHost.Dispose();
 		}
 
-		public static Dictionary<string, string> GetResponseHeaders(String url)
+		public static Dictionary<string, string> GetResponseHeaders(string urlString)
 		{
-			var webRequest = (HttpWebRequest)WebRequest.Create(url);
+			var webRequest = PclExport.Instance.CreateWebRequest(urlString);
 
-			var webResponse = webRequest.GetResponse();
+			var webResponse = PclExport.Instance.GetResponse(webRequest);
 
 			var map = new Dictionary<string, string>();
 			for (var i = 0; i < webResponse.Headers.Count; i++)
 			{
-				var header = webResponse.Headers.AllKeys[i];
-				map[header] = webResponse.Headers[header];
+				var headerKey = webResponse.Headers.AllKeys[i];
+				map[headerKey] = webResponse.Headers[headerKey];
 			}
 
 			return map;
@@ -83,7 +79,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		[Test]
 		public void Can_resolve_CustomHeader()
 		{
-			var webRequest = (HttpWebRequest)WebRequest.Create(
+			var webRequest = WebRequest.CreateHttp(
 				ListeningOn + "json/reply/Headers?Name=X-CustomHeader");
 			webRequest.Headers["X-CustomHeader"] = "CustomValue";
 
@@ -106,7 +102,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		{
 			try
 			{
-				var webRequest = (HttpWebRequest)WebRequest.Create(
+				var webRequest = WebRequest.CreateHttp(
 					ListeningOn + "json/reply/RequestFilter?StatusCode=401");
 
 				webRequest.GetResponse();

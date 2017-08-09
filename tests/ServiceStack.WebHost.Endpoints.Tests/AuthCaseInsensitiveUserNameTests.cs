@@ -20,7 +20,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                     new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider));
 
                 container.Register<IAuthRepository>(c =>
-                    new OrmLiteAuthRepository(c.Resolve<IDbConnectionFactory>()));
+                    new OrmLiteAuthRepository(c.Resolve<IDbConnectionFactory>()) { ForceCaseInsensitiveUserNameSearch = true });
                 
                 container.Resolve<IAuthRepository>().InitSchema();
                 
@@ -31,7 +31,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                     })
                 {
                     IncludeRegistrationService = true,
-                    SaveUserNamesInLowerCase = true,
                 });
             }
         }
@@ -110,7 +109,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                     new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider));
 
                 container.Register<IAuthRepository>(c =>
-                    new OrmLiteAuthRepository(c.Resolve<IDbConnectionFactory>()));
+                    new OrmLiteAuthRepository(c.Resolve<IDbConnectionFactory>()) { ForceCaseInsensitiveUserNameSearch = true });
                 
                 container.Resolve<IAuthRepository>().InitSchema();
                 
@@ -120,7 +119,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                         new CredentialsAuthProvider(AppSettings), 
                     })
                 {
-                    IncludeRegistrationService = true,
+                    IncludeRegistrationService = true, 
                 });
             }
         }

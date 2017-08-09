@@ -147,8 +147,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
     public class ServerEventsAppHost : AppSelfHostBase
     {
-        public ServerEventsAppHost()
-            : base(typeof(ServerEventsAppHost).Name, typeof(ServerEventsAppHost).GetAssembly()) { }
+        public ServerEventsAppHost() : base(typeof(ServerEventsAppHost).Name, typeof(ServerEventsAppHost).GetAssembly()) { }
 
         public bool UseRedisServerEvents { get; set; }
         public bool LimitToAuthenticatedUsers { get; set; }
@@ -1231,7 +1230,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
     class Conf
     {
-        public const string AbsoluteBaseUri = "http://127.0.0.1:10000/";
+        public const string AbsoluteBaseUri = "http://127.0.0.1:10010/";
     }
 
     [TestFixture]

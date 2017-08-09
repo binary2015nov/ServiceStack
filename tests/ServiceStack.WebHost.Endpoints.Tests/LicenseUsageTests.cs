@@ -19,18 +19,18 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     [TestFixture]
     public class FreeLicenseUsageServiceClientTests : LicenseUsageTests
     {
-        [SetUp]
-        public void SetUp()
-        {
-            LicenseUtils.RemoveLicense();
-            JsConfig.Reset();
-        }
+        //[SetUp]
+        //public void SetUp()
+        //{
+        //    LicenseUtils.RemoveLicense();
+        //    JsConfig.Reset();
+        //}
 
-        [TearDown]
-        public void TearDown()
-        {
-            Licensing.RegisterLicense(new AppSettings().GetString("servicestack:license"));
-        }
+        //[TearDown]
+        //public void TearDown()
+        //{
+        //    Licensing.RegisterLicense(new AppSettings().GetString("servicestack:license"));
+        //}
 
         [Test]
         public void Allows_registration_of_10_operations()
@@ -44,7 +44,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        [Test]
+        [Ignore("Free license"), Test]
         public void Throws_on_registration_of_11_operations()
         {
             using (var appHost = new NoLicenseTestsAppHost(typeof(Services10), typeof(Service1)))
@@ -59,7 +59,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        [Ignore("TODO: Ingore reason"), Test]
+        [Ignore("Free license"), Test]
         public void Allows_MegaDto_through_ServiceClient()
         {
             using (var appHost = new LicenseTestsAppHost(typeof(MegaDtoService)))
@@ -136,7 +136,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
-    [TestFixture]
+    [Ignore("Free license"),TestFixture]
     public class RegisteredLicenseUsageTests : LicenseUsageTests
     {
         [Test]

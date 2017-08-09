@@ -139,12 +139,9 @@ namespace ServiceStack
             return AssertAppHost().CreateServiceRunner<TRequest>(actionContext);
         }
 
-        internal static object ExecuteService(object request, IRequest httpReq)
+        public static object ExecuteService(object requestDto, IRequest request)
         {
-            using (Profiler.Current.Step("Execute Service"))
-            {
-                return AssertAppHost().ServiceController.Execute(request, httpReq);
-            }
+            return AssertAppHost().ExecuteService(requestDto, request);           
         }
 
         public static TPlugin GetPlugin<TPlugin>() where TPlugin : class, IPlugin

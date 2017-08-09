@@ -114,6 +114,7 @@ namespace ServiceStack.Server.Tests.Auth
         }
     }
 
+    [Explicit]
     public class DynamoDbAuthRepoStatelessAuthTests : StatelessAuthTests
     {
         public static AmazonDynamoDBClient CreateDynamoDBClient()

@@ -147,7 +147,7 @@ namespace ServiceStack
 
         public object Execute(object requestDto)
         {
-            var response = HostContext.ServiceController.Execute(requestDto, Request);
+            var response = HostContext.ExecuteService(requestDto, Request);
             var ex = response as Exception;
             if (ex != null)
                 throw ex;

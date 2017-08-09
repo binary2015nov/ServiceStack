@@ -10,6 +10,7 @@ using ServiceStack.Aws.DynamoDb;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
+    [Explicit]
     public class AutoQueryDataDynamoTests : AutoQueryDataTests
     {
         public override ServiceStackHost CreateAppHost()
@@ -85,8 +86,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_query_on_ForeignKey_and_RockstarAlbumGenreIndex_Mapped()
         {
-            QueryResponse<RockstarAlbum> response;
-            response = client.Get(new QueryDataRockstarAlbumGenreIndexMapped { Genre = "Grunge", Include = "Total" }); //Hash
+            QueryResponse<RockstarAlbum> response = client.Get(new QueryDataRockstarAlbumGenreIndexMapped { Genre = "Grunge", Include = "Total" }); //Hash
             Assert.That(response.Results.Count, Is.EqualTo(5));
             Assert.That(response.Total, Is.EqualTo(5));
 
@@ -157,7 +157,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             Assert.That(ids, Is.EqualTo(orderedIds));
         }
 
-        [Test]
+        [Test, Explicit]
         public void Can_OrderBy_queries_SearchDataMovieTitleIndex()
         {
             var movies = client.Get(new SearchDataMovieTitleIndex { Take = 100, OrderBy = "ImdbId" });

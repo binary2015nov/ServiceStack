@@ -185,7 +185,7 @@ namespace ServiceStack
             {
                 Interlocked.Increment(ref timesStarted);
 
-                httpReq = (HttpWebRequest)WebRequest.Create(EventStreamUri);
+                httpReq = WebRequest.CreateHttp(EventStreamUri);
                 //share auth cookies
                 httpReq.CookieContainer = ((IHasCookieContainer)ServiceClient).CookieContainer;
                 httpReq.AllowReadStreamBuffering = false;

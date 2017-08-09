@@ -451,7 +451,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
             };
             Config.WsdlServiceNamespace = "http://www.servicestack.net/types";
             Config.DebugMode = true;
-            Config. PreferredContentTypes = new List<string> { MimeTypes.ProtoBuf };
+            Config.PreferredContentTypes.Add(MimeTypes.ProtoBuf);
         }
 
         public Action<Container> ConfigureFilter { get; set; }
@@ -471,18 +471,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 				.Add<GetHttpResult>("/gethttpresult")
 			;
 
-			container.Register<IAppSettings>(new AppSettings());
-
 			//var appSettings = container.Resolve<IResourceManager>();
 
-			container.Register(c => new ExampleConfig(c.Resolve<IAppSettings>()));
+			container.Register(c => new ExampleConfig(AppSettings));
 			//var appConfig = container.Resolve<ExampleConfig>();
 
 			container.Register<IDbConnectionFactory>(c =>
-				new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider));
-
-			var resetMovies = container.Resolve<ResetMoviesService>();
-			resetMovies.Post(null);
+				new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider));	
 
 			//var movies = container.Resolve<IDbConnectionFactory>().Exec(x => x.Select<Movie>());
 			//Console.WriteLine(movies.Dump());
@@ -495,6 +490,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
             Plugins.Add(new ProtoBufFormat());
             Plugins.Add(new RequestInfoFeature());
 		}
+
+	    protected override void OnAfterInit()
+	    {
+	        var resetMovies = Container.Resolve<ResetMoviesService>();
+	        resetMovies.Post(null);
+        }
 	}
 
     public class ExampleAppHostHttpListenerPool : AppHostHttpListenerPoolBase
@@ -529,9 +530,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
                 .Add<GetHttpResult>("/gethttpresult")
             ;
 
-            container.Register<IAppSettings>(new AppSettings());
-
-            container.Register(c => new ExampleConfig(c.Resolve<IAppSettings>()));
+            container.Register(c => new ExampleConfig(AppSettings));
             //var appConfig = container.Resolve<ExampleConfig>();
 
             container.Register<IDbConnectionFactory>(c =>
@@ -550,6 +549,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 
             Plugins.Add(new RequestInfoFeature());
         }
-    }
 
+        protected override void OnAfterInit()
+        {
+            var resetMovies = Container.Resolve<ResetMoviesService>();
+            resetMovies.Post(null);
+        }
+    }
 }

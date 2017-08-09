@@ -101,14 +101,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             try
             {
-                var response = Constant.ListeningOn.CombineWith("/non-existing-request")
-                    .GetJsonFromUrl();
+                var response = Constant.ListeningOn.AppendPath("/non-existing-request").GetJsonFromUrl();
                 Assert.Fail("Should throw");
             }
             catch (WebException ex)
             {
-                Assert.That(ex.Message, Does.Contain("(404) Not Found"));
-
+                Assert.That(((HttpWebResponse)ex.Response).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
                 Assert.That(BeginRequestCount, Is.EqualTo(1));
                 Thread.Sleep(1);
                 Assert.That(EndRequestCount, Is.EqualTo(1));

@@ -113,5 +113,4 @@ namespace ServiceStack.Formats
             res.OutputStream.Write(utf8Bytes, 0, utf8Bytes.Length);
         }
     }
-
 }

@@ -176,9 +176,9 @@ namespace ServiceStack.Host.Handlers
             return HostContext.Metadata.GetOperationType(operationName);
         }
 
-        protected static object ExecuteService(object requestDto, IRequest httpReq)
+        protected static object ExecuteService(object requestDto, IRequest request)
         {
-            return HostContext.ExecuteService(requestDto, httpReq);
+            return HostContext.ExecuteService(requestDto, request);
         }
 
         protected static void AssertOperationExists(string operationName, Type type)

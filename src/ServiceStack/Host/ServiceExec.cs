@@ -150,12 +150,12 @@ namespace ServiceStack.Host
                 actionName = overrideVerb;
 
             var format = request.ResponseContentType.ToContentFormat()?.ToUpper();
-
+            var operationName = requestDto.GetType().GetOperationName();
             InstanceExecFn action;
-            if (execMap.TryGetValue(ActionContext.Key(actionName + format, request.OperationName), out action) ||
-            execMap.TryGetValue(ActionContext.AnyFormatKey(format, request.OperationName), out action) ||
-            execMap.TryGetValue(ActionContext.Key(actionName, request.OperationName), out action) ||
-            execMap.TryGetValue(ActionContext.AnyKey(request.OperationName), out action))
+            if (execMap.TryGetValue(ActionContext.Key(actionName + format, operationName), out action) ||
+            execMap.TryGetValue(ActionContext.AnyFormatKey(format, operationName), out action) ||
+            execMap.TryGetValue(ActionContext.Key(actionName, operationName), out action) ||
+            execMap.TryGetValue(ActionContext.AnyKey(operationName), out action))
             {
                 return action(request, service, requestDto);
             }

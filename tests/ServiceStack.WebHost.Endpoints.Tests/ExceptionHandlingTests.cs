@@ -210,7 +210,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             public ExceptionHandlingAppHostHttpListener(): base("Exception handling tests", typeof(UserService).GetAssembly())
             {
                 JsConfig.EmitCamelCaseNames = true;
-                Config.DebugMode = true;
+                Config.DebugMode = false;
             }
 
             public override void Configure(Container container)
@@ -218,7 +218,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 //Custom global uncaught exception handling strategy
                 this.UncaughtExceptionHandlers.Add((req, res, operationName, ex) =>
                 {
-                    res.Write(string.Format("UncaughtException {0}", ex.GetType().Name));
+                    res.Write("UncaughtException {0}".Fmt(ex.GetType().Name));
                     res.EndRequest(skipHeaders: true);
                 });
 
@@ -278,7 +278,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		};
 
 
-        [Test, TestCaseSource("ServiceClients")]
+        [Test, TestCaseSource(nameof(ServiceClients))]
         public void Handles_Returned_Http_Error(IRestClient client)
         {
             try
@@ -294,7 +294,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        [Test, TestCaseSource("ServiceClients")]
+        [Test, TestCaseSource(nameof(ServiceClients))]
         public void Handles_Thrown_Http_Error(IRestClient client)
         {
             try
@@ -310,7 +310,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        [Test, TestCaseSource("ServiceClients")]
+        [Test, TestCaseSource(nameof(ServiceClients))]
         public void Handles_Thrown_Http_Error_With_Forbidden_status_code(IRestClient client)
         {
             try
@@ -326,7 +326,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        [Test, TestCaseSource("ServiceClients")]
+        [Test, TestCaseSource(nameof(ServiceClients))]
         public void Handles_Normal_Exception(IRestClient client)
         {
             try
@@ -339,11 +339,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 Assert.That(ex.IsAny400());
                 Assert.That(!ex.IsAny500());
                 Assert.That(ex.ErrorCode, Is.EqualTo("ArgumentException"));
-                Assert.That(ex.StatusCode, Is.EqualTo((int)System.Net.HttpStatusCode.BadRequest));
+                Assert.That(ex.StatusCode, Is.EqualTo((int)HttpStatusCode.BadRequest));
             }
         }
 
-        [Test, TestCaseSource("ServiceClients")]
+        [Test, TestCaseSource(nameof(ServiceClients))]
         public void Handles_Exception_in_Stream_Response(IRestClient client)
         {
             try
@@ -375,7 +375,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
             catch (WebException webEx)
             {
-                var errorResponse = ((HttpWebResponse)webEx.Response);
+                var errorResponse = (HttpWebResponse)webEx.Response;
                 Assert.That(webEx.IsAny400());
                 Assert.That(!webEx.IsAny500());
                 var body = errorResponse.GetResponseStream().ReadFully().FromUtf8Bytes();
@@ -394,7 +394,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
             catch (WebException webEx)
             {
-                var errorResponse = ((HttpWebResponse)webEx.Response);
+                var errorResponse = (HttpWebResponse)webEx.Response;
                 var body = errorResponse.GetResponseStream().ReadFully().FromUtf8Bytes();
                 Assert.That(body, Is.EqualTo("{}"));
             }

@@ -2,12 +2,13 @@
 using NUnit.Framework;
 using ServiceStack.NativeTypes.Java;
 using ServiceStack.Text;
+using System.Collections.Generic;
+using ServiceStack.NativeTypes;
+using ServiceStack.Testing;
 
 namespace ServiceStack.Common.Tests
 {
-    using System.Collections.Generic;
-    using NativeTypes;
-    using Testing;
+
 
     [TestFixture]
     public class NativeTypesTests
@@ -18,7 +19,7 @@ namespace ServiceStack.Common.Tests
         public void TestFixtureSetUp()
         {
             appHost =
-                new BasicAppHost(typeof(Dto).Assembly, typeof(TypesCSharp).Assembly)
+                new MockAppHost(typeof(Dto).Assembly)
                 {
                     TestMode = true,
                     Plugins = { new NativeTypesFeature() },

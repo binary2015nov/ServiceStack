@@ -21,6 +21,7 @@ using ServiceStack.IO;
 using ServiceStack.Logging;
 using ServiceStack.Messaging;
 using ServiceStack.Metadata;
+using ServiceStack.MiniProfiler;
 using ServiceStack.NativeTypes;
 using ServiceStack.Redis;
 using ServiceStack.Serialization;
@@ -891,9 +892,12 @@ namespace ServiceStack
             return ExecuteService(requestDto, RequestAttributes.None);
         }
 
-        public virtual object ExecuteService(object requestDto, IRequest req)
+        public virtual object ExecuteService(object requestDto, IRequest request)
         {
-            return ServiceController.Execute(requestDto, req);
+            using (Profiler.Current.Step("Execute Service"))
+            {
+                return ServiceController.Execute(requestDto, request);
+            }
         }
 
         public virtual object ExecuteService(object requestDto, RequestAttributes requestAttributes)
@@ -906,9 +910,9 @@ namespace ServiceStack
             return ServiceController.ExecuteMessage(mqMessage, new BasicRequest(mqMessage));
         }
 
-        public virtual object ExecuteMessage(IMessage dto, IRequest req)
+        public virtual object ExecuteMessage(IMessage message, IRequest req)
         {
-            return ServiceController.ExecuteMessage(dto, req);
+            return ServiceController.ExecuteMessage(message, req);
         }
 
         public virtual void RegisterService(Type serviceType, params string[] atRestPaths)

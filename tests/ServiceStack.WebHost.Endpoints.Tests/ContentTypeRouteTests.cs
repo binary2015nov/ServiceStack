@@ -15,11 +15,18 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         public object Any(ContentRoute request)
         {
+            if (Request.ResponseContentType == MimeTypes.Html)
+            {
+                return AnyHtml(request);
+            }
             return request;
         }
 
-        public object GetJson(ContentRoute request)
+        public object Get(ContentRoute request)
         {
+            if (Request.ResponseContentType == MimeTypes.Html)
+                return GetHtml(request);
+            
             request.Id++;
             return request;
         }
@@ -49,27 +56,28 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         class AppHost : AppSelfHostBase
         {
-            public AppHost()
-                : base(nameof(ContentTypeRouteTests), typeof(ContentRouteService).GetAssembly()) { }
+            public AppHost() : base(nameof(ContentTypeRouteTests), typeof(ContentRouteService).GetAssembly()) { }
 
-            public override void Configure(Container container) {}
+            public override void Configure(Container container) { }
         }
 
-        private readonly ServiceStackHost appHost;
-        public ContentTypeRouteTests()
+        private ServiceStackHost appHost;
+
+        [OneTimeSetUpAttribute]
+        public void OneTimeSetUp()
         {
             appHost = new AppHost()
                 .Init()
                 .Start(Constant.ListeningOn);
         }
-
+    
         [OneTimeTearDown] public void OneTimeTearDown() => appHost.Dispose();
 
         [Test]
         public void GET_Html_Request_calls_GetHtml()
         {
-            var html = Constant.ListeningOn.CombineWith("/content/1")
-                .GetStringFromUrl(accept: MimeTypes.Html);
+            var html = Constant.ListeningOn.AppendPath("/content/1")
+                .GetHtmlFromUrl();
 
             Assert.That(html, Does.Contain("<h1>GetHtml 1</h1>"));
         }
@@ -77,8 +85,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void POST_Html_Request_calls_AnyHtml()
         {
-            var html = Constant.ListeningOn.CombineWith("/content/1")
-                .PostStringToUrl(accept: MimeTypes.Html, requestBody: "");
+            var html = Constant.ListeningOn.AppendPath("/content/1")
+                .GetStringFromUrl(method: HttpMethods.Post, accept: MimeTypes.Html, requestBody: "");
 
             Assert.That(html, Does.Contain("<h1>AnyHtml 1</h1>"));
         }
@@ -100,6 +108,5 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var response = client.Post<ContentRoute>(new ContentRoute { Id = 1 });
             Assert.That(response.Id, Is.EqualTo(1));
         }
-
     }
 }

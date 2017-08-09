@@ -166,7 +166,7 @@ namespace ServiceStack.Auth
 
         public bool UseDistinctRoleTables { get; set; }
 
-        public bool ForceCaseInsensitiveUserNameSearch { get; set; } = true;
+        public bool ForceCaseInsensitiveUserNameSearch { get; set; }
 
         public abstract void Exec(Action<IDbConnection> fn);
 
@@ -314,31 +314,17 @@ namespace ServiceStack.Auth
             
             TUserAuth userAuth = null;
 
-            // Usernames/Emails are saved in Lower Case so we can do an exact seeach using lowerUserName
-            if (HostContext.GetPlugin<AuthFeature>()?.SaveUserNamesInLowerCase == true)
-            {
-                return isEmail
-                    ? db.Select<TUserAuth>(q => q.Email == lowerUserName).FirstOrDefault()
-                    : db.Select<TUserAuth>(q => q.UserName == lowerUserName).FirstOrDefault();
-            }
-            
-            // Try an exact search using index first
-            userAuth = isEmail
-                ? db.Select<TUserAuth>(q => q.Email == userNameOrEmail).FirstOrDefault()
-                : db.Select<TUserAuth>(q => q.UserName == userNameOrEmail).FirstOrDefault();
-
-            if (userAuth != null)
-                return userAuth;
-
-            // Fallback to a non-index search if no exact match is found
             if (ForceCaseInsensitiveUserNameSearch)
             {
-                userAuth = isEmail
+                return isEmail
                     ? db.Select<TUserAuth>(q => q.Email.ToLower() == lowerUserName).FirstOrDefault()
                     : db.Select<TUserAuth>(q => q.UserName.ToLower() == lowerUserName).FirstOrDefault();
             }
-            
-            return userAuth;
+
+            // Try an exact search using index first
+            return isEmail
+                ? db.Select<TUserAuth>(q => q.Email == userNameOrEmail).FirstOrDefault()
+                : db.Select<TUserAuth>(q => q.UserName == userNameOrEmail).FirstOrDefault();
         }
         
         public virtual bool TryAuthenticate(string userName, string password, out IUserAuth userAuth)

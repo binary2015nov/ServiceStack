@@ -29,9 +29,8 @@ namespace ServiceStack.RabbitMq
         public RabbitMqMessageFactory(string connectionString = "localhost",
             string username = null, string password = null)
         {
-            if (connectionString == null)
-                throw new ArgumentNullException(nameof(connectionString));
-
+            if (connectionString.IsNullOrEmpty())
+                connectionString = "localhost";
             ConnectionFactory = new ConnectionFactory {
                 RequestedHeartbeat = 10,
             };

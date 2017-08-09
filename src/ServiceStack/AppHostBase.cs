@@ -26,10 +26,13 @@ namespace ServiceStack
             return request.GetAbsoluteUrl(virtualPath);
         }
 
-        public override string ResolvePhysicalPath(string virtualPath, IRequest httpReq)
+        public override string ResolvePhysicalPath(string virtualPath, IRequest request)
         {
-            var path = ((AspNetRequest)httpReq).HttpRequest.PhysicalPath;
-            return path;
+            if (request is AspNetRequest)
+	        {
+                return ((AspNetRequest)request).HttpRequest.PhysicalPath;	    ;
+	        }
+            return base.ResolvePhysicalPath(virtualPath, request);
         }
 
         public override IRequest TryGetCurrentRequest()

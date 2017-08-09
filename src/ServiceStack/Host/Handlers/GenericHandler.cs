@@ -129,6 +129,5 @@ namespace ServiceStack.Host.Handlers
                     : HandleException(httpReq, httpRes, operationName, ex.ApplyResponseConverters(httpReq));
             }
         }
-
     }
 }

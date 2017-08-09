@@ -4,10 +4,6 @@ using ServiceStack.WebHost.Endpoints.Tests.Support.Services;
 
 namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 {
-
-	public interface IFoo { }
-	public class Foo : IFoo { }
-
 	public class TestAppHost : AppHostBase
 	{
         public TestAppHost(params Assembly[] assembliesWithServices)
@@ -22,4 +18,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 			container.Register<IFoo>(c => new Foo());
 		}
 	}
+
+    public interface IFoo { }
+    public class Foo : IFoo { }
 }

@@ -351,17 +351,17 @@ namespace ServiceStack.Host
         /// <summary>
         /// Execute MQ with requestContext
         /// </summary>
-        public object ExecuteMessage(IMessage dto, IRequest req)
+        public object ExecuteMessage(IMessage message, IRequest req)
         {
             RequestContext.Instance.StartRequestContext();
             
-            req.PopulateFromRequestIfHasSessionId(dto.Body);
+            req.PopulateFromRequestIfHasSessionId(message.Body);
 
-            req.Dto = appHost.ApplyRequestConverters(req, dto.Body);
-            if (appHost.ApplyMessageRequestFilters(req, req.Response, dto.Body))
+            req.Dto = appHost.ApplyRequestConverters(req, message.Body);
+            if (appHost.ApplyMessageRequestFilters(req, req.Response, message.Body))
                 return req.Response.Dto;
 
-            var response = Execute(dto.Body, req);
+            var response = Execute(message.Body, req);
 
             var taskResponse = response as Task;
             if (taskResponse != null)
@@ -389,7 +389,7 @@ namespace ServiceStack.Host
         {
             req.Dto = requestDto;
             var requestType = requestDto.GetType();
-            req.OperationName = requestType.GetOperationName();
+
             if (appHost.Config.EnableAccessRestrictions)
                 AssertServiceRestrictions(requestType, req.RequestAttributes);
 
