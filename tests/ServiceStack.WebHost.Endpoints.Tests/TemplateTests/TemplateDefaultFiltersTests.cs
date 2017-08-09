@@ -789,5 +789,64 @@ Total    1550
    | first }}").Trim(), Is.EqualTo("D"));
         }
 
+        [Test]
+        public void Does_fmt()
+        {
+            var context = new TemplateContext().Init();
+            
+            Assert.That(context.EvaluateTemplate("{{ 'in {0} middle' | fmt('the') }}"), 
+                Is.EqualTo("in the middle"));
+            Assert.That(context.EvaluateTemplate("{{ 'in {0} middle of the {1}' | fmt('the', 'night') }}"), 
+                Is.EqualTo("in the middle of the night"));
+            Assert.That(context.EvaluateTemplate("{{ 'in {0} middle of the {1} I go {2}' | fmt('the', 'night', 'walking') }}"), 
+                Is.EqualTo("in the middle of the night I go walking"));
+            Assert.That(context.EvaluateTemplate("{{ 'in {0} middle of the {1} I go {2} in my {3}' | fmt(['the', 'night', 'walking', 'sleep']) }}"), 
+                Is.EqualTo("in the middle of the night I go walking in my sleep"));
+            
+            Assert.That(context.EvaluateTemplate("{{ 'I owe {0:c}' | fmt(123.45) }}"), 
+                Is.EqualTo("I owe $123.45"));
+        }
+
+        [Test]
+        public void Does_appendFmt()
+        {
+            var context = new TemplateContext().Init();
+            
+            Assert.That(context.EvaluateTemplate("{{ 'in ' | appendFmt('{0} middle','the') }}"), 
+                Is.EqualTo("in the middle"));
+            Assert.That(context.EvaluateTemplate("{{ 'in ' | appendFmt('{0} middle of the {1}', 'the', 'night') }}"), 
+                Is.EqualTo("in the middle of the night"));
+            Assert.That(context.EvaluateTemplate("{{ 'in ' | appendFmt('{0} middle of the {1} I go {2}', 'the', 'night', 'walking') }}"), 
+                Is.EqualTo("in the middle of the night I go walking"));
+            Assert.That(context.EvaluateTemplate("{{ 'in ' | appendFmt('{0} middle of the {1} I go {2} in my {3}', ['the', 'night', 'walking', 'sleep']) }}"), 
+                Is.EqualTo("in the middle of the night I go walking in my sleep"));
+            
+            Assert.That(context.EvaluateTemplate("{{ 'I ' | appendFmt('owe {0:c}', 123.45) }}"), 
+                Is.EqualTo("I owe $123.45"));
+        }
+
+        [Test]
+        public void Can_use_exist_tests_on_non_existing_arguments()
+        {
+            var context = new TemplateContext
+            {
+                Args =
+                {
+                    ["arg"] = "value" 
+                }
+            }.Init();
+            
+            context.VirtualFiles.WriteFile("h1.html", "<h1>{{ it }}</h1>");
+            
+            
+            Assert.That(context.EvaluateTemplate("{{ arg | ifNotNull }}"), Is.EqualTo("value"));
+            Assert.That(context.EvaluateTemplate("{{ arg | ifExists }}"), Is.EqualTo("value"));
+            Assert.That(context.EvaluateTemplate("{{ noArg | ifNotNull }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ noArg | ifExists }}"), Is.EqualTo(""));
+            
+            Assert.That(context.EvaluateTemplate("{{ arg | selectPartial: h1 }}"), Is.EqualTo("<h1>value</h1>"));
+            Assert.That(context.EvaluateTemplate("{{ noArg | selectPartial: h1 }}"), Is.EqualTo(""));
+        }
+
     }
 }

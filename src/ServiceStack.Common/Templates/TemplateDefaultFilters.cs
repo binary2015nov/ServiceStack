@@ -113,6 +113,26 @@ namespace ServiceStack.Templates
             ? formattable.ToString(format, null) 
             : string.Format(format, obj);
 
+        public string fmt(string format, object arg)
+        {
+            if (arg is object[] args)
+                return string.Format(format, args);
+            
+            if (arg is List<object> argsList)
+                return string.Format(format, argsList.ToArray());
+
+            return string.Format(format, arg);
+        }
+        public string fmt(string format, object arg0, object arg1) => string.Format(format, arg0, arg1);
+        public string fmt(string format, object arg0, object arg1, object arg2) => string.Format(format, arg0, arg1, arg2);
+
+        public string append(string target, string suffix) => target + suffix;
+        public string appendLine(string target) => target + newLine();
+
+        public string appendFmt(string target, string format, object arg) => target + fmt(format, arg);
+        public string appendFmt(string target, string format, object arg0, object arg1) => target + fmt(format, arg0, arg1);
+        public string appendFmt(string target, string format, object arg0, object arg1, object arg2) => target + fmt(format, arg0, arg1, arg2);
+
         public object dateFormat(DateTime dateValue) =>  dateValue.ToString((string)Context.Args[TemplateConstants.DefaultDateFormat]);
         public object dateFormat(DateTime dateValue, string format) => dateValue.ToString(format ?? throw new ArgumentNullException(nameof(format)));
         public object dateTimeFormat(DateTime dateValue) =>  dateValue.ToString((string)Context.Args[TemplateConstants.DefaultDateTimeFormat]);
@@ -190,9 +210,6 @@ namespace ServiceStack.Templates
 
         public ICollection keys(IDictionary target) => target.Keys;
         public ICollection values(IDictionary target) => target.Values;
-
-        public string append(string target, string suffix) => target + suffix;
-        public string appendLine(string target) => target + newLine();
 
         public string addPath(string target, string pathToAppend) => target.AppendPath(pathToAppend);
         public string addPaths(string target, IEnumerable pathsToAppend) => 
@@ -280,6 +297,12 @@ namespace ServiceStack.Templates
 
         [HandleUnknownValue]
         public bool isNotNull(object test) => test != null;
+
+        [HandleUnknownValue]
+        public object ifNotNull(object target) => target;
+
+        [HandleUnknownValue]
+        public object ifExists(object target) => target;
 
         public bool or(object lhs, object rhs) => isTrue(lhs) || isTrue(rhs);
         public bool and(object lhs, object rhs) => isTrue(lhs) && isTrue(rhs);
@@ -1182,7 +1205,9 @@ namespace ServiceStack.Templates
             throw new NotSupportedException($"'{nameof(scopeVars)}' expects a Dictionary but received a '{target.GetType().Name}'");
         }
         
+        [HandleUnknownValue]
         public Task select(TemplateScopeContext scope, object target, object selectTemplate) => select(scope, target, selectTemplate, null);
+        [HandleUnknownValue]
         public async Task select(TemplateScopeContext scope, object target, object selectTemplate, object scopeOptions) 
         {
             if (target == null)
@@ -1208,7 +1233,9 @@ namespace ServiceStack.Templates
             }
         }
 
+        [HandleUnknownValue]
         public Task selectPartial(TemplateScopeContext scope, object target, string pageName) => selectPartial(scope, target, pageName, null); 
+        [HandleUnknownValue]
         public async Task selectPartial(TemplateScopeContext scope, object target, string pageName, object scopedParams) 
         {
             if (target == null)
@@ -1322,7 +1349,7 @@ namespace ServiceStack.Templates
                         foreach (var key in keys)
                         {
                             sbHeader.Append('<').Append(headerTag).Append('>');
-                            sbHeader.Append(textStyle(key, headerStyle));
+                            sbHeader.Append(textStyle(key, headerStyle)?.HtmlEncode());
                             sbHeader.Append("</").Append(headerTag).Append('>');
                         }
                         sbHeader.Append("</tr>");
@@ -1332,7 +1359,8 @@ namespace ServiceStack.Templates
                     foreach (var key in keys)
                     {
                         var value = d[key];
-                        sbRows.Append("<td>").Append(value).Append("</td>");
+                        var encodedValue = value?.ToString()?.HtmlEncode();
+                        sbRows.Append("<td>").Append(encodedValue).Append("</td>");
                     }
                     sbRows.Append("</tr>");
                 }
@@ -1351,7 +1379,7 @@ namespace ServiceStack.Templates
 
             sb.Append(">");
             if (scopedParams.TryGetValue("caption", out object caption))
-                sb.Append("<caption>").Append(caption).Append("</caption>");
+                sb.Append("<caption>").Append(caption.ToString().HtmlEncode()).Append("</caption>");
             
             sb.Append("<thead>").Append(htmlHeaders).Append("</thead>");
             sb.Append("<tbody>").Append(htmlRows).Append("</tbody>");

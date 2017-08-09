@@ -81,45 +81,54 @@ namespace ServiceStack.Templates
 
         public void TryGetPage(string fromVirtualPath, string virtualPath, out TemplatePage page, out TemplateCodePage codePage)
         {
-            var cp = GetCodePage(virtualPath);
-            if (cp != null)
+            var tryExactMatch = virtualPath.IndexOf('/') >= 0; //if path is nested, look for an exact match first
+            if (tryExactMatch)
             {
-                codePage = cp;
-                page = null;
-                return;
-            }
-
-            var p = Pages.GetPage(virtualPath);
-            if (p != null)
-            {
-                page = p;
-                codePage = null;
-                return;
-            }
-            
-            var partentPath = fromVirtualPath;
-            while (!string.IsNullOrEmpty(partentPath = partentPath.LastLeftPart('/')))
-            {
-                var seekPath = partentPath.CombineWith(virtualPath);
-                cp = GetCodePage(seekPath);
+                var cp = GetCodePage(virtualPath);
                 if (cp != null)
                 {
                     codePage = cp;
                     page = null;
                     return;
                 }
-                
-                p = Pages.GetPage(seekPath);
+
+                var p = Pages.GetPage(virtualPath);
                 if (p != null)
                 {
                     page = p;
                     codePage = null;
                     return;
                 }
-                
-                if (partentPath.IndexOf('/') == -1)
-                    break;
             }
+            
+            //otherwise find closest match from page.VirtualPath
+            var partentPath = fromVirtualPath.IndexOf('/') >= 0
+                ? fromVirtualPath.LastLeftPart('/')
+                : "";
+            do
+            {
+                var seekPath = partentPath.CombineWith(virtualPath);
+                var cp = GetCodePage(seekPath);
+                if (cp != null)
+                {
+                    codePage = cp;
+                    page = null;
+                    return;
+                }
+
+                var p = Pages.GetPage(seekPath);
+                if (p != null)
+                {
+                    page = p;
+                    codePage = null;
+                    return;
+                }
+
+                partentPath = fromVirtualPath.IndexOf('/') >= 0
+                    ? fromVirtualPath.LastLeftPart('/')
+                    : "";
+
+            } while (!string.IsNullOrEmpty(partentPath));
             
             throw new FileNotFoundException($"Page at path was not found: '{virtualPath}'");
         }
