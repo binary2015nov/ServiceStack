@@ -127,7 +127,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new CustomValidationAppHost();
             appHost.Init();
-            appHost.Start(Constant.AbsoluteBaseUri);
+            appHost.Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -141,7 +141,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             try
             {
-                var response = "{0}/customerror".Fmt(Constant.ServiceStackBaseHost).GetJsonFromUrl();
+                var response = "{0}/customerror".Fmt(Config.ListeningOn).GetJsonFromUrl();
                 Assert.Fail("Should throw HTTP Error");
             }
             catch (Exception ex)
@@ -156,7 +156,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             try
             {
-                var response = "{0}/customrequesterror/the.name".Fmt(Constant.ServiceStackBaseHost)
+                var response = "{0}/customrequesterror/the.name".Fmt(Config.ListeningOn)
                     .GetJsonFromUrl();
                 Assert.Fail("Should throw HTTP Error");
             }
@@ -172,7 +172,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             try
             {
-                var response = (Constant.ServiceStackBaseHost + "/customrequesterror/thename?items=[{name:item.name}]")
+                var response = (Config.ListeningOn + "/customrequesterror/thename?items=[{name:item.name}]")
                     .GetJsonFromUrl();
                 Assert.Fail("Should throw HTTP Error");
             }
@@ -186,7 +186,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void RequestBindingException_QueryString_returns_populated_FieldError()
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
+            var client = new JsonServiceClient(Config.ListeningOn);
             try
             {
                 var response = client.Get<ErrorRequestBinding>("/errorrequestbinding?Int=string&Decimal=string");
@@ -214,7 +214,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             try
             {
-                var response = Constant.ServiceStackBaseHost.CombineWith("/json/reply/ErrorRequestBinding?Int=string&Decimal=string")
+                var response = Config.ListeningOn.CombineWith("/json/reply/ErrorRequestBinding?Int=string&Decimal=string")
                     .GetJsonFromUrl();
                 Assert.Fail("Should throw");
             }
@@ -229,7 +229,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             try
             {
-                var response = Constant.ServiceStackBaseHost.CombineWith("errorrequestbinding")
+                var response = Config.ListeningOn.CombineWith("errorrequestbinding")
                     .PostStringToUrl("Int=string&Decimal=string", contentType: MimeTypes.FormUrlEncoded, accept: MimeTypes.Json);
                 Assert.Fail("Should throw");
             }
@@ -244,7 +244,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             try
             {
-                var response = Constant.ServiceStackBaseHost.CombineWith("/json/reply/ErrorRequestBinding")
+                var response = Config.ListeningOn.CombineWith("/json/reply/ErrorRequestBinding")
                     .PostStringToUrl("Int=string&Decimal=string", contentType: MimeTypes.FormUrlEncoded, accept: MimeTypes.Json);
                 Assert.Fail("Should throw");
             }

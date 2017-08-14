@@ -21,7 +21,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_mock_Session_when_accessed_via_HttpRequest_Context()
         {
-            using (new MockAppHost().Init())
+            using (new BasicAppHost().Init())
             {
                 HttpContext.Current = new HttpContext(
                     new HttpRequest(null, "http://example.com", null),

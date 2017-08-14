@@ -19,7 +19,7 @@ namespace ServiceStack.Common.Tests
         public void TestFixtureSetUp()
         {
             appHost =
-                new MockAppHost(typeof(Dto).Assembly)
+                new BasicAppHost(typeof(Dto).Assembly)
                 {
                     TestMode = true,
                     Plugins = { new NativeTypesFeature() },

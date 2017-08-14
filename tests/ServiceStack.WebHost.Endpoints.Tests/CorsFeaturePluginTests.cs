@@ -40,7 +40,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new CorsFeaturePluginAppHostHttpListener()
                 .Init()
-                .Start(Constant.ServiceStackBaseHost);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -52,7 +52,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_Get_CORS_Headers_with_non_matching_OPTIONS_Request()
         {
-            "{0}/corsplugin".Fmt(Constant.AbsoluteBaseUri).OptionsFromUrl(responseFilter: r =>
+            "{0}/corsplugin".Fmt(Config.AbsoluteBaseUri).OptionsFromUrl(responseFilter: r =>
                 {
                     Assert.That(r.Headers[HttpHeaders.AllowOrigin], Is.EqualTo(CorsFeature.DefaultOrigin));
                     Assert.That(r.Headers[HttpHeaders.AllowMethods], Is.EqualTo(CorsFeature.DefaultMethods));
@@ -63,7 +63,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_Get_CORS_Headers_with_not_found_OPTIONS_Request()
         {
-            "{0}/notfound".Fmt(Constant.ServiceStackBaseHost).OptionsFromUrl(responseFilter: r =>
+            "{0}/notfound".Fmt(Config.AbsoluteBaseUri).OptionsFromUrl(responseFilter: r =>
             {
                 Assert.That(r.Headers[HttpHeaders.AllowOrigin], Is.EqualTo(CorsFeature.DefaultOrigin));
                 Assert.That(r.Headers[HttpHeaders.AllowMethods], Is.EqualTo(CorsFeature.DefaultMethods));

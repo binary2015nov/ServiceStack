@@ -42,7 +42,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
     {
         protected override IJsonServiceClient CreateClient()
         {
-            return new JsonServiceClient(Constant.AbsoluteBaseUri);
+            return new JsonServiceClient(Config.AbsoluteBaseUri);
         }
     }
 
@@ -50,7 +50,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
     {
         protected override IJsonServiceClient CreateClient()
         {
-            return new JsonHttpClient(Constant.AbsoluteBaseUri);
+            return new JsonHttpClient(Config.ListeningOn);
         }
     }
 
@@ -62,7 +62,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
         {
             appHost = new EncryptedMessagesAppHost()
                 .Init()
-                .Start(Constant.AbsoluteBaseUri);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]

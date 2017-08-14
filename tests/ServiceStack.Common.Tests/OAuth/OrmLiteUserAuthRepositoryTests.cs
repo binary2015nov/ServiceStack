@@ -18,7 +18,7 @@ namespace ServiceStack.Common.Tests.OAuth
         [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
-            appHost = new MockAppHost() 
+            appHost = new BasicAppHost() 
             {
                 ConfigureAppHost = host =>
                 {

@@ -26,7 +26,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_Mock_Session_in_Container()
         {
-            using (var appHost = new MockAppHost
+            using (var appHost = new BasicAppHost
             {
                 ConfigureAppHost = host => host.RegisterService(typeof(MockSessionTestService)),
                 ConfigureContainer = x => x.Register<IAuthSession>(c => CreateUserSession())
@@ -43,7 +43,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_Mock_UnitTest_Session_in_IOC_with_MockHttpRequest()
         {
-            using (new MockAppHost
+            using (new BasicAppHost
             {
                 ConfigureContainer = container =>
                         container.Register<IAuthSession>(c => CreateUserSession())
@@ -62,7 +62,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_Mock_IntegrationTest_Session_with_Request()
         {
-            using (new MockAppHost(typeof(SessionService).GetAssembly()).Init())
+            using (new BasicAppHost(typeof(SessionService).GetAssembly()).Init())
             {
                 var req = new MockHttpRequest
                 {
@@ -79,7 +79,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_Mock_Session_in_RequestFilterAttribute()
         {
-            using (var appHost = new MockAppHost
+            using (var appHost = new BasicAppHost
             {
                 ConfigureAppHost = host =>
                 {
@@ -121,9 +121,9 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_Mock_Session_in_RequestFilter_in_IntegrationTest()
         {
-            using (new AppHost().Init().Start(Constant.AbsoluteBaseUri))
+            using (new AppHost().Init().Start(Config.ListeningOn))
             {
-                var client = new JsonServiceClient(Constant.AbsoluteBaseUri);
+                var client = new JsonServiceClient(Config.AbsoluteBaseUri);
                 var response = client.Get(new MockSessionTest());
 
                 Assert.That(response.UserAuthId, Is.EqualTo("1"));

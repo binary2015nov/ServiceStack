@@ -15,7 +15,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		[Test]
 		public void Wsdl_state_is_correct()
 		{
-            using (var appHost = new MockAppHost().Init())
+            using (var appHost = new BasicAppHost().Init())
             {
 
                 var dummyServiceType = GetType();
@@ -36,7 +36,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		[Test]
 		public void Xsd_output_does_not_contain_xml_declaration()
 		{
-		    using (var appHost = new MockAppHost().Init())
+		    using (var appHost = new BasicAppHost().Init())
 		    {
 		        var xsd = new XsdGenerator
 		        {

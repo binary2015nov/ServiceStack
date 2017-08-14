@@ -103,7 +103,7 @@ namespace ServiceStack.ServiceHost.Tests
         [Test]
         public void GetPhysicalPath_Honours_WebHostPhysicalPath()
         {
-            using (var appHost = new MockAppHost
+            using (var appHost = new BasicAppHost
             {
                 ConfigFilter = c =>
                 {

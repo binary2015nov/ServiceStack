@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using ServiceStack.Text;
 using ServiceStack.Text.Controller;
@@ -13,11 +12,11 @@ using ServiceStack.Text.Json;
 namespace ServiceStack.Templates
 {
     // ReSharper disable InconsistentNaming
-    
+
     public class TemplateDefaultFilters : TemplateFilter
     {
         public static TemplateDefaultFilters Instance = new TemplateDefaultFilters();
-        
+
         // methods without arguments can be used in bindings, e.g. {{ now | dateFormat }}
         public DateTime now() => DateTime.Now;
         public DateTime utcNow() => DateTime.UtcNow;
@@ -30,7 +29,7 @@ namespace ServiceStack.Templates
         public DateTime addDays(DateTime target, int count) => target.AddDays(count);
         public DateTime addMonths(DateTime target, int count) => target.AddMonths(count);
         public DateTime addYears(DateTime target, int count) => target.AddYears(count);
-        
+
         public string indent() => Context.Args[TemplateConstants.DefaultIndent] as string;
         public string indents(int count) => repeat(Context.Args[TemplateConstants.DefaultIndent] as string, count);
         public string space() => " ";
@@ -49,12 +48,12 @@ namespace ServiceStack.Templates
                 return r;
             if (value is bool b)
                 return b ? TemplateConstants.TrueRawString : TemplateConstants.FalseRawString;
-            
+
             var rawStr = value.ToString().ToRawString();
             return rawStr;
         }
 
-        public string appSetting(string name) =>  Context.AppSettings.GetString(name);
+        public string appSetting(string name) => Context.AppSettings.GetString(name);
 
         public double add(double lhs, double rhs) => lhs + rhs;
         public double sub(double lhs, double rhs) => lhs - rhs;
@@ -64,13 +63,13 @@ namespace ServiceStack.Templates
         public double div(double lhs, double rhs) => lhs / rhs;
         public double divide(double lhs, double rhs) => lhs / rhs;
 
-        public long incr(long value) => value + 1; 
-        public long increment(long value) => value + 1; 
-        public long incrBy(long value, long by) => value + by; 
-        public long incrementBy(long value, long by) => value + by; 
-        public long decr(long value) => value - 1; 
-        public long decrement(long value) => value - 1; 
-        public long decrBy(long value, long by) => value - by; 
+        public long incr(long value) => value + 1;
+        public long increment(long value) => value + 1;
+        public long incrBy(long value, long by) => value + by;
+        public long incrementBy(long value, long by) => value + by;
+        public long decr(long value) => value - 1;
+        public long decrement(long value) => value - 1;
+        public long decrBy(long value, long by) => value - by;
         public long decrementBy(long value, long by) => value - by;
         public long mod(long value, long divisor) => value % divisor;
 
@@ -103,21 +102,21 @@ namespace ServiceStack.Templates
         {
             var cultureInfo = culture != null
                 ? new CultureInfo(culture)
-                : (CultureInfo) Context.Args[TemplateConstants.DefaultCulture];
+                : (CultureInfo)Context.Args[TemplateConstants.DefaultCulture];
 
             var fmt = string.Format(cultureInfo, "{0:C}", decimalValue);
             return fmt;
         }
 
-        public string format(object obj, string format) => obj is IFormattable formattable 
-            ? formattable.ToString(format, null) 
+        public string format(object obj, string format) => obj is IFormattable formattable
+            ? formattable.ToString(format, null)
             : string.Format(format, obj);
 
         public string fmt(string format, object arg)
         {
             if (arg is object[] args)
                 return string.Format(format, args);
-            
+
             if (arg is List<object> argsList)
                 return string.Format(format, argsList.ToArray());
 
@@ -133,13 +132,16 @@ namespace ServiceStack.Templates
         public string appendFmt(string target, string format, object arg0, object arg1) => target + fmt(format, arg0, arg1);
         public string appendFmt(string target, string format, object arg0, object arg1, object arg2) => target + fmt(format, arg0, arg1, arg2);
 
-        public object dateFormat(DateTime dateValue) =>  dateValue.ToString((string)Context.Args[TemplateConstants.DefaultDateFormat]);
-        public object dateFormat(DateTime dateValue, string format) => dateValue.ToString(format ?? throw new ArgumentNullException(nameof(format)));
-        public object dateTimeFormat(DateTime dateValue) =>  dateValue.ToString((string)Context.Args[TemplateConstants.DefaultDateTimeFormat]);
-        public object timeFormat(TimeSpan timeValue) =>  timeValue.ToString((string)Context.Args[TemplateConstants.DefaultTimeFormat]);
-        public object timeFormat(TimeSpan timeValue, string format) =>  timeValue.ToString(format);
+        [HandleUnknownValue]
+        public Task noshow(TemplateScopeContext scope, object value) => TypeConstants.EmptyTask;
 
-        public string splitCase(string text) => text.SplitCamelCase().Replace('_',' ');
+        public object dateFormat(DateTime dateValue) => dateValue.ToString((string)Context.Args[TemplateConstants.DefaultDateFormat]);
+        public object dateFormat(DateTime dateValue, string format) => dateValue.ToString(format ?? throw new ArgumentNullException(nameof(format)));
+        public object dateTimeFormat(DateTime dateValue) => dateValue.ToString((string)Context.Args[TemplateConstants.DefaultDateTimeFormat]);
+        public object timeFormat(TimeSpan timeValue) => timeValue.ToString((string)Context.Args[TemplateConstants.DefaultTimeFormat]);
+        public object timeFormat(TimeSpan timeValue, string format) => timeValue.ToString(format);
+
+        public string splitCase(string text) => text.SplitCamelCase().Replace('_', ' ');
         public string humanize(string text) => splitCase(text).ToTitleCase();
         public string titleCase(string text) => text.ToTitleCase();
         public string pascalCase(string text) => text.ToPascalCase();
@@ -189,7 +191,7 @@ namespace ServiceStack.Templates
         public bool endsWith(string text, string needle) => text?.EndsWith(needle) == true;
 
         public string replace(string text, string oldValue, string newValue) => text.Replace(oldValue, newValue);
-        
+
 
         public string trimStart(string text) => text?.TrimStart();
         public string trimEnd(string text) => text?.TrimEnd();
@@ -202,8 +204,29 @@ namespace ServiceStack.Templates
 
         public string[] splitOnFirst(string text, string needle) => text.SplitOnFirst(needle);
         public string[] splitOnLast(string text, string needle) => text.SplitOnLast(needle);
-        public string[] split(string stringList) => split(stringList, ',');
-        public string[] split(string stringList, char delimiter) => stringList.Split(delimiter);
+        public string[] split(string stringList) => stringList.Split(',');
+        public string[] split(string stringList, object delimiter)
+        {
+            if (delimiter is IEnumerable<object> objDelims)
+                delimiter = objDelims.Select(x => x.ToString());
+
+            if (delimiter is char c)
+                return stringList.Split(c);
+            if (delimiter is string s)
+                return s.Length == 1
+                    ? stringList.Split(s[0])
+                    : stringList.Split(new[] { s }, StringSplitOptions.RemoveEmptyEntries);
+            if (delimiter is IEnumerable<string> strDelims)
+                return strDelims.All(x => x.Length == 1)
+                    ? stringList.Split(strDelims.Select(x => x[0]).ToArray(), StringSplitOptions.RemoveEmptyEntries)
+                    : stringList.Split(strDelims.ToArray(), StringSplitOptions.RemoveEmptyEntries);
+
+            throw new NotSupportedException($"{delimiter} is not a valid delimiter");
+        }
+
+        public string urlEncode(string value, bool upperCase) => value.UrlEncode(upperCase);
+        public string urlEncode(string value) => value.UrlEncode();
+        public string urlDecode(string value) => value.UrlDecode();
 
         public Dictionary<string, string> parseKeyValueText(string target) => target?.ParseKeyValueText();
         public Dictionary<string, string> parseKeyValueText(string target, string delimiter) => target?.ParseKeyValueText(delimiter);
@@ -212,20 +235,20 @@ namespace ServiceStack.Templates
         public ICollection values(IDictionary target) => target.Values;
 
         public string addPath(string target, string pathToAppend) => target.AppendPath(pathToAppend);
-        public string addPaths(string target, IEnumerable pathsToAppend) => 
+        public string addPaths(string target, IEnumerable pathsToAppend) =>
             target.AppendPaths(pathsToAppend.Map(x => x.ToString()).ToArray());
 
-        public string addQueryString(string url, object urlParams) => 
+        public string addQueryString(string url, object urlParams) =>
             urlParams.AssertOptions(nameof(addQueryString)).Aggregate(url, (current, entry) => current.AddQueryParam(entry.Key, entry.Value));
-        
-        public string addHashParams(string url, object urlParams) => 
+
+        public string addHashParams(string url, object urlParams) =>
             urlParams.AssertOptions(nameof(addHashParams)).Aggregate(url, (current, entry) => current.AddHashParam(entry.Key, entry.Value));
-        
+
         public string repeating(int times, string text) => repeat(text, AssertWithinMaxQuota(times));
         public string repeat(string text, int times)
         {
             AssertWithinMaxQuota(times);
-            var sb = new StringBuilder();
+            var sb = new System.Text.StringBuilder();
             for (var i = 0; i < times; i++)
             {
                 sb.Append(text);
@@ -250,7 +273,7 @@ namespace ServiceStack.Templates
 
         public bool isEven(int value) => value % 2 == 0;
         public bool isOdd(int value) => !isEven(value);
-        
+
         public static bool isTrue(object target) => target is bool b && b;
         public static bool isFalsy(object target)
         {
@@ -266,7 +289,7 @@ namespace ServiceStack.Templates
                 return l == 0;
             if (target is double d)
                 return d == 0 || double.IsNaN(d);
-            
+
             return false;
         }
 
@@ -276,16 +299,18 @@ namespace ServiceStack.Templates
 
         public object ifNot(object returnTarget, object test) => !isTrue(test) ? returnTarget : null;
         public object unless(object returnTarget, object test) => ifNot(returnTarget, test); //alias
-        
+
         [HandleUnknownValue]
         public object otherwise(object returnTaget, object elseReturn) => returnTaget ?? elseReturn;
+        [HandleUnknownValue]
+        public object @default(object returnTaget, object elseReturn) => returnTaget ?? elseReturn;
 
         [HandleUnknownValue]
         public object ifFalsy(object returnTarget, object test) => isFalsy(test) ? returnTarget : null;
 
         [HandleUnknownValue]
         public object ifTruthy(object returnTarget, object test) => !isFalsy(test) ? returnTarget : null;
-        
+
         [HandleUnknownValue]
         public object falsy(object test, object returnIfFalsy) => isFalsy(test) ? returnIfFalsy : null;
 
@@ -297,20 +322,78 @@ namespace ServiceStack.Templates
 
         [HandleUnknownValue]
         public bool isNotNull(object test) => test != null;
-
         [HandleUnknownValue]
-        public object ifNotNull(object target) => target;
+        public bool exists(object test) => test != null;
 
         [HandleUnknownValue]
         public object ifExists(object target) => target;
+        [HandleUnknownValue]
+        public object ifExists(object returnTarget, object test) => test != null ? returnTarget : null;
+        [HandleUnknownValue]
+        public object ifNotExists(object returnTarget, object target) => target == null ? returnTarget : null;
+        [HandleUnknownValue]
+        public object ifNo(object returnTarget, object target) => target == null ? returnTarget : null;
+
+        [HandleUnknownValue]
+        public object ifNotEmpty(object target) => isEmpty(target) ? null : target;
+
+        [HandleUnknownValue]
+        public object ifNotEmpty(object returnTarget, object test) => isEmpty(test) ? null : returnTarget;
+
+        [HandleUnknownValue]
+        public object ifEmpty(object returnTarget, object test) => isEmpty(test) ? returnTarget : null;
+
+        public bool isEmpty(object target)
+        {
+            if (target == null)
+                return true;
+
+            if (target is string s)
+                return s == string.Empty;
+
+            if (target is IEnumerable e)
+                return !e.GetEnumerator().MoveNext();
+
+            return false;
+        }
+
+        public bool isString(object target) => target is string;
+        public bool isInt(object target) => target is int;
+        public bool isLong(object target) => target is long;
+        public bool isInteger(object target) => target?.GetType()?.IsIntegerType() == true;
+        public bool isDouble(object target) => target is double;
+        public bool isFloat(object target) => target is float;
+        public bool isDecimal(object target) => target is decimal;
+        public bool isBool(object target) => target is bool;
+        public bool isList(object target) => target is IEnumerable && !(target is IDictionary) && !(target is string);
+        public bool isEnumerable(object target) => target is IEnumerable;
+        public bool isDictionary(object target) => target is IDictionary;
+        public bool isChar(object target) => target is char;
+        public bool isChars(object target) => target is char[];
+        public bool isByte(object target) => target is byte;
+        public bool isBytes(object target) => target is byte[];
+        public bool isObjectDictionary(object target) => target is IDictionary<string, object>;
+        public bool isStringDictionary(object target) => target is IDictionary<string, string>;
+
+        public bool isType(object target, string typeName) => typeName.EqualsIgnoreCase(target?.GetType()?.Name);
+        public bool isNumber(object target) => target?.GetType()?.IsNumericType() == true;
+        public bool isRealNumber(object target) => target?.GetType()?.IsRealNumberType() == true;
+        public bool isEnum(object target) => target?.GetType()?.IsEnum() == true;
+        public bool isArray(object target) => target?.GetType()?.IsArray() == true;
+        public bool isAnonObject(object target) => target?.GetType()?.IsAnonymousType() == true;
+        public bool isClass(object target) => target?.GetType()?.IsClass() == true;
+        public bool isValueType(object target) => target?.GetType()?.IsValueType() == true;
+        public bool isDto(object target) => target?.GetType()?.IsDto() == true;
+        public bool isTuple(object target) => target?.GetType()?.IsTuple() == true;
+        public bool isKeyValuePair(object target) => "KeyValuePair`2".Equals(target?.GetType()?.Name);
 
         public bool or(object lhs, object rhs) => isTrue(lhs) || isTrue(rhs);
         public bool and(object lhs, object rhs) => isTrue(lhs) && isTrue(rhs);
 
         public bool equals(object target, object other) =>
-            target == null || other == null 
-                ? target == other 
-                : target.GetType() == other.GetType() 
+            target == null || other == null
+                ? target == other
+                : target.GetType() == other.GetType()
                     ? target.Equals(other)
                     : target.Equals(other.ConvertTo(target.GetType()));
 
@@ -336,14 +419,14 @@ namespace ServiceStack.Templates
                 throw new ArgumentNullException(nameof(target));
             if (other == null)
                 throw new ArgumentNullException(nameof(other));
-            
+
             if (target is IComparable c)
             {
-                return target.GetType() == other?.GetType() 
+                return target.GetType() == other?.GetType()
                     ? fn(c.CompareTo(other))
                     : fn(c.CompareTo(other.ConvertTo(target.GetType())));
             }
-            
+
             throw new NotSupportedException($"{target} is not IComparable");
         }
 
@@ -355,10 +438,10 @@ namespace ServiceStack.Templates
 
         public IEnumerable<object> reverse(TemplateScopeContext scope, IEnumerable<object> original) => original.Reverse();
 
-        public IEnumerable<object> take(TemplateScopeContext scope, IEnumerable<object> original, object countOrBinding) => 
+        public IEnumerable<object> take(TemplateScopeContext scope, IEnumerable<object> original, object countOrBinding) =>
             original.Take(scope.GetValueOrEvaluateBinding<int>(countOrBinding));
 
-        public IEnumerable<object> skip(TemplateScopeContext scope, IEnumerable<object> original, object countOrBinding) => 
+        public IEnumerable<object> skip(TemplateScopeContext scope, IEnumerable<object> original, object countOrBinding) =>
             original.Skip(scope.GetValueOrEvaluateBinding<int>(countOrBinding));
 
         public IEnumerable<object> limit(TemplateScopeContext scope, IEnumerable<object> original, object skipOrBinding, object takeOrBinding)
@@ -399,7 +482,7 @@ namespace ServiceStack.Templates
                 {
                     foreach (var b in currentArray)
                     {
-                        to.Add(new[]{ a, b });
+                        to.Add(new[] { a, b });
                     }
                 }
             }
@@ -436,13 +519,13 @@ namespace ServiceStack.Templates
                             }
                         }
                     }
-                    
+
                     foreach (var entry in scopedParams)
                     {
                         var bindTo = entry.Key;
                         if (!(entry.Value is string bindToLiteral))
                             throw new NotSupportedException($"'{nameof(let)}' in '{scope.Page.VirtualPath}' expects a string Expression for its value but received '{entry.Value}' instead");
-                        
+
                         bindToLiteral.ToStringSegment().ParseNextToken(out object value, out JsBinding binding);
                         var bindValue = scope.Evaluate(value, binding);
                         scope.ScopedParams[bindTo] = bindValue;
@@ -461,7 +544,7 @@ namespace ServiceStack.Templates
 
         public object assign(TemplateScopeContext scope, string argExpr, object value) //from filter
         {
-            var targetEndPos = argExpr.IndexOfAny(new[] {'.', '['});
+            var targetEndPos = argExpr.IndexOfAny(new[] { '.', '[' });
             if (targetEndPos == -1)
             {
                 scope.ScopedParams[argExpr] = value;
@@ -474,7 +557,7 @@ namespace ServiceStack.Templates
 
                 scope.InvokeAssignExpression(argExpr, target, value);
             }
-            
+
             return value;
         }
 
@@ -486,7 +569,7 @@ namespace ServiceStack.Templates
 
         public Task assignTo(TemplateScopeContext scope, string argName) //from context filter
         {
-            var ms = (MemoryStream) scope.OutputStream;
+            var ms = (MemoryStream)scope.OutputStream;
             var value = ms.ReadFully().FromUtf8Bytes();
             scope.ScopedParams[argName] = value;
             ms.SetLength(0); //just capture output, don't write anything to the ResponseStream
@@ -502,18 +585,18 @@ namespace ServiceStack.Templates
             scope.TryGetPage(pageName, out TemplatePage page, out TemplateCodePage codePage);
             if (page != null)
                 await page.Init();
-     
+
             await scope.WritePageAsync(page, codePage, pageParams);
         }
 
         public Task forEach(TemplateScopeContext scope, object target, object items) => forEach(scope, target, items, null);
-        public async Task forEach(TemplateScopeContext scope, object target, object items, object scopeOptions) 
+        public async Task forEach(TemplateScopeContext scope, object target, object items, object scopeOptions)
         {
             var objs = items as IEnumerable;
             if (objs != null)
             {
                 var scopedParams = scope.GetParamsWithItemBinding(nameof(select), scopeOptions, out string itemBinding);
-                
+
                 var i = 0;
                 var itemScope = scope.CreateScopedContext(target.ToString(), scopedParams);
                 foreach (var item in objs)
@@ -531,17 +614,36 @@ namespace ServiceStack.Templates
         public string toString(object target) => target?.ToString();
         public List<object> toList(IEnumerable target) => target.Map(x => x);
         public object[] toArray(IEnumerable target) => target.Map(x => x).ToArray();
-        
+
+        public char toChar(object target) => target is string s && s.Length == 1 ? s[0] : target.ConvertTo<char>();
+        public char[] toChars(object target) => target is string s
+            ? s.ToCharArray()
+            : target is IEnumerable<object> objects
+                ? objects.Where(x => x != null).Select(x => x.ToString()[0]).ToArray()
+                : target.ConvertTo<char[]>();
+
+        public byte[] toUtf8Bytes(string target) => target.ToUtf8Bytes();
+        public string fromUtf8Bytes(byte[] target) => target.FromUtf8Bytes();
+
+        public byte toByte(object target) => target.ConvertTo<byte>();
+        public int toInt(object target) => target.ConvertTo<int>();
+        public long toLong(object target) => target.ConvertTo<long>();
+        public float toFloat(object target) => target.ConvertTo<float>();
+        public double toDouble(object target) => target.ConvertTo<double>();
+        public decimal toDecimal(object target) => target.ConvertTo<decimal>();
+        public bool toBool(object target) => target.ConvertTo<bool>();
+        public Dictionary<string, object> toObjectDictionary(object target) => target.ToObjectDictionary();
+
         public List<object> step(IEnumerable target, object scopeOptions)
         {
             var items = target.AssertEnumerable(nameof(step));
-            
+
             var scopedParams = scopeOptions.AssertOptions(nameof(step));
 
             var from = scopedParams.TryGetValue("from", out object oFrom)
                 ? (int)oFrom
                 : 0;
-            
+
             var by = scopedParams.TryGetValue("by", out object oBy)
                 ? (int)oBy
                 : 1;
@@ -574,7 +676,7 @@ namespace ServiceStack.Templates
         {
             if (needle == null)
                 return false;
-            
+
             if (target is string s)
             {
                 if (needle is char c)
@@ -595,7 +697,7 @@ namespace ServiceStack.Templates
 
         public int AssertWithinMaxQuota(int value)
         {
-            var maxQuota = (int) Context.Args[TemplateConstants.MaxQuota]; 
+            var maxQuota = (int)Context.Args[TemplateConstants.MaxQuota];
             if (value > maxQuota)
                 throw new NotSupportedException($"{value} exceeds Max Quota of {maxQuota}");
 
@@ -608,9 +710,9 @@ namespace ServiceStack.Templates
             var items = target.AssertEnumerable(nameof(toDictionary));
             var literal = scope.AssertExpression(nameof(toDictionary), expression);
             var scopedParams = scope.GetParamsWithItemBinding(nameof(toDictionary), scopeOptions, out string itemBinding);
-            
+
             literal.ToStringSegment().ParseNextToken(out object value, out JsBinding binding);
-            
+
             return items.ToDictionary(item => scope.AddItemToScope(itemBinding, item).Evaluate(value, binding));
         }
 
@@ -674,19 +776,19 @@ namespace ServiceStack.Templates
         public double average(TemplateScopeContext scope, object target, object expression, object scopeOptions) =>
             applyInternal(nameof(average), scope, target, expression, scopeOptions, (a, b) => a + b).ConvertTo<double>() / target.AssertEnumerable(nameof(average)).Count();
 
-        private object applyInternal(string filterName, TemplateScopeContext scope, object target, object expression, object scopeOptions, 
+        private object applyInternal(string filterName, TemplateScopeContext scope, object target, object expression, object scopeOptions,
             Func<double, double, double> fn)
         {
             if (target is double d)
                 return fn(d, expression.ConvertTo<double>());
             if (target is int i)
-                return (int) fn(i, expression.ConvertTo<double>());
+                return (int)fn(i, expression.ConvertTo<double>());
             if (target is long l)
-                return (long) fn(l, expression.ConvertTo<double>());
-            
+                return (long)fn(l, expression.ConvertTo<double>());
+
             var items = target.AssertEnumerable(filterName);
-            var total = filterName == nameof(min) 
-                ? double.MaxValue 
+            var total = filterName == nameof(min)
+                ? double.MaxValue
                 : 0;
             Type itemType = null;
             if (expression != null)
@@ -697,7 +799,7 @@ namespace ServiceStack.Templates
                 foreach (var item in items)
                 {
                     if (item == null) continue;
-                    
+
                     scope.AddItemToScope(itemBinding, item);
                     var result = scope.Evaluate(value, binding);
                     if (result == null) continue;
@@ -720,7 +822,7 @@ namespace ServiceStack.Templates
 
             if (filterName == nameof(min) && itemType == null)
                 return 0;
-                
+
             if (expression == null && itemType == null)
                 itemType = target.GetType().FirstGenericType()?.GetGenericArguments().FirstOrDefault();
 
@@ -734,7 +836,7 @@ namespace ServiceStack.Templates
         {
             var items = target.AssertEnumerable(nameof(reduce));
             Type itemType = null;
-            
+
             var literal = scope.AssertExpression(nameof(reduce), expression);
             var scopedParams = scope.GetParamsWithItemBinding(nameof(reduce), scopeOptions, out string itemBinding);
             var accumulator = scopedParams.TryGetValue("initialValue", out object initialValue)
@@ -742,15 +844,15 @@ namespace ServiceStack.Templates
                 : 1;
 
             var bindAccumlator = scopedParams.TryGetValue("accumulator", out object accumulatorName)
-                ? (string) accumulatorName
+                ? (string)accumulatorName
                 : "accumulator";
-            
+
             literal.ToStringSegment().ParseNextToken(out object value, out JsBinding binding);
             var i = 0;
             foreach (var item in items)
             {
                 if (item == null) continue;
-                    
+
                 scope.AddItemToScope(bindAccumlator, accumulator);
                 scope.AddItemToScope("index", i++);
                 scope.AddItemToScope(itemBinding, item);
@@ -762,7 +864,7 @@ namespace ServiceStack.Templates
 
                 accumulator = result.ConvertTo<double>();
             }
-                
+
             if (expression == null && itemType == null)
                 itemType = target.GetType().FirstGenericType()?.GetGenericArguments().FirstOrDefault();
 
@@ -780,24 +882,38 @@ namespace ServiceStack.Templates
             return IgnoreResult.Value;
         }
 
+        [HandleUnknownValue]
         public Task @do(TemplateScopeContext scope, object target, object expression) => @do(scope, target, expression, null);
+        [HandleUnknownValue]
         public Task @do(TemplateScopeContext scope, object target, object expression, object scopeOptions)
         {
-            var items = target.AssertEnumerable(nameof(@do));
-            var literal = scope.AssertExpression(nameof(@do), expression);
-            var scopedParams = scope.GetParamsWithItemBinding(nameof(first), scopeOptions, out string itemBinding);
+            if (target == null)
+                return TypeConstants.EmptyTask;
 
+            var scopedParams = scope.GetParamsWithItemBinding(nameof(@do), scopeOptions, out string itemBinding);
+            var literal = scope.AssertExpression(nameof(@do), expression);
             literal.ToStringSegment().ParseNextToken(out object value, out JsBinding binding);
-            var i = 0;
-            foreach (var item in items)
+
+            if (target is IEnumerable objs && !(target is IDictionary) && !(target is string))
             {
-                scope.AddItemToScope(itemBinding, item, i++);
+                var items = target.AssertEnumerable(nameof(@do));
+
+                var i = 0;
+                foreach (var item in items)
+                {
+                    scope.AddItemToScope(itemBinding, item, i++);
+                    var result = scope.Evaluate(value, binding);
+                }
+            }
+            else
+            {
+                scope.AddItemToScope(itemBinding, target);
                 var result = scope.Evaluate(value, binding);
             }
 
             return TypeConstants.EmptyTask;
         }
-        
+
         public object property(object target, string propertyName)
         {
             if (target == null)
@@ -958,7 +1074,7 @@ namespace ServiceStack.Templates
         }
 
         public IEnumerable<object> orderBy(TemplateScopeContext scope, object target, object filter) => orderBy(scope, target, filter, null);
-        public IEnumerable<object> orderBy(TemplateScopeContext scope, object target, object filter, object scopeOptions) => 
+        public IEnumerable<object> orderBy(TemplateScopeContext scope, object target, object filter, object scopeOptions) =>
             orderByInternal(nameof(orderBy), scope, target, filter, scopeOptions);
 
         public IEnumerable<object> orderByDescending(TemplateScopeContext scope, object target, object filter) => orderByDescending(scope, target, filter, null);
@@ -966,7 +1082,7 @@ namespace ServiceStack.Templates
             orderByInternal(nameof(orderByDescending), scope, target, filter, scopeOptions);
 
         public IEnumerable<object> thenBy(TemplateScopeContext scope, object target, object filter) => thenBy(scope, target, filter, null);
-        public IEnumerable<object> thenBy(TemplateScopeContext scope, object target, object filter, object scopeOptions) => 
+        public IEnumerable<object> thenBy(TemplateScopeContext scope, object target, object filter, object scopeOptions) =>
             thenByInternal(nameof(thenBy), scope, target, filter, scopeOptions);
 
         public IEnumerable<object> thenByDescending(TemplateScopeContext scope, object target, object filter) => thenByDescending(scope, target, filter, null);
@@ -996,7 +1112,7 @@ namespace ServiceStack.Templates
 
         private static IComparer<object> GetComparer(string filterName, TemplateScopeContext scope, Dictionary<string, object> scopedParams)
         {
-            var comparer = (IComparer<object>) Comparer<object>.Default;
+            var comparer = (IComparer<object>)Comparer<object>.Default;
             if (scopedParams.TryGetValue(TemplateConstants.Comparer, out object oComparer))
             {
                 var nonGenericComparer = oComparer as IComparer;
@@ -1007,7 +1123,7 @@ namespace ServiceStack.Templates
             }
             return comparer;
         }
-        
+
         public static IEnumerable<object> orderByInternal(string filterName, TemplateScopeContext scope, object target, object expression, object scopeOptions)
         {
             var items = target.AssertEnumerable(filterName);
@@ -1039,23 +1155,23 @@ namespace ServiceStack.Templates
             var i = 0;
 
             var comparer = GetComparer(filterName, scope, scopedParams);
-            
+
             var sorted = filterName == nameof(thenByDescending)
                 ? items.ThenByDescending(item => scope.AddItemToScope(itemBinding, item, i++).Evaluate(value, binding), comparer)
-                : items.ThenBy(item =>scope.AddItemToScope(itemBinding, item, i++).Evaluate(value, binding), comparer);
+                : items.ThenBy(item => scope.AddItemToScope(itemBinding, item, i++).Evaluate(value, binding), comparer);
 
             return sorted;
         }
-        
+
         public IEnumerable<IGrouping<object, object>> groupBy(TemplateScopeContext scope, IEnumerable<object> items, object expression) => groupBy(scope, items, expression, null);
-        public IEnumerable<IGrouping<object, object>> groupBy(TemplateScopeContext scope, IEnumerable<object> items, object expression, object scopeOptions) 
+        public IEnumerable<IGrouping<object, object>> groupBy(TemplateScopeContext scope, IEnumerable<object> items, object expression, object scopeOptions)
         {
             var literal = scope.AssertExpression(nameof(groupBy), expression);
             var scopedParams = scope.GetParamsWithItemBinding(nameof(groupBy), scopeOptions, out string itemBinding);
 
             literal.ToStringSegment().ParseNextToken(out object value, out JsBinding binding);
 
-            var comparer = (IEqualityComparer<object>) EqualityComparer<object>.Default;
+            var comparer = (IEqualityComparer<object>)EqualityComparer<object>.Default;
             if (scopedParams.TryGetValue(TemplateConstants.Comparer, out object oComparer))
             {
                 comparer = oComparer as IEqualityComparer<object>;
@@ -1067,7 +1183,7 @@ namespace ServiceStack.Templates
                     comparer = new EqualityComparerWrapper<long>(longComparer);
                 else if (oComparer is IEqualityComparer<double> doubleComparer)
                     comparer = new EqualityComparerWrapper<double>(doubleComparer);
-                
+
                 if (comparer == null)
                 {
                     var nonGenericComparer = oComparer as IEqualityComparer;
@@ -1081,9 +1197,9 @@ namespace ServiceStack.Templates
             if (scopedParams.TryGetValue(TemplateConstants.Map, out object map))
             {
                 ((string)map).ToStringSegment().ParseNextToken(out object mapValue, out JsBinding mapBinding);
-                
+
                 var result = items.GroupBy(
-                    item => scope.AddItemToScope(itemBinding, item).Evaluate(value, binding), 
+                    item => scope.AddItemToScope(itemBinding, item).Evaluate(value, binding),
                     item => scope.AddItemToScope(itemBinding, item).Evaluate(mapValue, mapBinding),
                     comparer);
                 return result;
@@ -1106,7 +1222,7 @@ namespace ServiceStack.Templates
         {
             if (target == null)
                 return null;
-            
+
             if (target is IDictionary d)
             {
                 if (d.Contains(key))
@@ -1136,12 +1252,12 @@ namespace ServiceStack.Templates
                         return value;
                 }
             }
-            
+
             throw new NotSupportedException($"'{nameof(get)}' expects a collection but received a '{target.GetType().Name}'");
         }
-        
+
         public object map(TemplateScopeContext scope, object items, object expression) => map(scope, items, expression, null);
-        public object map(TemplateScopeContext scope, object target, object expression, object scopeOptions) 
+        public object map(TemplateScopeContext scope, object target, object expression, object scopeOptions)
         {
             var literal = scope.AssertExpression(nameof(map), expression);
             var scopedParams = scope.GetParamsWithItemBinding(nameof(map), scopeOptions, out string itemBinding);
@@ -1153,7 +1269,7 @@ namespace ServiceStack.Templates
                 var i = 0;
                 return items.Map(item => scope.AddItemToScope(itemBinding, item, i++).Evaluate(value, binding));
             }
-            
+
             var result = scope.AddItemToScope(itemBinding, target).Evaluate(value, binding);
             return result;
         }
@@ -1162,10 +1278,10 @@ namespace ServiceStack.Templates
         {
             if (target == null)
                 return null;
-            
+
             if (target is IDictionary<string, object> g)
                 return new ScopeVars(g);
-            
+
             if (target is IDictionary d)
             {
                 var to = new ScopeVars();
@@ -1204,15 +1320,15 @@ namespace ServiceStack.Templates
 
             throw new NotSupportedException($"'{nameof(scopeVars)}' expects a Dictionary but received a '{target.GetType().Name}'");
         }
-        
+
         [HandleUnknownValue]
         public Task select(TemplateScopeContext scope, object target, object selectTemplate) => select(scope, target, selectTemplate, null);
         [HandleUnknownValue]
-        public async Task select(TemplateScopeContext scope, object target, object selectTemplate, object scopeOptions) 
+        public async Task select(TemplateScopeContext scope, object target, object selectTemplate, object scopeOptions)
         {
             if (target == null)
                 return;
-            
+
             var scopedParams = scope.GetParamsWithItemBinding(nameof(select), scopeOptions, out string itemBinding);
             var template = JsonTypeSerializer.Unescape(selectTemplate.ToString());
             var itemScope = scope.CreateScopedContext(template, scopedParams);
@@ -1234,22 +1350,22 @@ namespace ServiceStack.Templates
         }
 
         [HandleUnknownValue]
-        public Task selectPartial(TemplateScopeContext scope, object target, string pageName) => selectPartial(scope, target, pageName, null); 
+        public Task selectPartial(TemplateScopeContext scope, object target, string pageName) => selectPartial(scope, target, pageName, null);
         [HandleUnknownValue]
-        public async Task selectPartial(TemplateScopeContext scope, object target, string pageName, object scopedParams) 
+        public async Task selectPartial(TemplateScopeContext scope, object target, string pageName, object scopedParams)
         {
             if (target == null)
                 return;
-            
+
             scope.TryGetPage(pageName, out TemplatePage page, out TemplateCodePage codePage);
             if (page != null)
                 await page.Init();
-            
+
             var pageParams = scope.GetParamsWithItemBinding(nameof(selectPartial), page, scopedParams, out string itemBinding);
 
             if (target is IEnumerable objs && !(target is IDictionary) && !(target is string))
             {
-                
+
                 var i = 0;
                 foreach (var item in objs)
                 {
@@ -1263,14 +1379,14 @@ namespace ServiceStack.Templates
                 await scope.WritePageAsync(page, codePage, pageParams);
             }
         }
-        
+
         private async Task serialize(TemplateScopeContext scope, object items, string jsconfig, Func<object, string> fn)
         {
             var defaultJsConfig = Context.Args[TemplateConstants.DefaultJsConfig] as string;
-            jsconfig  = jsconfig != null && !string.IsNullOrEmpty(defaultJsConfig)
+            jsconfig = jsconfig != null && !string.IsNullOrEmpty(defaultJsConfig)
                 ? defaultJsConfig + "," + jsconfig
                 : defaultJsConfig;
-            
+
             if (jsconfig != null)
             {
                 using (JsConfig.CreateScope(jsconfig))
@@ -1281,23 +1397,23 @@ namespace ServiceStack.Templates
             }
             await scope.OutputStream.WriteAsync(items.ToJson());
         }
-        
+
         private IRawString serialize(object target, string jsconfig, Func<object, string> fn)
         {
             var defaultJsConfig = Context.Args[TemplateConstants.DefaultJsConfig] as string;
-            jsconfig  = jsconfig != null && !string.IsNullOrEmpty(defaultJsConfig)
+            jsconfig = jsconfig != null && !string.IsNullOrEmpty(defaultJsConfig)
                 ? defaultJsConfig + "," + jsconfig
                 : defaultJsConfig;
 
-            if (jsconfig == null) 
+            if (jsconfig == null)
                 return fn(target.AssertNoCircularDeps()).ToRawString();
-           
+
             using (JsConfig.CreateScope(jsconfig))
             {
                 return fn(target).ToRawString();
             }
         }
-        
+
         //Filters
         public IRawString json(object value) => serialize(value, null, x => x.ToJson() ?? "null");
         public IRawString json(object value, string jsconfig) => serialize(value, jsconfig, x => x.ToJson() ?? "null");
@@ -1318,75 +1434,13 @@ namespace ServiceStack.Templates
 
         public Task csv(TemplateScopeContext scope, object items) => scope.OutputStream.WriteAsync(items.ToCsv());
         public Task xml(TemplateScopeContext scope, object items) => scope.OutputStream.WriteAsync(items.ToXml());
-        
-        //html
-        public IRawString htmltable(TemplateScopeContext scope, object target) => htmltable(scope, target, null);
-        public IRawString htmltable(TemplateScopeContext scope, object target, object scopeOptions)
-        {
-            if (target is IDictionary<string, object> single)
-                target = new[] { single };
-            
-            var items = target.AssertEnumerable(nameof(htmltable));
-            var scopedParams = scope.AssertOptions(nameof(htmltable), scopeOptions);
 
-            scopedParams.TryGetValue("headerStyle", out object oHeaderStyle);
-            scopedParams.TryGetValue("headerTag", out object oHeaderTag);
-            var headerTag = oHeaderTag as string ?? "th";
-            var headerStyle = oHeaderStyle as string ?? "splitCase";
+        public JsonObject jsonToObject(string json) => JsonObject.Parse(json);
+        public JsonArrayObjects jsonToArrayObjects(string json) => JsonArrayObjects.Parse(json);
+        public Dictionary<string, object> jsonToObjectDictionary(string json) => json.FromJson<Dictionary<string, object>>();
+        public Dictionary<string, string> jsonToStringDictionary(string json) => json.FromJson<Dictionary<string, string>>();
 
-            var sbHeader = StringBuilderCache.Allocate();
-            var sbRows = StringBuilderCache.Allocate();
-            List<string> keys = null;
-
-            foreach (var item in items)
-            {
-                if (item is IDictionary<string,object> d)
-                {
-                    if (keys == null)
-                    {
-                        keys = d.Keys.ToList();
-                        sbHeader.Append("<tr>");
-                        foreach (var key in keys)
-                        {
-                            sbHeader.Append('<').Append(headerTag).Append('>');
-                            sbHeader.Append(textStyle(key, headerStyle)?.HtmlEncode());
-                            sbHeader.Append("</").Append(headerTag).Append('>');
-                        }
-                        sbHeader.Append("</tr>");
-                    }
-
-                    sbRows.Append("<tr>");
-                    foreach (var key in keys)
-                    {
-                        var value = d[key];
-                        var encodedValue = value?.ToString()?.HtmlEncode();
-                        sbRows.Append("<td>").Append(encodedValue).Append("</td>");
-                    }
-                    sbRows.Append("</tr>");
-                }
-            }
-
-            var htmlHeaders = StringBuilderCache.Retrieve(sbHeader);
-            var htmlRows = StringBuilderCache.Retrieve(sbRows);
-
-            var sb = StringBuilderCache.Allocate();
-            sb.Append("<table");
-
-            if (scopedParams.TryGetValue("id", out object id))
-                sb.Append(" id=\"").Append(id).Append("\"");
-            if (scopedParams.TryGetValue("className", out object className))
-                sb.Append(" class=\"").Append(className).Append("\"");
-
-            sb.Append(">");
-            if (scopedParams.TryGetValue("caption", out object caption))
-                sb.Append("<caption>").Append(caption.ToString().HtmlEncode()).Append("</caption>");
-            
-            sb.Append("<thead>").Append(htmlHeaders).Append("</thead>");
-            sb.Append("<tbody>").Append(htmlRows).Append("</tbody>");
-            sb.Append("</table>");
-
-            var html = StringBuilderCache.Retrieve(sb);
-            return html.ToRawString();
-        }
+        public Dictionary<string, object> jsvToObjectDictionary(string json) => json.FromJsv<Dictionary<string, object>>();
+        public Dictionary<string, string> jsvToStringDictionary(string json) => json.FromJsv<Dictionary<string, string>>();
     }
 }

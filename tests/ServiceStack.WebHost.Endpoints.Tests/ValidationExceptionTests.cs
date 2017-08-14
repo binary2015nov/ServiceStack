@@ -91,12 +91,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Constant.ListeningOn);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown] public void OneTimeTearDown() => appHost.Dispose();
 
-        protected virtual JsonServiceClient GetClient() => new JsonServiceClient(Constant.ListeningOn);
+        protected virtual JsonServiceClient GetClient() => new JsonServiceClient(Config.ListeningOn);
 
         [Test]
         public void Triggering_all_validtors_returns_right_ErrorCode()

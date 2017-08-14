@@ -14,7 +14,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     [TestFixture]
     public class FileUploadTests
     {
-        string ListeningOn = Constant.ListeningOn;
+        string ListeningOn = Config.ListeningOn;
         ExampleAppHostHttpListener appHost;
 
         [OneTimeSetUp]

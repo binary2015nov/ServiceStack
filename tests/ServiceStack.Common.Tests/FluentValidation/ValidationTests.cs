@@ -12,7 +12,7 @@ namespace ServiceStack.Common.Tests.FluentValidation
         [Test]
         public void Can_register_IDtoBValidator_separately()
         {
-            using (var appHost = new MockAppHost
+            using (var appHost = new BasicAppHost
             {
                 ConfigureAppHost = host => {
                     host.RegisterService<DtoAService>();

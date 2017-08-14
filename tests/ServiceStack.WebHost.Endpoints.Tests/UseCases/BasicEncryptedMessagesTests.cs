@@ -74,7 +74,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
         {
             appHost = new BasicEncryptedMessagesAppHost()
                 .Init()
-                .Start(Constant.AbsoluteBaseUri);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -107,7 +107,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
         [Test]
         public void Can_Send_Encrypted_Message()
         {
-            var client = new JsonServiceClient(Constant.AbsoluteBaseUri);
+            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
 
             var request = new HelloSecure { Name = "World" };
             var encRequest = RsaUtils.Encrypt(request.ToJson(), SecureConfig.PublicKeyXml);

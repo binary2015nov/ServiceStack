@@ -13,7 +13,7 @@ namespace ServiceStack
 {
     public class HttpHandlerFactory : IHttpHandlerFactory
     {
-        static readonly List<string> WebHostRootFileNames = new List<string>();
+        public static readonly HashSet<string> WebHostRootFileNames = new HashSet<string>();
         private static string WebHostPhysicalPath = null;
         private static IHttpHandler DefaultHttpHandler = null;
         private static IHttpHandler NonRootModeDefaultHttpHandler = null;
@@ -60,19 +60,19 @@ namespace ServiceStack
                     //Can't serve Default.aspx pages so ignore and allow for next default document
                     if (!fileNameLower.EndsWith(".aspx"))
                     {
-                        defaultRootFileName = fileNameLower;
+                        defaultRootFileName = file.Name;
                         StaticFileHandler.SetDefaultFile(file.VirtualPath, file.ReadAllBytes(), file.LastModified);
 
                         if (DefaultHttpHandler == null)
                             DefaultHttpHandler = new StaticFileHandler(file);
                     }
                 }
-                WebHostRootFileNames.Add(fileNameLower);
+                WebHostRootFileNames.Add(file.Name);
             }
 
             foreach (var dir in appHost.VirtualFileSources.GetRootDirectories())
             {
-                WebHostRootFileNames.Add(dir.Name.ToLowerInvariant());
+                WebHostRootFileNames.Add(dir.Name);
             }
 
             if (!config.DefaultRedirectPath.IsNullOrEmpty())
@@ -236,7 +236,7 @@ namespace ServiceStack
                         : NotFoundHttpHandler;
                 }
 
-                return StaticFileHandler.ShouldAllow(requestPath)
+                return ShouldAllow(requestPath)
                     ? StaticFilesHandler
                     : ForbiddenHttpHandler;
             }
@@ -266,6 +266,26 @@ namespace ServiceStack
             }
 
             return null;
+        }
+
+        // no handler registered 
+        // serve the file from the filesystem, restricting to a safelist of extensions
+        public static bool ShouldAllow(string filePath)
+        {
+            var parts = filePath.SplitOnLast('.');
+            if (parts.Length == 1 || string.IsNullOrEmpty(parts[1]))
+                return false;
+
+            var fileExt = parts[1];
+            if (HostContext.Config.AllowFileExtensions.Contains(fileExt))
+                return true;
+
+            foreach (var pathGlob in HostContext.Config.AllowFilePaths)
+            {
+                if (filePath.GlobPath(pathGlob))
+                    return true;
+            }
+            return false;
         }
 
         public void ReleaseHandler(IHttpHandler handler)

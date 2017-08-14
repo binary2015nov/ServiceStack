@@ -7,7 +7,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     [TestFixture]
     public class CustomServiceRunnerTests
     {
-        string ListeningOn = Constant.AbsoluteBaseUri;
+        string ListeningOn = Config.AbsoluteBaseUri;
         private ServiceStackHost appHost;
 
         [OneTimeSetUp]
@@ -15,7 +15,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new CustomServiceRunnerAppHost()
                 .Init()
-                .Start(ListeningOn);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]

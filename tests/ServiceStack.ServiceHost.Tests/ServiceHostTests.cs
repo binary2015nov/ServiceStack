@@ -17,7 +17,7 @@ namespace ServiceStack.ServiceHost.Tests
         [SetUp]
         public void SetUp()
         {
-            appHost = new MockAppHost().Init();
+            appHost = new BasicAppHost().Init();
             serviceController = appHost.ServiceController;
         }
 

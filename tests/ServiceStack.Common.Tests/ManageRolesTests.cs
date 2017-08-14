@@ -36,7 +36,7 @@ namespace ServiceStack.Common.Tests
         [Test]
         public void By_default_assigned_roles_are_saved_in_UserAuth_table()
         {
-            using (var appHost = new MockAppHost
+            using (var appHost = new BasicAppHost
             {
                 ConfigureContainer = container =>
                 {
@@ -89,7 +89,7 @@ namespace ServiceStack.Common.Tests
         [Test]
         public void Can_assign_roles_that_persist_to_UserAuthRole_table()
         {
-            using (var appHost = new MockAppHost
+            using (var appHost = new BasicAppHost
             {
                 ConfigureContainer = container =>
                 {
@@ -146,7 +146,7 @@ namespace ServiceStack.Common.Tests
         [Test, Explicit]
         public void Can_assign_roles_that_persist_to_UserAuthRole_table_in_DynamoDb()
         {
-            using (var appHost = new MockAppHost
+            using (var appHost = new BasicAppHost
             {
                 ConfigureContainer = container =>
                 {

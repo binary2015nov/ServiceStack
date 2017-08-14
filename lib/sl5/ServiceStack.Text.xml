@@ -1870,12 +1870,13 @@
             <summary>
             When overridden in a descendant class, Initializes a new System.Net.HttpWebRequest instance for the specified URI scheme.
             </summary>
-            <param name="urlString">A URI string that identifies the Internet resource.</param>
+            <param name="uriString">A URI string that identifies the Internet resource.</param>
             <returns>A System.Net.HttpWebRequest instance for the specific URI scheme.</returns>
-            <exception cref="T:System.ArgumentNullException">The urlString is null.</exception>
-            <exception cref="T:System.NotSupportedException">The request scheme specified in urlString has not been registered.</exception>
+            <exception cref="T:System.ArgumentNullException">The uriString is null.</exception>
+            <exception cref="T:System.NotSupportedException">The request scheme specified in uriString has not been registered.</exception>
             <exception cref="T:System.Security.SecurityException">The caller does not have permission to connect to the requested URI or a URI
             that the request is redirected to.</exception>
+            <exception cref="T:System.NotSupportedException">The request scheme specified in uriString is the http or https scheme.</exception>
             <exception cref="T:System.FormatException">The URI specified in uriString is not a valid URI.</exception>
         </member>
         <member name="M:ServiceStack.PlatformExtensions.AddAttributes(System.Reflection.PropertyInfo,System.Attribute[])">
@@ -2964,7 +2965,7 @@
         </member>
         <member name="M:ServiceStack.StringExtensions.AppendPaths(System.String,System.String[])">
             <summary>
-             Appends the uri component elements with character escaping in a specified System.String array to the base URI.
+             Appends the uri component elements without character escaping in a specified System.String array to the base URI.
             </summary>
             <param name="baseUriString">The base System.Uri, represented as a System.String.</param>
             <param name="uriComponents">An string array that contains the uri component elements.</param>

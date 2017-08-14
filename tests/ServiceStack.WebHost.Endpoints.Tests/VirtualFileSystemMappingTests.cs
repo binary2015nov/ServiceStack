@@ -77,7 +77,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             appHost
                 .Init()
-                .Start(Constant.ListeningOn);
+                .Start(Config.ListeningOn);
         }
 
         private string ClearFolders()
@@ -126,7 +126,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_resolve_mapped_files_from_service()
         {
-            var client = new JsonServiceClient(Constant.ListeningOn);
+            var client = new JsonServiceClient(Config.ListeningOn);
             var response = client.Get(new GetMappedFile { VirtualPath = "vfs1/file.txt" });
             Assert.That(response.FileName, Is.EqualTo("file.txt"));
             Assert.That(response.Contents, Is.EqualTo("MOUNT1"));
@@ -141,11 +141,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_resolve_mapped_files_directly()
         {
-            var url = Constant.ListeningOn.AppendPaths("vfs1", "file.txt");
+            var url = Config.ListeningOn.AppendPaths("vfs1", "file.txt");
             var contents = url.GetStringFromUrl();
             Assert.That(contents, Is.EqualTo("MOUNT1"));
 
-            contents = Constant.ListeningOn.AppendPaths("vfs2", "dir2", "nested-file.txt").GetStringFromUrl();
+            contents = Config.ListeningOn.AppendPaths("vfs2", "dir2", "nested-file.txt").GetStringFromUrl();
             Assert.That(contents, Is.EqualTo("NESTED MOUNT2"));
         }
     }

@@ -34,7 +34,7 @@ namespace ServiceStack.Common.Tests
             ServiceClientBaseUri = serviceClientBaseUri;
             ServiceAssemblies = serviceAssemblies;
 
-            this.AppHost = new MockAppHost(serviceAssemblies).Init();
+            this.AppHost = new BasicAppHost(serviceAssemblies).Init();
             LogManager.LogFactory = new ConsoleLogFactory();
         }
 

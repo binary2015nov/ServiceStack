@@ -68,7 +68,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Constant.ListeningOn);
+                .Start(Config.ListeningOn);
         }
     
         [OneTimeTearDown] public void OneTimeTearDown() => appHost.Dispose();
@@ -76,7 +76,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void GET_Html_Request_calls_GetHtml()
         {
-            var html = HttpUtils.GetHtmlFromUrl(Constant.ListeningOn.AppendPath("/content/1"));
+            var html = HttpUtils.GetHtmlFromUrl(Config.ListeningOn.AppendPath("/content/1"));
 
             Assert.That(html, Does.Contain("<h1>GetHtml 1</h1>"));
         }
@@ -84,7 +84,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void POST_Html_Request_calls_AnyHtml()
         {
-            var html = HttpUtils.GetHtmlFromUrl(Constant.ListeningOn.AppendPath("/content/1"), method: HttpMethods.Post, requestBody: "");
+            var html = HttpUtils.GetHtmlFromUrl(Config.ListeningOn.AppendPath("/content/1"), method: HttpMethods.Post, requestBody: "");
 
             Assert.That(html, Does.Contain("<h1>AnyHtml 1</h1>"));
         }
@@ -92,7 +92,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void GET_JSON_Request_calls_GetJson()
         {
-            var client = new JsonServiceClient(Constant.ListeningOn);
+            var client = new JsonServiceClient(Config.ListeningOn);
 
             var response = client.Get<ContentRoute>(new ContentRoute { Id = 1 });
             Assert.That(response.Id, Is.EqualTo(1 + 1));
@@ -101,7 +101,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void POST_JSON_Request_calls_Any()
         {
-            var client = new JsonServiceClient(Constant.ListeningOn);
+            var client = new JsonServiceClient(Config.ListeningOn);
 
             var response = client.Post<ContentRoute>(new ContentRoute { Id = 1 });
             Assert.That(response.Id, Is.EqualTo(1));

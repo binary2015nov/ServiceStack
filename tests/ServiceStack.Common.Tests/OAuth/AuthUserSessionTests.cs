@@ -84,7 +84,7 @@ namespace ServiceStack.Common.Tests.OAuth
         [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
-            appHost = new MockAppHost().Init();
+            appHost = new BasicAppHost().Init();
         }
 
         [OneTimeTearDown]

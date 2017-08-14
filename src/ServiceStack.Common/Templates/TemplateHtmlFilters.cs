@@ -22,7 +22,7 @@ namespace ServiceStack.Templates
             var headerStyle = oHeaderStyle as string ?? "splitCase";
 
             var sbHeader = StringBuilderCache.Allocate();
-            var sbRows = StringBuilderCacheAlt.Allocate();
+            var sbRows = StringBuilderCache.Allocate();
             List<string> keys = null;
 
             foreach (var item in items)
@@ -57,8 +57,8 @@ namespace ServiceStack.Templates
             if (isEmpty && emptyCaption == null)
                 return RawString.Empty;
 
-            var htmlHeaders = StringBuilderCache.ReturnAndFree(sbHeader);
-            var htmlRows = StringBuilderCacheAlt.ReturnAndFree(sbRows);
+            var htmlHeaders = StringBuilderCache.Retrieve(sbHeader);
+            var htmlRows = StringBuilderCache.Retrieve(sbRows);
 
             var sb = StringBuilderCache.Allocate();
             sb.Append("<table");
@@ -84,7 +84,7 @@ namespace ServiceStack.Templates
 
             sb.Append("</table>");
 
-            var html = StringBuilderCache.ReturnAndFree(sb);
+            var html = StringBuilderCache.Retrieve(sb);
             return html.ToRawString();
         }
     }

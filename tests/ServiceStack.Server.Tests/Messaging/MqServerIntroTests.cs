@@ -367,7 +367,7 @@ namespace ServiceStack.Server.Tests.Messaging
         [Test]
         public void Does_process_messages_in_BasicAppHost()
         {
-            using (var appHost = new MockAppHost(typeof(HelloService).GetAssembly())
+            using (var appHost = new BasicAppHost(typeof(HelloService).GetAssembly())
             {
                 ConfigureAppHost = host =>
                 {
@@ -462,7 +462,7 @@ namespace ServiceStack.Server.Tests.Messaging
         public void Does_dispose_request_scope_dependency_in_PostMessageHandler()
         {
             var disposeCount = 0;
-            using (var appHost = new MockAppHost(typeof(HelloWithDepService).GetAssembly())
+            using (var appHost = new BasicAppHost(typeof(HelloWithDepService).GetAssembly())
             {
                 ConfigureAppHost = host =>
                 {

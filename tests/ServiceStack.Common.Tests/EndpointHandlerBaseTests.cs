@@ -92,7 +92,7 @@ namespace ServiceStack.Common.Tests
                     var file = Request.Files[i];
 
                     string fileId = Guid.NewGuid().ToString();
-                    var session = base.GetSession();
+                    var session = this.GetSession();
                     var fileName = session.Id.CombineWith(fileId);
                     VirtualFiles.WriteFile(fileName, file.InputStream);
                 }

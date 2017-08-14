@@ -10,7 +10,7 @@ namespace ServiceStack.Common.Tests.OAuth
     [TestFixture]
     public class CredentialsServiceTests
     {
-        public class CredentialsTestAppHost : MockAppHost
+        public class CredentialsTestAppHost : BasicAppHost
         {
             public CredentialsTestAppHost() : base(typeof(CredentialsServiceTests).GetAssembly()) {}
 

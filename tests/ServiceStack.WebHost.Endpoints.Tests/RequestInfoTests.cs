@@ -26,7 +26,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Constant.ListeningOn);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -35,7 +35,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_return_expected_request_info()
         {
-            var url = Constant.ListeningOn.AppendPath("metadata").AddQueryParam("debug", "requestinfo");
+            var url = Config.ListeningOn.AppendPath("metadata").AddQueryParam("debug", "requestinfo");
             var json = url.GetJsonFromUrl();
             var info = json.FromJson<RequestInfoResponse>();
             

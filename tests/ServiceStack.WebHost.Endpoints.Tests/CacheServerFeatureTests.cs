@@ -22,7 +22,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Constant.ListeningOn);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -41,7 +41,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         protected JsonServiceClient GetClient()
         {
-            var client = new JsonServiceClient(Constant.ListeningOn);
+            var client = new JsonServiceClient(Config.ListeningOn);
 #if NETCORE            
             client.AddHeader(HttpHeaders.AcceptEncoding, "gzip,deflate");
 #endif

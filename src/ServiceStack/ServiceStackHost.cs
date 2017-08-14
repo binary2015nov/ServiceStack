@@ -80,6 +80,7 @@ namespace ServiceStack
             AfterInitCallbacks = new List<Action<IAppHost>>();
             OnDisposeCallbacks = new List<Action<IAppHost>>();
             OnEndRequestCallbacks = new List<Action<IRequest>>();
+            AddVirtualFileSources = new List<IVirtualPathProvider>();
             RawHttpHandlers = new List<Func<IHttpRequest, IHttpHandler>>();
             CatchAllHandlers = new List<HttpHandlerResolverDelegate>();
             CustomErrorHttpHandlers = new Dictionary<HttpStatusCode, IServiceStackHandler> {
@@ -479,6 +480,8 @@ namespace ServiceStack
             pathProviders.AddRange(Config.EmbeddedResourceSources.Distinct()
                 .Map(x => new ResourceVirtualFiles(x) { LastModified = GetAssemblyLastModified(x) } ));
 
+            if (AddVirtualFileSources.Count > 0)
+                pathProviders.AddRange(AddVirtualFileSources);
             return pathProviders;
         }
 
@@ -619,6 +622,8 @@ namespace ServiceStack
         public IVirtualFiles VirtualFiles { get; set; }
 
         public IVirtualPathProvider VirtualFileSources { get; set; }
+
+        public List<IVirtualPathProvider> AddVirtualFileSources { get; set; }
 
         public List<Action<IRequest, object>> GatewayRequestFilters { get; set; }
 

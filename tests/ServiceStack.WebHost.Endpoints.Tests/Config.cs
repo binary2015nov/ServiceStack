@@ -2,10 +2,9 @@
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
-    public class Constant
+    public class Config
     {
         public static readonly string AbsoluteBaseUri = Environment.GetEnvironmentVariable("CI_BASEURI") ?? "http://localhost:20000";
-        public static readonly string ServiceStackBaseHost = AbsoluteBaseUri + "/";
         public static readonly string ListeningOn = AbsoluteBaseUri + "/";
         public static readonly string RabbitMQConnString = Environment.GetEnvironmentVariable("CI_RABBITMQ") ?? "localhost";
         public static readonly string SqlServerConnString = Environment.GetEnvironmentVariable("CI_SQLSERVER") ?? @"Data Source=(localdb)\ProjectsV13;Initial Catalog=master;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";

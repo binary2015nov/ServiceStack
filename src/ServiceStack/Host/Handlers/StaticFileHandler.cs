@@ -398,25 +398,5 @@ namespace ServiceStack.Host.Handlers
 
             return results;
         }
-
-        // no handler registered 
-        // serve the file from the filesystem, restricting to a safelist of extensions
-        public static bool ShouldAllow(string filePath)
-        {
-            var parts = filePath.SplitOnLast('.');
-            if (parts.Length == 1 || string.IsNullOrEmpty(parts[1]))
-                return false;
-
-            var fileExt = parts[1];
-            if (HostContext.Config.AllowFileExtensions.Contains(fileExt))
-                return true;
-
-            foreach (var pathGlob in HostContext.Config.AllowFilePaths)
-            {
-                if (filePath.GlobPath(pathGlob))
-                    return true;
-            }
-            return false;
-        }
     }
 }

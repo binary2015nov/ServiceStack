@@ -52,7 +52,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new HttpHandlerAppHost()
                 .Init()
-                .Start(Constant.ListeningOn);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -101,7 +101,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             try
             {
-                var response = Constant.ListeningOn.AppendPath("/non-existing-request").GetJsonFromUrl();
+                var response = Config.ListeningOn.AppendPath("/non-existing-request").GetJsonFromUrl();
                 Assert.Fail("Should throw");
             }
             catch (WebException ex)
@@ -116,7 +116,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_set_Headers_with_Custom_Result()
         {
-            var xml = Constant.ListeningOn.CombineWith("customresult")
+            var xml = Config.ListeningOn.CombineWith("customresult")
                 .GetStringFromUrl(responseFilter: res => {
                     Assert.That(res.ContentType, Is.EqualTo("application/xml"));
                     Assert.That(res.Headers["Content-Disposition"], Is.EqualTo("attachement; filename=\"file.xml\""));

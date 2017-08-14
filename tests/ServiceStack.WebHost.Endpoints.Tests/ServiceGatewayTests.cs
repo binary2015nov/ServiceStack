@@ -337,7 +337,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             public IServiceGateway GetGateway(Type requestType)
             {
                 var gateway = requestType.Name.Contains("External")
-                    ? new JsonServiceClient(Constant.ListeningOn)
+                    ? new JsonServiceClient(Config.ListeningOn)
                     : (IServiceGateway) localGateway;
                 return gateway;
             }
@@ -394,7 +394,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             public override void Configure(Container container)
             {
                 container.Register<IMessageFactory>(c => new MessageFactory());
-                container.Register<IServiceGateway>(c => new JsonServiceClient(Tests.Constant.ListeningOn));
+                container.Register<IServiceGateway>(c => new JsonServiceClient(Tests.Config.ListeningOn));
                 
                 Plugins.Add(new ValidationFeature());
                 container.RegisterValidator(typeof(SGSyncPostValidationInternalValidator));
@@ -464,9 +464,9 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = CreateAppHost()
                 .Init()
-                .Start(Constant.ListeningOn);
+                .Start(Config.ListeningOn);
 
-            client = new JsonServiceClient(Constant.ListeningOn);
+            client = new JsonServiceClient(Config.ListeningOn);
         }
 
         [OneTimeTearDown]

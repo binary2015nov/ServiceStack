@@ -42,7 +42,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Issues
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Constant.AbsoluteBaseUri);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -57,7 +57,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Issues
             var xml = @"<TestXml>
                           <User>steve</User>
                         </TestXml>";
-            var response = Constant.AbsoluteBaseUri.CombineWith("/testxml")
+            var response = Config.AbsoluteBaseUri.CombineWith("/testxml")
                   .PostStringToUrl(xml, contentType: "text/xml; charset=utf-8", accept: "application/json");
 
             Assert.That(response, Is.EqualTo("{\"User\":\"steve\"}").Or.EqualTo(("{\"user\":\"steve\"}")));

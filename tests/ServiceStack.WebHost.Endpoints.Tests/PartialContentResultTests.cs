@@ -67,9 +67,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     [TestFixture]
     public class PartialContentResultTests
     {
-        string BaseUri = Constant.ServiceStackBaseHost;
-        string ListeningOn = Constant.AbsoluteBaseUri;
-
         private ServiceStackHost appHost;
 
         readonly FileInfo uploadedFile = new FileInfo("~/TestExistingDir/upload.html".MapProjectPlatformPath());
@@ -80,7 +77,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new PartialContentAppHost()
                 .Init()
-                .Start(ListeningOn);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -91,7 +88,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             "File size {0}".Print(uploadedFile.Length);
 
-            byte[] actualContents = "{0}/TestExistingDir/upload.html".Fmt(BaseUri).GetBytesFromUrl(
+            byte[] actualContents = "{0}/TestExistingDir/upload.html".Fmt(Config.AbsoluteBaseUri).GetBytesFromUrl(
                 responseFilter: httpRes => "Content-Length header {0}".Print(httpRes.Headers["Content-Length"]));
 
             "response size {0}".Fmt(actualContents.Length);
@@ -104,7 +101,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             "File size {0}".Print(uploadedFile.Length);
 
-            byte[] actualContents = "{0}/partialfiles/TestExistingDir/upload.html".Fmt(BaseUri).GetBytesFromUrl(
+            byte[] actualContents = "{0}/partialfiles/TestExistingDir/upload.html".Fmt(Config.AbsoluteBaseUri).GetBytesFromUrl(
                 responseFilter: httpRes => "Content-Length header {0}".Print(httpRes.Headers["Content-Length"]));
 
             "response size {0}".Fmt(actualContents.Length);
@@ -115,7 +112,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_StaticFile_GET_206_Partial_response_for_file_with_range_header()
         {
-            var actualContents = "{0}/TestExistingDir/upload.html".Fmt(BaseUri).GetStringFromUrl(
+            var actualContents = "{0}/TestExistingDir/upload.html".Fmt(Config.AbsoluteBaseUri).GetStringFromUrl(
                 requestFilter: httpReq => httpReq.AddRange(5, 11),
                 responseFilter: httpRes =>
                 {
@@ -130,7 +127,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_GET_206_Partial_response_for_file_with_range_header()
         {
-            var actualContents = "{0}/partialfiles/TestExistingDir/upload.html".Fmt(BaseUri).GetStringFromUrl(
+            var actualContents = "{0}/partialfiles/TestExistingDir/upload.html".Fmt(Config.AbsoluteBaseUri).GetStringFromUrl(
                 requestFilter: httpReq => httpReq.AddRange(5, 11),
                 responseFilter: httpRes =>
                 {
@@ -145,7 +142,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_GET_206_Partial_response_for_memory_with_range_header()
         {
-            var actualContents = "{0}/partialfiles/memory?mimeType=audio/mpeg".Fmt(BaseUri).GetStringFromUrl(
+            var actualContents = "{0}/partialfiles/memory?mimeType=audio/mpeg".Fmt(Config.AbsoluteBaseUri).GetStringFromUrl(
                 requestFilter: httpReq => httpReq.AddRange(5, 9),
                 responseFilter: httpRes => "Content-Length header {0}".Print(httpRes.Headers["Content-Length"]));
 
@@ -156,7 +153,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_GET_206_Partial_response_for_text_with_range_header()
         {
-            var actualContents = "{0}/partialfiles/text".Fmt(BaseUri).GetStringFromUrl(
+            var actualContents = "{0}/partialfiles/text".Fmt(Config.AbsoluteBaseUri).GetStringFromUrl(
                 requestFilter: httpReq => httpReq.AddRange(5, 9),
                 responseFilter: httpRes => "Content-Length header {0}".Print(httpRes.Headers["Content-Length"]));
 

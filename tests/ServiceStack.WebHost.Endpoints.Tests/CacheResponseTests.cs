@@ -216,7 +216,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Constant.ListeningOn);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -237,7 +237,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             ServerCacheOnly.Count = 0;
             var request = new ServerCacheOnly { Id = 1, Value = "foo" };
 
-            var response = Constant.ListeningOn.CombineWith(request.ToGetUrl())
+            var response = Config.ListeningOn.CombineWith(request.ToGetUrl())
                 .GetJsonFromUrl(responseFilter: res =>
                 {
                     Assert.That(res.ContentType, Does.StartWith(MimeTypes.Json));
@@ -248,7 +248,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             Assert.That(ServerCacheOnly.Count, Is.EqualTo(1));
             AssertEquals(response, request);
 
-            response = Constant.ListeningOn.CombineWith(request.ToGetUrl())
+            response = Config.ListeningOn.CombineWith(request.ToGetUrl())
                 .GetJsonFromUrl(responseFilter: res =>
                 {
                     Assert.That(res.ContentType, Does.StartWith(MimeTypes.Json));
@@ -259,7 +259,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             Assert.That(ServerCacheOnly.Count, Is.EqualTo(1));
             AssertEquals(response, request);
 
-            var client = new JsonServiceClient(Constant.ListeningOn);
+            var client = new JsonServiceClient(Config.ListeningOn);
             response = client.Get<ServerCacheOnly>(request);
             Assert.That(ServerCacheOnly.Count, Is.EqualTo(1));
             AssertEquals(response, request);
@@ -271,7 +271,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             ServerCacheOnlyAsync.Count = 0;
             var request = new ServerCacheOnlyAsync { Id = 1, Value = "foo" };
 
-            var response = Constant.ListeningOn.CombineWith(request.ToGetUrl())
+            var response = Config.ListeningOn.CombineWith(request.ToGetUrl())
                 .GetJsonFromUrl(responseFilter: res =>
                 {
                     Assert.That(res.ContentType, Does.StartWith(MimeTypes.Json));
@@ -282,7 +282,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             Assert.That(ServerCacheOnlyAsync.Count, Is.EqualTo(1));
             AssertEquals(response, request);
 
-            response = Constant.ListeningOn.CombineWith(request.ToGetUrl())
+            response = Config.ListeningOn.CombineWith(request.ToGetUrl())
                 .GetJsonFromUrl(responseFilter: res =>
                 {
                     Assert.That(res.ContentType, Does.StartWith(MimeTypes.Json));
@@ -293,7 +293,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             Assert.That(ServerCacheOnlyAsync.Count, Is.EqualTo(1));
             AssertEquals(response, request);
 
-            var client = new JsonServiceClient(Constant.ListeningOn);
+            var client = new JsonServiceClient(Config.ListeningOn);
             response = await client.GetAsync<ServerCacheOnlyAsync>(request);
             Assert.That(ServerCacheOnlyAsync.Count, Is.EqualTo(1));
             AssertEquals(response, request);
@@ -305,14 +305,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             ServerCacheOnly.Count = 0;
             var request = new ServerCacheOnly { Id = 2, Value = "foo" };
 
-            var response = Constant.ListeningOn.CombineWith(request.ToGetUrl())
+            var response = Config.ListeningOn.CombineWith(request.ToGetUrl())
                 .GetJsonFromUrl()
                 .FromJson<ServerCacheOnly>();
 
             Assert.That(ServerCacheOnly.Count, Is.EqualTo(1));
             AssertEquals(response, request);
 
-            response = Constant.ListeningOn.CombineWith(new ServerCacheOnly { Id = 1 }.ToGetUrl())
+            response = Config.ListeningOn.CombineWith(new ServerCacheOnly { Id = 1 }.ToGetUrl())
                 .GetJsonFromUrl()
                 .FromJson<ServerCacheOnly>();
 
@@ -327,21 +327,21 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             ServerCacheOnly.Count = 0;
             var request = new ServerCacheUser { Id = 3, Value = "foo" };
 
-            var response = Constant.ListeningOn.CombineWith(request.ToGetUrl())
+            var response = Config.ListeningOn.CombineWith(request.ToGetUrl())
                 .GetJsonFromUrl(requestFilter: req => req.Headers["X-ss-id"] = "1")
                 .FromJson<ServerCacheUser>();
 
             Assert.That(ServerCacheUser.Count, Is.EqualTo(1));
             AssertEquals(response, request);
 
-            response = Constant.ListeningOn.CombineWith(request.ToGetUrl())
+            response = Config.ListeningOn.CombineWith(request.ToGetUrl())
                 .GetJsonFromUrl(requestFilter: req => req.Headers["X-ss-id"] = "1")
                 .FromJson<ServerCacheUser>();
 
             Assert.That(ServerCacheUser.Count, Is.EqualTo(1));
             AssertEquals(response, request);
 
-            response = Constant.ListeningOn.CombineWith(request.ToGetUrl())
+            response = Config.ListeningOn.CombineWith(request.ToGetUrl())
                 .GetJsonFromUrl(requestFilter: req => req.Headers["X-ss-id"] = "2")
                 .FromJson<ServerCacheUser>();
 
@@ -355,21 +355,21 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             ServerCacheRoles.Count = 0;
             var request = new ServerCacheRoles { Id = 3, Value = "foo" };
 
-            var response = Constant.ListeningOn.CombineWith(request.ToGetUrl())
+            var response = Config.ListeningOn.CombineWith(request.ToGetUrl())
                 .GetJsonFromUrl(requestFilter: req => req.Headers["X-role"] = "RoleA")
                 .FromJson<ServerCacheRoles>();
 
             Assert.That(ServerCacheRoles.Count, Is.EqualTo(1));
             AssertEquals(response, request);
 
-            response = Constant.ListeningOn.CombineWith(request.ToGetUrl())
+            response = Config.ListeningOn.CombineWith(request.ToGetUrl())
                 .GetJsonFromUrl(requestFilter: req => req.Headers["X-role"] = "RoleA")
                 .FromJson<ServerCacheRoles>();
 
             Assert.That(ServerCacheRoles.Count, Is.EqualTo(1));
             AssertEquals(response, request);
 
-            response = Constant.ListeningOn.CombineWith(request.ToGetUrl())
+            response = Config.ListeningOn.CombineWith(request.ToGetUrl())
                 .GetJsonFromUrl(requestFilter: req => req.Headers["X-role"] = "RoleB")
                 .FromJson<ServerCacheRoles>();
 
@@ -382,7 +382,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             ServerCacheOnly.Count = 0;
             var request = new ServerCacheOnly { Id = 4, Value = "bar" };
-            var url = Constant.ListeningOn.CombineWith(request.ToGetUrl());
+            var url = Config.ListeningOn.CombineWith(request.ToGetUrl());
 
             ServerCacheOnly response;
 
@@ -447,7 +447,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_execute_with_CompressionDisabled()
         {
-            var client = new JsvServiceClient(Constant.ListeningOn)
+            var client = new JsvServiceClient(Config.ListeningOn)
             {
                 DisableAutoCompression = true,
             };
@@ -464,10 +464,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             var request = new ServerCacheShort { Id = 5, Value = "foo" };
 
-            var response = Constant.ListeningOn.CombineWith(request.ToGetUrl())
+            var response = Config.ListeningOn.CombineWith(request.ToGetUrl())
                 .GetJsonFromUrl()
                 .FromJson<ServerCacheShort>();
-            response = Constant.ListeningOn.CombineWith(request.ToGetUrl())
+            response = Config.ListeningOn.CombineWith(request.ToGetUrl())
                 .GetJsonFromUrl()
                 .FromJson<ServerCacheShort>();
 
@@ -476,7 +476,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             Thread.Sleep(1100);
 
-            response = Constant.ListeningOn.CombineWith(request.ToGetUrl())
+            response = Config.ListeningOn.CombineWith(request.ToGetUrl())
                 .GetJsonFromUrl()
                 .FromJson<ServerCacheShort>();
 
@@ -489,7 +489,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             ClientCacheMaxAge.Count = 0;
             var request = new ClientCacheMaxAge { Id = 6, Value = "foo" };
-            var client = new CachedServiceClient(new JsonServiceClient(Constant.ListeningOn));
+            var client = new CachedServiceClient(new JsonServiceClient(Config.ListeningOn));
 
             ClientCacheMaxAge response;
 
@@ -509,7 +509,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             ClientCacheMaxAge.Count = 0;
             var request = new ClientCacheMustRevalidate { Id = 7, Value = "foo" };
-            var client = new CachedServiceClient(new JsonServiceClient(Constant.ListeningOn));
+            var client = new CachedServiceClient(new JsonServiceClient(Config.ListeningOn));
 
             ClientCacheMustRevalidate response;
 
@@ -530,21 +530,21 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             ServerCustomCacheKey.Count = 0;
             var request = new ServerCustomCacheKey { Id = 8, Value = "foo" };
 
-            var response = Constant.ListeningOn.CombineWith(request.ToGetUrl())
+            var response = Config.ListeningOn.CombineWith(request.ToGetUrl())
                 .GetJsonFromUrl()
                 .FromJson<ServerCustomCacheKey>();
 
             Assert.That(ServerCustomCacheKey.Count, Is.EqualTo(1));
             AssertEquals(response, request);
 
-            response = Constant.ListeningOn.CombineWith(request.ToGetUrl())
+            response = Config.ListeningOn.CombineWith(request.ToGetUrl())
                 .GetJsonFromUrl()
                 .FromJson<ServerCustomCacheKey>();
 
             Assert.That(ServerCustomCacheKey.Count, Is.EqualTo(2));
             AssertEquals(response, request);
 
-            response = Constant.ListeningOn.CombineWith(request.ToGetUrl())
+            response = Config.ListeningOn.CombineWith(request.ToGetUrl())
                 .GetJsonFromUrl()
                 .FromJson<ServerCustomCacheKey>();
 
@@ -555,7 +555,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_not_cache_Error_Responses()
         {
-            var client = new JsonServiceClient(Constant.ListeningOn);
+            var client = new JsonServiceClient(Config.ListeningOn);
 
             try
             {

@@ -6,16 +6,16 @@ using ServiceStack.Host;
 
 namespace ServiceStack.Testing
 {
-    public class MockAppHost : ServiceStackHost
+    public class BasicAppHost : ServiceStackHost
     {
-        public MockAppHost(params Assembly[] serviceAssemblies)
-            : base(typeof (MockAppHost).GetOperationName(),
+        public BasicAppHost(params Assembly[] serviceAssemblies)
+            : base(typeof (BasicAppHost).GetOperationName(),
                    serviceAssemblies.Length > 0 ? serviceAssemblies : new[]
                    {
 #if !NETSTANDARD1_6
                        Assembly.GetExecutingAssembly()
 #else
-                       typeof(MockAppHost).GetTypeInfo().Assembly
+                       typeof(BasicAppHost).GetTypeInfo().Assembly
 #endif
                    })
         {
@@ -32,11 +32,11 @@ namespace ServiceStack.Testing
 
         public Action<Container> ConfigureContainer { get; set; }
 
-        public Action<MockAppHost> ConfigureAppHost { get; set; }
+        public Action<BasicAppHost> ConfigureAppHost { get; set; }
 
         public Action<HostConfig> ConfigFilter { get; set; }
 
-        public Func<MockAppHost, ServiceController> UseServiceController
+        public Func<BasicAppHost, ServiceController> UseServiceController
         {
             set { ServiceController = value(this); }
         }

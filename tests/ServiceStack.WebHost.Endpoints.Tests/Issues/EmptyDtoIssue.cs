@@ -51,7 +51,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Issues
             {
                 appHost = new AppHost()
                     .Init()
-                    .Start(Constant.ListeningOn);
+                    .Start(Config.ListeningOn);
             }
 
             [OneTimeTearDown]
@@ -63,7 +63,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Issues
             [Test]
             public void Can_POST_empty_array()
             {
-                var client = new JsonServiceClient(Constant.AbsoluteBaseUri);
+                var client = new JsonServiceClient(Config.AbsoluteBaseUri);
                 client.Post(new PostEmptyArray { Ids = new int[] { } });
             }
 
@@ -71,7 +71,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Issues
             public void Can_GET_empty_array()
             {
 
-                var client = new JsonServiceClient(Constant.AbsoluteBaseUri);
+                var client = new JsonServiceClient(Config.AbsoluteBaseUri);
                 client.Get(new GetEmptyArray { Ids = new int[] { } });
             }
         }

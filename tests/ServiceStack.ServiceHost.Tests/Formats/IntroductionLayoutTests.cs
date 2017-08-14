@@ -51,7 +51,7 @@ namespace ServiceStack.ServiceHost.Tests.Formats
         [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
-            appHost = new MockAppHost().Init();
+            appHost = new BasicAppHost().Init();
         }
 
         [OneTimeTearDown]

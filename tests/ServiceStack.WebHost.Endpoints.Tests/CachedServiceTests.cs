@@ -14,7 +14,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new ExampleAppHostHttpListener();
             appHost.Init();
-            appHost.Start(Constant.AbsoluteBaseUri);
+            appHost.Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -26,7 +26,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_call_Cached_WebService_with_JSON()
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
+            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
 
             var response = client.Get<MoviesResponse>("/cached/movies");
 
@@ -36,7 +36,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_call_Cached_WebService_with_JSON_string()
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
+            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
 
             var response = client.Get<string>("/cached-string/TEXT");
 
@@ -46,7 +46,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_call_CachedWithTimeout_WebService_with_JSON()
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
+            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
 
             var response = client.Get<MoviesResponse>("/cached-timeout/movies");
 
@@ -56,7 +56,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_call_CachedWithTimeout_and_Redis_WebService_with_JSON()
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
+            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
 
             var response = client.Get<MoviesResponse>("/cached-timeout-redis/movies");
 
@@ -66,7 +66,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_call_Cached_WebService_with_ProtoBuf()
         {
-            var client = new ProtoBufServiceClient(Constant.ServiceStackBaseHost);
+            var client = new ProtoBufServiceClient(Config.AbsoluteBaseUri);
 
             var response = client.Get<MoviesResponse>("/cached/movies");
 
@@ -76,7 +76,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_call_Cached_WebService_with_JSONP()
         {
-            var url = Constant.ServiceStackBaseHost.CombineWith("/cached/movies?callback=cb");
+            var url = Config.AbsoluteBaseUri.CombineWith("/cached/movies?callback=cb");
             var jsonp = url.GetJsonFromUrl();
             Assert.That(jsonp.StartsWith("cb("));
         }

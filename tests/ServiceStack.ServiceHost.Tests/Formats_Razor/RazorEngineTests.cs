@@ -18,7 +18,7 @@ namespace ServiceStack.ServiceHost.Tests.Formats_Razor
         [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
-            appHost = new MockAppHost().Init();
+            appHost = new BasicAppHost().Init();
         }
 
         [OneTimeTearDown]

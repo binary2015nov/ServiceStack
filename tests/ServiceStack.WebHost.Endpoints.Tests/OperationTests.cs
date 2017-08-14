@@ -31,7 +31,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             appHost = new OperationTestsAppHost();
             appHost.Init();
 #if NETCORE
-            appHost.Start(Constant.ListeningOn);
+            appHost.Start(Config.ListeningOn);
 #endif
 
             var dummyServiceType = GetType();

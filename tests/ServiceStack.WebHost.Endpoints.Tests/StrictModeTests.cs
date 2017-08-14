@@ -34,7 +34,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Constant.ListeningOn);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -43,7 +43,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Returning_ValueTime_throws_StrictModeException()
         {
-            var client = new JsonServiceClient(Constant.ListeningOn);
+            var client = new JsonServiceClient(Config.ListeningOn);
 
             try
             {

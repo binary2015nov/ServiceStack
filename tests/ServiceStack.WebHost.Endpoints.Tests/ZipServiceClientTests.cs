@@ -49,7 +49,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Constant.ListeningOn);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -66,7 +66,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_send_GZip_client_request_list()
         {
-            var client = new JsonServiceClient(Constant.ListeningOn)
+            var client = new JsonServiceClient(Config.ListeningOn)
             {
                 RequestCompressionType = CompressionTypes.GZip,
             };
@@ -81,7 +81,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_send_GZip_client_request_list_HttpClient()
         {
-            var client = new JsonHttpClient(Constant.ListeningOn)
+            var client = new JsonHttpClient(Config.ListeningOn)
             {
                 RequestCompressionType = CompressionTypes.GZip,
             };
@@ -96,7 +96,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public async Task Can_send_GZip_client_request_list_HttpClient_async()
         {
-            var client = new JsonHttpClient(Constant.ListeningOn)
+            var client = new JsonHttpClient(Config.ListeningOn)
             {
                 RequestCompressionType = CompressionTypes.GZip,
             };
@@ -111,7 +111,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_send_GZip_client_request()
         {
-            var client = new JsonServiceClient(Constant.ListeningOn)
+            var client = new JsonServiceClient(Config.ListeningOn)
             {
                 RequestCompressionType = CompressionTypes.GZip,
             };
@@ -122,7 +122,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_send_Deflate_client_request()
         {
-            var client = new JsonServiceClient(Constant.ListeningOn)
+            var client = new JsonServiceClient(Config.ListeningOn)
             {
                 RequestCompressionType = CompressionTypes.Deflate,
             };
@@ -133,7 +133,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_send_GZip_client_request_HttpClient()
         {
-            var client = new JsonHttpClient(Constant.ListeningOn)
+            var client = new JsonHttpClient(Config.ListeningOn)
             {
                 RequestCompressionType = CompressionTypes.GZip,
             };
@@ -144,7 +144,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_send_Deflate_client_request_HttpClient()
         {
-            var client = new JsonHttpClient(Constant.ListeningOn)
+            var client = new JsonHttpClient(Config.ListeningOn)
             {
                 RequestCompressionType = CompressionTypes.Deflate,
             };
@@ -155,7 +155,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Explicit, Test]
         public void Can_send_gzip_client_request_ASPNET()
         {
-            var client = new JsonServiceClient(Constant.AspNetServiceStackBaseUri)
+            var client = new JsonServiceClient(Config.AspNetServiceStackBaseUri)
             {
                 RequestCompressionType = CompressionTypes.GZip,
             };

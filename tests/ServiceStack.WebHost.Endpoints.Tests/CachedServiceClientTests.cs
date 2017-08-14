@@ -11,7 +11,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         protected override ICachedServiceClient GetCachedServiceClient()
         {
-            var client = new JsonServiceClient(Constant.ListeningOn);
+            var client = new JsonServiceClient(Config.ListeningOn);
 #if NETCORE            
             client.AddHeader(HttpHeaders.AcceptEncoding, "gzip,deflate");
 #endif
@@ -23,7 +23,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         protected override ICachedServiceClient GetCachedServiceClient()
         {
-            return new CachedHttpClient(new JsonHttpClient(Constant.ListeningOn));
+            return new CachedHttpClient(new JsonHttpClient(Config.ListeningOn));
         }
     }
 
@@ -44,7 +44,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Constant.ListeningOn);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -100,7 +100,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             var client = GetCachedServiceClient();
 
-            var requestUrl = Constant.ListeningOn.CombineWith("set-cache?etag=etag");
+            var requestUrl = Config.ListeningOn.CombineWith("set-cache?etag=etag");
 
             var response = client.Get<SetCache>(requestUrl);
             Assert.That(client.CacheHits, Is.EqualTo(0));
@@ -132,7 +132,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             var client = GetCachedServiceClient();
 
-            var requestUrl = Constant.ListeningOn.CombineWith("set-cache?lastModified=2016-01-01");
+            var requestUrl = Config.ListeningOn.CombineWith("set-cache?lastModified=2016-01-01");
 
             var response = client.Get<SetCache>(requestUrl);
             Assert.That(client.CacheHits, Is.EqualTo(0));
@@ -148,7 +148,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             var client = GetCachedServiceClient();
 
-            var requestUrl = Constant.ListeningOn.CombineWith("set-cache?lastModified=2016-01-01");
+            var requestUrl = Config.ListeningOn.CombineWith("set-cache?lastModified=2016-01-01");
 
             var response = await client.GetAsync<SetCache>(requestUrl);
             Assert.That(client.CacheHits, Is.EqualTo(0));

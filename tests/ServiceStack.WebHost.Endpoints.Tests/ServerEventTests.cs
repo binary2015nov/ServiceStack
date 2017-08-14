@@ -204,7 +204,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                     }
                 }
                 .Init()
-                .Start(Constant.AbsoluteBaseUri);
+                .Start(Config.ListeningOn);
         }
     }
 
@@ -216,7 +216,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             return new ServerEventsAppHost()
                 .Init()
-                .Start(Constant.AbsoluteBaseUri);
+                .Start(Config.ListeningOn);
         }
     }
 
@@ -228,7 +228,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             return new ServerEventsAppHost { UseRedisServerEvents = true }
                 .Init()
-                .Start(Constant.AbsoluteBaseUri);
+                .Start(Config.ListeningOn);
         }
     }
 
@@ -264,7 +264,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         private static ServerEventsClient CreateServerEventsClient(params string[] channels)
         {
-            var client = new ServerEventsClient(Constant.AbsoluteBaseUri, channels);
+            var client = new ServerEventsClient(Config.AbsoluteBaseUri, channels);
             return client;
         }
 
@@ -276,8 +276,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 var task = client.Connect();
                 var connectMsg = await task.WaitAsync();
 
-                Assert.That(connectMsg.HeartbeatUrl, Does.StartWith(Constant.AbsoluteBaseUri));
-                Assert.That(connectMsg.UnRegisterUrl, Does.StartWith(Constant.AbsoluteBaseUri));
+                Assert.That(connectMsg.HeartbeatUrl, Does.StartWith(Config.AbsoluteBaseUri));
+                Assert.That(connectMsg.UnRegisterUrl, Does.StartWith(Config.AbsoluteBaseUri));
                 Assert.That(connectMsg.HeartbeatIntervalMs, Is.GreaterThan(0));
                 Assert.That(connectMsg.IdleTimeoutMs, Is.EqualTo(TimeSpan.FromSeconds(30).TotalMilliseconds));
             }
@@ -292,7 +292,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 var taskMsg = client.WaitForNextCommand();
 
                 var connectMsg = await taskConnect.WaitAsync();
-                Assert.That(connectMsg.HeartbeatUrl, Does.StartWith(Constant.AbsoluteBaseUri));
+                Assert.That(connectMsg.HeartbeatUrl, Does.StartWith(Config.AbsoluteBaseUri));
 
                 var joinMsg = (ServerEventJoin)await taskMsg.WaitAsync();
                 Assert.That(joinMsg.DisplayName, Is.EqualTo(client.ConnectionInfo.DisplayName));
@@ -316,7 +316,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 };
 
                 var connectMsg = await client.Connect().WaitAsync(2000);
-                Assert.That(connectMsg.HeartbeatUrl, Does.StartWith(Constant.AbsoluteBaseUri));
+                Assert.That(connectMsg.HeartbeatUrl, Does.StartWith(Config.AbsoluteBaseUri));
 
                 await allJoinsReceived.Task.WaitAsync(3000);
 
@@ -528,7 +528,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             EnsureSynchronizationContext();
 
-            var heartbeatUrl = Constant.AbsoluteBaseUri.CombineWith("event-heartbeat")
+            var heartbeatUrl = Config.AbsoluteBaseUri.CombineWith("event-heartbeat")
                 .AddQueryParam("id", "unknown");
 
             var task = heartbeatUrl.GetStringFromUrlAsync()

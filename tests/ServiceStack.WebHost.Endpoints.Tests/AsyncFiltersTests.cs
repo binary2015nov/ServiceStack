@@ -211,8 +211,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Constant.ListeningOn);
-            client = new JsonServiceClient(Constant.ListeningOn);
+                .Start(Config.ListeningOn);
+            client = new JsonServiceClient(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -343,7 +343,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             AppHost.CancelledAt = -1;
 
-            var client = new JsonServiceClient(Constant.ListeningOn)
+            var client = new JsonServiceClient(Config.ListeningOn)
             {
                 ResponseFilter = res =>
                 {
@@ -365,7 +365,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             AppHost.CancelledAt = -1;
 
-            var client = new JsonServiceClient(Constant.ListeningOn)
+            var client = new JsonServiceClient(Config.ListeningOn)
             {
                 ResponseFilter = res =>
                 {

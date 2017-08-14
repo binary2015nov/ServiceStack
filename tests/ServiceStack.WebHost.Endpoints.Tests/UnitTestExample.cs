@@ -148,7 +148,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
-            appHost = new MockAppHost().Init();
+            appHost = new BasicAppHost().Init();
             var container = appHost.Container;
 
             container.Register<IDbConnectionFactory>(

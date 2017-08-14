@@ -3814,6 +3814,12 @@
             </summary>
             <returns>number of rows affected</returns>
         </member>
+        <member name="M:ServiceStack.OrmLite.OrmLiteWriteApi.ExecuteSql(System.Data.IDbConnection,System.String,System.Collections.Generic.Dictionary{System.String,System.Object})">
+            <summary>
+            Execute any arbitrary raw SQL with db params.
+            </summary>
+            <returns>number of rows affected</returns>
+        </member>
         <member name="M:ServiceStack.OrmLite.OrmLiteWriteApi.Insert``1(System.Data.IDbConnection,``0,System.Boolean)">
             <summary>
             Insert 1 POCO, use selectIdentity to retrieve the last insert AutoIncrement id (if any). E.g:

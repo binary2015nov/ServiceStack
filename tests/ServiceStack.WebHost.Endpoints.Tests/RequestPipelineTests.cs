@@ -190,7 +190,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new RequestPipelineAppHost()
                 .Init()
-                .Start(Constant.AbsoluteBaseUri);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -222,7 +222,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_fire_all_filters_sync()
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
+            var client = new JsonServiceClient(Config.ListeningOn);
 
             var response = client.Get(new TestFiltersSync());
 
@@ -232,7 +232,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public async Task Does_fire_all_filters_async()
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
+            var client = new JsonServiceClient(Config.ListeningOn);
 
             var response = await client.GetAsync(new TestFiltersAsync());
 

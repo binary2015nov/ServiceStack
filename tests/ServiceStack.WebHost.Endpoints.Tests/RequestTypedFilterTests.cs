@@ -99,7 +99,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new TypedFilterAppHost()
                 .Init()
-                .Start(Constant.ListeningOn);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -111,7 +111,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_modify_requestDto_with_TypedRequestFilter()
         {
-            var client = new JsonServiceClient(Constant.ListeningOn);
+            var client = new JsonServiceClient(Config.ListeningOn);
             var response = client.Get(new ResourceType1
             {
                 Arg1 = "arg1",
@@ -126,7 +126,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_execute_requestDto_interfaces_typedfilters()
         {
-            var client = new JsonServiceClient(Constant.ListeningOn);
+            var client = new JsonServiceClient(Config.ListeningOn);
 
             var response1 = client.Get(new ResourceType1 { TenantName = "tennant" });
             Assert.That(response1.SharedProperty, Is.EqualTo("Is Shared"));
@@ -138,7 +138,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_execute_requestDto_interfaces_TypedResponsefilters()
         {
-            var client = new JsonServiceClient(Constant.ListeningOn);
+            var client = new JsonServiceClient(Config.ListeningOn);
 
             var response1 = client.Get(new TypedResponseFilter1 { Id = 1 });
             Assert.That(response1.Id, Is.EqualTo(0));

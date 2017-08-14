@@ -126,7 +126,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var response = client.Get(new QueryDataMovieTitleIndex { Ratings = new[] { "G", "PG-13" } });
             Assert.That(response.Results.Count, Is.EqualTo(5));
 
-            var url = Constant.ListeningOn + "moviesdataindex/search?ratings=G,PG-13";
+            var url = Config.ListeningOn + "moviesdataindex/search?ratings=G,PG-13";
             response = url.AsJsonInto<MovieTitleIndex>();
             Assert.That(response.Results.Count, Is.EqualTo(5));
 
@@ -138,7 +138,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             });
             Assert.That(response.Results.Count, Is.EqualTo(9));
 
-            url = Constant.ListeningOn + "moviesdataindex?ratings=G,PG-13&ids=1,2&imdbIds=tt0071562,tt0060196";
+            url = Config.ListeningOn + "moviesdataindex?ratings=G,PG-13&ids=1,2&imdbIds=tt0071562,tt0060196";
             response = url.AsJsonInto<MovieTitleIndex>();
             Assert.That(response.Results.Count, Is.EqualTo(9));
         }
@@ -193,13 +193,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 .ThenBy(x => x.ImdbId).Map(x => x.ImdbId);
             Assert.That(ids, Is.EqualTo(orderedIds));
 
-            var url = Constant.ListeningOn + "moviesdata/search?take=100&orderBy=Rating,ImdbId";
+            var url = Config.ListeningOn + "moviesdata/search?take=100&orderBy=Rating,ImdbId";
             movies = url.AsJsonInto<MovieTitleIndex>();
             ids = movies.Results.Map(x => x.ImdbId);
             orderedIds = movies.Results.OrderBy(x => x.Rating).ThenBy(x => x.ImdbId).Map(x => x.ImdbId);
             Assert.That(ids, Is.EqualTo(orderedIds));
 
-            url = Constant.ListeningOn + "moviesdata/search?take=100&orderByDesc=Rating,ImdbId";
+            url = Config.ListeningOn + "moviesdata/search?take=100&orderByDesc=Rating,ImdbId";
             movies = url.AsJsonInto<MovieTitleIndex>();
             ids = movies.Results.Map(x => x.ImdbId);
             orderedIds = movies.Results.OrderByDescending(x => x.Rating)
@@ -211,7 +211,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public void Cached_DynamoQuery_does_cached_duplicate_requests_when_MaxAge()
         {
             var request = new QueryCacheMaxAgeDataRockstars();
-            var client = new CachedServiceClient(new JsonServiceClient(Constant.ListeningOn));
+            var client = new CachedServiceClient(new JsonServiceClient(Config.ListeningOn));
 
             var response = client.Get(request);
             Assert.That(client.CacheHits, Is.EqualTo(0));
@@ -230,7 +230,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public void Cached_DynamoQuery_does_cached_duplicate_requests_when_MaxAge_Custom_Cached()
         {
             var request = new CustomQueryCacheMaxAgeDataRockstars();
-            var client = new CachedServiceClient(new JsonServiceClient(Constant.ListeningOn));
+            var client = new CachedServiceClient(new JsonServiceClient(Config.ListeningOn));
 
             var response = client.Get(request);
             Assert.That(client.CacheHits, Is.EqualTo(0));
@@ -249,7 +249,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public void Cached_DynamoQuery_does_return_NotModified_when_MustRevalidate()
         {
             var request = new QueryCacheMustRevalidateDataRockstars();
-            var client = new CachedServiceClient(new JsonServiceClient(Constant.ListeningOn));
+            var client = new CachedServiceClient(new JsonServiceClient(Config.ListeningOn));
 
             var response = client.Get(request);
             Assert.That(client.NotModifiedHits, Is.EqualTo(0));

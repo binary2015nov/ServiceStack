@@ -44,7 +44,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Prefer_user_defined_routes_first()
         {
-            using (var appHost = new MockAppHost
+            using (var appHost = new BasicAppHost
             {
                 ConfigureAppHost = host =>
                 {

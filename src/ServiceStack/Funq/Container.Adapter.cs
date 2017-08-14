@@ -129,6 +129,8 @@ namespace Funq
             return entry != null;
         }
 
+        public bool Exists(Type type) => throw new NotImplementedException();
+
         private Dictionary<Type, Action<object>[]> autoWireCache = new Dictionary<Type, Action<object>[]>();
 
         private static MethodInfo GetResolveMethod(Type typeWithResolveMethod, Type serviceType)

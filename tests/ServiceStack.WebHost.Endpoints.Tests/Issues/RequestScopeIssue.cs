@@ -50,7 +50,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Issues
         {
             appHost = new RequestScopeAppHost()
                 .Init()
-                .Start(Constant.AbsoluteBaseUri);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -62,7 +62,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Issues
         [Test]
         public void Can_get_RequestScope_dependency()
         {
-            var client = new JsonServiceClient(Constant.AbsoluteBaseUri);
+            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
 
             Assert.That(client.Get(new GetMasterConfig()).Id, Is.EqualTo(1));
             Assert.That(client.Get(new GetMasterConfig()).Id, Is.EqualTo(2));

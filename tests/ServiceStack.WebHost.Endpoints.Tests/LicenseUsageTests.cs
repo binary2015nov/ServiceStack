@@ -38,7 +38,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             using (var appHost = new LicenseTestsAppHost(typeof(Services10)))
             {
                 appHost.Init();
-                appHost.Start(Constant.ListeningOn);
+                appHost.Start(Config.ListeningOn);
 
                 Assert.That(appHost.Metadata.GetOperationDtos().Count, Is.EqualTo(10));
             }
@@ -54,7 +54,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                             .With.Property("InnerException").TypeOf<LicenseException>(),
                 () => {
                     appHost.Init();
-                    appHost.Start(Constant.ListeningOn);
+                    appHost.Start(Config.ListeningOn);
                 });
             }
         }
@@ -65,9 +65,9 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             using (var appHost = new LicenseTestsAppHost(typeof(MegaDtoService)))
             {
                 appHost.Init();
-                appHost.Start(Constant.ListeningOn);
+                appHost.Start(Config.ListeningOn);
 
-                var client = new JsonServiceClient(Constant.AbsoluteBaseUri);
+                var client = new JsonServiceClient(Config.AbsoluteBaseUri);
 
                 var request = MegaDto.Create();
 
@@ -92,7 +92,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Allows_MegaDto_through_RabbitMqClients()
         {
-            var mqFactory = new RabbitMqMessageFactory(connectionString: Constant.RabbitMQConnString);
+            var mqFactory = new RabbitMqMessageFactory(connectionString: Config.RabbitMQConnString);
 
             var request = MegaDto.Create();
 
@@ -147,7 +147,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             using (var appHost = new LicenseTestsAppHost(typeof(Services10), typeof(Service1)))
             {
                 appHost.Init();
-                appHost.Start(Constant.ListeningOn);
+                appHost.Start(Config.ListeningOn);
 
                 Assert.That(appHost.Metadata.GetOperationDtos().Count, Is.EqualTo(11));
             }
