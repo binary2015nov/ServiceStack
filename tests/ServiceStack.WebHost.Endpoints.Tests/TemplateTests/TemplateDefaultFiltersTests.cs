@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using ServiceStack.Templates;
 using ServiceStack.Text;
-using ServiceStack.VirtualPath;
+using ServiceStack.IO;
 
 namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
 {
@@ -832,20 +833,239 @@ Total    1550
             {
                 Args =
                 {
-                    ["arg"] = "value" 
+                    ["arg"] = "value",
+                    ["list"] = new[]{ 1, 2, 3 },
+                    ["emptyList"] = new int[0],
+                    ["map"] = new Dictionary<string, object> { {"a", 1}, {"b", 2} },
+                    ["emptyMap"] = new Dictionary<string, object> { },
                 }
             }.Init();
             
             context.VirtualFiles.WriteFile("h1.html", "<h1>{{ it }}</h1>");
             
             
-            Assert.That(context.EvaluateTemplate("{{ arg | ifNotNull }}"), Is.EqualTo("value"));
             Assert.That(context.EvaluateTemplate("{{ arg | ifExists }}"), Is.EqualTo("value"));
-            Assert.That(context.EvaluateTemplate("{{ noArg | ifNotNull }}"), Is.EqualTo(""));
             Assert.That(context.EvaluateTemplate("{{ noArg | ifExists }}"), Is.EqualTo(""));
-            
+
+            Assert.That(context.EvaluateTemplate("{{ 1 | ifExists(arg) }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ 1 | ifExists(noArg) }}"), Is.EqualTo(""));
+
+            Assert.That(context.EvaluateTemplate("{{ 1 | ifNotExists(arg) }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ 1 | ifNotExists(noArg) }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ 1 | ifNo(arg) }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ 1 | ifNo(noArg) }}"), Is.EqualTo("1"));
+
             Assert.That(context.EvaluateTemplate("{{ arg | selectPartial: h1 }}"), Is.EqualTo("<h1>value</h1>"));
             Assert.That(context.EvaluateTemplate("{{ noArg | selectPartial: h1 }}"), Is.EqualTo(""));
+            
+            Assert.That(context.EvaluateTemplate("{{ list | ifNotEmpty | join }}"), Is.EqualTo("1,2,3"));
+            Assert.That(context.EvaluateTemplate("{{ noList | ifNotEmpty }}"), Is.EqualTo(""));
+
+            Assert.That(context.EvaluateTemplate("{{ 1 | ifNotEmpty(list) }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ 1 | ifNotEmpty(emptyList) }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ 1 | ifNotEmpty(noList) }}"), Is.EqualTo(""));
+
+            Assert.That(context.EvaluateTemplate("{{ 1 | ifEmpty(list) }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ 1 | ifEmpty(emptyList) }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ 1 | ifEmpty(noList) }}"), Is.EqualTo("1"));
+        }
+
+        [Test]
+        public void Can_call_htmltable_with_empty_arg()
+        {
+            var context = new TemplateContext
+            {
+                Args =
+                {
+                    ["arg"] = new List<Dictionary<string,object>>
+                    {
+                        new Dictionary<string, object>{ { "a", 1 } }
+                    },
+                    ["emptyArg"] = new List<Dictionary<string,object>>()
+                }
+            }.Init();
+
+            Assert.That(context.EvaluateTemplate("{{ arg | htmltable }}"),
+                Is.EqualTo("<table><thead><tr><th>a</th></tr></thead><tbody><tr><td>1</td></tr></tbody></table>"));
+
+            Assert.That(context.EvaluateTemplate("{{ arg | htmltable() }}"),
+                Is.EqualTo("<table><thead><tr><th>a</th></tr></thead><tbody><tr><td>1</td></tr></tbody></table>"));
+            
+            Assert.That(context.EvaluateTemplate("{{ arg | htmltable({}) }}"),
+                Is.EqualTo("<table><thead><tr><th>a</th></tr></thead><tbody><tr><td>1</td></tr></tbody></table>"));
+            
+            Assert.That(context.EvaluateTemplate("{{ arg | htmltable({ }) }}"),
+                Is.EqualTo("<table><thead><tr><th>a</th></tr></thead><tbody><tr><td>1</td></tr></tbody></table>"));
+            
+            Assert.That(context.EvaluateTemplate("{{ emptyArg | htmltable }}"), Is.EqualTo(""));
+            
+            Assert.That(context.EvaluateTemplate("{{ emptyArg | htmltable({ emptyCaption: 'no rows' }) }}"), 
+                Is.EqualTo("<table><caption>no rows</caption></table>"));
+        }
+
+        [Test]
+        public void Does_not_emit_binding_on_empty_Key_Value()
+        {
+            var context = new TemplateContext
+            {
+                Args =
+                {
+                    ["row"] = new List<KeyValuePair<string,object>>
+                    {
+                        new KeyValuePair<string, object>("arg", "value"),
+                        new KeyValuePair<string, object>("enmptyArg", ""),
+                        new KeyValuePair<string, object>("nullArg", null),
+                    } 
+                }
+            }.Init();
+
+            var output = context.EvaluateTemplate("{{ row | select: <i>{ it.Key }</i><b>{ it.Value }</b> }}");
+            Assert.That(output, Is.EqualTo("<i>arg</i><b>value</b><i>enmptyArg</i><b></b><i>nullArg</i><b></b>"));
+        }
+
+        [Test]
+        public void Does_resolve_partials_and_files_using_cascading_resolution()
+        {
+            var context = new TemplateContext
+            {
+                TemplateFilters = { new TemplateProtectedFilters() }
+            }.Init();
+
+            context.VirtualFiles.WriteFile("root-partial.html", @"root-partial.html");
+            context.VirtualFiles.WriteFile("root-file.txt", @"root-file.txt");
+            context.VirtualFiles.WriteFile("partial.html", @"partial.html");
+            context.VirtualFiles.WriteFile("file.txt", @"file.txt");
+
+            context.VirtualFiles.WriteFile("dir/partial.html", @"dir/partial.html");
+            context.VirtualFiles.WriteFile("dir/file.txt", @"dir/file.txt");
+
+            context.VirtualFiles.WriteFile("dir/dir-partial.html", @"dir/dir-partial.html");
+            context.VirtualFiles.WriteFile("dir/dir-file.txt", @"dir/dir-file.txt");
+
+            context.VirtualFiles.WriteFile("dir/sub/partial.html", @"dir/sub/partial.html");
+            context.VirtualFiles.WriteFile("dir/sub/file.txt", @"dir/sub/file.txt");
+            
+            context.VirtualFiles.WriteFile("page.html", @"partial: {{ 'partial' | partial }}
+file: {{ 'file.txt' | includeFile }}
+root-partial: {{ 'root-partial' | partial }}
+root-file: {{ 'root-file.txt' | includeFile }}");
+
+            context.VirtualFiles.WriteFile("dir/page.html", @"partial: {{ 'partial' | partial }}
+file: {{ 'file.txt' | includeFile }}
+root-partial: {{ 'root-partial' | partial }}
+root-file: {{ 'root-file.txt' | includeFile }}");
+
+            context.VirtualFiles.WriteFile("dir/sub/page.html", @"partial: {{ 'partial' | partial }}
+file: {{ 'file.txt' | includeFile }}
+root-partial: {{ 'root-partial' | partial }}
+root-file: {{ 'root-file.txt' | includeFile }}
+dir-partial: {{ 'dir-partial' | partial }}
+dir-file: {{ 'dir-file.txt' | includeFile }}");
+            
+            Assert.That(new PageResult(context.GetPage("page")).Result.NormalizeNewLines(),
+                Is.EqualTo(@"
+partial: partial.html
+file: file.txt
+root-partial: root-partial.html
+root-file: root-file.txt".NormalizeNewLines()));
+            
+            Assert.That(new PageResult(context.GetPage("dir/page")).Result.NormalizeNewLines(),
+                Is.EqualTo(@"
+partial: dir/partial.html
+file: dir/file.txt
+root-partial: root-partial.html
+root-file: root-file.txt".NormalizeNewLines()));
+            
+            Assert.That(new PageResult(context.GetPage("dir/sub/page")).Result.NormalizeNewLines(),
+                Is.EqualTo(@"
+partial: dir/sub/partial.html
+file: dir/sub/file.txt
+root-partial: root-partial.html
+root-file: root-file.txt
+dir-partial: dir/dir-partial.html
+dir-file: dir/dir-file.txt
+".NormalizeNewLines()));
+        }
+
+        [Test]
+        public void Can_use_noshow_or_discard_to_discard_return_value()
+        {
+            var context = new TemplateContext().Init();
+            
+            context.VirtualFiles.WriteFile("partial.html", "partial");
+
+            Assert.That(context.EvaluateTemplate("{{ 1 | noshow }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ add(1,1) | noshow }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ 'partial' | partial | noshow }}"), Is.EqualTo(""));
+        }
+
+        [Test]
+        public void Can_use_split_with_different_delimiters()
+        {
+            var context = new TemplateContext().Init();
+
+            Assert.That(context.EvaluateTemplate("{{ 'a,b,c' | split | join('|') }}"), Is.EqualTo("a|b|c"));
+            Assert.That(context.EvaluateTemplate("{{ 'a:b:c' | split(':') | join('|') }}"), Is.EqualTo("a|b|c"));
+            Assert.That(context.EvaluateTemplate("{{ 'a::b::c' | split('::') | join('|') }}"), Is.EqualTo("a|b|c"));
+            Assert.That(context.EvaluateTemplate("{{ 'a:b/c' | split([':','/']) | join('|') }}"), Is.EqualTo("a|b|c"));
+            Assert.That(context.EvaluateTemplate("{{ 'a::b//c' | split(['::','//']) | join('|') }}"), Is.EqualTo("a|b|c"));
+        }
+
+        [Test]
+        public void Can_use_test_isTest_filters()
+        {
+            var context = new TemplateContext
+            {
+                Args =
+                {
+                    ["string"] = "foo",
+                    ["int"] = 1,
+                    ["long"] = (long)1,
+                    ["byte"] = (byte)1,
+                    ["double"] = (double)1.1,
+                    ["float"] = (float)1.1,
+                    ["decimal"] = (decimal)1.1,
+                    ["bool"] = true,
+                    ["char"] = 'c',
+                    ["chars"] = new[]{ 'a','b','c' },
+                    ["bytes"] = new byte[]{ 1, 2, 3 },
+                    ["intDictionary"] = new Dictionary<int, int>(),
+                    ["stringDictionary"] = new Dictionary<string, string>(),
+                    ["objectDictionary"] = new Dictionary<string, object>(),
+                    ["objectList"] = new List<object>(),
+                    ["objectArray"] = new object[]{ 1, "a" },
+                    ["anonObject"] = new { id = 1 },
+                    ["context"] = new TemplateContext(),
+                    ["tuple"] = Tuple.Create(1, "a"),
+                    ["keyValuePair"] = new KeyValuePair<int,string>(1,"a")
+                }
+            }.Init();
+
+            Assert.That(context.EvaluateTemplate("{{ 'a' | isString | iif(1,0) }}:{{ 1 | isString | iif(1,0) }}"), Is.EqualTo("1:0"));
+            Assert.That(context.EvaluateTemplate("{{ 'a' | isInt | iif(1,0) }}:{{ 1 | isInt | iif(1,0) }}"), Is.EqualTo("0:1"));
+            Assert.That(context.EvaluateTemplate("{{ 'a' | isLong | iif(1,0) }}:{{ 1 | toLong | isLong | iif(1,0) }}"), Is.EqualTo("0:1"));
+            Assert.That(context.EvaluateTemplate("{{ 'a' | isDouble | iif(1,0) }}:{{ 1.1 | isDouble | iif(1,0) }}"), Is.EqualTo("0:1"));
+            Assert.That(context.EvaluateTemplate("{{ 'a' | isFloat | iif(1,0) }}:{{ 1.1 | toFloat | isFloat | iif(1,0) }}"), Is.EqualTo("0:1"));
+            Assert.That(context.EvaluateTemplate("{{ 'a' | isDecimal | iif(1,0) }}:{{ 1.1 | toDecimal | isDecimal | iif(1,0) }}"), Is.EqualTo("0:1"));
+            Assert.That(context.EvaluateTemplate("{{ 'a' | isBool | iif(1,0) }}:{{ false | isBool | iif(1,0) }}"), Is.EqualTo("0:1"));
+            Assert.That(context.EvaluateTemplate("{{ 'a' | isChar | iif(1,0) }}:{{ 'a' | toChar | isChar | iif(1,0) }}"), Is.EqualTo("0:1"));
+            Assert.That(context.EvaluateTemplate("{{ 'a' | isChars | iif(1,0) }}:{{ 'a' | toChars | isChars | iif(1,0) }}:{{ ['a','b'] | toChars | isChars | iif(1,0) }}"), Is.EqualTo("0:1:1"));
+            Assert.That(context.EvaluateTemplate("{{ 'a' | isByte | iif(1,0) }}:{{ 1 | toByte | isByte | iif(1,0) }}"), Is.EqualTo("0:1"));
+            Assert.That(context.EvaluateTemplate("{{ bytes | isBytes | iif(1,0) }}:{{ 'a' | isBytes | iif(1,0) }}:{{ 'a' | toUtf8Bytes | isBytes | iif(1,0) }}"), Is.EqualTo("1:0:1"));
+            Assert.That(context.EvaluateTemplate("{{ 'a' | isList | iif(1,0) }}:{{ {a:1} | isList | iif(1,0) }}:{{ ['a'] | isList | iif(1,0) }}"), Is.EqualTo("0:0:1"));
+            Assert.That(context.EvaluateTemplate("{{ 'a' | isEnumerable | iif(1,0) }}:{{ 1 | isEnumerable | iif(1,0) }}:{{ ['a'] | isEnumerable | iif(1,0) }}:{{ {a:1} | isEnumerable | iif(1,0) }}"), Is.EqualTo("1:0:1:1"));
+            Assert.That(context.EvaluateTemplate("{{ 'a' | isDictionary | iif(1,0) }}:{{ {a:1} | isDictionary | iif(1,0) }}:{{ ['a'] | isDictionary | iif(1,0) }}"), Is.EqualTo("0:1:0"));
+            Assert.That(context.EvaluateTemplate("{{ {a:'a'} | isStringDictionary | iif(1,0) }}:{{ {a:1} | isStringDictionary | iif(1,0) }}:{{ stringDictionary | isStringDictionary | iif(1,0) }}"), Is.EqualTo("0:0:1"));
+            Assert.That(context.EvaluateTemplate("{{ {a:'a'} | isObjectDictionary | iif(1,0) }}:{{ {a:1} | isObjectDictionary | iif(1,0) }}:{{ stringDictionary | isObjectDictionary | iif(1,0) }}"), Is.EqualTo("1:1:0"));
+            Assert.That(context.EvaluateTemplate("{{ 'a' | isNumber | iif(1,0) }}:{{ 1 | isNumber | iif(1,0) }}:{{ 1.1 | isNumber | iif(1,0) }}"), Is.EqualTo("0:1:1"));
+            Assert.That(context.EvaluateTemplate("{{ 'a' | isRealNumber | iif(1,0) }}:{{ 1 | isRealNumber | iif(1,0) }}:{{ 1.1 | isRealNumber | iif(1,0) }}"), Is.EqualTo("0:0:1"));
+            Assert.That(context.EvaluateTemplate("{{ objectList | isArray | iif(1,0) }}:{{ objectArray | isArray | iif(1,0) }}:{{ [1,'a'] | isArray | iif(1,0) }}"), Is.EqualTo("0:1:0"));
+            Assert.That(context.EvaluateTemplate("{{ anonObject | isAnonObject | iif(1,0) }}:{{ context | isAnonObject | iif(1,0) }}:{{ {a:1} | isAnonObject | iif(1,0) }}"), Is.EqualTo("1:0:0"));
+            Assert.That(context.EvaluateTemplate("{{ context | isClass | iif(1,0) }}:{{ 1 | isClass | iif(1,0) }}"), Is.EqualTo("1:0"));
+            Assert.That(context.EvaluateTemplate("{{ context | isValueType | iif(1,0) }}:{{ 1 | isValueType | iif(1,0) }}"), Is.EqualTo("0:1"));
+            Assert.That(context.EvaluateTemplate("{{ {a:1} | isKeyValuePair | iif(1,0) }}:{{ keyValuePair | isKeyValuePair | iif(1,0) }}:{{ {a:1} | toList | get(0) | isKeyValuePair | iif(1,0) }}"), Is.EqualTo("0:1:1"));
+
+            Assert.That(context.EvaluateTemplate("{{ 'a' | isType('string') | iif(1,0) }}:{{ string | isType('String') | iif(1,0) }}:{{ 1 | isString | iif(1,0) }}"), Is.EqualTo("1:1:0"));
         }
 
     }

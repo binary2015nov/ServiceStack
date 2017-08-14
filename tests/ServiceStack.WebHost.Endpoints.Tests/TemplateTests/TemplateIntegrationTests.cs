@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Net;
 using Funq;
 using NUnit.Framework;
@@ -10,7 +9,7 @@ using ServiceStack.IO;
 using ServiceStack.OrmLite;
 using ServiceStack.Templates;
 using ServiceStack.Text;
-using ServiceStack.VirtualPath;
+using ServiceStack.IO;
 
 namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
 {
@@ -122,10 +121,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
     {
         class AppHost : AppSelfHostBase
         {
-            public AppHost() : base(nameof(TemplateIntegrationTests), typeof(MyTemplateServices).GetAssembly())
-            {
-
-            }
+            public AppHost() : base(nameof(TemplateIntegrationTests), typeof(MyTemplateServices).GetAssembly()) {}
 
             public override void Configure(Container container)
             {
@@ -249,6 +245,10 @@ layout: alt/alt-layout
 <h1>Dir Page File</h1>
 {{ 'dir-file.txt' | includeFile }}
 ");
+                files.WriteFile("dir/dir-page-file-cache.html", @"
+<h1>Dir Page File Cache</h1>
+{{ 'dir-file.txt' | includeFileWithCache }}
+");
             }
 
             public readonly List<IVirtualPathProvider> TemplateFiles = new List<IVirtualPathProvider> { new MemoryVirtualFiles() };
@@ -260,7 +260,7 @@ layout: alt/alt-layout
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Constant.ListeningOn);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -269,7 +269,7 @@ layout: alt/alt-layout
         [Test]
         public void Can_process_home_page()
         {
-            var html = Constant.ListeningOn.GetStringFromUrl();
+            var html = Config.ListeningOn.GetStringFromUrl();
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <body id=root>
@@ -284,7 +284,7 @@ layout: alt/alt-layout
         [Test]
         public void Does_direct_page_with_layout()
         {
-            var html = Constant.ListeningOn.AppendPath("direct-page").GetStringFromUrl();
+            var html = Config.ListeningOn.AppendPath("direct-page").GetStringFromUrl();
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <body id=root>
@@ -299,7 +299,7 @@ layout: alt/alt-layout
         [Test]
         public void Does_return_dir_page_with_dir_layout_by_default()
         {
-            var html = Constant.ListeningOn.AppendPaths("dir", "dir-page").GetStringFromUrl();
+            var html = Config.ListeningOn.AppendPath("dir", "dir-page").GetStringFromUrl();
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <body id=dir>
@@ -314,7 +314,7 @@ layout: alt/alt-layout
         [Test]
         public void Does_return_alt_dir_page_with_closest_alt_layout()
         {
-            var html = Constant.ListeningOn.AppendPaths("dir", "alt-dir-page").GetStringFromUrl();
+            var html = Config.ListeningOn.AppendPath("dir", "alt-dir-page").GetStringFromUrl();
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <body id=dir-alt-layout>
@@ -328,7 +328,7 @@ layout: alt/alt-layout
         [Test]
         public void Can_request_alt_layout_within_alt_subdir()
         {
-            var html = Constant.ListeningOn.AppendPaths("dir", "alt-layout-alt-dir-page").GetStringFromUrl();
+            var html = Config.ListeningOn.AppendPath("dir", "alt-layout-alt-dir-page").GetStringFromUrl();
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <body id=alt-alt-layout>
@@ -342,7 +342,7 @@ layout: alt/alt-layout
         [Test]
         public void Does_return_shadowed_code_page_with_layout()
         {
-            var html = Constant.ListeningOn.AppendPath("shadowed-page").GetStringFromUrl();
+            var html = Config.ListeningOn.AppendPath("shadowed-page").GetStringFromUrl();
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <body id=root>
@@ -355,7 +355,7 @@ layout: alt/alt-layout
         [Test]
         public void Does_return_shadowed_index_code_page_with_layout()
         {
-            var html = Constant.ListeningOn.AppendPath("shadowed").GetStringFromUrl();
+            var html = Config.ListeningOn.AppendPath("shadowed").GetStringFromUrl();
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <body id=root>
@@ -368,7 +368,7 @@ layout: alt/alt-layout
         [Test]
         public void Does_execute_ServiceStackCodePage_with_Db_and_Request()
         {
-            var html = Constant.ListeningOn.AppendPath("rockstar").AddQueryParam("id", "1").GetStringFromUrl();
+            var html = Config.ListeningOn.AppendPath("rockstar").AddQueryParam("id", "1").GetStringFromUrl();
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <body id=root>
@@ -385,7 +385,7 @@ layout: alt/alt-layout
         [Test]
         public void Does_execute_RockstarPageView()
         {
-            var html = Constant.ListeningOn.AppendPaths("rockstar-pages", "1").GetStringFromUrl();
+            var html = Config.ListeningOn.AppendPath("rockstar-pages", "1").GetStringFromUrl();
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <body id=root>
@@ -402,7 +402,7 @@ layout: alt/alt-layout
         [Test]
         public void Does_execute_RockstarPageView_with_custom_layout()
         {
-            var html = Constant.ListeningOn.AppendPaths("rockstar-pages", "1").AddQueryParam("layout", "custom_layout").GetStringFromUrl();
+            var html = Config.ListeningOn.AppendPath("rockstar-pages", "1").AddQueryParam("layout", "custom_layout").GetStringFromUrl();
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <body id=custom>
@@ -419,7 +419,7 @@ layout: alt/alt-layout
         [Test]
         public void Does_execute_ProductsPage_with_default_layout()
         {
-            var html = Constant.ListeningOn.AppendPath("products").GetStringFromUrl();
+            var html = Config.ListeningOn.AppendPath("products").GetStringFromUrl();
             
             Assert.That(html.NormalizeNewLines(), Does.StartWith(@"<html>
 <body id=root>
@@ -432,13 +432,14 @@ layout: alt/alt-layout
                     <td>Price</td>
                 </tr>
             </thead>
-            <tr><th>Beverages</th><td>Chai</td><td>".NormalizeNewLines()));
+            <tr><th>Beverages</th><td>Chai</td><td>$18.00</td></tr>
+<tr><th>Beverages</th><td>Chang</td><td>$19.00</td></tr>".NormalizeNewLines()));
         }
 
         [Test]
         public void Does_execute_ProductsPage_with_Sidebar_CodePage_layout()
         {
-            var html = Constant.ListeningOn.AppendPath("products-sidebar").GetStringFromUrl();
+            var html = Config.ListeningOn.AppendPath("products-sidebar").GetStringFromUrl();
 
             Assert.That(html.NormalizeNewLines(), Does.StartWith(@"<html>
 <body id=sidebar>
@@ -456,13 +457,14 @@ layout: alt/alt-layout
                     <td>Price</td>
                 </tr>
             </thead>
-            <tr><th>Beverages</th><td>Chai</td>".NormalizeNewLines()));
+            <tr><th>Beverages</th><td>Chai</td><td>$18.00</td></tr>
+<tr><th>Beverages</th><td>Chang</td><td>$19.00</td></tr>".NormalizeNewLines()));
         }
 
         [Test]
         public void CodePage_partials_are_injected_with_current_Request()
         {
-            var html = Constant.ListeningOn.AppendPath("requestinfo-page").GetStringFromUrl();
+            var html = Config.ListeningOn.AppendPath("requestinfo-page").GetStringFromUrl();
 
             Assert.That(html.NormalizeNewLines(), Does.StartWith(@"
 <html>
@@ -478,7 +480,7 @@ layout: alt/alt-layout
         [Test]
         public void Can_resolve_closest_partial_starting_from_page_directory()
         {
-            var html = Constant.ListeningOn.AppendPaths("dir","dir-page-partial").GetStringFromUrl();
+            var html = Config.ListeningOn.AppendPath("dir","dir-page-partial").GetStringFromUrl();
             
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
@@ -496,13 +498,31 @@ layout: alt/alt-layout
         [Test]
         public void Can_resolve_closest_file_starting_from_page_directory()
         {
-            var html = Constant.ListeningOn.AppendPaths("dir","dir-page-file").GetStringFromUrl();
-            
+            var html = Config.ListeningOn.AppendPath("dir", "dir-page-file").GetStringFromUrl();
+
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <body id=dir>
 
 <h1>Dir Page File</h1>
+
+<h2>Dir File</h2>
+
+
+</body>
+</html>".NormalizeNewLines()));
+        }
+
+        [Test]
+        public void Can_resolve_closest_file_with_cache_starting_from_page_directory()
+        {
+            var html = Config.ListeningOn.AppendPath("dir", "dir-page-file-cache").GetStringFromUrl();
+
+            Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
+<html>
+<body id=dir>
+
+<h1>Dir Page File Cache</h1>
 
 <h2>Dir File</h2>
 

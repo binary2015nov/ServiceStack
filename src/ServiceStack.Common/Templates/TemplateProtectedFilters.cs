@@ -4,33 +4,56 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using ServiceStack.IO;
 using ServiceStack.Text;
 
 namespace ServiceStack.Templates
 {
     public class TemplateProtectedFilters : TemplateFilter
     {
-        public async Task includeFile(TemplateScopeContext scope, string virtualPath)
+        public static IVirtualFile ResolveFile(string filterName, TemplateScopeContext scope, string virtualPath)
         {
-            var file = scope.Context.VirtualFiles.GetFile(virtualPath);
+            var file = ResolveFile(scope.Context.VirtualFiles, scope.PageResult.VirtualPath, virtualPath);
+            if (file == null)
+                throw new FileNotFoundException($"{filterName} '{virtualPath}' in page '{scope.Page.VirtualPath}' was not found");
+
+            return file;
+        }
+
+        public static IVirtualFile ResolveFile(IVirtualPathProvider virtualFiles, string fromVirtualPath, string virtualPath)
+        {
+            IVirtualFile file = null;
+            var tryExactMatch = virtualPath.IndexOf('/') >= 0; //if nested path specified, look for an exact match first
+            if (tryExactMatch)
+                file = virtualFiles.GetFile(virtualPath);
+
             if (file == null)
             {
-                var partentPath = scope.PageResult.VirtualPath;
-                while (!string.IsNullOrEmpty(partentPath = partentPath.LastLeftPart('/')))
+                var parentPath = fromVirtualPath.IndexOf('/') >= 0
+                    ? fromVirtualPath.LastLeftPart('/')
+                    : "";
+
+                do
                 {
-                    var seekPath = partentPath.CombineWith(virtualPath);
-                    file = scope.Context.VirtualFiles.GetFile(seekPath);
+                    var seekPath = parentPath.CombineWith(virtualPath);
+                    file = virtualFiles.GetFile(seekPath);
                     if (file != null)
                         break;
-                
-                    if (partentPath.IndexOf('/') == -1)
-                        break;
-                }
-                
-                if (file == null)
-                    throw new FileNotFoundException($"includeFile '{virtualPath}' in page '{scope.Page.VirtualPath}' was not found");
-            }
 
+                    if (parentPath == "")
+                        break;
+
+                    parentPath = parentPath.IndexOf('/') >= 0
+                        ? parentPath.LastLeftPart('/')
+                        : "";
+                } while (true);
+            }
+            return file;
+        }
+
+        public async Task includeFile(TemplateScopeContext scope, string virtualPath)
+        {
+            var file = ResolveFile(nameof(includeFile), scope, virtualPath);
             using (var reader = file.OpenRead())
             {
                 await reader.CopyToAsync(scope.OutputStream);
@@ -165,20 +188,19 @@ namespace ServiceStack.Templates
                     return;
                 }
             }
-            
-            var file = scope.Context.VirtualFiles.GetFile(virtualPath);
-            if (file == null)
-                throw new FileNotFoundException($"{nameof(includeFileWithCache)} with '{virtualPath}' in page '{scope.Page.VirtualPath}' was not found");
 
+            var file = ResolveFile(nameof(includeFileWithCache), scope, virtualPath);
             var ms = MemoryStreamFactory.GetStream();
             using (ms)
             {
-                var captureScope = scope.ScopeWithStream(ms);
-                await includeFile(captureScope, virtualPath);
+                using (var reader = file.OpenRead())
+                {
+                    await reader.CopyToAsync(ms);
+                }
 
                 ms.Position = 0;
                 var bytes = ms.ToArray();
-                Context.ExpiringCache[cacheKey] = cacheEntry = Tuple.Create(DateTime.UtcNow.Add(expireIn),(object)bytes);
+                Context.ExpiringCache[cacheKey] = Tuple.Create(DateTime.UtcNow.Add(expireIn),(object)bytes);
                 await scope.OutputStream.WriteAsync(bytes);
             }
         }

@@ -8,6 +8,7 @@ using NUnit.Framework;
 using ServiceStack.DataAnnotations;
 using ServiceStack.IO;
 using ServiceStack.Templates;
+using ServiceStack.IO;
 using ServiceStack.VirtualPath;
 
 namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
@@ -135,7 +136,7 @@ title: We encode < & >
         {
             appHost = new AppHost()
                 .Init()
-                .Start(Constant.ListeningOn);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown] public void OneTimeTearDown() => appHost.Dispose();
@@ -146,7 +147,7 @@ title: We encode < & >
         [Test]
         public void Request_for_partial_page_returns_complete_page_with_default_layout()
         {
-            var html = Constant.ListeningOn.CombineWith("root-static-page.html")
+            var html = Config.ListeningOn.CombineWith("root-static-page.html")
                 .GetStringFromUrl(accept: MimeTypes.Html);
 
             Assert.That(html, Does.StartWith("<html><head><title>"));
@@ -157,7 +158,7 @@ title: We encode < & >
         [Test]
         public void Request_for_noprefix_page_returns_alt_layout()
         {
-            var html = Constant.ListeningOn.CombineWith("noprefix-page")
+            var html = Config.ListeningOn.CombineWith("noprefix-page")
                 .GetStringFromUrl(accept: MimeTypes.Html);
 
             Assert.That(html, Does.StartWith("<html><head><title>"));
@@ -168,7 +169,7 @@ title: We encode < & >
         [Test]
         public void Request_for_variable_page_returns_complete_page_with_alt_layout()
         {
-            var html = Constant.ListeningOn.CombineWith("variable-layout-page.html")
+            var html = Config.ListeningOn.CombineWith("variable-layout-page.html")
                 .GetStringFromUrl(accept: MimeTypes.Html);
 
             Assert.That(html, Does.StartWith("<html><head><title>Variable Layout</title>"));
@@ -179,7 +180,7 @@ title: We encode < & >
         [Test]
         public void Request_for_htmlencode_pages_returns_htmlencoded_variables()
         {
-            var html = Constant.ListeningOn.CombineWith("htmlencode-page.html")
+            var html = Config.ListeningOn.CombineWith("htmlencode-page.html")
                 .GetStringFromUrl(accept: MimeTypes.Html);
 
             Assert.That(html, Does.StartWith("<html><head><title>We encode &lt; &amp; &gt;</title>"));
@@ -191,22 +192,22 @@ title: We encode < & >
         [Test]
         public void Request_for_dir_index_page_using_supported_conventions()
         {
-            var htmlOrig = Constant.ListeningOn.CombineWith("dir/index.html")
+            var htmlOrig = Config.ListeningOn.CombineWith("dir/index.html")
                 .GetStringFromUrl(accept: MimeTypes.Html);
             
             Assert.That(htmlOrig, Does.StartWith("<html><head><title>no prefix @ /dir</title>"));
             Assert.That(htmlOrig, Does.Contain("id='dir-alt-layout'"));
             Assert.That(htmlOrig, Does.Contain("<h1>/dir/noprefix page!</h1>"));
             
-            var html = Constant.ListeningOn.CombineWith("dir/index")
+            var html = Config.ListeningOn.CombineWith("dir/index")
                 .GetStringFromUrl(accept: MimeTypes.Html);
             Assert.That(html, Is.EqualTo(htmlOrig));
             
-            html = Constant.ListeningOn.CombineWith("dir/")
+            html = Config.ListeningOn.CombineWith("dir/")
                 .GetStringFromUrl(accept: MimeTypes.Html);
             Assert.That(html, Is.EqualTo(htmlOrig));
             
-            html = Constant.ListeningOn.CombineWith("dir")
+            html = Config.ListeningOn.CombineWith("dir")
                 .GetStringFromUrl(accept: MimeTypes.Html);
             Assert.That(html, Is.EqualTo(htmlOrig));
         }
@@ -215,13 +216,13 @@ title: We encode < & >
         [Test]
         public void Request_for_dir_index_page_without_trailing_slash_auto_redirects()
         {
-            Constant.ListeningOn.CombineWith("dir")
+            Config.ListeningOn.CombineWith("dir")
                 .GetStringFromUrl(accept: MimeTypes.Html, 
                     requestFilter: req => req.AllowAutoRedirect = false,
                     responseFilter: res =>
                     {
                         Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.MovedPermanently));
-                        Assert.That(res.Headers[HttpHeaders.Location], Is.EqualTo(Constant.ListeningOn.CombineWith("dir/")));
+                        Assert.That(res.Headers[HttpHeaders.Location], Is.EqualTo(Config.ListeningOn.CombineWith("dir/")));
                     });
         }
 #endif
@@ -231,7 +232,7 @@ title: We encode < & >
         {
             try
             {
-                Constant.ListeningOn.CombineWith("_layout.html")
+                Config.ListeningOn.CombineWith("_layout.html")
                     .GetStringFromUrl(accept: MimeTypes.Html);
                 
                 Assert.Fail("Should throw");
@@ -243,7 +244,7 @@ title: We encode < & >
             
             try
             {
-                Constant.ListeningOn.CombineWith("_layout")
+                Config.ListeningOn.CombineWith("_layout")
                     .GetStringFromUrl(accept: MimeTypes.Html);
                 
                 Assert.Fail("Should throw");
@@ -257,7 +258,7 @@ title: We encode < & >
         [Test]
         public void Request_for_existing_page_can_be_overridden_by_Service()
         {
-            var html = Constant.ListeningOn.CombineWith("existing-page")
+            var html = Config.ListeningOn.CombineWith("existing-page")
                 .GetStringFromUrl(accept: MimeTypes.Html);
 
             Assert.That(html, Does.StartWith("<html><head><title>Service Title</title>"));
@@ -298,7 +299,7 @@ title: We encode < & >
             Assert.That(strFragment5.Value, Is.EqualTo("</body></html>"));
         }
 
-        [Test, Explicit]
+        [Test]
         public void Does_limit_file_changes_checks_to_specified_time()
         {
             var context = new TemplateContext
@@ -396,5 +397,36 @@ title: We encode < & >
 </html>
 ".NormalizeNewLines()));
         }
+
+        [Test]
+        public void Does_find_last_modified_file_in_page()
+        {
+            var context = new TemplateContext
+            {
+                TemplateFilters = { new TemplateProtectedFilters() }
+            }.Init();
+
+            context.VirtualFiles.WriteFile("_layout.html", "layout {{ page }}");
+            context.VirtualFiles.WriteFile("page.html", "page: partial {{ 'root-partial' | partial }}, file {{ 'file.txt' | includeFile }}");
+            context.VirtualFiles.WriteFile("root-partial.html", "root-partial: partial {{ 'inner-partial' | partial }}, partial-file {{ 'partial-file.txt' | includeFile }}");
+            context.VirtualFiles.WriteFile("file.txt", "file.txt");
+            context.VirtualFiles.WriteFile("inner-partial.html", "inner-partial.html");
+            context.VirtualFiles.WriteFile("partial-file.txt", "partial-file.txt");
+
+            ((InMemoryVirtualFile)context.VirtualFiles.GetFile("page.html")).FileLastModified = new DateTime(2001, 01, 01);
+            ((InMemoryVirtualFile)context.VirtualFiles.GetFile("_layout.html")).FileLastModified = new DateTime(2001, 01, 02);
+            ((InMemoryVirtualFile)context.VirtualFiles.GetFile("root-partial.html")).FileLastModified = new DateTime(2001, 01, 03);
+            ((InMemoryVirtualFile)context.VirtualFiles.GetFile("file.txt")).FileLastModified = new DateTime(2001, 01, 04);
+            ((InMemoryVirtualFile)context.VirtualFiles.GetFile("inner-partial.html")).FileLastModified = new DateTime(2001, 01, 05);
+            ((InMemoryVirtualFile)context.VirtualFiles.GetFile("partial-file.txt")).FileLastModified = new DateTime(2001, 01, 06);
+
+            var page = context.Pages.GetPage("page").Init().Result;
+            context.Pages.GetPage("root-partial").Init().Wait();
+
+            var lastModified = context.Pages.GetLastModified(page);
+            Assert.That(lastModified, Is.EqualTo(new DateTime(2001, 01, 06)));
+        }
+
+
     }
 }

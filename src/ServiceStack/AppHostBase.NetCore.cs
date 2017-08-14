@@ -16,8 +16,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using ServiceStack.VirtualPath;
 using ServiceStack.Configuration;
+using ServiceStack.IO;
 
 namespace ServiceStack
 {
@@ -113,7 +113,10 @@ namespace ServiceStack
             if (serviceStackHandler != null)
             {
                 if (serviceStackHandler is NotFoundHttpHandler)
+                {
                     await next();
+                    return;
+                }
 
                 if (!string.IsNullOrEmpty(serviceStackHandler.RequestName))
                     operationName = serviceStackHandler.RequestName;
@@ -124,8 +127,20 @@ namespace ServiceStack
                     httpReq.OperationName = operationName = restHandler.RestPath.RequestType.GetOperationName();
                 }
 
-                var task = serviceStackHandler.ProcessRequestAsync(httpReq, httpRes, operationName);
-                await HostContext.Async.ContinueWith(httpReq, task, x => httpRes.Close(), TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.AttachedToParent);
+                try
+                {
+                    await serviceStackHandler.ProcessRequestAsync(httpReq, httpRes, operationName);
+                }
+                catch (Exception ex)
+                {
+                    var logFactory = context.Features.Get<ILoggerFactory>();
+                    var log = logFactory.CreateLogger(GetType());
+                    log.LogError(default(EventId), ex, ex.Message);
+                }
+                finally
+                {
+                    httpRes.Close();
+                }
                 //Matches Exceptions handled in HttpListenerBase.InitTask()
 
                 return;

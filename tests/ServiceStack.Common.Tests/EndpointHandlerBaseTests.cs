@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using ServiceStack.Host;
+using ServiceStack.IO;
 using ServiceStack.Testing;
-using ServiceStack.VirtualPath;
 using ServiceStack.Web;
 
 namespace ServiceStack.Common.Tests
@@ -25,7 +25,7 @@ namespace ServiceStack.Common.Tests
         [Test]
         public void Can_parse_Ips()
         {
-            using (new MockAppHost().Init())
+            using (new BasicAppHost().Init())
             {
                 var result = CreateRequest("204.2.145.235").GetAttributes();
 
@@ -49,7 +49,7 @@ namespace ServiceStack.Common.Tests
         [Test]
         public void Can_mock_uploading_files()
         {
-            using (new MockAppHost
+            using (new BasicAppHost
             {
                 ConfigureAppHost = host => host.VirtualFiles = new MemoryVirtualFiles(),
             }.Init())
@@ -92,7 +92,7 @@ namespace ServiceStack.Common.Tests
                     var file = Request.Files[i];
 
                     string fileId = Guid.NewGuid().ToString();
-                    var session = base.Request.GetSession();
+                    var session = base.GetSession();
                     var fileName = session.Id.CombineWith(fileId);
                     VirtualFiles.WriteFile(fileName, file.InputStream);
                 }

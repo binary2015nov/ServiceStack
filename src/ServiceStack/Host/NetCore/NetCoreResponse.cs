@@ -121,7 +121,8 @@ namespace ServiceStack.Host.NetCore
 
         public void SetContentLength(long contentLength)
         {
-            response.ContentLength = contentLength;
+            if (contentLength >= 0)
+                response.ContentLength = contentLength;
         }
 
         public object OriginalResponse => response;
@@ -130,20 +131,20 @@ namespace ServiceStack.Host.NetCore
 
         public int StatusCode
         {
-            get { return response.StatusCode; }
-            set { response.StatusCode = value; }
+            get => response.StatusCode;
+            set => response.StatusCode = value;
         }
 
         public string StatusDescription 
         { 
-            get { return response.HttpContext.Features.Get<IHttpResponseFeature>().ReasonPhrase; }
-            set { response.HttpContext.Features.Get<IHttpResponseFeature>().ReasonPhrase = value; }
+            get => response.HttpContext.Features.Get<IHttpResponseFeature>().ReasonPhrase;
+            set => response.HttpContext.Features.Get<IHttpResponseFeature>().ReasonPhrase = value;
         }
 
         public string ContentType
         {
-            get { return response.ContentType; }
-            set { response.ContentType = value; }
+            get => response.ContentType;
+            set => response.ContentType = value;
         }
 
         public Stream OutputStream => response.Body;
