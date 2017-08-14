@@ -116,7 +116,7 @@ namespace ServiceStack.Common.Tests
         public void Can_PopulateTheVortex()
         {
             var obj = (MindTwister)AutoMappingUtils.PopulateWith(new MindTwister());
-            Console.WriteLine("Mindtwister = " + ServiceStack.Text.XmlSerializer.SerializeToString(obj)); // TypeSerializer and JsonSerializer blow up on this structure with a Null Reference Exception!
+            Console.WriteLine("Mindtwister = " + XmlSerializer.Serialize(obj)); // TypeSerializer and JsonSerializer blow up on this structure with a Null Reference Exception!
             Assert.IsNotNull(obj);
             Assert.IsNotNull(obj.Name);
             Assert.IsNotNull(obj.Arrays);

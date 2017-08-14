@@ -63,7 +63,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         private ServiceStackHost appHost;
 
-        [OneTimeSetUpAttribute]
+        [OneTimeSetUp]
         public void OneTimeSetUp()
         {
             appHost = new AppHost()
@@ -76,8 +76,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void GET_Html_Request_calls_GetHtml()
         {
-            var html = Constant.ListeningOn.AppendPath("/content/1")
-                .GetHtmlFromUrl();
+            var html = HttpUtils.GetHtmlFromUrl(Constant.ListeningOn.AppendPath("/content/1"));
 
             Assert.That(html, Does.Contain("<h1>GetHtml 1</h1>"));
         }
@@ -85,8 +84,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void POST_Html_Request_calls_AnyHtml()
         {
-            var html = Constant.ListeningOn.AppendPath("/content/1")
-                .GetStringFromUrl(method: HttpMethods.Post, accept: MimeTypes.Html, requestBody: "");
+            var html = HttpUtils.GetHtmlFromUrl(Constant.ListeningOn.AppendPath("/content/1"), method: HttpMethods.Post, requestBody: "");
 
             Assert.That(html, Does.Contain("<h1>AnyHtml 1</h1>"));
         }

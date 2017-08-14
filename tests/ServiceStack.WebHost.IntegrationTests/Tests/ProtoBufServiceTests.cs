@@ -74,7 +74,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     [TestFixture]
     public class ProtoBufServiceTests
     {
-        private const string ListeningOn = Constant.ServiceStackBaseUri;
+        private const string ListeningOn = Constant.ServiceStackBaseHost;
 
         private static ProtoBufEmail CreateProtoBufEmail()
         {

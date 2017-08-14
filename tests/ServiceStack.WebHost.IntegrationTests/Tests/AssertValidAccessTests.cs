@@ -34,7 +34,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
             try
             {
-                var client = new JsonServiceClient(Constant.ServiceStackBaseUri);
+                var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
                 client.Send(
                     new AssignRoles
                     {
@@ -103,7 +103,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
             try
             {
-                var client = new JsonServiceClient(Constant.ServiceStackBaseUri);
+                var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
                 client.Send(
                     new AssignRoles
                     {
@@ -258,7 +258,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             try
             {
-                Constant.ServiceStackBaseUri.AppendPath("requiresadmin").GetStringFromUrl();
+                HttpUtils.GetStringFromUrl(Constant.ServiceStackBaseHost.AppendPath("requiresadmin"));
                 Assert.Fail("Should not allow access to protected resource");
             }
             catch (Exception ex)
@@ -273,8 +273,9 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_access_Admin_service_with_AuthSecret()
         {
-            Constant.ServiceStackBaseUri.AppendPath("requiresadmin")
-                .AddQueryParam("authsecret", Constant.AuthSecret).GetStringFromUrl();           
+            var urlString = Constant.ServiceStackBaseHost.AppendPath("requiresadmin")
+                .AddQueryParam("authsecret", Constant.AuthSecret);
+            HttpUtils.GetStringFromUrl(urlString);           
         }
     }
 }

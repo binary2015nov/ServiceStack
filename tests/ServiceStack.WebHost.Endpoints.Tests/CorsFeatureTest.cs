@@ -85,7 +85,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost.Config.GlobalResponseHeaders.Clear();
 
-            var response = RequestContextTests.GetResponseHeaders(Constant.ServiceStackBaseUri + "/corsmethod");
+            var response = RequestContextTests.GetResponseHeaders(Constant.ServiceStackBaseHost + "/corsmethod");
             Assert.That(response[HttpHeaders.AllowOrigin], Is.EqualTo("http://localhost http://localhost2"));
             Assert.That(response[HttpHeaders.AllowMethods], Is.EqualTo("POST, GET"));
             Assert.That(response[HttpHeaders.AllowHeaders], Is.EqualTo("Type1, Type2"));
@@ -97,7 +97,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost.LoadPlugin(new CorsFeature { AutoHandleOptionsRequests = false });
 
-            var response = RequestContextTests.GetResponseHeaders(Constant.ServiceStackBaseUri + "/globalcorsfeature");
+            var response = RequestContextTests.GetResponseHeaders(Constant.ServiceStackBaseHost + "/globalcorsfeature");
             Assert.That(response[HttpHeaders.AllowOrigin], Is.EqualTo(CorsFeature.DefaultOrigin));
             Assert.That(response[HttpHeaders.AllowMethods], Is.EqualTo(CorsFeature.DefaultMethods));
             Assert.False(response.ContainsKey(HttpHeaders.AllowCredentials));

@@ -298,7 +298,7 @@ title: We encode < & >
             Assert.That(strFragment5.Value, Is.EqualTo("</body></html>"));
         }
 
-        [Test]
+        [Test, Explicit]
         public void Does_limit_file_changes_checks_to_specified_time()
         {
             var context = new TemplateContext

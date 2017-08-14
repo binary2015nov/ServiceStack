@@ -17,7 +17,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     {
         private const string TestString = "ServiceStack";
 
-        protected WebServicesTests() : base(Constant.ServiceStackBaseUri, typeof(ReverseService).Assembly)
+        protected WebServicesTests() : base(Constant.ServiceStackBaseHost, typeof(ReverseService).Assembly)
         {
         }
 

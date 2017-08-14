@@ -244,7 +244,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var response = Constant.AbsoluteBaseUri
                 .CombineWith(new SessionTypedIncr().ToGetUrl())
                 .AddQueryParam("ss-id", sessionId)
-                .GetJsonFromUrl(req => req.CookieContainer = cookieContainer)
+                .GetJsonFromUrl(requestFilter: req => req.CookieContainer = cookieContainer)
                 .FromJson<AuthUserSession>();
 
             Assert.That(response.Tag, Is.EqualTo(2));

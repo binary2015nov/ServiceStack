@@ -27,12 +27,12 @@ new XmlDictionaryReaderQuotas { MaxStringContentLength = 1024 * 1024, }
 );
 
         public DataContractSerializer(
-#if !(SL5 || __IOS__ || XBOX || ANDROID || PCL)
+#if !(SL5 || __IOS__ || XBOX || ANDROID || PCL || NETSTANDARD1_1 || NETSTANDARD1_6)
 XmlDictionaryReaderQuotas quotas = null
 #endif
 )
         {
-#if !(SL5 || __IOS__ || XBOX || ANDROID || PCL)
+#if !(SL5 || __IOS__ || XBOX || ANDROID || PCL  || NETSTANDARD1_1 || NETSTANDARD1_6)
             this.quotas = quotas;
 #endif
         }

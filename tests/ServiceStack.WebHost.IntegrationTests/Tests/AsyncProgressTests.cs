@@ -48,7 +48,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         private static async Task AsyncDownloadWithProgress<TResponse>(IReturn<TResponse> requestDto)
         {
             AsyncServiceClient.BufferSize = 100;          
-            var asyncClient = new JsonServiceClient(Constant.ServiceStackBaseUri);
+            var asyncClient = new JsonServiceClient(Constant.ServiceStackBaseHost);
             var progress = new List<string>();
 
             //Note: total = -1 when 'Transfer-Encoding: chunked'

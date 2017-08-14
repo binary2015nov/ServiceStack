@@ -159,11 +159,11 @@ namespace ServiceStack.Server.Tests.Auth
         [Test]
         public async Task Can_access_Secured_Pages_with_ApiKeyAuth_async()
         {
-            Assert.That(await ListeningOn.CombineWith("/secured").GetStringFromUrlAsync(
+            Assert.That(await HttpUtils.GetStringFromUrlAsync(ListeningOn.AppendPath("/secured"),
                 requestFilter: req => req.AddApiKeyAuth(ApiKey)),
                 Does.Contain("<!--view:Secured.cshtml-->"));
 
-            Assert.That(await ListeningOn.CombineWith("/SecuredPage").GetStringFromUrlAsync(
+            Assert.That(await HttpUtils.GetStringFromUrlAsync(ListeningOn.CombineWith("/SecuredPage"),
                 requestFilter: req => req.AddApiKeyAuth(ApiKey)),
                 Does.Contain("<!--page:SecuredPage.cshtml-->"));
 

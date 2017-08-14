@@ -934,24 +934,24 @@ namespace ServiceStack
     public static class PclExportExt
     {
         //HttpUtils
-        public static WebResponse PostFileToUrl(this string urlString,
-            FileInfo uploadFileInfo, string uploadFileMimeType,
-            string accept = null,
-            Action<HttpWebRequest> requestFilter = null)
-        {
-            var webReq = (HttpWebRequest)WebRequest.Create(urlString);
-            using (var fileStream = uploadFileInfo.OpenRead())
-            {
-                var fileName = uploadFileInfo.Name;
-                webReq.AllowAutoRedirect = false;
-                webReq.UploadFile(fileStream, fileName, uploadFileMimeType, accept: accept, requestFilter: requestFilter, method: "POST");
-            }
+        //public static WebResponse PostFileToUrl(this string urlString,
+        //    FileInfo uploadFileInfo, string uploadFileMimeType,
+        //    string accept = null,
+        //    Action<HttpWebRequest> requestFilter = null)
+        //{
+        //    var webReq = WebRequest.CreateHttp(urlString);
+        //    using (var fileStream = uploadFileInfo.OpenRead())
+        //    {
+        //        var fileName = uploadFileInfo.Name;
+        //        webReq.AllowAutoRedirect = false;
+        //        webReq.UploadFile(fileStream, fileName, uploadFileMimeType, accept: accept, requestFilter: requestFilter, method: "POST");
+        //    }
 
-            if (HttpUtils.ResultsFilter != null)
-                return null;
+            //if (HttpUtils.ResultsFilter != null)
+            //    return null;
 
-            return webReq.GetResponse();
-        }
+        //    return webReq.GetResponse();
+        //}
 
         public static WebResponse PutFileToUrl(this string url,
             FileInfo uploadFileInfo, string uploadFileMimeType,
@@ -966,8 +966,8 @@ namespace ServiceStack
                 webReq.UploadFile(fileStream, fileName, uploadFileMimeType, accept: accept, requestFilter: requestFilter, method: "PUT");
             }
 
-            if (HttpUtils.ResultsFilter != null)
-                return null;
+            //if (HttpUtils.ResultsFilter != null)
+            //    return null;
 
             return webReq.GetResponse();
         }
@@ -982,8 +982,8 @@ namespace ServiceStack
                 webRequest.UploadFile(fileStream, fileName, uploadFileMimeType);
             }
 
-            if (HttpUtils.ResultsFilter != null)
-                return null;
+            //if (HttpUtils.ResultsFilter != null)
+            //    return null;
 
             return webRequest.GetResponse();
         }

@@ -9,7 +9,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Handles_malicious_php_cookies()
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseUri)
+            var client = new JsonServiceClient(Constant.ServiceStackBaseHost)
             {
                 StoreCookies = false,
                 RequestFilter = r => r.Headers["Cookie"] = "$Version=1; $Path=/; $Path=/; RealCookie=choc-chip"

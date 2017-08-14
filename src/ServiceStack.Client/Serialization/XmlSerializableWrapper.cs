@@ -4,7 +4,6 @@ using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Serialization;
 using ServiceStack.Text;
-using static System.String;
 
 namespace ServiceStack.Serialization
 {
@@ -23,7 +22,7 @@ namespace ServiceStack.Serialization
         public XmlSerializerWrapper(Type type, string name, string ns)
         {
             this.objectType = type;
-            if (!IsNullOrEmpty(ns))
+            if (!ns.IsNullOrEmpty())
             {
                 this.defaultNS = ns;
                 this.serializer = new System.Xml.Serialization.XmlSerializer(type, ns);
@@ -68,8 +67,8 @@ namespace ServiceStack.Serialization
         {
             string readersNS;
 
-            readersNS = (IsNullOrEmpty(reader.NamespaceURI)) ? "" : reader.NamespaceURI;
-            if (Compare(this.defaultNS, readersNS) != 0)
+            readersNS = (reader.NamespaceURI.IsNullOrEmpty()) ? "" : reader.NamespaceURI;
+            if (string.Compare(this.defaultNS, readersNS) != 0)
             {
                 this.serializer = new System.Xml.Serialization.XmlSerializer(this.objectType, readersNS);
                 this.defaultNS = readersNS;

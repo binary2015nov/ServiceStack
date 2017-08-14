@@ -33,35 +33,35 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Root_path_redirects_to_metadata_page()
         {
-            var html = ListeningOn.GetStringFromUrl();
+            var html = HttpUtils.GetStringFromUrl(ListeningOn);
             Assert.That(html.Contains("The following operations are supported."));
         }
 
         [Test]
         public void Can_download_webpage_html_page()
         {
-            var html = (ListeningOn + "webpage.html").GetStringFromUrl();
+            var html = HttpUtils.GetStringFromUrl((ListeningOn + "webpage.html"));
             Assert.That(html.Contains("Default index ServiceStack.WebHost.Endpoints.Tests page"));
         }
 
         [Test]
         public void Can_download_requestinfo_json()
         {
-            var html = (ListeningOn + "?debug=requestinfo").GetStringFromUrl();
+            var html = HttpUtils.GetStringFromUrl((ListeningOn + "?debug=requestinfo"));
             Assert.That(html.Contains("\"Host\":"));
         }
 
         [Test]
         public void Gets_404_on_non_existant_page()
         {
-            var webRes = (ListeningOn + "nonexistant.html").GetWebResponse();
+            var webRes = HttpUtils.GetWebResponse((ListeningOn + "nonexistant.html"));
             Assert.That(webRes.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         }
 
         [Test]
         public void Gets_403_on_page_with_non_whitelisted_extension()
         {
-            var webRes = (ListeningOn + "webpage.forbidden").GetWebResponse();
+            var webRes = HttpUtils.GetWebResponse((ListeningOn + "webpage.forbidden"));
             Assert.That(webRes.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
         }
 
@@ -78,10 +78,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_call_jsv_debug_on_GetFactorial_WebService()
         {
-            const string url = ListeningOn + "jsv/reply/GetFactorial?ForNumber=3&debug=true";
-            var contents = url.GetStringFromUrl();
-
-
+            var contents = HttpUtils.GetStringFromUrl(ListeningOn + "jsv/reply/GetFactorial?ForNumber=3&debug=true");
             Console.WriteLine("JSV DEBUG: " + contents);
 
             Assert.That(contents, Is.Not.Null);
@@ -94,7 +91,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             int errorCount = 0;
             try
             {
-                missingUrl.GetStringFromUrl();
+                HttpUtils.GetStringFromUrl(missingUrl);
             }
             catch (Exception ex)
             {
@@ -103,7 +100,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
             try
             {
-                missingUrl.GetStringFromUrl();
+                HttpUtils.GetStringFromUrl(missingUrl);
             }
             catch (Exception ex)
             {

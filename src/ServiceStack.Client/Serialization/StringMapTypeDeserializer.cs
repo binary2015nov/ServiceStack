@@ -15,7 +15,7 @@ namespace ServiceStack.Serialization
     /// </summary>
     public class StringMapTypeDeserializer
     {
-        private static ITracer Log = new ConsoleTracer();
+        private static ILog Log = LogManager.GetLogger(typeof(StringMapTypeDeserializer));
 
         internal class PropertySerializerEntry
         {
@@ -153,14 +153,14 @@ namespace ServiceStack.Serialization
                     if (ignoredWarningsOnPropertyNames == null ||
                         !ignoredWarningsOnPropertyNames.Contains(ignoredProperty))
                     {
-                        Log.WriteWarning("Property '{0}' does not exist on type '{1}'", ignoredProperty, type.FullName);
+                        Log.WarnFormat("Property '{0}' does not exist on type '{1}'", ignoredProperty, type.FullName);
                     }
                     return instance;
                 }
 
                 if (propertySerializerEntry.PropertySetFn == null)
                 {
-                    Log.WriteWarning("Could not set value of read-only property '{0}' on type '{1}'", propertyName,
+                    Log.WarnFormat("Could not set value of read-only property '{0}' on type '{1}'", propertyName,
                                     type.FullName);
                     return instance;
                 }
@@ -174,7 +174,7 @@ namespace ServiceStack.Serialization
                 var value = propertySerializerEntry.PropertyParseStringFn(propertyTextValue);
                 if (value == null)
                 {
-                    Log.WriteWarning("Could not create instance on '{0}' for property '{1}' with text value '{2}'",
+                    Log.WarnFormat("Could not create instance on '{0}' for property '{1}' with text value '{2}'",
                                     instance, propertyName, propertyTextValue);
                     return instance;
                 }
@@ -199,7 +199,6 @@ namespace ServiceStack.Serialization
             return instance;
         }
         
-
         public object CreateFromMap(IDictionary<string, string> keyValuePairs)
         {
             return PopulateFromMap(null, keyValuePairs, null);
@@ -209,7 +208,6 @@ namespace ServiceStack.Serialization
         {
             return PopulateFromMap(null, nameValues, null);
         }
-
     }
 
     public class RequestBindingError

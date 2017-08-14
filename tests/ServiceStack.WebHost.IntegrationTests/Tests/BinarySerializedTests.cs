@@ -39,7 +39,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_call_cached_WebService_with_Protobuf()
         {
-            var client = new ProtoBufServiceClient(Constant.ServiceStackBaseUri);
+            var client = new ProtoBufServiceClient(Constant.ServiceStackBaseHost);
 
             try
             {
@@ -62,7 +62,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             //new ProtoBufServiceTests().Can_Send_ProtoBuf_request();
 
-            var client = new ProtoBufServiceClient(Constant.ServiceStackBaseUri);
+            var client = new ProtoBufServiceClient(Constant.ServiceStackBaseHost);
 
             try
             {

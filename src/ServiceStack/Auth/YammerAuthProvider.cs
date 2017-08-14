@@ -107,7 +107,7 @@ namespace ServiceStack.Auth
             try
             {
                 // Get access response object
-                var contents = AccessTokenUrlFilter(this, accessTokenUrl).GetStringFromUrl();
+                var contents = HttpUtils.GetStringFromUrl(AccessTokenUrlFilter(this, accessTokenUrl));
 
                 var authInfo = PclExportClient.Instance.ParseQueryString(contents);
                 var authObj = JsonObject.Parse(contents);

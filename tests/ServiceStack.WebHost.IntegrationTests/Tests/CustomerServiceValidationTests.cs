@@ -10,7 +10,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     [TestFixture]
     public class CustomerServiceValidationTests
     {
-        private const string ListeningOn = Constant.ServiceStackBaseUri;
+        private const string ListeningOn = Constant.ServiceStackBaseHost;
 
         private string[] ExpectedPostErrorFields = new[] {
             "Id",

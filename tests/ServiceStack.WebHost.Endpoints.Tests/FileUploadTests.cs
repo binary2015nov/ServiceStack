@@ -63,7 +63,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             switch (contentType)
             {
                 case MimeTypes.Xml:
-                    result = XmlSerializer.DeserializeFromString<T>(contents);
+                    result = XmlSerializer.Deserialize<T>(contents);
                     break;
 
                 case MimeTypes.Json:

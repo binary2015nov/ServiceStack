@@ -99,7 +99,7 @@ namespace ServiceStack.Auth {
 
                 string accessTokeUrl = $"{AccessTokenUrl}?client_id={ApplicationId}&client_secret={SecureKey}&code={code}&redirect_uri={CallbackUrl.UrlEncode()}";
 
-                string contents = AccessTokenUrlFilter(this, accessTokeUrl).GetStringFromUrl(accept: "*/*", requestFilter: RequestFilter);
+                string contents = HttpUtils.GetStringFromUrl(AccessTokenUrlFilter(this, accessTokeUrl), accept: "*/*", requestFilter: RequestFilter);
 
                 var authInfo = JsonObject.Parse(contents);
 

@@ -8,7 +8,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     [TestFixture]
     public class RequestFilterTests
     {
-        private const string ServiceClientBaseUri = Constant.ServiceStackBaseUri;
+        private const string ServiceClientBaseUri = Constant.ServiceStackBaseHost;
 
         [Test]
         public void Does_return_bare_401_StatusCode()

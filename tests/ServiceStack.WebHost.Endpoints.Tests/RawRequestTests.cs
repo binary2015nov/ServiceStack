@@ -83,7 +83,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public void Can_POST_raw_request()
         {
             var rawData = "<<(( 'RAW_DATA' ))>>";
-            var requestUrl = Constant.ServiceStackBaseUri + "/rawrequest";
+            var requestUrl = Constant.ServiceStackBaseHost + "/rawrequest";
             var json = requestUrl.PostStringToUrl(rawData, contentType: MimeTypes.PlainText, accept: MimeTypes.Json);
             var response = json.FromJson<RawRequestResponse>();
             Assert.That(response.Result, Is.EqualTo(rawData));
@@ -93,7 +93,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public void Can_POST_raw_request_to_predefined_route()
         {
             var rawData = "{\"raw\":\"json\"}";
-            var requestUrl = Constant.ServiceStackBaseUri + "/json/reply/RawRequest";
+            var requestUrl = Constant.ServiceStackBaseHost + "/json/reply/RawRequest";
             var json = requestUrl.PostJsonToUrl(rawData);
             var response = json.FromJson<RawRequestResponse>();
             Assert.That(response.Result, Is.EqualTo(rawData));
@@ -103,7 +103,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public void Can_POST_raw_request_with_params()
         {
             var rawData = "<<(( 'RAW_DATA' ))>>";
-            var requestUrl = Constant.ServiceStackBaseUri + "/rawrequest/Foo?Param=Bar";
+            var requestUrl = Constant.ServiceStackBaseHost + "/rawrequest/Foo?Param=Bar";
             var json = requestUrl.PostStringToUrl(rawData, contentType: MimeTypes.PlainText, accept: MimeTypes.Json);
             var response = json.FromJson<RawRequestResponse>();
             var expected = "{0}:{1}:{2}".Fmt("Foo", "Bar", rawData);
@@ -114,7 +114,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public void Can_PUT_raw_request()
         {
             var rawData = "<<(( 'RAW_DATA' ))>>";
-            var requestUrl = Constant.ServiceStackBaseUri + "/rawrequest";
+            var requestUrl = Constant.ServiceStackBaseHost + "/rawrequest";
             var json = requestUrl.PutStringToUrl(rawData, contentType: MimeTypes.PlainText, accept: MimeTypes.Json);
             var response = json.FromJson<RawRequestResponse>();
             Assert.That(response.Result, Is.EqualTo(rawData));
@@ -137,7 +137,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                           </LeadApplication>
                         </LeadApplications>";
 
-            var requestUrl = Constant.ServiceStackBaseUri + "/Leads/LeadData/";
+            var requestUrl = Constant.ServiceStackBaseHost + "/Leads/LeadData/";
             var responseXml = requestUrl.PostXmlToUrl(xml);
 
             Assert.That(responseXml, Is.EqualTo(xml));

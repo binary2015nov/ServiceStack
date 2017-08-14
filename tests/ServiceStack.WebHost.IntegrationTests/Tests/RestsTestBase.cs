@@ -17,7 +17,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
         readonly HostConfig defaultConfig = new HostConfig();
 
-        public RestsTestBase() : base(Constant.ServiceStackBaseUri, typeof(HelloService).Assembly)
+        public RestsTestBase() : base(Constant.ServiceStackBaseHost, typeof(HelloService).Assembly)
         //: base("http://localhost:4000", typeof(HelloService).Assembly) //Uncomment to test on dev web server
         {
         }
@@ -148,7 +148,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             switch (contentType)
             {
                 case MimeTypes.Xml:
-                    result = XmlSerializer.DeserializeFromString<T>(contents);
+                    result = XmlSerializer.Deserialize<T>(contents);
                     break;
 
                 case MimeTypes.Json:

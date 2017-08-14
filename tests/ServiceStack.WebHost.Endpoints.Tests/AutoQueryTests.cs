@@ -1480,19 +1480,19 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public void Can_consume_as_CSV()
         {
             var url = Constant.ListeningOn + "movies/search.csv?ratings=G,PG-13";
-            var csv = url.GetStringFromUrl();
+            var csv = HttpUtils.GetStringFromUrl(url);
             var headers = csv.SplitOnFirst('\n')[0].Trim();
             Assert.That(headers, Is.EqualTo("Id,ImdbId,Title,Rating,Score,Director,ReleaseDate,TagLine,Genres"));
             csv.Print();
 
             url = Constant.ListeningOn + "query/rockstars.csv?Age=27";
-            csv = url.GetStringFromUrl();
+            csv = HttpUtils.GetStringFromUrl(url);
             headers = csv.SplitOnFirst('\n')[0].Trim();
             Assert.That(headers, Is.EqualTo("Id,FirstName,LastName,Age,DateOfBirth,DateDied,LivingStatus"));
             csv.Print();
 
             url = Constant.ListeningOn + "customrockstars.csv";
-            csv = url.GetStringFromUrl();
+            csv = HttpUtils.GetStringFromUrl(url);
             headers = csv.SplitOnFirst('\n')[0].Trim();
             Assert.That(headers, Is.EqualTo("FirstName,LastName,Age,RockstarAlbumName,RockstarGenreName"));
             csv.Print();

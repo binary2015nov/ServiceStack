@@ -45,7 +45,7 @@ namespace ServiceStack
             }
         }
 
-        public override StreamDeserializerDelegate StreamDeserializer => XmlSerializer.DeserializeFromStream;
+        public override StreamDeserializerDelegate StreamDeserializer => (t, s) => XmlSerializer.Deserialize(s, t);
     }
 }
 #endif

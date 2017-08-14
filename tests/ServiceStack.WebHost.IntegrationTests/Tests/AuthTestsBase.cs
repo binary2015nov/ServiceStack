@@ -13,7 +13,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         public const string Permission2 = "Permission2";
 
         private JsonServiceClient serviceClient;
-        public JsonServiceClient ServiceClient => serviceClient ?? (serviceClient = new JsonServiceClient(Constant.ServiceStackBaseUri));
+        public JsonServiceClient ServiceClient => serviceClient ?? (serviceClient = new JsonServiceClient(Constant.ServiceStackBaseHost));
 
         public Register CreateAdminUser()
         {
@@ -59,7 +59,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
         public JsonServiceClient Login(string userName, string password)
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseUri);
+            var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
             client.Send(new Authenticate
             {
                 UserName = userName,

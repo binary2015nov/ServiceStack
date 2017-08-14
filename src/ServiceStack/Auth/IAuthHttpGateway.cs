@@ -113,7 +113,7 @@ namespace ServiceStack.Auth
 
             var url = GithubUserUrl.Fmt(accessToken);
 
-            var json = url.GetJsonFromUrl(httpReq => httpReq.Headers[HttpRequestHeader.UserAgent] = ServiceClientBase.DefaultUserAgent);
+            var json = url.GetJsonFromUrl(requestFilter: httpReq => httpReq.Headers[HttpRequestHeader.UserAgent] = ServiceClientBase.DefaultUserAgent);
 
             return json;
         }
@@ -125,7 +125,7 @@ namespace ServiceStack.Auth
 
             var url = GithubUserEmailsUrl.Fmt(accessToken);
 
-            var json = url.GetJsonFromUrl(httpReq => httpReq.Headers[HttpRequestHeader.UserAgent] = ServiceClientBase.DefaultUserAgent);
+            var json = url.GetJsonFromUrl(requestFilter: httpReq => httpReq.Headers[HttpRequestHeader.UserAgent] = ServiceClientBase.DefaultUserAgent);
 
             return json;
         }
@@ -157,8 +157,8 @@ namespace ServiceStack.Auth
         {
             yammerUserId.ThrowIfNullOrEmpty("yammerUserId");
 
-            var url = YammerUserUrl.Fmt(yammerUserId);
-            var json = url.GetStringFromUrl();
+            var urlString = YammerUserUrl.Fmt(yammerUserId);
+            var json = HttpUtils.GetStringFromUrl(urlString);
             return json;
         }
     }

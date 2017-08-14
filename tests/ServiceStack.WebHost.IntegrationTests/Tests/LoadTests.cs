@@ -13,7 +13,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_download_sync_pdf()
         {
-            var client = new ImagingService(Constant.ServiceStackBaseUri);
+            var client = new ImagingService(Constant.ServiceStackBaseHost);
 
             var pdfBytes = client.GetBytes("/sample.pdf");
 
@@ -25,7 +25,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public async Task Can_download_async_pdf()
         {
-            var client = new ImagingService(Constant.ServiceStackBaseUri);
+            var client = new ImagingService(Constant.ServiceStackBaseHost);
 
             var pdfBytes = await client.GetBytesAsync("/sample.pdf");
 
@@ -39,7 +39,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             const int NoOfTimes = 1000;
 
-            var client = new ImagingService(Constant.ServiceStackBaseUri);
+            var client = new ImagingService(Constant.ServiceStackBaseHost);
 
             var fetchTasks = new List<Task>();
 

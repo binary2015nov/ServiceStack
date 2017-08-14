@@ -10,7 +10,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_call_service_returning_string()
         {
-            var response = Constant.ServiceStackBaseUri.CombineWith("hello2/world")
+            var response = Constant.ServiceStackBaseHost.CombineWith("hello2/world")
                 .GetJsonFromUrl();
 
             Assert.That(response, Is.EqualTo("world"));

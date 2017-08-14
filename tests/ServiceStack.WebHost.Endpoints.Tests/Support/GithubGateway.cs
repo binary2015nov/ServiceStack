@@ -252,7 +252,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support
         public T GetJson<T>(string route, params object[] routeArgs)
         {
             return GithubApiBaseUrl.CombineWith(route.Fmt(routeArgs))
-                .GetJsonFromUrl(RequestFilter)
+                .GetJsonFromUrl(requestFilter: RequestFilter)
                 .FromJson<T>();
         }
 
@@ -265,7 +265,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support
             {
                 results = nextUrl
                     .GetJsonFromUrl(
-                        RequestFilter,
+                        requestFilter: RequestFilter,
                         responseFilter: res => {
                             var links = ParseLinkUrls(res.Headers["Link"]);
                             links.TryGetValue("next", out nextUrl);

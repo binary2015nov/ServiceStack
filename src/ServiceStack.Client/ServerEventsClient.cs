@@ -302,7 +302,7 @@ namespace ServiceStack
 
             EnsureSynchronizationContext();
 
-            ConnectionInfo.HeartbeatUrl.GetStringFromUrlAsync(requestFilter: req => {
+            HttpUtils.GetStringFromUrlAsync(ConnectionInfo.HeartbeatUrl, requestFilter: req => {
                     var hold = httpReq;
                     if (hold != null)
                         req.CookieContainer = hold.CookieContainer;
@@ -734,7 +734,7 @@ namespace ServiceStack
             {
                 EnsureSynchronizationContext();
                 try {
-                    ConnectionInfo.UnRegisterUrl.GetStringFromUrl(requestFilter: req =>
+                    HttpUtils.GetStringFromUrl(ConnectionInfo.UnRegisterUrl, requestFilter: req =>
                     {
                         var hold = httpReq;
                         if (hold != null)

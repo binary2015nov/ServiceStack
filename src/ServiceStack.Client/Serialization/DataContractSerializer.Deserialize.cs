@@ -12,7 +12,7 @@ namespace ServiceStack.Serialization
         {
             try
             {
-                return XmlSerializer.DeserializeFromString(xml, type);
+                return XmlSerializer.Deserialize(xml, type);
             }
             catch (Exception ex)
             {

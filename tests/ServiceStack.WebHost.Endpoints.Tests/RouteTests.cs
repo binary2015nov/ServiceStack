@@ -418,7 +418,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void RootPath_returns_BaseUrl()
         {
-            var url = Constant.ServiceStackBaseUri;
+            var url = Constant.ServiceStackBaseHost;
             using (var appHost = new RouteInfoAppHost()
                 .Init()
                 .Start(url + "/"))

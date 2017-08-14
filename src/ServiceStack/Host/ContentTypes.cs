@@ -135,7 +135,7 @@ namespace ServiceStack.Host
             switch (contentTypeAttr)
             {
                 case RequestAttributes.Xml:
-                    return XmlSerializer.SerializeToString(response).ToUtf8Bytes();
+                    return XmlSerializer.Serialize(response).ToUtf8Bytes();
 
                 case RequestAttributes.Json:
                     return JsonDataContractSerializer.Instance.SerializeToString(response).ToUtf8Bytes();
@@ -194,7 +194,7 @@ namespace ServiceStack.Host
             switch (contentTypeAttr)
             {
                 case RequestAttributes.Xml:
-                    return XmlSerializer.SerializeToString(response);
+                    return XmlSerializer.Serialize(response);
 
                 case RequestAttributes.Json:
                     return JsonDataContractSerializer.Instance.SerializeToString(response);
@@ -265,7 +265,7 @@ namespace ServiceStack.Host
             switch (contentTypeAttr)
             {
                 case RequestAttributes.Xml:
-                    return (r, o, s) => XmlSerializer.SerializeToStream(o, s);
+                    return (r, o, s) => XmlSerializer.Serialize(o, s);
 
                 case RequestAttributes.Json:
                     return (r, o, s) => JsonDataContractSerializer.Instance.SerializeToStream(o, s);
@@ -291,7 +291,7 @@ namespace ServiceStack.Host
             switch (contentTypeAttr)
             {
                 case RequestAttributes.Xml:
-                    return XmlSerializer.DeserializeFromString(request, type);
+                    return XmlSerializer.Deserialize(request, type);
 
                 case RequestAttributes.Json:
                     return JsonDataContractSerializer.Instance.DeserializeFromString(request, type);
@@ -327,7 +327,7 @@ namespace ServiceStack.Host
             {
                 case RequestAttributes.Xml:
                 case RequestAttributes.Soap11: //"text/xml; charset=utf-8" also matches xml
-                    return XmlSerializer.DeserializeFromStream;
+                    return (t, s) => XmlSerializer.Deserialize(s, t);
 
                 case RequestAttributes.Json:
                     return JsonDataContractSerializer.Instance.DeserializeFromStream;
