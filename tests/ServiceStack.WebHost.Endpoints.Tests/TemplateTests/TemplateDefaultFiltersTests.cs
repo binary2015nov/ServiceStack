@@ -70,6 +70,48 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
         }
 
         [Test]
+        public void Can_escape_strings()
+        {
+            var context = new TemplateContext
+            {
+                Args =
+                {
+                    ["json"] = "{\"key\":\"single'back`tick\"}",
+                    ["hasNewLines"] = "has\nnew\r\nlines",
+                }
+            }.Init();
+
+            Assert.That(context.EvaluateTemplate("var s = '{{ json | escapeSingleQuotes | raw }}'"), Is.EqualTo("var s = '{\"key\":\"single\\'back`tick\"}'"));
+            Assert.That(context.EvaluateTemplate("var s = `{{ json | escapeBackticks    | raw }}`"), Is.EqualTo("var s = `{\"key\":\"single'back\\`tick\"}`"));
+            Assert.That(context.EvaluateTemplate("var s = '{{ json | jsString }}'"), Is.EqualTo("var s = '{\"key\":\"single\\'back`tick\"}'"));
+            Assert.That(context.EvaluateTemplate("var s = {{ json | jsQuotedString }}"), Is.EqualTo("var s = '{\"key\":\"single\\'back`tick\"}'"));
+
+            Assert.That(context.EvaluateTemplate("var s = '{{ hasNewLines | jsString }}'"), Is.EqualTo(@"var s = 'has\nnew\r\nlines'"));
+
+            Assert.That(context.EvaluateTemplate(@"{{ [{x:1,y:2},{x:3,y:4}] | json | assignTo:json }}var s = '{{ json | jsString }}';"), 
+                Is.EqualTo("var s = '[{\"x\":1,\"y\":2},{\"x\":3,\"y\":4}]';"));
+
+            Assert.That(context.EvaluateTemplate(@"{{ `[
+  {""name"":""Mc Donald's""}
+]` | raw | assignTo:json }}
+var obj = {{ json }};
+var str = '{{ json | jsString }}';
+var str = {{ json | jsQuotedString }};
+var escapeSingle = '{{ ""single' quote's"" | escapeSingleQuotes | escapeNewLines | raw }}';
+var escapeDouble = ""{{ 'double"" quote""s' | escapeDoubleQuotes | escapeNewLines | raw }}"";
+".NormalizeNewLines()), Is.EqualTo(@"
+var obj = [
+  {""name"":""Mc Donald's""}
+];
+var str = '[\n  {""name"":""Mc Donald\'s""}\n]';
+var str = '[\n  {""name"":""Mc Donald\'s""}\n]';
+var escapeSingle = 'single\' quote\'s';
+var escapeDouble = ""double\"" quote\""s"";
+".NormalizeNewLines()));
+
+        }
+
+        [Test]
         public async Task Does_default_filter_appSetting()
         {
             var context = CreateContext().Init();
@@ -1012,6 +1054,28 @@ dir-file: dir/dir-file.txt
         }
 
         [Test]
+        public void Can_use_length_filters()
+        {
+            var context = new TemplateContext
+            {
+                Args =
+                {
+                    ["items"] = new[]{1,2,3},
+                }
+            }.Init();
+
+            Assert.That(context.EvaluateTemplate("{{ items | length }}"), Is.EqualTo("3"));
+            Assert.That(context.EvaluateTemplate("{{ items | hasMinCount(0) | iif(1,0) }}:{{ items | hasMinCount(3) | iif(1,0) }}:{{ items | hasMinCount(4) | iif(1,0) }}"), Is.EqualTo("1:1:0"));
+            Assert.That(context.EvaluateTemplate("{{ items | hasMaxCount(0) | iif(1,0) }}:{{ items | hasMaxCount(3) | iif(1,0) }}:{{ items | hasMaxCount(4) | iif(1,0) }}"), Is.EqualTo("0:1:1"));
+
+            Assert.That(context.EvaluateTemplate("{{ null | hasMinCount(0) | iif(1,0) }}:{{ 1 | hasMinCount(1) | iif(1,0) }}:{{ 'a' | hasMinCount(0) | iif(1,0) }}"), Is.EqualTo("0:0:1"));
+            Assert.That(context.EvaluateTemplate("{{ null | length }}:{{ 1 | length }}:{{ 'a' | length }}"), Is.EqualTo("0:0:1"));
+
+            Assert.That(context.EvaluateTemplate("{{ [1,2] | hasMinCount(0) | iif(1,0) }}:{{ 1 | hasMinCount(1) | iif(1,0) }}:{{ 'a' | hasMinCount(0) | iif(1,0) }}"), Is.EqualTo("1:0:1"));
+            Assert.That(context.EvaluateTemplate("{{ noArg | hasMinCount(0) | iif(1,0) }}:{{ items | hasMinCount(1) | ifUse(length(items)) }}"), Is.EqualTo("0:3"));
+        }
+
+        [Test]
         public void Can_use_test_isTest_filters()
         {
             var context = new TemplateContext
@@ -1066,6 +1130,98 @@ dir-file: dir/dir-file.txt
             Assert.That(context.EvaluateTemplate("{{ {a:1} | isKeyValuePair | iif(1,0) }}:{{ keyValuePair | isKeyValuePair | iif(1,0) }}:{{ {a:1} | toList | get(0) | isKeyValuePair | iif(1,0) }}"), Is.EqualTo("0:1:1"));
 
             Assert.That(context.EvaluateTemplate("{{ 'a' | isType('string') | iif(1,0) }}:{{ string | isType('String') | iif(1,0) }}:{{ 1 | isString | iif(1,0) }}"), Is.EqualTo("1:1:0"));
+        }
+
+        [Test]
+        public void Can_use_eval()
+        {
+            var context = new TemplateContext
+            {
+                Args =
+                {
+                    ["arg"] = "value"
+                }
+            }.Init();
+
+            Assert.That(context.EvaluateTemplate("{{ '1' | eval | typeName }}"), Is.EqualTo("Int32"));
+            Assert.That(context.EvaluateTemplate("{{ 'arg' | eval }}"), Is.EqualTo("value"));
+            Assert.That(context.EvaluateTemplate("{{ `'arg'` | eval }}"), Is.EqualTo("arg"));
+            Assert.That(context.EvaluateTemplate("{{ '{a:1}' | eval | get: a }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ '{a:arg}' | eval | get: a }}"), Is.EqualTo("value"));
+            Assert.That(context.EvaluateTemplate("{{ '[1]' | eval | get(0) }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ '[{a:arg}]' | eval | get(0) | get:a }}"), Is.EqualTo("value"));
+
+            Assert.That(context.EvaluateTemplate("{{ 'incr(1)' | eval }}"), Is.EqualTo("2"));
+            Assert.That(context.EvaluateTemplate("{{ '{a:incr(1)}' | eval | get: a }}"), Is.EqualTo("2"));
+        }
+
+        [Test]
+        public void Can_parse_JSON()
+        {
+            var context = new TemplateContext().Init();
+
+            Assert.That(context.EvaluateTemplate("{{ '1' | parseJson | typeName }}"), Is.EqualTo("Int32"));
+            Assert.That(context.EvaluateTemplate("{{ 'arg' | parseJson }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ `'arg'` | parseJson }}"), Is.EqualTo("arg"));
+            Assert.That(context.EvaluateTemplate("{{ '{a:1}' | parseJson | get: a }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ '{a:arg}' | parseJson | get: a }}"), Is.EqualTo(":arg"));
+            Assert.That(context.EvaluateTemplate("{{ '[1]' | parseJson | get(0) }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ '[{a:arg}]' | parseJson | get(0) | get:a }}"), Is.EqualTo(":arg"));
+        }
+
+        [Test]
+        public void Can_stop_filter_execution_with_end()
+        {
+            var context = new TemplateContext
+            {
+                Args =
+                {
+                    ["arg"] = "foo",
+                    ["items"] = new[]{1,2,3}
+                }
+            }.Init();
+
+            Assert.That(context.EvaluateTemplate("{{ 1 | end }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ 1 | endIfNull }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ null  | endIfNull     | default('unreachable') }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ arg   | endIfNull     | useFmt('{0} + {1} = {2}',1,2,3) }}"), Is.EqualTo("1 + 2 = 3"));
+            Assert.That(context.EvaluateTemplate("{{ arg   | endIfNotNull  | use('bar') | assignTo: arg }}{{ arg }}"), Is.EqualTo("foo"));
+            Assert.That(context.EvaluateTemplate("{{ noArg | endIfExists   | use('bar') | assignTo: noArg }}{{ noArg }}"), Is.EqualTo("bar"));
+            Assert.That(context.EvaluateTemplate("{{ []    | endIfEmpty    | default('unreachable') }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ items | endIfNotEmpty | use([4,5,6]) | assignTo: items }}{{ items | join }}"), Is.EqualTo("1,2,3"));
+            Assert.That(context.EvaluateTemplate("{{ nums  | endIfNotEmpty | use([4,5,6]) | assignTo: nums  }}{{ nums  | join }}"), Is.EqualTo("4,5,6"));
+            Assert.That(context.EvaluateTemplate("{{ 1 | endIfFalsy | default('unreachable') }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ 0 | endIfFalsy | default('unreachable') }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ arg | endIfTruthy | use('bar') }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ one | endIfTruthy | default(1) | assignTo: one }}{{ one }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ 1 | endIf(true) }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ 1 | endIf(false) }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ 5 | times | endIfAny: it = 4\n | join }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ 5 | times | endIfAny: it = 5\n | join }}"), Is.EqualTo("0,1,2,3,4"));
+            Assert.That(context.EvaluateTemplate("{{ 5 | times | endIfAll: lt(it,4)\n | join }}"), Is.EqualTo("0,1,2,3,4"));
+            Assert.That(context.EvaluateTemplate("{{ 5 | times | endIfAll: lt(it,5)\n | join }}"), Is.EqualTo(""));
+
+            Assert.That(context.EvaluateTemplate("{{ 1   | endWhere: isString(it) }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ 'a' | endWhere: isString(it) }}"), Is.EqualTo(""));
+
+            Assert.That(context.EvaluateTemplate("{{ endIf(true)  | use(1) }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ endIf(false) | use(1) }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ true  | ifEnd | use(1) }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ false | ifEnd | use(1) }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ true  | ifNotEnd | use(1) }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ false | ifNotEnd | use(1) }}"), Is.EqualTo(""));
+
+            Assert.That(context.EvaluateTemplate("{{ doIf(true)  | use(1) }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ doIf(false) | use(1) }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ true  | ifDo | use(1) }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ false | ifDo | use(1) }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ true  | ifDo | select: 1 }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ false | ifDo | select: 1 }}"), Is.EqualTo(""));
+
+            Assert.That(context.EvaluateTemplate("{{ true  | ifUse(1) }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ false | ifUse(1) }}"), Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate("{{ 1 | useIf(true)  }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ 1 | useIf(false) }}"), Is.EqualTo(""));
         }
 
     }

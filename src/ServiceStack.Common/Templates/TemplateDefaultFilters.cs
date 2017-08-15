@@ -293,11 +293,16 @@ namespace ServiceStack.Templates
             return false;
         }
 
+        [HandleUnknownValue]
         public object @if(object returnTarget, object test) => isTrue(test) ? returnTarget : null;
+        [HandleUnknownValue]
         public object iif(object test, object ifTrue, object ifFalse) => isTrue(test) ? ifTrue : ifFalse;
+        [HandleUnknownValue]
         public object when(object returnTarget, object test) => @if(returnTarget, test);     //alias
 
+        [HandleUnknownValue]
         public object ifNot(object returnTarget, object test) => !isTrue(test) ? returnTarget : null;
+        [HandleUnknownValue]
         public object unless(object returnTarget, object test) => ifNot(returnTarget, test); //alias
 
         [HandleUnknownValue]
@@ -318,12 +323,27 @@ namespace ServiceStack.Templates
         public object truthy(object test, object returnIfTruthy) => !isFalsy(test) ? returnIfTruthy : null;
 
         [HandleUnknownValue]
-        public bool isNull(object test) => test == null;
+        public bool isNull(object test) => test == null || test == JsNull.Value;
 
         [HandleUnknownValue]
-        public bool isNotNull(object test) => test != null;
+        public bool isNotNull(object test) => !isNull(test);
         [HandleUnknownValue]
-        public bool exists(object test) => test != null;
+        public bool exists(object test) => !isNull(test);
+
+        [HandleUnknownValue]
+        public bool isZero(double value) => value.Equals(0d);
+
+        [HandleUnknownValue]
+        public bool isPositive(double value) => value > 0;
+
+        [HandleUnknownValue]
+        public bool isNegative(double value) => value < 0;
+
+        [HandleUnknownValue]
+        public bool isNaN(double value) => double.IsNaN(value);
+
+        [HandleUnknownValue]
+        public bool isInfinity(double value) => double.IsInfinity(value);
 
         [HandleUnknownValue]
         public object ifExists(object target) => target;
@@ -343,9 +363,16 @@ namespace ServiceStack.Templates
         [HandleUnknownValue]
         public object ifEmpty(object returnTarget, object test) => isEmpty(test) ? returnTarget : null;
 
+        [HandleUnknownValue]
+        public object ifTrue(object returnTarget, object test) => isTrue(test) ? returnTarget : null;
+
+        [HandleUnknownValue]
+        public object ifFalse(object returnTarget, object test) => !isTrue(test) ? returnTarget : null;
+
+        [HandleUnknownValue]
         public bool isEmpty(object target)
         {
-            if (target == null)
+            if (isNull(target))
                 return true;
 
             if (target is string s)
@@ -357,35 +384,147 @@ namespace ServiceStack.Templates
             return false;
         }
 
+        [HandleUnknownValue]
+        public object end(object ignore) => StopExecution.Value;
+
+        [HandleUnknownValue]
+        public object endIfNull(object target) => isNull(target) ? StopExecution.Value : target;
+
+        [HandleUnknownValue]
+        public object endIfNotNull(object target) => !isNull(target) ? StopExecution.Value : target;
+
+        [HandleUnknownValue]
+        public object endIfExists(object target) => !isNull(target) ? StopExecution.Value : target;
+
+        [HandleUnknownValue]
+        public object endIfEmpty(object target) => isEmpty(target) ? StopExecution.Value : target;
+
+        [HandleUnknownValue]
+        public object endIfNotEmpty(object target) => !isEmpty(target) ? StopExecution.Value : target;
+
+        [HandleUnknownValue]
+        public object endIfFalsy(object target) => isFalsy(target) ? StopExecution.Value : target;
+
+        [HandleUnknownValue]
+        public object endIfTruthy(object target) => !isFalsy(target) ? StopExecution.Value : target;
+
+        [HandleUnknownValue]
+        public object endIf(object test) => isTrue(test) ? (object)StopExecution.Value : IgnoreResult.Value;
+
+        [HandleUnknownValue]
+        public object ifEnd(object test) => isTrue(test) ? (object)StopExecution.Value : IgnoreResult.Value;
+
+        [HandleUnknownValue]
+        public object ifNotEnd(object test) => !isTrue(test) ? (object)StopExecution.Value : IgnoreResult.Value;
+
+        [HandleUnknownValue]
+        public object endIf(object returnTarget, object test) => isTrue(test) ? StopExecution.Value : returnTarget;
+
+        [HandleUnknownValue]
+        public object endIfAny(TemplateScopeContext scope, object target, object expression) => any(scope, target, expression) ? StopExecution.Value : target;
+
+        [HandleUnknownValue]
+        public object endIfAll(TemplateScopeContext scope, object target, object expression) => all(scope, target, expression) ? StopExecution.Value : target;
+
+        [HandleUnknownValue]
+        public object endWhere(TemplateScopeContext scope, object target, object expression) => endWhere(scope, target, expression, null);
+
+        [HandleUnknownValue]
+        public object endWhere(TemplateScopeContext scope, object target, object expression, object scopeOptions)
+        {
+            var literal = scope.AssertExpression(nameof(count), expression);
+            var scopedParams = scope.GetParamsWithItemBinding(nameof(count), scopeOptions, out string itemBinding);
+
+            literal.ParseConditionExpression(out ConditionExpression expr);
+            scope.AddItemToScope(itemBinding, target);
+            var result = expr.Evaluate(scope);
+
+            return result is bool b && b
+                ? StopExecution.Value
+                : target;
+        }
+
+        [HandleUnknownValue]
+        public object ifDo(object test) => isTrue(test) ? (object)IgnoreResult.Value : StopExecution.Value;
+        [HandleUnknownValue]
+        public object doIf(object test) => isTrue(test) ? (object)IgnoreResult.Value : StopExecution.Value;
+
+        [HandleUnknownValue]
+        public object ifUse(object test, object useValue) => isTrue(test) ? useValue : StopExecution.Value;
+        [HandleUnknownValue]
+        public object useIf(object useValue, object test) => isTrue(test) ? useValue : StopExecution.Value;
+
+        public object use(object discardTarget, object useValue) => useValue;
+        public object useFmt(object discardTarget, string format, object arg) => fmt(format, arg);
+        public object useFmt(object discardTarget, string format, object arg1, object arg2) => fmt(format, arg1, arg2);
+        public object useFmt(object discardTarget, string format, object arg1, object arg2, object arg3) => fmt(format, arg1, arg2, arg3);
+        public object useFormat(object discardTarget, object arg, string fmt) => format(arg, fmt);
+
+        [HandleUnknownValue]
         public bool isString(object target) => target is string;
+        [HandleUnknownValue]
         public bool isInt(object target) => target is int;
+        [HandleUnknownValue]
         public bool isLong(object target) => target is long;
+        [HandleUnknownValue]
         public bool isInteger(object target) => target?.GetType()?.IsIntegerType() == true;
+        [HandleUnknownValue]
         public bool isDouble(object target) => target is double;
+        [HandleUnknownValue]
         public bool isFloat(object target) => target is float;
+        [HandleUnknownValue]
         public bool isDecimal(object target) => target is decimal;
+        [HandleUnknownValue]
         public bool isBool(object target) => target is bool;
+        [HandleUnknownValue]
         public bool isList(object target) => target is IEnumerable && !(target is IDictionary) && !(target is string);
+        [HandleUnknownValue]
         public bool isEnumerable(object target) => target is IEnumerable;
+        [HandleUnknownValue]
         public bool isDictionary(object target) => target is IDictionary;
+        [HandleUnknownValue]
         public bool isChar(object target) => target is char;
+        [HandleUnknownValue]
         public bool isChars(object target) => target is char[];
+        [HandleUnknownValue]
         public bool isByte(object target) => target is byte;
+        [HandleUnknownValue]
         public bool isBytes(object target) => target is byte[];
+        [HandleUnknownValue]
         public bool isObjectDictionary(object target) => target is IDictionary<string, object>;
+        [HandleUnknownValue]
         public bool isStringDictionary(object target) => target is IDictionary<string, string>;
 
+        [HandleUnknownValue]
         public bool isType(object target, string typeName) => typeName.EqualsIgnoreCase(target?.GetType()?.Name);
+        [HandleUnknownValue]
         public bool isNumber(object target) => target?.GetType()?.IsNumericType() == true;
+        [HandleUnknownValue]
         public bool isRealNumber(object target) => target?.GetType()?.IsRealNumberType() == true;
+        [HandleUnknownValue]
         public bool isEnum(object target) => target?.GetType()?.IsEnum() == true;
+        [HandleUnknownValue]
         public bool isArray(object target) => target?.GetType()?.IsArray() == true;
+        [HandleUnknownValue]
         public bool isAnonObject(object target) => target?.GetType()?.IsAnonymousType() == true;
+        [HandleUnknownValue]
         public bool isClass(object target) => target?.GetType()?.IsClass() == true;
+        [HandleUnknownValue]
         public bool isValueType(object target) => target?.GetType()?.IsValueType() == true;
+        [HandleUnknownValue]
         public bool isDto(object target) => target?.GetType()?.IsDto() == true;
+        [HandleUnknownValue]
         public bool isTuple(object target) => target?.GetType()?.IsTuple() == true;
+        [HandleUnknownValue]
         public bool isKeyValuePair(object target) => "KeyValuePair`2".Equals(target?.GetType()?.Name);
+
+        [HandleUnknownValue]
+        public int length(object target) => target is IEnumerable e ? e.Cast<object>().Count() : 0;
+
+        [HandleUnknownValue]
+        public bool hasMinCount(object target, int minCount) => target is IEnumerable e && e.Cast<object>().Count() >= minCount;
+        [HandleUnknownValue]
+        public bool hasMaxCount(object target, int maxCount) => target is IEnumerable e && e.Cast<object>().Count() <= maxCount;
 
         public bool or(object lhs, object rhs) => isTrue(lhs) || isTrue(rhs);
         public bool and(object lhs, object rhs) => isTrue(lhs) && isTrue(rhs);
@@ -415,7 +554,7 @@ namespace ServiceStack.Templates
 
         internal static bool compareTo(object target, object other, Func<int, bool> fn)
         {
-            if (target == null)
+            if (target == null || target == JsNull.Value)
                 throw new ArgumentNullException(nameof(target));
             if (other == null)
                 throw new ArgumentNullException(nameof(other));
@@ -632,7 +771,21 @@ namespace ServiceStack.Templates
         public double toDouble(object target) => target.ConvertTo<double>();
         public decimal toDecimal(object target) => target.ConvertTo<decimal>();
         public bool toBool(object target) => target.ConvertTo<bool>();
+
         public Dictionary<string, object> toObjectDictionary(object target) => target.ToObjectDictionary();
+        public Dictionary<string, string> toStringDictionary(IDictionary map)
+        {
+            if (isNull(map))
+                return null;
+
+            var to = new Dictionary<string,string>();
+            foreach (var key in map.Keys)
+            {
+                var value = map[key];
+                to[key.ToString()] = value?.ToString();
+            }
+            return to;
+        }
 
         public List<object> step(IEnumerable target, object scopeOptions)
         {
@@ -674,7 +827,7 @@ namespace ServiceStack.Templates
 
         public bool contains(object target, object needle)
         {
-            if (needle == null)
+            if (isNull(needle))
                 return false;
 
             if (target is string s)
@@ -887,7 +1040,7 @@ namespace ServiceStack.Templates
         [HandleUnknownValue]
         public Task @do(TemplateScopeContext scope, object target, object expression, object scopeOptions)
         {
-            if (target == null)
+            if (isNull(target) || target is bool b && !b)
                 return TypeConstants.EmptyTask;
 
             var scopedParams = scope.GetParamsWithItemBinding(nameof(@do), scopeOptions, out string itemBinding);
@@ -916,7 +1069,7 @@ namespace ServiceStack.Templates
 
         public object property(object target, string propertyName)
         {
-            if (target == null)
+            if (isNull(target))
                 return null;
 
             var props = TypeProperties.Get(target.GetType());
@@ -930,7 +1083,7 @@ namespace ServiceStack.Templates
 
         public object field(object target, string fieldName)
         {
-            if (target == null)
+            if (isNull(target))
                 return null;
 
             var props = TypeFields.Get(target.GetType());
@@ -963,9 +1116,9 @@ namespace ServiceStack.Templates
             return null;
         }
 
-        public object any(TemplateScopeContext scope, object target) => target.AssertEnumerable(nameof(any)).Any();
-        public object any(TemplateScopeContext scope, object target, object expression) => any(scope, target, expression, null);
-        public object any(TemplateScopeContext scope, object target, object expression, object scopeOptions)
+        public bool any(TemplateScopeContext scope, object target) => target.AssertEnumerable(nameof(any)).Any();
+        public bool any(TemplateScopeContext scope, object target, object expression) => any(scope, target, expression, null);
+        public bool any(TemplateScopeContext scope, object target, object expression, object scopeOptions)
         {
             var items = target.AssertEnumerable(nameof(any));
             var literal = scope.AssertExpression(nameof(any), expression);
@@ -984,8 +1137,8 @@ namespace ServiceStack.Templates
             return false;
         }
 
-        public object all(TemplateScopeContext scope, object target, object expression) => all(scope, target, expression, null);
-        public object all(TemplateScopeContext scope, object target, object expression, object scopeOptions)
+        public bool all(TemplateScopeContext scope, object target, object expression) => all(scope, target, expression, null);
+        public bool all(TemplateScopeContext scope, object target, object expression, object scopeOptions)
         {
             var items = target.AssertEnumerable(nameof(all));
             var literal = scope.AssertExpression(nameof(all), expression);
@@ -1220,7 +1373,7 @@ namespace ServiceStack.Templates
 
         public object get(object target, object key)
         {
-            if (target == null)
+            if (isNull(target))
                 return null;
 
             if (target is IDictionary d)
@@ -1276,7 +1429,7 @@ namespace ServiceStack.Templates
 
         public object scopeVars(object target)
         {
-            if (target == null)
+            if (isNull(target))
                 return null;
 
             if (target is IDictionary<string, object> g)
@@ -1326,7 +1479,7 @@ namespace ServiceStack.Templates
         [HandleUnknownValue]
         public async Task select(TemplateScopeContext scope, object target, object selectTemplate, object scopeOptions)
         {
-            if (target == null)
+            if (isNull(target))
                 return;
 
             var scopedParams = scope.GetParamsWithItemBinding(nameof(select), scopeOptions, out string itemBinding);
@@ -1354,7 +1507,7 @@ namespace ServiceStack.Templates
         [HandleUnknownValue]
         public async Task selectPartial(TemplateScopeContext scope, object target, string pageName, object scopedParams)
         {
-            if (target == null)
+            if (isNull(target))
                 return;
 
             scope.TryGetPage(pageName, out TemplatePage page, out TemplateCodePage codePage);
@@ -1442,5 +1595,16 @@ namespace ServiceStack.Templates
 
         public Dictionary<string, object> jsvToObjectDictionary(string json) => json.FromJsv<Dictionary<string, object>>();
         public Dictionary<string, string> jsvToStringDictionary(string json) => json.FromJsv<Dictionary<string, string>>();
+
+        public object eval(TemplateScopeContext scope, string js) => JS.eval(js, scope);
+        public object parseJson(string json) => JSON.parse(json);
+
+        public string escapeSingleQuotes(string text) => text?.Replace("'", "\\'");
+        public string escapeDoubleQuotes(string text) => text?.Replace("\"", "\\\"");
+        public string escapeBackticks(string text) => text?.Replace("`", "\\`");
+        public string escapeNewLines(string text) => text?.Replace("\r", "\\r").Replace("\n", "\\n");
+
+        public IRawString jsString(string text) => escapeNewLines(escapeSingleQuotes(text)).ToRawString();
+        public IRawString jsQuotedString(string text) => ("'" + escapeNewLines(escapeSingleQuotes(text)) + "'").ToRawString();
     }
 }

@@ -1,11 +1,14 @@
-using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 using ServiceStack;
 using ServiceStack.Configuration;
+using System;
+using System.Collections.Concurrent;
+using ServiceStack.Text;
 
 namespace Funq
 {
@@ -129,7 +132,17 @@ namespace Funq
             return entry != null;
         }
 
-        public bool Exists(Type type) => throw new NotImplementedException();
+        public bool Exists(Type type)
+        {
+            var existsGeneric = typeof(Container).GetMethods()
+                .First(x => x.Name == "Exists"
+                            && x.IsGenericMethod
+                            && x.GetGenericArguments().Length == 1);
+
+            var existsMethod = existsGeneric.MakeGenericMethod(type);
+            var instance = existsMethod.Invoke(this, TypeConstants.EmptyObjectArray);
+            return instance is bool exists && exists;
+        }
 
         private Dictionary<Type, Action<object>[]> autoWireCache = new Dictionary<Type, Action<object>[]>();
 

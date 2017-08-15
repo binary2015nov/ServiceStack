@@ -188,6 +188,9 @@ namespace ServiceStack
             if (value is T)
                 return (T)value;
 
+            if (typeof(T) == typeof(string) && value is IRawString rs)
+                return (T)(object)rs.ToRawString();
+
             return value.ConvertTo<T>();
         }
 
