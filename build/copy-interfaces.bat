@@ -53,15 +53,15 @@ COPY ..\lib\netstandard1.6\ServiceStack.Client.dll ..\..\ServiceStack.Aws\lib\ne
 COPY ..\lib\net45\ServiceStack.dll ..\..\ServiceStack.Aws\lib\net45
 COPY ..\lib\netstandard1.6\ServiceStack.dll ..\..\ServiceStack.Aws\lib\netstandard1.6
 
-COPY ..\lib\pcl\ServiceStack.Interfaces.dll ..\..\Admin\lib\pcl
-COPY ..\lib\netstandard1.1\ServiceStack.Interfaces.dll ..\..\Admin\lib\netstandard1.1
-COPY ..\lib\net45\ServiceStack.Common.dll ..\..\Admin\lib\net45
-COPY ..\lib\netstandard1.3\ServiceStack.Common.dll ..\..\Admin\lib\netstandard1.3
-COPY ..\lib\net45\ServiceStack.Client.dll ..\..\Admin\lib\net45
-COPY ..\lib\netstandard1.1\ServiceStack.Client.dll ..\..\Admin\lib\netstandard1.1
-COPY ..\lib\netstandard1.6\ServiceStack.Client.dll ..\..\Admin\lib\netstandard1.6
-COPY ..\lib\net45\ServiceStack.dll ..\..\Admin\lib\net45
-COPY ..\lib\netstandard1.6\ServiceStack.dll ..\..\Admin\lib\netstandard1.6
+COPY ..\lib\pcl\ServiceStack.Interfaces.dll ..\..\ServiceStack.Admin\lib\pcl
+COPY ..\lib\netstandard1.1\ServiceStack.Interfaces.dll ..\..\ServiceStack.Admin\lib\netstandard1.1
+COPY ..\lib\net45\ServiceStack.Common.dll ..\..\ServiceStack.Admin\lib\net45
+COPY ..\lib\netstandard1.3\ServiceStack.Common.dll ..\..\ServiceStack.Admin\lib\netstandard1.3
+COPY ..\lib\net45\ServiceStack.Client.dll ..\..\ServiceStack.Admin\lib\net45
+COPY ..\lib\netstandard1.1\ServiceStack.Client.dll ..\..\ServiceStack.Admin\lib\netstandard1.1
+COPY ..\lib\netstandard1.6\ServiceStack.Client.dll ..\..\ServiceStack.Admin\lib\netstandard1.6
+COPY ..\lib\net45\ServiceStack.dll ..\..\ServiceStack.Admin\lib\net45
+COPY ..\lib\netstandard1.6\ServiceStack.dll ..\..\ServiceStack.Admin\lib\netstandard1.6
 
 COPY ..\lib\pcl\ServiceStack.Interfaces.dll ..\..\Stripe\lib\pcl
 COPY ..\lib\netstandard1.1\ServiceStack.Interfaces.dll ..\..\Stripe\lib\netstandard1.1
