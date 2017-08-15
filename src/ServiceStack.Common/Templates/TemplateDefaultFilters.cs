@@ -233,7 +233,7 @@ namespace ServiceStack.Templates
 
         public string addPath(string target, string pathToAppend) => target.AppendPath(pathToAppend);
         public string addPaths(string target, IEnumerable pathsToAppend) =>
-            target.AppendPath(pathsToAppend.Map(x => x.ToString()).ToArray());
+            target.AppendPaths(pathsToAppend.Map(x => x.ToString()).ToArray());
 
         public string addQueryString(string url, object urlParams) =>
             urlParams.AssertOptions(nameof(addQueryString)).Aggregate(url, (current, entry) => current.AddQueryParam(entry.Key, entry.Value));
@@ -250,7 +250,7 @@ namespace ServiceStack.Templates
             {
                 sb.Append(text);
             }
-            return StringBuilderCache.ReturnAndFree(sb);
+            return StringBuilderCache.Retrieve(sb);
         }
 
         public List<object> itemsOf(int count, object target)

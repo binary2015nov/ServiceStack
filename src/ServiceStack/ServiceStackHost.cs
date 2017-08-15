@@ -693,7 +693,7 @@ namespace ServiceStack
 
         public virtual void OnStartupException(Exception ex)
         {
-            if (Config.StrictMode == true)
+            if (Config.StrictMode)
                 throw ex;
 
             this.StartUpErrors.Add(DtoUtils.CreateErrorResponse(null, ex).GetResponseStatus());
