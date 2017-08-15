@@ -132,14 +132,11 @@ namespace ServiceStack.Templates
         public string appendFmt(string target, string format, object arg0, object arg1) => target + fmt(format, arg0, arg1);
         public string appendFmt(string target, string format, object arg0, object arg1, object arg2) => target + fmt(format, arg0, arg1, arg2);
 
-        [HandleUnknownValue]
-        public Task noshow(TemplateScopeContext scope, object value) => TypeConstants.EmptyTask;
-
-        public object dateFormat(DateTime dateValue) => dateValue.ToString((string)Context.Args[TemplateConstants.DefaultDateFormat]);
-        public object dateFormat(DateTime dateValue, string format) => dateValue.ToString(format ?? throw new ArgumentNullException(nameof(format)));
-        public object dateTimeFormat(DateTime dateValue) => dateValue.ToString((string)Context.Args[TemplateConstants.DefaultDateTimeFormat]);
-        public object timeFormat(TimeSpan timeValue) => timeValue.ToString((string)Context.Args[TemplateConstants.DefaultTimeFormat]);
-        public object timeFormat(TimeSpan timeValue, string format) => timeValue.ToString(format);
+        public string dateFormat(DateTime dateValue) => dateValue.ToString((string)Context.Args[TemplateConstants.DefaultDateFormat]);
+        public string dateFormat(DateTime dateValue, string format) => dateValue.ToString(format ?? throw new ArgumentNullException(nameof(format)));
+        public string dateTimeFormat(DateTime dateValue) => dateValue.ToString((string)Context.Args[TemplateConstants.DefaultDateTimeFormat]);
+        public string timeFormat(TimeSpan timeValue) => timeValue.ToString((string)Context.Args[TemplateConstants.DefaultTimeFormat]);
+        public string timeFormat(TimeSpan timeValue, string format) => timeValue.ToString(format);
 
         public string splitCase(string text) => text.SplitCamelCase().Replace('_', ' ');
         public string humanize(string text) => splitCase(text).ToTitleCase();
@@ -153,15 +150,15 @@ namespace ServiceStack.Templates
             switch (headerStyle)
             {
                 case "splitCase":
-                    return Instance.splitCase(text);
+                    return splitCase(text);
                 case "humanize":
-                    return Instance.humanize(text);
+                    return humanize(text);
                 case "titleCase":
-                    return Instance.titleCase(text);
+                    return titleCase(text);
                 case "pascalCase":
-                    return Instance.pascalCase(text);
+                    return pascalCase(text);
                 case "camelCase":
-                    return Instance.camelCase(text);
+                    return camelCase(text);
             }
             return text;
         }
@@ -236,7 +233,7 @@ namespace ServiceStack.Templates
 
         public string addPath(string target, string pathToAppend) => target.AppendPath(pathToAppend);
         public string addPaths(string target, IEnumerable pathsToAppend) =>
-            target.AppendPaths(pathsToAppend.Map(x => x.ToString()).ToArray());
+            target.AppendPath(pathsToAppend.Map(x => x.ToString()).ToArray());
 
         public string addQueryString(string url, object urlParams) =>
             urlParams.AssertOptions(nameof(addQueryString)).Aggregate(url, (current, entry) => current.AddQueryParam(entry.Key, entry.Value));
@@ -248,12 +245,12 @@ namespace ServiceStack.Templates
         public string repeat(string text, int times)
         {
             AssertWithinMaxQuota(times);
-            var sb = new System.Text.StringBuilder();
+            var sb = StringBuilderCache.Allocate();
             for (var i = 0; i < times; i++)
             {
                 sb.Append(text);
             }
-            return sb.ToString();
+            return StringBuilderCache.ReturnAndFree(sb);
         }
 
         public List<object> itemsOf(int count, object target)
@@ -293,81 +290,40 @@ namespace ServiceStack.Templates
             return false;
         }
 
-        [HandleUnknownValue]
-        public object @if(object returnTarget, object test) => isTrue(test) ? returnTarget : null;
-        [HandleUnknownValue]
-        public object iif(object test, object ifTrue, object ifFalse) => isTrue(test) ? ifTrue : ifFalse;
-        [HandleUnknownValue]
-        public object when(object returnTarget, object test) => @if(returnTarget, test);     //alias
+        [HandleUnknownValue] public object @if(object returnTarget, object test) => isTrue(test) ? returnTarget : null;
+        [HandleUnknownValue] public object iif(object test, object ifTrue, object ifFalse) => isTrue(test) ? ifTrue : ifFalse;
+        [HandleUnknownValue] public object when(object returnTarget, object test) => @if(returnTarget, test);     //alias
 
-        [HandleUnknownValue]
-        public object ifNot(object returnTarget, object test) => !isTrue(test) ? returnTarget : null;
-        [HandleUnknownValue]
-        public object unless(object returnTarget, object test) => ifNot(returnTarget, test); //alias
+        [HandleUnknownValue] public object ifNot(object returnTarget, object test) => !isTrue(test) ? returnTarget : null;
+        [HandleUnknownValue] public object unless(object returnTarget, object test) => ifNot(returnTarget, test); //alias
 
-        [HandleUnknownValue]
-        public object otherwise(object returnTaget, object elseReturn) => returnTaget ?? elseReturn;
-        [HandleUnknownValue]
-        public object @default(object returnTaget, object elseReturn) => returnTaget ?? elseReturn;
+        [HandleUnknownValue] public object otherwise(object returnTaget, object elseReturn) => returnTaget ?? elseReturn;
+        [HandleUnknownValue] public object @default(object returnTaget, object elseReturn) => returnTaget ?? elseReturn;
 
-        [HandleUnknownValue]
-        public object ifFalsy(object returnTarget, object test) => isFalsy(test) ? returnTarget : null;
+        [HandleUnknownValue] public object ifFalsy(object returnTarget, object test) => isFalsy(test) ? returnTarget : null;
+        [HandleUnknownValue] public object ifTruthy(object returnTarget, object test) => !isFalsy(test) ? returnTarget : null;
+        [HandleUnknownValue] public object falsy(object test, object returnIfFalsy) => isFalsy(test) ? returnIfFalsy : null;
+        [HandleUnknownValue] public object truthy(object test, object returnIfTruthy) => !isFalsy(test) ? returnIfTruthy : null;
 
-        [HandleUnknownValue]
-        public object ifTruthy(object returnTarget, object test) => !isFalsy(test) ? returnTarget : null;
+        [HandleUnknownValue] public bool isNull(object test) => test == null || test == JsNull.Value;
+        [HandleUnknownValue] public bool isNotNull(object test) => !isNull(test);
+        [HandleUnknownValue] public bool exists(object test) => !isNull(test);
 
-        [HandleUnknownValue]
-        public object falsy(object test, object returnIfFalsy) => isFalsy(test) ? returnIfFalsy : null;
+        [HandleUnknownValue] public bool isZero(double value) => value.Equals(0d);
+        [HandleUnknownValue] public bool isPositive(double value) => value > 0;
+        [HandleUnknownValue] public bool isNegative(double value) => value < 0;
+        [HandleUnknownValue] public bool isNaN(double value) => double.IsNaN(value);
+        [HandleUnknownValue] public bool isInfinity(double value) => double.IsInfinity(value);
 
-        [HandleUnknownValue]
-        public object truthy(object test, object returnIfTruthy) => !isFalsy(test) ? returnIfTruthy : null;
-
-        [HandleUnknownValue]
-        public bool isNull(object test) => test == null || test == JsNull.Value;
-
-        [HandleUnknownValue]
-        public bool isNotNull(object test) => !isNull(test);
-        [HandleUnknownValue]
-        public bool exists(object test) => !isNull(test);
-
-        [HandleUnknownValue]
-        public bool isZero(double value) => value.Equals(0d);
-
-        [HandleUnknownValue]
-        public bool isPositive(double value) => value > 0;
-
-        [HandleUnknownValue]
-        public bool isNegative(double value) => value < 0;
-
-        [HandleUnknownValue]
-        public bool isNaN(double value) => double.IsNaN(value);
-
-        [HandleUnknownValue]
-        public bool isInfinity(double value) => double.IsInfinity(value);
-
-        [HandleUnknownValue]
-        public object ifExists(object target) => target;
-        [HandleUnknownValue]
-        public object ifExists(object returnTarget, object test) => test != null ? returnTarget : null;
-        [HandleUnknownValue]
-        public object ifNotExists(object returnTarget, object target) => target == null ? returnTarget : null;
-        [HandleUnknownValue]
-        public object ifNo(object returnTarget, object target) => target == null ? returnTarget : null;
-
-        [HandleUnknownValue]
-        public object ifNotEmpty(object target) => isEmpty(target) ? null : target;
-
-        [HandleUnknownValue]
-        public object ifNotEmpty(object returnTarget, object test) => isEmpty(test) ? null : returnTarget;
-
-        [HandleUnknownValue]
-        public object ifEmpty(object returnTarget, object test) => isEmpty(test) ? returnTarget : null;
-
-        [HandleUnknownValue]
-        public object ifTrue(object returnTarget, object test) => isTrue(test) ? returnTarget : null;
-
-        [HandleUnknownValue]
-        public object ifFalse(object returnTarget, object test) => !isTrue(test) ? returnTarget : null;
+        [HandleUnknownValue] public object ifExists(object target) => target;
+        [HandleUnknownValue] public object ifExists(object returnTarget, object test) => test != null ? returnTarget : null;
+        [HandleUnknownValue] public object ifNotExists(object returnTarget, object target) => target == null ? returnTarget : null;
+        [HandleUnknownValue] public object ifNo(object returnTarget, object target) => target == null ? returnTarget : null;
+        [HandleUnknownValue] public object ifNotEmpty(object target) => isEmpty(target) ? null : target;
+        [HandleUnknownValue] public object ifNotEmpty(object returnTarget, object test) => isEmpty(test) ? null : returnTarget;
+        [HandleUnknownValue] public object ifEmpty(object returnTarget, object test) => isEmpty(test) ? returnTarget : null;
+        [HandleUnknownValue] public object ifTrue(object returnTarget, object test) => isTrue(test) ? returnTarget : null;
+        [HandleUnknownValue] public object ifFalse(object returnTarget, object test) => !isTrue(test) ? returnTarget : null;
 
         [HandleUnknownValue]
         public bool isEmpty(object target)
@@ -384,50 +340,33 @@ namespace ServiceStack.Templates
             return false;
         }
 
-        [HandleUnknownValue]
-        public object end(object ignore) => StopExecution.Value;
+        [HandleUnknownValue] public Task end(TemplateScopeContext scope, object ignore) => TypeConstants.EmptyTask;
+        [HandleUnknownValue] public object end(object ignore) => StopExecution.Value;
 
-        [HandleUnknownValue]
-        public object endIfNull(object target) => isNull(target) ? StopExecution.Value : target;
+        [HandleUnknownValue] public object endIfNull(object target) => isNull(target) ? StopExecution.Value : target;
+        [HandleUnknownValue] public object endIfNull(object ignoreTarget, object target) => isNull(target) ? StopExecution.Value : target;
+        [HandleUnknownValue] public object endIfNotNull(object target) => !isNull(target) ? (object) StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object endIfNotNull(object ignoreTarget, object target) => !isNull(target) ? (object) StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object endIfExists(object target) => !isNull(target) ? (object) StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object endIfExists(object ignoreTarget, object target) => !isNull(target) ? (object) StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object endIfEmpty(object target) => isEmpty(target) ? StopExecution.Value : target;
+        [HandleUnknownValue] public object endIfEmpty(object ignoreTarget, object target) => isEmpty(target) ? StopExecution.Value : target;
+        [HandleUnknownValue] public object endIfNotEmpty(object target) => !isEmpty(target) ? (object) StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object endIfNotEmpty(object ignoreTarget, object target) => !isEmpty(target) ? (object) StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object endIfFalsy(object target) => isFalsy(target) ? (object) StopExecution.Value : target;
+        [HandleUnknownValue] public object endIfFalsy(object ignoreTarget, object target) => isFalsy(target) ? (object) StopExecution.Value : target;
+        [HandleUnknownValue] public object endIfTruthy(object target) => !isFalsy(target) ? (object) StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object endIfTruthy(object ignoreTarget, object target) => !isFalsy(target) ? (object) StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object endIf(object test) => isTrue(test) ? (object)StopExecution.Value : IgnoreResult.Value;
 
-        [HandleUnknownValue]
-        public object endIfNotNull(object target) => !isNull(target) ? StopExecution.Value : target;
-
-        [HandleUnknownValue]
-        public object endIfExists(object target) => !isNull(target) ? StopExecution.Value : target;
-
-        [HandleUnknownValue]
-        public object endIfEmpty(object target) => isEmpty(target) ? StopExecution.Value : target;
-
-        [HandleUnknownValue]
-        public object endIfNotEmpty(object target) => !isEmpty(target) ? StopExecution.Value : target;
-
-        [HandleUnknownValue]
-        public object endIfFalsy(object target) => isFalsy(target) ? StopExecution.Value : target;
-
-        [HandleUnknownValue]
-        public object endIfTruthy(object target) => !isFalsy(target) ? StopExecution.Value : target;
-
-        [HandleUnknownValue]
-        public object endIf(object test) => isTrue(test) ? (object)StopExecution.Value : IgnoreResult.Value;
-
-        [HandleUnknownValue]
-        public object ifEnd(object test) => isTrue(test) ? (object)StopExecution.Value : IgnoreResult.Value;
-
-        [HandleUnknownValue]
-        public object ifNotEnd(object test) => !isTrue(test) ? (object)StopExecution.Value : IgnoreResult.Value;
-
-        [HandleUnknownValue]
-        public object endIf(object returnTarget, object test) => isTrue(test) ? StopExecution.Value : returnTarget;
-
-        [HandleUnknownValue]
-        public object endIfAny(TemplateScopeContext scope, object target, object expression) => any(scope, target, expression) ? StopExecution.Value : target;
-
-        [HandleUnknownValue]
-        public object endIfAll(TemplateScopeContext scope, object target, object expression) => all(scope, target, expression) ? StopExecution.Value : target;
-
-        [HandleUnknownValue]
-        public object endWhere(TemplateScopeContext scope, object target, object expression) => endWhere(scope, target, expression, null);
+        [HandleUnknownValue] public object ifEnd(bool test) => test ? (object)StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object ifEnd(object ignoreTarget, bool test) => test ? (object)StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object ifNotEnd(bool test) => !test ? (object)StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object ifNotEnd(object ignoreTarget, bool test) => !test ? (object)StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object endIf(object returnTarget, bool test) => test ? StopExecution.Value : returnTarget;
+        [HandleUnknownValue] public object endIfAny(TemplateScopeContext scope, object target, object expression) => any(scope, target, expression) ? StopExecution.Value : target;
+        [HandleUnknownValue] public object endIfAll(TemplateScopeContext scope, object target, object expression) => all(scope, target, expression) ? StopExecution.Value : target;
+        [HandleUnknownValue] public object endWhere(TemplateScopeContext scope, object target, object expression) => endWhere(scope, target, expression, null);
 
         [HandleUnknownValue]
         public object endWhere(TemplateScopeContext scope, object target, object expression, object scopeOptions)
@@ -444,87 +383,54 @@ namespace ServiceStack.Templates
                 : target;
         }
 
-        [HandleUnknownValue]
-        public object ifDo(object test) => isTrue(test) ? (object)IgnoreResult.Value : StopExecution.Value;
-        [HandleUnknownValue]
-        public object doIf(object test) => isTrue(test) ? (object)IgnoreResult.Value : StopExecution.Value;
+        [HandleUnknownValue] public object ifDo(object test) => isTrue(test) ? (object)IgnoreResult.Value : StopExecution.Value;
+        [HandleUnknownValue] public object ifDo(object ignoreTarget, object test) => isTrue(test) ? (object)IgnoreResult.Value : StopExecution.Value;
+        [HandleUnknownValue] public object doIf(object test) => isTrue(test) ? (object)IgnoreResult.Value : StopExecution.Value;
+        [HandleUnknownValue] public object doIf(object ignoreTarget, object test) => isTrue(test) ? (object)IgnoreResult.Value : StopExecution.Value;
 
-        [HandleUnknownValue]
-        public object ifUse(object test, object useValue) => isTrue(test) ? useValue : StopExecution.Value;
-        [HandleUnknownValue]
-        public object useIf(object useValue, object test) => isTrue(test) ? useValue : StopExecution.Value;
+        [HandleUnknownValue] public object ifUse(object test, object useValue) => isTrue(test) ? useValue : StopExecution.Value;
+        [HandleUnknownValue] public object useIf(object useValue, object test) => isTrue(test) ? useValue : StopExecution.Value;
 
-        public object use(object discardTarget, object useValue) => useValue;
-        public object useFmt(object discardTarget, string format, object arg) => fmt(format, arg);
-        public object useFmt(object discardTarget, string format, object arg1, object arg2) => fmt(format, arg1, arg2);
-        public object useFmt(object discardTarget, string format, object arg1, object arg2, object arg3) => fmt(format, arg1, arg2, arg3);
-        public object useFormat(object discardTarget, object arg, string fmt) => format(arg, fmt);
+        public object use(object ignoreTarget, object useValue) => useValue;
+        public object useFmt(object ignoreTarget, string format, object arg) => fmt(format, arg);
+        public object useFmt(object ignoreTarget, string format, object arg1, object arg2) => fmt(format, arg1, arg2);
+        public object useFmt(object ignoreTarget, string format, object arg1, object arg2, object arg3) => fmt(format, arg1, arg2, arg3);
+        public object useFormat(object ignoreTarget, object arg, string fmt) => format(arg, fmt);
 
-        [HandleUnknownValue]
-        public bool isString(object target) => target is string;
-        [HandleUnknownValue]
-        public bool isInt(object target) => target is int;
-        [HandleUnknownValue]
-        public bool isLong(object target) => target is long;
-        [HandleUnknownValue]
-        public bool isInteger(object target) => target?.GetType()?.IsIntegerType() == true;
-        [HandleUnknownValue]
-        public bool isDouble(object target) => target is double;
-        [HandleUnknownValue]
-        public bool isFloat(object target) => target is float;
-        [HandleUnknownValue]
-        public bool isDecimal(object target) => target is decimal;
-        [HandleUnknownValue]
-        public bool isBool(object target) => target is bool;
-        [HandleUnknownValue]
-        public bool isList(object target) => target is IEnumerable && !(target is IDictionary) && !(target is string);
-        [HandleUnknownValue]
-        public bool isEnumerable(object target) => target is IEnumerable;
-        [HandleUnknownValue]
-        public bool isDictionary(object target) => target is IDictionary;
-        [HandleUnknownValue]
-        public bool isChar(object target) => target is char;
-        [HandleUnknownValue]
-        public bool isChars(object target) => target is char[];
-        [HandleUnknownValue]
-        public bool isByte(object target) => target is byte;
-        [HandleUnknownValue]
-        public bool isBytes(object target) => target is byte[];
-        [HandleUnknownValue]
-        public bool isObjectDictionary(object target) => target is IDictionary<string, object>;
-        [HandleUnknownValue]
-        public bool isStringDictionary(object target) => target is IDictionary<string, string>;
+        [HandleUnknownValue] public bool isString(object target) => target is string;
+        [HandleUnknownValue] public bool isInt(object target) => target is int;
+        [HandleUnknownValue] public bool isLong(object target) => target is long;
+        [HandleUnknownValue] public bool isInteger(object target) => target?.GetType()?.IsIntegerType() == true;
+        [HandleUnknownValue] public bool isDouble(object target) => target is double;
+        [HandleUnknownValue] public bool isFloat(object target) => target is float;
+        [HandleUnknownValue] public bool isDecimal(object target) => target is decimal;
+        [HandleUnknownValue] public bool isBool(object target) => target is bool;
+        [HandleUnknownValue] public bool isList(object target) => target is IEnumerable && !(target is IDictionary) && !(target is string);
+        [HandleUnknownValue] public bool isEnumerable(object target) => target is IEnumerable;
+        [HandleUnknownValue] public bool isDictionary(object target) => target is IDictionary;
+        [HandleUnknownValue] public bool isChar(object target) => target is char;
+        [HandleUnknownValue] public bool isChars(object target) => target is char[];
+        [HandleUnknownValue] public bool isByte(object target) => target is byte;
+        [HandleUnknownValue] public bool isBytes(object target) => target is byte[];
+        [HandleUnknownValue] public bool isObjectDictionary(object target) => target is IDictionary<string, object>;
+        [HandleUnknownValue] public bool isStringDictionary(object target) => target is IDictionary<string, string>;
 
-        [HandleUnknownValue]
-        public bool isType(object target, string typeName) => typeName.EqualsIgnoreCase(target?.GetType()?.Name);
-        [HandleUnknownValue]
-        public bool isNumber(object target) => target?.GetType()?.IsNumericType() == true;
-        [HandleUnknownValue]
-        public bool isRealNumber(object target) => target?.GetType()?.IsRealNumberType() == true;
-        [HandleUnknownValue]
-        public bool isEnum(object target) => target?.GetType()?.IsEnum() == true;
-        [HandleUnknownValue]
-        public bool isArray(object target) => target?.GetType()?.IsArray() == true;
-        [HandleUnknownValue]
-        public bool isAnonObject(object target) => target?.GetType()?.IsAnonymousType() == true;
-        [HandleUnknownValue]
-        public bool isClass(object target) => target?.GetType()?.IsClass() == true;
-        [HandleUnknownValue]
-        public bool isValueType(object target) => target?.GetType()?.IsValueType() == true;
-        [HandleUnknownValue]
-        public bool isDto(object target) => target?.GetType()?.IsDto() == true;
-        [HandleUnknownValue]
-        public bool isTuple(object target) => target?.GetType()?.IsTuple() == true;
-        [HandleUnknownValue]
-        public bool isKeyValuePair(object target) => "KeyValuePair`2".Equals(target?.GetType()?.Name);
+        [HandleUnknownValue] public bool isType(object target, string typeName) => typeName.EqualsIgnoreCase(target?.GetType()?.Name);
+        [HandleUnknownValue] public bool isNumber(object target) => target?.GetType()?.IsNumericType() == true;
+        [HandleUnknownValue] public bool isRealNumber(object target) => target?.GetType()?.IsRealNumberType() == true;
+        [HandleUnknownValue] public bool isEnum(object target) => target?.GetType()?.IsEnum() == true;
+        [HandleUnknownValue] public bool isArray(object target) => target?.GetType()?.IsArray() == true;
+        [HandleUnknownValue] public bool isAnonObject(object target) => target?.GetType()?.IsAnonymousType() == true;
+        [HandleUnknownValue] public bool isClass(object target) => target?.GetType()?.IsClass() == true;
+        [HandleUnknownValue] public bool isValueType(object target) => target?.GetType()?.IsValueType() == true;
+        [HandleUnknownValue] public bool isDto(object target) => target?.GetType()?.IsDto() == true;
+        [HandleUnknownValue] public bool isTuple(object target) => target?.GetType()?.IsTuple() == true;
+        [HandleUnknownValue] public bool isKeyValuePair(object target) => "KeyValuePair`2".Equals(target?.GetType()?.Name);
 
-        [HandleUnknownValue]
-        public int length(object target) => target is IEnumerable e ? e.Cast<object>().Count() : 0;
+        [HandleUnknownValue] public int length(object target) => target is IEnumerable e ? e.Cast<object>().Count() : 0;
 
-        [HandleUnknownValue]
-        public bool hasMinCount(object target, int minCount) => target is IEnumerable e && e.Cast<object>().Count() >= minCount;
-        [HandleUnknownValue]
-        public bool hasMaxCount(object target, int maxCount) => target is IEnumerable e && e.Cast<object>().Count() <= maxCount;
+        [HandleUnknownValue] public bool hasMinCount(object target, int minCount) => target is IEnumerable e && e.Cast<object>().Count() >= minCount;
+        [HandleUnknownValue] public bool hasMaxCount(object target, int maxCount) => target is IEnumerable e && e.Cast<object>().Count() <= maxCount;
 
         public bool or(object lhs, object rhs) => isTrue(lhs) || isTrue(rhs);
         public bool and(object lhs, object rhs) => isTrue(lhs) && isTrue(rhs);
@@ -778,7 +684,7 @@ namespace ServiceStack.Templates
             if (isNull(map))
                 return null;
 
-            var to = new Dictionary<string,string>();
+            var to = new Dictionary<string, string>();
             foreach (var key in map.Keys)
             {
                 var value = map[key];
