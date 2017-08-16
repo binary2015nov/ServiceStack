@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using ServiceStack.NetCore;
+//using ServiceStack.NetCore;
 using ServiceStack.Text;
 using ServiceStack.Host;
 using ServiceStack.Host.Handlers;

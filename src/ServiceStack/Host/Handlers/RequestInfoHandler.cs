@@ -274,6 +274,8 @@ namespace ServiceStack.Host.Handlers
 
         public static RequestInfoResponse GetRequestInfo(IRequest httpReq)
         {
+            if (httpReq.QueryString[Keywords.Debug] != Keywords.RequestInfo)
+                return null;
             var session = httpReq.GetSession();
             var allowResponse = HostContext.Config.DebugMode || HostContext.HasValidAuthSecret(httpReq) || session != null && session.Roles.Contains("admin");
             if (!allowResponse)          

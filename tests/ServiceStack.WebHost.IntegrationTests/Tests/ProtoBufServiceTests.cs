@@ -124,14 +124,14 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Does_return_ProtoBuf_when_using_ProtoBuf_Content_Type_and_Wildcard()
         {
-            var bytes = ListeningOn.CombineWith("x-protobuf/reply/ProtoBufEmail")
+            var bytes = ListeningOn.AppendPath("x-protobuf/reply/ProtoBufEmail")
                 .PostBytesToUrl(accept: "{0}, */*".Fmt(MimeTypes.ProtoBuf),
                     requestBody: CreateProtoBufEmail().ToProtoBuf(),
                     responseFilter: res => Assert.That(res.ContentType, Is.EqualTo(MimeTypes.ProtoBuf)));
 
             Assert.That(bytes.Length, Is.GreaterThan(0));
 
-            bytes = ListeningOn.CombineWith("x-protobuf/reply/ProtoBufEmail")
+            bytes = ListeningOn.AppendPath("x-protobuf/reply/ProtoBufEmail")
                 .GetBytesFromUrl(accept: "{0}, */*".Fmt(MimeTypes.ProtoBuf),
                     responseFilter: res => Assert.That(res.ContentType, Is.EqualTo(MimeTypes.ProtoBuf)));
         }

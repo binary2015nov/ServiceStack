@@ -50,7 +50,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_call_Cached_WebService_with_JSONP()
         {
-            var url = Constant.ServiceStackBaseHost.CombineWith("/cached/movies?callback=cb");
+            var url = Constant.ServiceStackBaseHost.AppendPath("/cached/movies?callback=cb");
             var jsonp = url.GetJsonFromUrl();
             Assert.That(jsonp.StartsWith("cb("));
         }

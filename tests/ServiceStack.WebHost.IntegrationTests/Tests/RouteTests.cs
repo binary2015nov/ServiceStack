@@ -39,15 +39,15 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             Assert.That(reqInfoResponse.ApplicationBaseUrl, Is.EqualTo(url));
             Assert.That(reqInfoResponse.ResolveAbsoluteUrl, Is.EqualTo(url + "/resolve"));
 
-            var response = url.CombineWith("/routeinfo").GetJsonFromUrl().FromJson<GetRouteInfoResponse>();
+            var response = url.AppendPath("/routeinfo").GetJsonFromUrl().FromJson<GetRouteInfoResponse>();
             Assert.That(response.BaseUrl, Is.EqualTo(url));
             Assert.That(response.ResolvedUrl, Is.EqualTo(url.AppendPath("resolved")));
 
-            response = url.CombineWith("/routeinfo/dir").GetJsonFromUrl().FromJson<GetRouteInfoResponse>();
+            response = url.AppendPath("/routeinfo/dir").GetJsonFromUrl().FromJson<GetRouteInfoResponse>();
             Assert.That(response.BaseUrl, Is.EqualTo(url));
             Assert.That(response.ResolvedUrl, Is.EqualTo(url.AppendPath("resolved")));
 
-            response = url.CombineWith("/routeinfo/dir/sub").GetJsonFromUrl().FromJson<GetRouteInfoResponse>();
+            response = url.AppendPath("/routeinfo/dir/sub").GetJsonFromUrl().FromJson<GetRouteInfoResponse>();
             Assert.That(response.BaseUrl, Is.EqualTo(url));
             Assert.That(response.ResolvedUrl, Is.EqualTo(url.AppendPath("resolved")));
         }

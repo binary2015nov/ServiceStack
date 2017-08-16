@@ -24,7 +24,7 @@ namespace ServiceStack
         private static bool HostAutoRedirectsDirs = false;
 
         [ThreadStatic]
-        public static string DebugLastHandlerArgs;
+        public static readonly string DebugLastHandlerArgs;
 
         internal static void Init()
         {
@@ -154,15 +154,18 @@ namespace ServiceStack
                 if (reqInfo != null) return reqInfo;
             }
 
-            string location = appHost.Config.HandlerFactoryPath;
+            var config = appHost.Config;
+            string location = config.HandlerFactoryPath;
             string pathInfo = httpReq.PathInfo;
             string physicalPath = httpReq.GetPhysicalPath();
+            if (config.DebugMode)
+                DebugLastHandlerArgs = httpReq.Verb + "|" + httpReq.RawUrl + "|" + physicalPath;
 
             //Default Request /
             if (pathInfo.IsNullOrEmpty() || pathInfo == "/")
             {
                 //If the fallback route can handle it, let it
-                if (appHost.Config.FallbackRestPath != null)
+                if (config.FallbackRestPath != null)
                 {
                     string contentType;
                     var sanitizedPath = RestHandler.GetSanitizedPathInfo(pathInfo, out contentType);
@@ -178,7 +181,7 @@ namespace ServiceStack
                 var catchAllHandler = GetCatchAllHandlerIfAny(httpReq.HttpMethod, pathInfo, physicalPath);
                 if (catchAllHandler != null) return catchAllHandler;
 
-                if (location == null)
+                if (location.IsNullOrEmpty())
                     return DefaultHttpHandler;
 
                 return NonRootModeDefaultHttpHandler;

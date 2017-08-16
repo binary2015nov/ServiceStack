@@ -37,9 +37,9 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Explicit("ASP.NET does not allow invalid chars see http://stackoverflow.com/questions/13691829/path-parameters-w-url-unfriendly-characters")]
         public void Can_handle_encoded_chars()
         {
-            var response = Constant.ServiceStackBaseHost.CombineWith("request/123%20456").GetStringFromUrl();
+            var response = Constant.ServiceStackBaseHost.AppendPath("request/123%20456").GetStringFromUrl();
             Assert.That(response, Is.EqualTo("123%20456"));
-            response = Constant.ServiceStackBaseHost.CombineWith("request/123%7C456").GetStringFromUrl();
+            response = Constant.ServiceStackBaseHost.AppendPath("request/123%7C456").GetStringFromUrl();
             Assert.That(response, Is.EqualTo("123%7C456"));
         }
 
@@ -61,7 +61,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_handle_collections_with_HttpClient()
         {
-            var url = Constant.ServiceStackBaseHost.CombineWith("collections")
+            var url = Constant.ServiceStackBaseHost.AppendPath("collections")
                 .AddQueryParam("Ids", "1,2,3")
                 .AddQueryParam("Names", "A,B,C");
 
@@ -71,7 +71,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             Assert.That(response.Ids, Is.EquivalentTo(new[] { 1, 2, 3 }));
             Assert.That(response.Names, Is.EquivalentTo(new List<string> { "A", "B", "C" }));
 
-            url = Constant.ServiceStackBaseHost.CombineWith("collections")
+            url = Constant.ServiceStackBaseHost.AppendPath("collections")
                 .AddQueryParam("Ids", "1")
                 .AddQueryParam("Ids", "2")
                 .AddQueryParam("Ids", "3")
@@ -89,7 +89,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_handle_collections_with_HttpClient_on_predefined_route()
         {
-            var url = Constant.ServiceStackBaseHost.CombineWith("json/reply/Collections")
+            var url = Constant.ServiceStackBaseHost.AppendPath("json/reply/Collections")
                 .AddQueryParam("Ids", "1,2,3")
                 .AddQueryParam("Names", "A,B,C");
 
@@ -99,7 +99,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             Assert.That(response.Ids, Is.EquivalentTo(new[] { 1, 2, 3 }));
             Assert.That(response.Names, Is.EquivalentTo(new List<string> { "A", "B", "C" }));
 
-            url = Constant.ServiceStackBaseHost.CombineWith("json/reply/Collections")
+            url = Constant.ServiceStackBaseHost.AppendPath("json/reply/Collections")
                 .AddQueryParam("Ids", "1")
                 .AddQueryParam("Ids", "2")
                 .AddQueryParam("Ids", "3")
