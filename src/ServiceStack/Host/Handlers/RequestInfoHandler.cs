@@ -273,14 +273,7 @@ namespace ServiceStack.Host.Handlers
         }
 
         public static RequestInfoResponse GetRequestInfo(IRequest httpReq)
-        {
-            if (httpReq.QueryString[Keywords.Debug] != Keywords.RequestInfo)
-                return null;
-            var session = httpReq.GetSession();
-            var allowResponse = HostContext.Config.DebugMode || HostContext.HasValidAuthSecret(httpReq) || session != null && session.Roles.Contains("admin");
-            if (!allowResponse)          
-                return null;
-            
+        {          
             int virtualPathCount = 0;
             int.TryParse(httpReq.QueryString["virtualPathCount"], out virtualPathCount);
             var hostType = HostContext.AppHost.GetType();
@@ -313,6 +306,8 @@ namespace ServiceStack.Host.Handlers
                 UserHostAddress = httpReq.UserHostAddress,
                 HttpMethod = httpReq.Verb,
                 AbsoluteUri = httpReq.AbsoluteUri,
+                PathInfo = httpReq.PathInfo,
+                GetPathUrl = httpReq.GetPathUrl(),
                 WebHostUrl = HostContext.Config.WebHostUrl,
                 ApplicationBaseUrl = httpReq.GetBaseUrl(),
                 ResolveAbsoluteUrl = HostContext.AppHost.ResolveAbsoluteUrl("~/resolve", httpReq),

@@ -23,8 +23,8 @@ namespace ServiceStack
         private static bool IsIntegratedPipeline = false;
         private static bool HostAutoRedirectsDirs = false;
 
-        [ThreadStatic]
-        public static readonly string DebugLastHandlerArgs;
+        [ThreadStatic] private static string debugLastHandlerArgs;
+        public static string DebugLastHandlerArgs => debugLastHandlerArgs;
 
         internal static void Init()
         {
@@ -159,7 +159,7 @@ namespace ServiceStack
             string pathInfo = httpReq.PathInfo;
             string physicalPath = httpReq.GetPhysicalPath();
             if (config.DebugMode)
-                DebugLastHandlerArgs = httpReq.Verb + "|" + httpReq.RawUrl + "|" + physicalPath;
+                debugLastHandlerArgs = httpReq.Verb + "|" + httpReq.RawUrl + "|" + physicalPath;
 
             //Default Request /
             if (pathInfo.IsNullOrEmpty() || pathInfo == "/")

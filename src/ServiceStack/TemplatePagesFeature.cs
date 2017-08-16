@@ -126,7 +126,7 @@ namespace ServiceStack
 
         public async Task<HotReloadPageResponse> Any(HotReloadPage request)
         {
-            if (!HostContext.DebugMode)
+            if (!HostContext.Config.DebugMode)
                 throw new NotImplementedException("set 'debug true' in web.settings to enable this service");
 
             var page = Pages.GetPage(request.Path ?? "/");

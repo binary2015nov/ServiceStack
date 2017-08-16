@@ -143,7 +143,7 @@ namespace ServiceStack.Host.Handlers
 
             if (DefaultHandledRequest(context)) return TypeConstants.EmptyTask;
 
-            var httpReq = new ServiceStack.Host.AspNet.AspNetRequest(context, operationName);
+            var httpReq = Request ?? new ServiceStack.Host.AspNet.AspNetRequest(context, operationName);
 
             if (RunAsAsync())
                 return ProcessRequestAsync(httpReq, httpReq.Response, operationName);
@@ -191,6 +191,5 @@ namespace ServiceStack.Host.Handlers
                 httpRes.EndRequest(skipHeaders: true);
             }
         }
-
     }
 }

@@ -16,21 +16,21 @@ namespace ServiceStack
         }
 
         public static IHttpHandler GetRequestInfoHandler(IRequest request)
-        {           
-            var reqInfo = RequestInfoHandler.GetRequestInfo(request);
-            if (reqInfo == null)
+        {
+            if (request.QueryString[Keywords.Debug] != Keywords.RequestInfo)
                 return null;
-
-            reqInfo.Host = HostContext.Config.DebugHttpListenerHostEnvironment + "_v" + Env.ServiceStackVersion + "_" + HostContext.ServiceName;
-            reqInfo.PathInfo = request.PathInfo;
-            reqInfo.GetPathUrl = request.GetPathUrl();
-
-            return new RequestInfoHandler { RequestInfo = reqInfo };
+            var session = request.GetSession();
+            if (HostContext.Config.DebugMode || HostContext.HasValidAuthSecret(request) ||
+                session != null && session.Roles.Contains("admin"))
+            {      
+                return new RequestInfoHandler { Request = request };
+            }
+            return null;
         }
 
         public static IHttpHandler GetRequestInfoHandler(string httpMethod, string pathInfo, string filePath)
         {
-            if (string.IsNullOrEmpty(pathInfo))
+            if (pathInfo.IsNullOrEmpty())
                 return null;
 
             var array = pathInfo.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
