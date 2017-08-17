@@ -360,7 +360,7 @@ namespace ServiceStack
                         if (RefreshToken != null)
                         {
                             var refreshRequest = new GetAccessToken {RefreshToken = RefreshToken};
-                            var uri = this.RefreshTokenUri ?? this.BaseUri.CombineWith(refreshRequest.ToPostUrl());
+                            var uri = this.RefreshTokenUri ?? this.BaseUri.AppendPath(refreshRequest.ToPostUrl());
 
                             GetAccessTokenResponse tokenResponse;
                             try

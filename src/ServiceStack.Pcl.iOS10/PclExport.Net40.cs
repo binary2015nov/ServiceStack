@@ -480,7 +480,9 @@ namespace ServiceStack
         public override HttpWebRequest CreateWebRequest(string urlString)
         {
             var webReq = base.CreateWebRequest(urlString);
+            webReq.UserAgent = Env.ServerUserAgent ?? "ServiceStack.Text";
             webReq.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            webReq.KeepAlive = false;
             return webReq;
         }
 

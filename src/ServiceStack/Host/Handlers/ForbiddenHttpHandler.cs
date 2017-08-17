@@ -52,8 +52,8 @@ Request.QueryString: {request.QueryString}
                         sb.AppendLine($"App.DefaultRootFileName: {DefaultRootFileName}");
                     if (!DefaultHandler.IsNullOrEmpty())
                         sb.AppendLine($"App.DefaultHandler: {DefaultHandler}");
-                    if (!HttpHandlerFactory.DebugLastHandlerArgs.IsNullOrEmpty())
-                        sb.AppendLine($"App.DebugLastHandlerArgs: {HttpHandlerFactory.DebugLastHandlerArgs}");
+                    if (!HttpHandlerFactory.LastHandlerArgs.IsNullOrEmpty())
+                        sb.AppendLine($"App.LastHandlerArgs: {HttpHandlerFactory.LastHandlerArgs}");
                 }
                 
                 return response.OutputStream.WriteAsync(StringBuilderCache.Retrieve(sb));

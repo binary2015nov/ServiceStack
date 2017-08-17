@@ -48,11 +48,6 @@
             Enable the authentication feature and configure the AuthService.
             </summary>
         </member>
-        <member name="P:ServiceStack.AuthFeature.SaveUserNamesInLowerCase">
-            <summary>
-            Should UserName or Emails be saved in AuthRepository in LowerCase
-            </summary>
-        </member>
         <member name="T:ServiceStack.Auth.IManageApiKeys">
             <summary>
             The Interface Auth Repositories need to implement to support API Keys

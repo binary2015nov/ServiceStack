@@ -15,13 +15,8 @@ namespace ServiceStack.Host
         public RequestPreferences(HttpContextBase httpContext)
         {
             this.httpContext = httpContext;
-            this.acceptEncoding = httpContext.Request.Headers[HttpHeaders.AcceptEncoding];
-            if (this.acceptEncoding.IsNullOrEmpty())
-            {
-                this.acceptEncoding = "none";
-                return;
-            }
-            this.acceptEncoding = this.acceptEncoding.ToLower();
+            var acceptEncode = httpContext.Request.Headers[HttpHeaders.AcceptEncoding];
+            this.acceptEncoding = acceptEncode.IsNullOrEmpty() ? "none" : acceptEncode.ToLower();
         }
 
         public static HttpWorkerRequest GetWorker(HttpContextBase context)
@@ -52,15 +47,10 @@ namespace ServiceStack.Host
         public string AcceptEncoding => acceptEncoding;
 #endif
 
-        public RequestPreferences(IRequest httpRequest)
+        public RequestPreferences(IRequest request)
         {
-            this.acceptEncoding = httpRequest.Headers[HttpHeaders.AcceptEncoding];
-            if (string.IsNullOrEmpty(this.acceptEncoding))
-            {
-                this.acceptEncoding = "none";
-                return;
-            }
-            this.acceptEncoding = this.acceptEncoding.ToLower();
+            var acceptEncode = request.Headers[HttpHeaders.AcceptEncoding];
+            this.acceptEncoding = acceptEncode.IsNullOrEmpty() ? "none" : acceptEncode.ToLower();
         }
 
         public bool AcceptsGzip => AcceptEncoding != null && AcceptEncoding.Contains("gzip");

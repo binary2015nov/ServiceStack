@@ -287,12 +287,12 @@ namespace ServiceStack.Razor.Managers
                 if (!httpReq.RawUrl.EndsWith("/"))
                     normalizedPathInfo = normalizedPathInfo.ParentDirectory();
 
-                normalizedPathInfo = normalizedPathInfo.CombineWith(partialName).TrimStart('/');
+                normalizedPathInfo = normalizedPathInfo.AppendPath(partialName).TrimStart('/');
             }
 
             // Look for partial from same directory or view page
             return GetContentPage(normalizedPathInfo)
-                ?? GetContentPage(normalizedPathInfo.CombineWith(RazorFormat.Instance.DefaultPageName))
+                ?? GetContentPage(normalizedPathInfo.AppendPath(RazorFormat.Instance.DefaultPageName))
                 ?? GetViewPage(partialName);
         }
 

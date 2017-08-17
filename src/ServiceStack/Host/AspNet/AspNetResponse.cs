@@ -22,12 +22,15 @@ namespace ServiceStack.Host.AspNet
 
         private readonly HttpResponseBase response;
 
-        public AspNetResponse(HttpResponseBase response, IRequest request = null)
+        public AspNetResponse(HttpResponseBase response)
+            : this(response, null) { }
+
+        public AspNetResponse(HttpResponseBase response, IRequest request)
         {
             this.response = response;
             this.Request = request;
             this.response.TrySkipIisCustomErrors = true;
-            this.Cookies = HostContext.AppHost.GetCookies(this);
+            this.Cookies = HostContext.AppHost != null ?  HostContext.AppHost.GetCookies(this) : new Cookies(this);
             this.Items = new Dictionary<string, object>();
         }
 

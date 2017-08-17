@@ -15,7 +15,6 @@ using ServiceStack.Logging;
 using ServiceStack.Text;
 using ServiceStack.Validation;
 using ServiceStack.Web;
-using static System.String;
 
 #if !NETSTANDARD1_6
 using ServiceStack.Host.AspNet;
@@ -60,7 +59,7 @@ namespace ServiceStack
 
             //IIS will assign null to params without a name: .../?some_value can be retrieved as req.Params[null]
             //TryGetValue is not happy with null dictionary keys, so we should bail out here
-            if (IsNullOrEmpty(name)) return null;
+            if (name.IsNullOrEmpty()) return null;
 
             Cookie cookie;
             if (httpReq.Cookies.TryGetValue(name, out cookie)) return cookie.Value;
@@ -98,7 +97,7 @@ namespace ServiceStack
 
             int pos;
 
-            if (resolvedPathInfo == Empty)
+            if (resolvedPathInfo.IsNullOrEmpty())
             {
                 pos = httpReq.AbsoluteUri.IndexOf('?');
                 if (pos == -1)
@@ -148,7 +147,7 @@ namespace ServiceStack
                 return null;
 
             var path = request.PathInfo;
-            return IsNullOrEmpty(path) || path[path.Length - 1] == '/'
+            return path.IsNullOrEmpty() || path[path.Length - 1] == '/'
                 ? path
                 : path.Substring(0, path.LastIndexOf('/') + 1);
         }
@@ -342,20 +341,14 @@ namespace ServiceStack
 
         private static readonly ILog Log = LogManager.GetLogger(typeof(HttpRequestExtensions));
 
-        private static readonly string WebHostDirectoryName = "";
-
-        static HttpRequestExtensions()
-        {
-            WebHostDirectoryName = Path.GetFileName("~".MapHostAbsolutePath());
-        }
+        private static readonly string WebHostDirectoryName = Path.GetFileName("~".MapHostAbsolutePath());
 
         public static string GetOperationNameFromLastPathInfo(string lastPathInfo)
         {
-            if (IsNullOrEmpty(lastPathInfo)) return null;
+            if (lastPathInfo.IsNullOrEmpty())
+                return null;
 
-            var operationName = lastPathInfo.Substring("/".Length);
-
-            return operationName;
+            return lastPathInfo.Substring("/".Length);
         }
 
         private static string GetLastPathInfoFromRawUrl(string rawUrl)
@@ -463,10 +456,10 @@ namespace ServiceStack
 
         public static string GetPathInfo(this HttpRequestBase request)
         {
-            if (!IsNullOrEmpty(request.PathInfo)) return request.PathInfo.TrimEnd('/');
+            if (!request.PathInfo.IsNullOrEmpty()) return request.PathInfo.TrimEnd('/');
 
             var mode = HostContext.Config.HandlerFactoryPath;
-            var appPath = IsNullOrEmpty(request.ApplicationPath)
+            var appPath = request.ApplicationPath.IsNullOrEmpty()
                           ? WebHostDirectoryName
                           : request.ApplicationPath.TrimStart('/');
 
@@ -479,11 +472,11 @@ namespace ServiceStack
         public static string GetPathInfo(string fullPath, string mode, string appPath)
         {
             var pathInfo = ResolvePathInfoFromMappedPath(fullPath, mode);
-            if (!IsNullOrEmpty(pathInfo)) return pathInfo;
+            if (!pathInfo.IsNullOrEmpty()) return pathInfo;
 
             //Wildcard mode relies on this to work out the handlerPath
             pathInfo = ResolvePathInfoFromMappedPath(fullPath, appPath);
-            if (!IsNullOrEmpty(pathInfo)) return pathInfo;
+            if (!pathInfo.IsNullOrEmpty()) return pathInfo;
 
             return fullPath;
         }
@@ -616,8 +609,8 @@ namespace ServiceStack
 
         public static string GetQueryStringContentType(this IRequest httpReq)
         {
-            var callback = httpReq.QueryString[Keywords.Callback];
-            if (!IsNullOrEmpty(callback)) return MimeTypes.Json;
+            if (!httpReq.QueryString[Keywords.Callback].IsNullOrEmpty())
+                return MimeTypes.Json;
 
             var format = httpReq.QueryString[Keywords.Format];
             if (format == null)
@@ -638,20 +631,20 @@ namespace ServiceStack
                 {
                     if (pi.Length - start > formatMaxLength)
                         return null;
-                    else
-                        end = pi.Length;
+                
+                    end = pi.Length;
                 } else if (end - start > formatMaxLength) return null;
 
                 //check for xml or jsv content-type
                 if (end - start == 3)
                 {
-                    if (String.Compare(pi, start, "xml", 0, "xml".Length, StringComparison.OrdinalIgnoreCase) == 0)
+                    if (string.Compare(pi, start, "xml", 0, "xml".Length, StringComparison.OrdinalIgnoreCase) == 0)
                          return MimeTypes.Xml;
-                    if (String.Compare(pi, start, "jsv", 0, "jsv".Length, StringComparison.OrdinalIgnoreCase) == 0)
+                    if (string.Compare(pi, start, "jsv", 0, "jsv".Length, StringComparison.OrdinalIgnoreCase) == 0)
                          return MimeTypes.Jsv;
                 } else if (end - start == 4) //check for "json" content-type
                 {
-                    if (String.Compare(pi, start, "json", 0, "json".Length, StringComparison.OrdinalIgnoreCase) == 0)
+                    if (string.Compare(pi, start, "json", 0, "json".Length, StringComparison.OrdinalIgnoreCase) == 0)
                          return MimeTypes.Json;
                 }
 
@@ -690,7 +683,7 @@ namespace ServiceStack
         public static string GetResponseContentType(this IRequest httpReq)
         {
             var specifiedContentType = GetQueryStringContentType(httpReq);
-            if (!IsNullOrEmpty(specifiedContentType)) return specifiedContentType;
+            if (!specifiedContentType.IsNullOrEmpty()) return specifiedContentType;
 
             var acceptContentTypes = httpReq.AcceptTypes;
             var defaultContentType = httpReq.ContentType;
@@ -703,7 +696,7 @@ namespace ServiceStack
             var preferredContentTypes = HostContext.Config.PreferredContentTypes;
 
             var acceptsAnything = false;
-            var hasDefaultContentType = !IsNullOrEmpty(defaultContentType);
+            var hasDefaultContentType = !defaultContentType.IsNullOrEmpty();
             if (acceptContentTypes != null)
             {
                 var hasPreferredContentTypes = new bool[preferredContentTypes.Count];
@@ -797,7 +790,7 @@ namespace ServiceStack
 
         public static string InferBaseUrl(this string absoluteUri, string fromPathInfo = null)
         {
-            if (IsNullOrEmpty(fromPathInfo))
+            if (fromPathInfo.IsNullOrEmpty())
             {
                 fromPathInfo = "/" + (HostContext.Config.HandlerFactoryPath ?? "");
             }
@@ -808,7 +801,7 @@ namespace ServiceStack
                     return null;
             }
 
-            if (IsNullOrEmpty(absoluteUri))
+            if (absoluteUri.IsNullOrEmpty())
                 return null;
 
             var pos = absoluteUri.IndexOf(fromPathInfo, "https://".Length + 1, StringComparison.Ordinal);

@@ -23,8 +23,8 @@ namespace ServiceStack
         private static bool IsIntegratedPipeline = false;
         private static bool HostAutoRedirectsDirs = false;
 
-        [ThreadStatic] private static string debugLastHandlerArgs;
-        public static string DebugLastHandlerArgs => debugLastHandlerArgs;
+        [ThreadStatic] private static string lastHandlerArgs;
+        public static string LastHandlerArgs => lastHandlerArgs;
 
         internal static void Init()
         {
@@ -150,16 +150,15 @@ namespace ServiceStack
             var appHost = HostContext.AppHost;
             foreach (var rawHttpHandler in appHost.RawHttpHandlers)
             {
-                var reqInfo = rawHttpHandler(httpReq);
-                if (reqInfo != null) return reqInfo;
+                var handler = rawHttpHandler(httpReq);
+                if (handler != null) return handler;
             }
 
             var config = appHost.Config;
             string location = config.HandlerFactoryPath;
             string pathInfo = httpReq.PathInfo;
             string physicalPath = httpReq.GetPhysicalPath();
-            if (config.DebugMode)
-                debugLastHandlerArgs = httpReq.Verb + "|" + httpReq.RawUrl + "|" + physicalPath;
+            lastHandlerArgs = httpReq.Verb + "|" + httpReq.RawUrl + "|" + physicalPath;
 
             //Default Request /
             if (pathInfo.IsNullOrEmpty() || pathInfo == "/")

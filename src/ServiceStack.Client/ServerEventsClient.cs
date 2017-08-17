@@ -108,7 +108,7 @@ namespace ServiceStack
             }
             set
             {
-                this.eventStreamPath = value.CombineWith("event-stream");
+                this.eventStreamPath = value.AppendPath("event-stream");
                 BuildEventStreamUri();
 
                 var meta = this.ServiceClient as IServiceClientMeta;
@@ -158,7 +158,7 @@ namespace ServiceStack
 
         public ServerEventsClient(string baseUri, params string[] channels)
         {
-            this.eventStreamPath = baseUri.CombineWith("event-stream");
+            this.eventStreamPath = baseUri.AppendPath("event-stream");
             this.Channels = channels;
 
             this.ServiceClient = new JsonServiceClient(baseUri);

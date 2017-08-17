@@ -15,10 +15,36 @@ using ServiceStack.Web;
 
 namespace ServiceStack.Host.AspNet
 {
-    public class AspNetRequest
-        : IHttpRequest, IHasResolver
+    public class AspNetRequest : IHttpRequest, IHasResolver
     {
-        public static ILog log = LogManager.GetLogger(typeof(AspNetRequest));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(AspNetRequest));
+
+        private readonly HttpRequestBase request;
+        private readonly IHttpResponse response;
+        
+        public AspNetRequest(HttpContextBase httpContext)
+            : this(httpContext, string.Empty, RequestAttributes.None) { }
+
+        public AspNetRequest(HttpContextBase httpContext, string operationName)
+            : this(httpContext, operationName ?? string.Empty, RequestAttributes.None) { }
+
+        public AspNetRequest(HttpContextBase httpContext, string operationName, RequestAttributes requestAttributes)
+        {         
+            this.request = httpContext.Request;
+            this.response = new AspNetResponse(httpContext.Response, this);
+            this.OperationName = operationName;
+            this.RequestAttributes = (requestAttributes != RequestAttributes.None ? requestAttributes : this.GetAttributes());
+            this.RequestPreferences = new RequestPreferences(httpContext);
+
+            if (httpContext.Items != null && httpContext.Items.Count > 0)
+            {
+                foreach (var key in httpContext.Items.Keys)
+                {
+                    if (key is string)
+                        Items[(string)key] = httpContext.Items[key];
+                }
+            }
+        }
 
         [Obsolete("Use Resolver")]
         public Container Container { get { throw new NotSupportedException("Use Resolver"); } }
@@ -28,42 +54,6 @@ namespace ServiceStack.Host.AspNet
         {
             get { return resolver ?? Service.DefaultResolver; }
             set { resolver = value; }
-        }
-
-        private readonly HttpRequestBase request;
-        private readonly IHttpResponse response;
-        
-        public AspNetRequest(HttpContextBase httpContext, string operationName = null)
-            : this(httpContext, operationName, RequestAttributes.None)
-        {
-            this.RequestAttributes = this.GetAttributes();
-        }
-
-        public AspNetRequest(HttpContextBase httpContext, string operationName, RequestAttributes requestAttributes)
-        {
-            this.OperationName = operationName;
-            this.RequestAttributes = requestAttributes;
-            this.request = httpContext.Request;
-            try
-            {
-                this.response = new AspNetResponse(httpContext.Response, this);
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex.Message, ex);
-            }
-
-            this.RequestPreferences = new RequestPreferences(httpContext);
-
-            if (httpContext.Items != null && httpContext.Items.Count > 0)
-            {
-                foreach (var key in httpContext.Items.Keys)
-                {
-                    var strKey = key as string;
-                    if (strKey == null) continue;
-                    Items[strKey] = httpContext.Items[key];
-                }
-            }
         }
 
         public HttpRequestBase HttpRequest => request;
@@ -107,30 +97,13 @@ namespace ServiceStack.Host.AspNet
 
         public string UserAgent => request.UserAgent;
 
-        private Dictionary<string, object> items;
-        public Dictionary<string, object> Items
-        {
-            get
-            {
-                if (items == null)
-                {
-                    items = new Dictionary<string, object>();
-                }
-                return items;
-            }
-        }
+        private Dictionary<string, object> items = new Dictionary<string, object>();
+        public Dictionary<string, object> Items { get { return items; } }
 
         private string responseContentType;
         public string ResponseContentType
         {
-            get
-            {
-                if (responseContentType == null)
-                {
-                    responseContentType = this.GetResponseContentType();
-                }
-                return responseContentType;
-            }
+            get { return responseContentType ?? (responseContentType = this.GetResponseContentType()); }
             set
             {
                 this.responseContentType = value;
@@ -169,7 +142,7 @@ namespace ServiceStack.Host.AspNet
                         }
                         catch(Exception ex)
                         {
-                            log.Warn("Error trying to create System.Net.Cookie: " + httpCookie.Name, ex);
+                            Logger.Warn("Error trying to create System.Net.Cookie: " + httpCookie.Name, ex);
                         }
 
                         if (cookie != null)
@@ -267,7 +240,8 @@ namespace ServiceStack.Host.AspNet
 
         public string[] AcceptTypes => request.AcceptTypes;
 
-        public string PathInfo => request.GetPathInfo();
+        private string pathInfo;
+        public string PathInfo => pathInfo ?? (pathInfo = request.GetPathInfo());
 
         public string UrlHostName => request.GetUrlHostName();
 
@@ -314,7 +288,6 @@ namespace ServiceStack.Host.AspNet
 
         public Uri UrlReferrer => request.UrlReferrer;
     }
-
 }
 
 #endif

@@ -1802,14 +1802,14 @@
             </summary>
             <param name="basePath">The base path to combine.</param>
             <param name="paths">An string array that contains the path elements to combine.</param>
-            <returns>The combined path string.</returns>
+            <returns>The combined paths string.</returns>
         </member>
         <member name="M:ServiceStack.PathUtils.CombinePaths(System.String[])">
             <summary>
             Combines the path elements in a specified System.String array.
             </summary>
             <param name="paths">An string array that contains the path elements to combine.</param>
-            <returns>The combined path string.</returns>
+            <returns>The combined paths string.</returns>
         </member>
         <member name="M:ServiceStack.PclExport.WriteLine(System.String)">
             <summary>
@@ -2038,7 +2038,6 @@
             <param name="args">An object array that contains zero or more objects to format.</param>
             <returns> A copy of format in which the format items have been replaced by the string representation 
             of the corresponding objects in args.</returns>
-            <exception cref="T:System.ArgumentNullException">format or args is null.</exception>
             <exception cref="T:System.FormatException">format is invalid.-or- The index of a format item is less than zero, or greater
             than or equal to the length of the args array.</exception>
         </member>

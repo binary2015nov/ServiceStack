@@ -264,7 +264,7 @@ namespace ServiceStack
     {
         public static NameValueCollectionWrapper InWrapper(this NameValueCollection nvc)
         {
-            return new NameValueCollectionWrapper(nvc);
+            return new NameValueCollectionWrapper(nvc ?? new NameValueCollection());
         }
 
         public static NameValueCollection ToNameValueCollection(this INameValueCollection nvc)

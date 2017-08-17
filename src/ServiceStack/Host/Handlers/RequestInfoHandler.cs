@@ -204,7 +204,7 @@ namespace ServiceStack.Host.Handlers
             if (response == null)
                 return;
 
-            response.HandlerFactoryArgs = HttpHandlerFactory.DebugLastHandlerArgs;
+            response.HandlerFactoryArgs = HttpHandlerFactory.LastHandlerArgs;
             response.DebugString = "";
 #if !NETSTANDARD1_6
             if (HttpContext.Current != null)

@@ -313,6 +313,5 @@ namespace ServiceStack.Common.Tests.Perf
                 "SCU.ToString(byteArrayValue)", () => TypeSerializer.SerializeToString(byteArrayValue)
             );
         }
-
     }
 }
