@@ -43,25 +43,29 @@
         color: #2a6496;
         text-decoration: underline;
     }
-    body, textarea, input {
+    body, textarea, input, table, td {
         font-size: 18px;
+    }
+    td {
+        vertical-align: top;
     }
     textarea {
         width: 100%;
         font-family: Monaco, Consolas;
-        min-height: 30%;
-        margin: 10px 0;
+        resize:vertical;
+        min-height: 600px;
+        padding: 10px 10px 0 10px;
     }
     input {
         padding: 5px 10px; 
     }
     .live-template {
-        padding: 30px;
+        padding: 10px 30px;
     }
     .live-template textarea {
         font-family: Monaco, Consolas;
         font-size: .98rem;
-        line-height: 1.25rem;
+        line-height: 1.20rem;
     }
     .live-template .output {
         border: 1px solid #eee;
@@ -79,6 +83,21 @@
     }
     .live-template.error {
         border-color: #a94442;
+    }
+    pre {
+        white-space: pre-wrap;
+    }
+    table {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    caption, th, td {
+        padding: 2px 5px;
+        text-align: left;
+    }
+    caption {
+        padding: 5px 8px;
+        background: #f1f1f1;
     }
 </style>
 <body>
@@ -100,11 +119,11 @@
 <script src="/js/ss-utils.js"></script>
 <script>
 $(".live-template").each(function(){
-
     var el = $(this)
     el.find("textarea").on("input", function(){
 
-        var request = { template: el.find("textarea").val() }
+        var template = el.find("textarea").val();
+        var request = { template: template }
 
         $.ajax({
             type: "POST",

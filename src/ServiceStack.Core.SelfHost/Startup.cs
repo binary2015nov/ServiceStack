@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define USE_AWS
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -123,14 +124,22 @@ namespace ServiceStack.Core.SelfHost
 
         public override void Configure(Container container)
         {
+#if USE_AWS
             var s3Client = new AmazonS3Client(
                 Environment.GetEnvironmentVariable("S3_ACCESS_KEY"), 
                 Environment.GetEnvironmentVariable("S3_SECRET_KEY"), 
                 RegionEndpoint.USEast1);
 
             VirtualFiles = new S3VirtualFiles(s3Client, "s3-postgresql");
+#endif
+            SetConfig(new HostConfig {
+                DebugMode = false,
+                AdminAuthSecret = Environment.GetEnvironmentVariable("AUTH_SECRET"),
+            });
 
-            Plugins.Add(new TemplatePagesFeature());
+            Plugins.Add(new TemplatePagesFeature { 
+                EnableDebugTemplateToAll = true,
+            });
             Plugins.Add(new SwaggerFeature());
         }
         public override List<IVirtualPathProvider> GetVirtualFileSources()

@@ -45,6 +45,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
             Assert.That(context.EvaluateTemplate(@"{{ 'in filter' | throw({ assignError: 'myError' }) }}
 <var>{{ myError.Message }}</var>"),
                 Is.EqualTo("<var>in filter</var>"));
+
+            Assert.That(context.EvaluateTemplate(@"{{ 'in filter' | throw({ assignError: 'myError' }) }}
+<var>{{ myError.Message }}</var><pre>{{ myError.StackTrace }}</pre>"),
+                Does.StartWith("<var>in filter</var><pre>   at "));
         }
 
         [Test]
@@ -75,6 +79,75 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
                 Is.EqualTo("<h1>SUCCESS!</h1>"));
             Assert.That(context.EvaluateTemplate(@"<h1>{{ 'SUCCESS!' | ifNotExists(lastError) }}</h1>"),
                 Is.EqualTo("<h1>SUCCESS!</h1>"));
+        }
+
+        [Test]
+        public void Can_throw_on_conditions()
+        {
+            var context = new TemplateContext
+            {
+                AssignExceptionsTo = "error"
+            }.Init();
+
+            Assert.That(context.EvaluateTemplate(@"{{ 'in filter' | throwIf(true) }}{{ ifError | select: <h1>FAIL! { it.Message }</h1> }}"),
+                Is.EqualTo("<h1>FAIL! in filter</h1>"));
+            Assert.That(context.EvaluateTemplate(@"{{ 'in filter' | throwIf(true) }}{{ error | ifExists | select: <h1>FAIL! { it.Message }</h1> }}"),
+                Is.EqualTo("<h1>FAIL! in filter</h1>"));
+            Assert.That(context.EvaluateTemplate(@"{{ true | ifThrow('in filter') }}{{ ifError | select: <h1>FAIL! { it.Message }</h1> }}"),
+                Is.EqualTo("<h1>FAIL! in filter</h1>"));
+            Assert.That(context.EvaluateTemplate(@"{{ true | ifThrow('in filter') }}{{ error | ifExists | select: <h1>FAIL! { it.Message }</h1> }}"),
+                Is.EqualTo("<h1>FAIL! in filter</h1>"));
+
+            Assert.That(context.EvaluateTemplate(@"{{ 'in filter' | throwIf(false) }}{{ ifError | select: <h1>FAIL! { it.Message }</h1> }}"),
+                Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate(@"{{ 'in filter' | throwIf(false) }}{{ error | ifExists | select: <h1>FAIL! { it.Message }</h1> }}"),
+                Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate(@"{{ false | ifThrow('in filter') }}{{ ifError | select: <h1>FAIL! { it.Message }</h1> }}"),
+                Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate(@"{{ false | ifThrow('in filter') }}{{ error | ifExists | select: <h1>FAIL! { it.Message }</h1> }}"),
+                Is.EqualTo(""));
+        }
+
+        [Test]
+        public void Can_throw_on_conditions_with_assignError()
+        {
+            var context = new TemplateContext
+            {
+                AssignExceptionsTo = "error"
+            }.Init();
+
+            Assert.That(context.EvaluateTemplate(@"{{ 'in filter' | throwIf(true, { assignError: 'ex' }) }}{{ ex | ifExists | select: <h1>FAIL! { it.Message }</h1> }}"),
+                Is.EqualTo("<h1>FAIL! in filter</h1>"));
+            Assert.That(context.EvaluateTemplate(@"{{ true | ifThrow('in filter', { assignError: 'ex' }) }}{{ ex | ifExists | select: <h1>FAIL! { it.Message }</h1> }}"),
+                Is.EqualTo("<h1>FAIL! in filter</h1>"));
+
+            Assert.That(context.EvaluateTemplate(@"{{ 'in filter' | throwIf(false, { assignError: 'ex' }) }}{{ ex | ifExists | select: <h1>FAIL! { it.Message }</h1> }}"),
+                Is.EqualTo(""));
+            Assert.That(context.EvaluateTemplate(@"{{ false | ifThrow('in filter', { assignError: 'ex' }) }}{{ ex | ifExists | select: <h1>FAIL! { it.Message }</h1> }}"),
+                Is.EqualTo(""));
+        }
+
+        [Test]
+        public void Can_throw_different_exception_types()
+        {
+            var context = new TemplateContext
+            {
+                AssignExceptionsTo = "error"
+            }.Init();
+
+            Assert.That(context.EvaluateTemplate(@"{{ true | ifThrowArgumentNullException('p') }}{{ ifError | select: <h1>{ it | typeName }! { it.Message }</h1> }}")
+                .NormalizeNewLines(),
+                Is.EqualTo("<h1>ArgumentNullException! Value cannot be null.\nParameter name: p</h1>"));
+            Assert.That(context.EvaluateTemplate(@"{{ true | ifThrowArgumentNullException('p', { assignError: 'ex' }) }}{{ ex | ifExists | select: <h1>{ it | typeName }! { it.Message }</h1> }}")
+                .NormalizeNewLines(),
+                Is.EqualTo("<h1>ArgumentNullException! Value cannot be null.\nParameter name: p</h1>"));
+
+            Assert.That(context.EvaluateTemplate(@"{{ true | ifThrowArgumentException('bad arg', 'p') }}{{ ifError | select: <h1>{ it | typeName }! { it.Message }</h1> }}")
+                .NormalizeNewLines(),
+                Is.EqualTo("<h1>ArgumentException! bad arg\nParameter name: p</h1>"));
+            Assert.That(context.EvaluateTemplate(@"{{ true | ifThrowArgumentException('bad arg', 'p', { assignError: 'ex' }) }}{{ ex | ifExists | select: <h1>{ it | typeName }! { it.Message }</h1> }}")
+                .NormalizeNewLines(),
+                Is.EqualTo("<h1>ArgumentException! bad arg\nParameter name: p</h1>"));
         }
 
         [Test]

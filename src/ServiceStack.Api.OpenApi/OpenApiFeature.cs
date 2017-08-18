@@ -22,6 +22,8 @@ namespace ServiceStack.Api.OpenApi
 
         public string LogoUrl { get; set; }
 
+        public string LogoHref { get; set; }
+
         public Action<OpenApiDeclaration> ApiDeclarationFilter { get; set; }
 
         /// <summary>
@@ -41,7 +43,7 @@ namespace ServiceStack.Api.OpenApi
 
         public OpenApiFeature()
         {
-            LogoUrl = "//raw.githubusercontent.com/ServiceStack/Assets/master/img/artwork/logo-24.png";
+            LogoUrl = "//raw.githubusercontent.com/ServiceStack/Assets/master/img/artwork/logo-64-swagger.png";
             Tags = new List<OpenApiTag>();
             AnyRouteVerbs = new List<string> { HttpMethods.Get, HttpMethods.Post, HttpMethods.Put, HttpMethods.Delete };
         }
@@ -72,7 +74,7 @@ namespace ServiceStack.Api.OpenApi
                 var swaggerUrl = "swagger-ui/";
 
                 appHost.GetPlugin<MetadataFeature>()
-                    ?.AddLink(MetadataFeature.PluginLinks, swaggerUrl, "Swagger UI");
+                    .AddPluginLink(swaggerUrl, "Swagger UI");
 
                 appHost.CatchAllHandlers.Add((httpMethod, pathInfo, filePath) =>
                 {
@@ -100,8 +102,12 @@ namespace ServiceStack.Api.OpenApi
                             res.ContentType = MimeTypes.Html;
                             var resourcesUrl = req.ResolveAbsoluteUrl("~/openapi");
                             html = html.Replace("http://petstore.swagger.io/v2/swagger.json", resourcesUrl)
-                                .Replace("ApiDocs", HostContext.AppHost.ServiceName)
-                                .Replace("{LogoUrl}", LogoUrl);
+                                .Replace("ApiDocs", HostContext.ServiceName)
+                                .Replace("<span class=\"logo__title\">swagger</span>", $"<span class=\"logo__title\">{HostContext.ServiceName}</span>")
+                                .Replace("http://swagger.io", LogoHref ?? "./");
+
+                            if (LogoUrl != null)
+                                html = html.Replace("images/logo_small.png", LogoUrl);
 
                             if (injectJs != null)
                             {

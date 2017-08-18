@@ -1,11 +1,15 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using ServiceStack.Auth;
+using ServiceStack.Host;
+using ServiceStack.Templates;
 using ServiceStack.Text;
+using ServiceStack.Web;
 
-namespace ServiceStack.Templates
+namespace ServiceStack
 {
     public class TemplateInfoFilters : TemplateFilter
     {
@@ -13,14 +17,15 @@ namespace ServiceStack.Templates
         public string envVariable(string variable) => Environment.GetEnvironmentVariable(variable);
         public string envExpandVariables(string name) => Environment.ExpandEnvironmentVariables(name);
         public string envStackTrace() => Environment.StackTrace;
-        public int envProcessorCount(string variable) => Environment.ProcessorCount;
-        public int envTickCount(string variable) => Environment.TickCount;
+        public int envProcessorCount() => Environment.ProcessorCount;
+        public int envTickCount() => Environment.TickCount;
 
-        public bool envIsAndroid() => Env.IsAndroid;
-        public bool envIsMonoTouch() => Env.IsMonoTouch;
-        public bool envIsMono() => Env.IsMono;
         public string envServerUserAgent() => Env.ServerUserAgent;
         public decimal envServiceStackVersion() => Env.ServiceStackVersion;
+
+        public bool envIsMono() => Env.IsMono;
+        public bool envIsAndroid() => Env.IsAndroid;
+        public bool envIsMonoTouch() => Env.IsMonoTouch;
 
 #if NET45
         public bool envIsWindows() => Env.IsWindows;
@@ -49,8 +54,25 @@ namespace ServiceStack.Templates
         public System.Runtime.InteropServices.Architecture envOSArchitecture() => System.Runtime.InteropServices.RuntimeInformation.OSArchitecture;
 #endif
 
-
         public List<IPAddress> networkIpv4Addresses() => IPAddressExtensions.GetAllNetworkInterfaceIpv4Addresses().Keys.ToList();
         public List<IPAddress> networkIpv6Addresses() => IPAddressExtensions.GetAllNetworkInterfaceIpv6Addresses();
+
+        private IHttpRequest req(TemplateScopeContext scope) => scope.GetValue("Request") as IHttpRequest;
+
+        public IAuthSession userSession(TemplateScopeContext scope) => req(scope).GetSession();
+        public string userSessionId(TemplateScopeContext scope) => req(scope).GetSessionId();
+        public string userPermanentSessionId(TemplateScopeContext scope) => req(scope).GetPermanentSessionId();
+        public HashSet<string> userSessionOptions(TemplateScopeContext scope) => req(scope).GetSessionOptions();
+        public bool userHasRole(TemplateScopeContext scope, string role) => 
+            userSession(scope)?.HasRole(role, HostContext.AppHost.GetAuthRepository(req(scope))) == true;
+        public bool userHasPermission(TemplateScopeContext scope, string permission) => 
+            userSession(scope)?.HasPermission(permission, HostContext.AppHost.GetAuthRepository(req(scope))) == true;
+
+        public List<OperationDto> metaAllDtos() => HostContext.Metadata.GetOperationDtos();
+        public List<string> metaAllDtoNames() => HostContext.Metadata.GetOperationDtos().Map(x => x.Name);
+        public IEnumerable<Operation> metaAllOperations() => HostContext.Metadata.Operations;
+        public List<string> metaAllOperationNames() => HostContext.Metadata.GetAllOperationNames();
+        public List<Type> metaAllOperationTypes() => HostContext.Metadata.GetAllOperationTypes();
+        public Operation metaOperation(string name) => HostContext.Metadata.GetOperation(HostContext.Metadata.GetOperationType(name));
     }
 }

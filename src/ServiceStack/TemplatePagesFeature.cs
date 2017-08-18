@@ -26,24 +26,45 @@ namespace ServiceStack
         public bool DisableHotReload { get; set; }
 
         public bool EnableDebugTemplate { get; set; }
+        public bool EnableDebugTemplateToAll { get; set; }
 
-        public string DebugDefaultTemplate { get; set; } = @"OS Environment Variable: {{ 'OS' | envVariable }}
-Current Directory: {{ envCurrentDirectory }}
-Expand Variables: {{ 'My system drive is %SystemDrive% and my system root is %SystemRoot%' | envExpandVariables }}
-Server UserAgent: {{ envServerUserAgent }}
-ServiceStack Version: {{ envServiceStackVersion }}
-Environment Variable Count: {{ envVariables | count }}
-Machine Name: {{ envMachineName }}
-UserName: {{ envUserName }}
-Version: {{ envVersion }}
-Request PathInfo: {{ Request.PathInfo }}
-Logical Drives: 
-{{ envLogicalDrives | select(' - {{ it }}\n') }}
-Ipv4 Addresses: 
-{{ networkIpv4Addresses | select(' - {{ it }}\n') }}
-Ipv6 Addresses: 
-{{ networkIpv6Addresses | select(' - {{ it }}\n') }}
-";
+        public string DebugDefaultTemplate { get; set; } = @"<table><tr><td style='width:50%'><pre>
+Service Name              {{ appHost.ServiceName }}
+Handler Path              {{ appConfig.HandlerFactoryPath }}
+VirtualFiles Path         {{ appVirtualFilesPath }}
+VirtualFileSources Path   {{ appVirtualFileSourcesPath }}
+OS Environment Variable   {{ 'OS' | envVariable }}
+ServiceStack Version      {{ envServiceStackVersion }}
+
+Request: 
+  - RemoteIp              {{ request.RemoteIp }}
+  - UserHostAddress       {{ request.UserHostAddress }}
+  - PathInfo              {{ request.PathInfo }}
+  - UserAgent             {{ request.UserAgent }}
+
+Session:
+  - ss-id                 {{ userSessionId }}
+  - ss-pid                {{ userPermanentSessionId }}
+  - ss-opt                {{ userSessionOptions | join }}
+
+User: 
+  - IsAuthenticated       {{ userSession | select: { it.IsAuthenticated } }}
+  - UserName              {{ userSession | select: { it.UserName } }}
+  - LastName              {{ userSession | select: { it.LastName } }}
+  - Is Admin              {{ userHasRole('Admin') }}
+  - Has Permission        {{ userHasPermission('ThePermission') }}
+</pre></td><td style='width:50%'> 
+{{ meta.Operations | take(10) | map('{ Request: it.Name, Response: it.ResponseType.Name, Service: it.ServiceType.Name }') | htmlDump({ caption: 'First 10 Services'}) }}
+<table><caption>Network Information</caption>
+<tr><th>    IPv4 Addresses                            </th><th>              IPv6 Addresses                            </th></tr>
+<td><pre>{{ networkIpv4Addresses | select: \n{ it } }}</pre></td><td><pre>{{ networkIpv6Addresses | select: \n{ it } }}</pre><td></tr></pre></td>
+</tr></table>";
+
+        public List<string> IgnorePaths { get; set; } = new List<string>
+        {
+            "/ss_admin",
+            "/swagger-ui",
+        };
 
         public string HtmlExtension
         {
@@ -82,10 +103,10 @@ Ipv6 Addresses:
             if (!DisableHotReload)
                 appHost.RegisterService(typeof(TemplatePagesServices));
 
-            if (DebugMode || EnableDebugTemplate)
+            if (DebugMode || EnableDebugTemplate || EnableDebugTemplateToAll)
             {
                 appHost.RegisterService(typeof(TemplatePagesDebugServices), "/templates/debug/eval");
-                appHost.GetPlugin<MetadataFeature>().AddLink(MetadataFeature.DebugInfo, "/templates/debug/eval", "Debug Templates");
+                appHost.GetPlugin<MetadataFeature>().AddDebugLink("/templates/debug/eval", "Debug Templates");
             }
 
             Init();
@@ -98,6 +119,15 @@ Ipv6 Addresses:
         {
             if (!DebugMode && catchAllPathsNotFound.ContainsKey(pathInfo))
                 return null;
+
+            foreach (var ignorePath in IgnorePaths)
+            {
+                if (pathInfo.StartsWith(ignorePath))
+                {
+                    catchAllPathsNotFound[pathInfo] = 1;
+                    return null;
+                }
+            }
 
             var codePage = Pages.GetCodePage(pathInfo);
             if (codePage != null)
@@ -129,7 +159,7 @@ Ipv6 Addresses:
         }
     }
 
-    [Exclude(Feature.Soap | Feature.Metadata)]
+    [ExcludeMetadata]
     [Route("/templates/hotreload/page")]
     public class HotReloadPage : IReturn<HotReloadPageResponse>
     {
@@ -152,7 +182,7 @@ Ipv6 Addresses:
 
         public async Task<HotReloadPageResponse> Any(HotReloadPage request)
         {
-            if (!HostContext.Config.DebugMode)
+            if (!HostContext.DebugMode)
                 throw new NotImplementedException("set 'debug true' in web.settings to enable this service");
 
             var page = Pages.GetPage(request.Path ?? "/");
@@ -172,10 +202,11 @@ Ipv6 Addresses:
         }
     }
 
-    [Exclude(Feature.Soap | Feature.Metadata)]
+    [ExcludeMetadata]
     public class DebugEvaluateTemplate : IReturn<string>
     {
         public string Template { get; set; }
+        public string AuthSecret { get; set; }
     }
 
     [DefaultRequest(typeof(DebugEvaluateTemplate))]
@@ -186,20 +217,31 @@ Ipv6 Addresses:
         {
             if (string.IsNullOrEmpty(request.Template))
                 return null;
-            
-            if (!HostContext.Config.DebugMode)
-                RequiredRoleAttribute.AssertRequiredRoles(Request, AuthRepository, RoleNames.Admin);
+
+            var feature = HostContext.GetPlugin<TemplatePagesFeature>();
+            if (!HostContext.DebugMode && !feature.EnableDebugTemplateToAll)
+            {
+                if (HostContext.Config.AdminAuthSecret == null || HostContext.Config.AdminAuthSecret != request.AuthSecret)
+                {
+                    RequiredRoleAttribute.AssertRequiredRoles(Request, RoleNames.Admin);
+                }
+            }
             
             var context = new TemplateContext
             {
                 TemplateFilters = { new TemplateInfoFilters() },
                 Args =
                 {
-                    {TemplateConstants.Request, base.Request}
+                    {TemplateConstants.Request, base.Request},
+                    {"request", base.Request},
+                    {"appHost", HostContext.AppHost},
+                    {"appConfig", HostContext.Config},
+                    {"appVirtualFilesPath", HostContext.VirtualFiles.RootDirectory.RealPath},
+                    {"appVirtualFileSourcesPath", HostContext.VirtualFileSources.RootDirectory.RealPath},
+                    {"meta", HostContext.Metadata},
                 }
             }.Init();
 
-            var feature = HostContext.GetPlugin<TemplatePagesFeature>();
             feature.Args.Each(x => context.Args[x.Key] = x.Value);
 
             var result = context.EvaluateTemplate(request.Template);
@@ -208,14 +250,26 @@ Ipv6 Addresses:
 
         public object GetHtml(DebugEvaluateTemplate request)
         {
+            var feature = HostContext.GetPlugin<TemplatePagesFeature>();
+            if (!HostContext.DebugMode && !feature.EnableDebugTemplateToAll)
+                RequiredRoleAttribute.AssertRequiredRoles(Request, RoleNames.Admin);
+            
             if (request.Template != null)
                 return Any(request);
 
-            var defaultTemplate = HostContext.GetPlugin<TemplatePagesFeature>().DebugDefaultTemplate ?? "";
+            var defaultTemplate = feature.DebugDefaultTemplate ?? "";
             
             var html = HtmlTemplates.GetDebugEvaluateTemplate();
             html = html.Replace("{0}", defaultTemplate);
 
+            var authsecret = Request.GetParam(Keywords.AuthSecret);
+            if (HostContext.Config.AdminAuthSecret != null &&
+                HostContext.Config.AdminAuthSecret == authsecret)
+            {
+                html = html.Replace("{ template: template }", 
+                    "{ template: template, authsecret:" + feature.DefaultFilters.jsQuotedString(authsecret).ToRawString() + " }");
+            }
+ 
             return html;
         }
     }
@@ -308,7 +362,7 @@ Ipv6 Addresses:
     {
         public IRequest Request { get; set; }
 
-        public virtual IResolver GetResolver() => Service.DefaultResolver;
+        public virtual IResolver GetResolver() => Service.GlobalResolver;
 
         public virtual T TryResolve<T>()
         {
@@ -370,7 +424,7 @@ Ipv6 Addresses:
         {
             var req = this.Request;
             if (req.GetSessionId() == null)
-                req.CreateSessionIds(req.Response);
+                req.Response.CreateSessionIds(req);
             return req.GetSession(reload);
         }
 

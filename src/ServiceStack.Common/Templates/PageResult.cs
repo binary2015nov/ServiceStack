@@ -91,6 +91,11 @@ namespace ServiceStack.Templates
         /// The last error thrown by a filter
         /// </summary>
         public Exception LastFilterError { get; set; }
+        
+        /// <summary>
+        /// What argument errors should be binded to
+        /// </summary>
+        public string AssignExceptionsTo { get; set; }
 
         private PageResult(PageFormat format)
         {
@@ -607,9 +612,7 @@ namespace ServiceStack.Templates
                         catch (StopFilterExecutionException) { throw; }
                         catch (Exception ex)
                         {
-                            var rethrow = ex is NotSupportedException ||
-                                          ex is TargetInvocationException ||
-                                          ex is NotImplementedException;
+                            var rethrow = TemplateConfig.FatalExceptions.Contains(ex.GetType());
 
                             var exResult = Format.OnExpressionException(this, ex);
                             if (exResult != null)
@@ -630,10 +633,7 @@ namespace ServiceStack.Templates
                     if (Context.SkipExecutingPageFiltersIfError)
                         this.SkipFilterExecution = true;
 
-                    var rethrow = ex.InnerException is NotSupportedException ||
-                                  ex.InnerException is TargetInvocationException ||
-                                  ex.InnerException is NotImplementedException;
-
+                    var rethrow = TemplateConfig.FatalExceptions.Contains(ex.InnerException.GetType());
                     if (!rethrow)
                     {
                         string errorBinding = null;
@@ -642,7 +642,7 @@ namespace ServiceStack.Templates
                             errorBinding = assignError as string;
 
                         if (errorBinding == null)
-                            errorBinding = Context.AssignExceptionsTo;
+                            errorBinding = AssignExceptionsTo ?? Context.AssignExceptionsTo;
 
                         if (!string.IsNullOrEmpty(errorBinding))
                         {
