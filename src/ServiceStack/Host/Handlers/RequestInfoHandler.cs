@@ -196,8 +196,6 @@ namespace ServiceStack.Host.Handlers
 
         public RequestInfoResponse RequestInfo { get; set; }
 
-        public static RequestHandlerInfo LastRequestInfo;
-
         public override void ProcessRequest(IRequest httpReq, IResponse httpRes, string operationName)
         {
             var response = this.RequestInfo ?? GetRequestInfo(httpReq);
@@ -297,11 +295,11 @@ namespace ServiceStack.Host.Handlers
             var response = new RequestInfoResponse
             {
                 Usage = "append '?debug=requestinfo' to any querystring. Optional params: virtualPathCount",
-                Host = HostContext.ServiceName + "_" + HostContext.Config.DebugHttpListenerHostEnvironment + "_" + Env.ServerUserAgent,
+                Host = HostContext.AppHost.GetType().Name + "_" + HostContext.Config.DebugHttpListenerHostEnvironment + "_" + Env.ServerUserAgent,
                 HostType = "{0} ({1})".Fmt(HostContext.IsAspNetHost ? "ASP.NET" : "SelfHost", hostType.BaseType()?.Name ?? hostType.Name),
                 StartedAt = HostContext.AppHost.ReadyAt.ToString("yyyy-MM-dd HH:mm:ss"),
                 Date = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
-                ServiceName = HostContext.ServiceName,
+                ServiceName = HostContext.Metadata.ServiceName,
                 HandlerFactoryPath = HostContext.Config.HandlerFactoryPath,
                 UserHostAddress = httpReq.UserHostAddress,
                 HttpMethod = httpReq.Verb,

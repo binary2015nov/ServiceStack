@@ -205,7 +205,7 @@ namespace ServiceStack
                 config.ServiceBaseUrl = base.Request.GetBaseUrl();
 
             if (config.ServiceName == null)
-                config.ServiceName = HostContext.ServiceName;
+                config.ServiceName = HostContext.Metadata.ServiceName;
 
             var userSession = Request.GetSession();
 

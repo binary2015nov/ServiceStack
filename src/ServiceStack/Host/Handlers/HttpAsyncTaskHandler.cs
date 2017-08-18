@@ -15,6 +15,8 @@ namespace ServiceStack.Host.Handlers
     {
         protected static ILog Log = LogManager.GetLogger(typeof(HttpAsyncTaskHandler));
 
+        public static RequestHandlerInfo LastRequestInfo { get; private set; }
+
         private Type[] ProcessRequestArgTypes = new[] { typeof(IRequest), typeof(IResponse), typeof(string) };
 
         public string RequestName { get; set; }
@@ -56,7 +58,7 @@ namespace ServiceStack.Host.Handlers
         {
             if (HostContext.Config.DebugMode)
             {
-                RequestInfoHandler.LastRequestInfo = new RequestHandlerInfo
+                LastRequestInfo = new RequestHandlerInfo
                 {
                     HandlerType = GetType().Name,
                     OperationName = operationName,

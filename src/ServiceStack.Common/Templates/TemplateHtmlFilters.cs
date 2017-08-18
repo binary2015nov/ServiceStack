@@ -346,7 +346,7 @@ namespace ServiceStack.Templates
                 }
             }
             sb.AppendLine("</pre>");
-            var html = StringBuilderCache.ReturnAndFree(sb);
+            var html = StringBuilderCache.Retrieve(sb);
             return html.ToRawString();
         }
     }

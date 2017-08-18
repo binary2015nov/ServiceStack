@@ -413,12 +413,11 @@ namespace ServiceStack.Auth
                 referrerUrl = request?.Continue
                     ?? authService.Request.GetHeader("Referer");
 
-            var requestUri = authService.Request.AbsoluteUri;
             if (referrerUrl.IsNullOrEmpty()
                 || referrerUrl.IndexOf("/auth", StringComparison.OrdinalIgnoreCase) >= 0)
                 referrerUrl = this.RedirectUrl
                     ?? authService.Request.GetBaseUrl()
-                    ?? requestUri.InferBaseUrl();
+                    ?? authService.Request.GetBaseUrl();
 
             return referrerUrl;
         }

@@ -16,7 +16,7 @@ namespace ServiceStack
     /// </summary>
     public abstract class AppSelfHostBase : AppHostHttpListenerBase
     {
-        private static ILog Logger = LogManager.GetLogger(typeof(AppSelfHostBase));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(AppSelfHostBase));
 
         private readonly AutoResetEvent listenForNextRequest = new AutoResetEvent(false);
 

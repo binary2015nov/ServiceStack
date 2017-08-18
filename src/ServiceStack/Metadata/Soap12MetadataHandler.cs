@@ -32,7 +32,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             {
                 HttpRequest = httpReq,
                 MetadataConfig = HostContext.Config.ServiceEndpointsMetadataConfig,
-                Title = HostContext.ServiceName,
+                Title = HostContext.AppHost.ServiceName,
                 Format = this.Format,
                 OperationName = operationName,
                 HostName = httpReq.GetUrlHostName(),

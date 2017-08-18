@@ -1797,6 +1797,14 @@
             <returns>The string that remains after all occurrences of characters in the trimChars parameter are removed from the start of the current string.
             If trimChars is null or an empty array, white-space characters are removed instead.</returns>
         </member>
+        <member name="M:ServiceStack.StringExtensions.TrimPrefixes(System.String,System.String[])">
+            <summary>
+             Removes the leading occurrences of the first matched string specified in an array from the current System.String object.
+            </summary>
+            <param name="value">The string to be trimed.</param>
+            <param name="prefixes">An array of strings to match, or null.</param>
+            <returns>The string that remains after the first matched string is removed from the start of the current string.</returns>
+        </member>
         <member name="M:ServiceStack.StringExtensions.Print(System.String,System.Object[])">
             <summary>
             Prints a formatted message.

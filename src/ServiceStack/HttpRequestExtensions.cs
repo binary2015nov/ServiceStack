@@ -776,59 +776,14 @@ namespace ServiceStack
 
         public static string ResolveAbsoluteUrl(this IRequest httpReq, string virtualPath = null)
         {
-            return HostContext.ResolveAbsoluteUrl(virtualPath ?? "~".CombineWith(httpReq.RawUrl), httpReq);
-        }
-
-        public static string GetAbsoluteUrl(this IRequest httpReq, string url)
-        {
-            if (url?.SafeSubstring(0, 2) == "~/")
-            {
-                url = httpReq.GetBaseUrl().CombineWith(url.Substring(2));
-            }
-            return url;
-        }
-
-        public static string InferBaseUrl(this string absoluteUri, string fromPathInfo = null)
-        {
-            if (fromPathInfo.IsNullOrEmpty())
-            {
-                fromPathInfo = "/" + (HostContext.Config.HandlerFactoryPath ?? "");
-            }
-            else
-            {
-                fromPathInfo = fromPathInfo.TrimEnd('/');
-                if (fromPathInfo.Length == 0)
-                    return null;
-            }
-
-            if (absoluteUri.IsNullOrEmpty())
-                return null;
-
-            var pos = absoluteUri.IndexOf(fromPathInfo, "https://".Length + 1, StringComparison.Ordinal);
-            return pos >= 0 ? absoluteUri.Substring(0, pos) : absoluteUri;
+            return HostContext.AppHost.ResolveAbsoluteUrl(virtualPath, httpReq).NormalizeScheme(
+                HostContext.Config.UseHttpsLinks || httpReq.GetHeader(HttpHeaders.XForwardedProtocol) == "https");
         }
 
         public static string GetBaseUrl(this IRequest httpReq)
         {
-            return HostContext.AppHost.GetBaseUrl(httpReq);
-        }
-
-        public static bool UseHttps(this IRequest httpReq)
-        {
-            return HostContext.Config.UseHttpsLinks ||
-                httpReq.GetHeader(HttpHeaders.XForwardedProtocol) == "https";
-        }
-
-        public static string NormalizeScheme(this string url, bool useHttps)
-        {
-            if (url == null || !useHttps)
-                return url;
-
-            url = url.TrimStart();
-            if (url.StartsWith("http://"))
-                return "https://" + url.Substring("http://".Length);
-
-            return url;
+            return HostContext.AppHost.GetBaseUrl(httpReq).NormalizeScheme(
+                HostContext.Config.UseHttpsLinks || httpReq.GetHeader(HttpHeaders.XForwardedProtocol) == "https");
         }
 
         public static RequestAttributes ToRequestAttributes(string[] attrNames)

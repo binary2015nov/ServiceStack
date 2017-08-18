@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using ServiceStack.Text;
 using ServiceStack.Web;
 
@@ -20,7 +21,7 @@ namespace ServiceStack.Host.Handlers
             HostContext.AppHost.OnLogError(typeof(NotFoundHttpHandler),
                 $"{request.UserHostAddress} Request not found: {request.RawUrl}");
 
-            var sb = StringBuilderCache.Allocate();
+            var sb = new StringBuilder();
 
             var responseStatus = response.Dto.GetResponseStatus();
             if (responseStatus != null)
@@ -50,7 +51,7 @@ namespace ServiceStack.Host.Handlers
             if (responseStatus != null)
                 response.StatusDescription = responseStatus.ErrorCode;
 
-            var text = StringBuilderCache.Retrieve(sb);
+            var text = sb.ToString();
             response.EndHttpHandlerRequest(skipClose: true, afterHeaders: r => r.Write(text));
         }
 

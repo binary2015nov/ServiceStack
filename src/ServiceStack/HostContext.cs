@@ -63,8 +63,6 @@ namespace ServiceStack
 
         public static ServiceMetadata Metadata => AssertAppHost().Metadata;
 
-        public static string ServiceName => AssertAppHost().ServiceName;
-
         public static bool StrictMode => AppHost?.Config?.StrictMode == true;
 
         public static bool TestMode

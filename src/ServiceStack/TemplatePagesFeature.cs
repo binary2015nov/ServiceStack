@@ -85,7 +85,7 @@ Ipv6 Addresses:
             if (DebugMode || EnableDebugTemplate)
             {
                 appHost.RegisterService(typeof(TemplatePagesDebugServices), "/templates/debug/eval");
-                appHost.GetPlugin<MetadataFeature>().AddDebugLink("/templates/debug/eval", "Debug Templates");
+                appHost.GetPlugin<MetadataFeature>().AddLink(MetadataFeature.DebugInfo, "/templates/debug/eval", "Debug Templates");
             }
 
             Init();
@@ -187,8 +187,8 @@ Ipv6 Addresses:
             if (string.IsNullOrEmpty(request.Template))
                 return null;
             
-            if (!HostContext.DebugMode)
-                RequiredRoleAttribute.AssertRequiredRoles(Request, RoleNames.Admin);
+            if (!HostContext.Config.DebugMode)
+                RequiredRoleAttribute.AssertRequiredRoles(Request, AuthRepository, RoleNames.Admin);
             
             var context = new TemplateContext
             {

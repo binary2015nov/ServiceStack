@@ -95,8 +95,6 @@ namespace ServiceStack.Formats
                     .Replace("format=shtm", "")
                     .TrimEnd('?', '&');
 
-                url += url.Contains("?") ? "&" : "?";
-
                 var now = DateTime.UtcNow;
                 var requestName = req.OperationName ?? dto.GetType().GetOperationName();
 

@@ -1,15 +1,14 @@
 ﻿using System.Linq;
 using System.Runtime.Serialization;
 using Funq;
-using ServiceStack;
 using ServiceStack.Admin;
 using ServiceStack.Api.Swagger;
 using ServiceStack.Auth;
 using ServiceStack.Authentication.OpenId;
 using ServiceStack.Caching;
 using ServiceStack.Common.Tests;
-using ServiceStack.Configuration;
 using ServiceStack.Data;
+using ServiceStack.DataAnnotations;
 using ServiceStack.Messaging;
 using ServiceStack.Messaging.Redis;
 using ServiceStack.MiniProfiler;
@@ -33,7 +32,7 @@ namespace ServiceStack.WebHost.IntegrationTests
         {
             JsConfig.EmitCamelCaseNames = true;
             Config.AdminAuthSecret = Constant.AuthSecret;
-            Config.ApiVersion = "0.2.0";
+            Config.ApiVersion = "2.0.0";
             Config.DebugMode = true;
             
             //Show StackTraces for easier debugging
@@ -139,11 +138,11 @@ namespace ServiceStack.WebHost.IntegrationTests
             container.RegisterValidators(typeof(CustomersValidator).Assembly);
 
             typeof(ResponseStatus)
-                .AddAttributes(new ServiceStack.DataAnnotations.DescriptionAttribute("This is the Response Status!"));
+                .AddAttributes(new DescriptionAttribute("This is the Response Status!"));
 
             typeof(ResponseStatus)
                .GetProperty("Message")
-               .AddAttributes(new ServiceStack.DataAnnotations.DescriptionAttribute("A human friendly error message"));
+               .AddAttributes(new DescriptionAttribute("A human friendly error message"));
 
             if (StartMqHost)
             {

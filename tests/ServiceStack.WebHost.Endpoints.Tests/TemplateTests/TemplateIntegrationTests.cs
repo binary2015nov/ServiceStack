@@ -530,6 +530,5 @@ layout: alt/alt-layout
 </body>
 </html>".NormalizeNewLines()));
         }
-
     }
 }

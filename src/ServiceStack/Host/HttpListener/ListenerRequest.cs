@@ -32,11 +32,11 @@ namespace ServiceStack.Host.HttpListener
 
         public ListenerRequest(HttpListenerContext httpContext, string operationName, RequestAttributes requestAttributes)
         {
-            this.OperationName = operationName;
-            this.RequestAttributes = requestAttributes;
             this.request = httpContext.Request;
             this.response = new ListenerResponse(httpContext.Response, this);
-
+            this.OperationName = operationName;
+            this.RequestAttributes = requestAttributes;
+       
             this.RequestPreferences = new RequestPreferences(this);
         }
 
@@ -308,7 +308,6 @@ namespace ServiceStack.Host.HttpListener
             return pathInfo;
         }
     }
-
 }
 
 #endif

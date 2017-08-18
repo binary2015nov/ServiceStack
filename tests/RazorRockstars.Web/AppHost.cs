@@ -194,5 +194,5 @@ namespace RazorRockstars.Web
                 ResolvedUrl = base.Request.ResolveAbsoluteUrl("~/resolved")
             };
         }
-   }
+    }
 }

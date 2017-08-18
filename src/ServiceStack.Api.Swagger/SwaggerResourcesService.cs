@@ -73,18 +73,14 @@ namespace ServiceStack.Api.Swagger
         public object Get(SwaggerResources request)
         {
             var basePath = base.Request.GetBaseUrl();
-
+            var operations = HostContext.Metadata;
             var result = new SwaggerResourcesResponse
             {
                 BasePath = basePath,
                 Apis = new List<SwaggerResourceRef>(),
-                ApiVersion = HostContext.Config.ApiVersion,
-                Info = new SwaggerInfo
-                {
-                    Title = HostContext.ServiceName,
-                }
+                ApiVersion = operations.ApiVersion,
+                Info = new SwaggerInfo { Title = operations.ServiceName }
             };
-            var operations = HostContext.Metadata;
             var allTypes = operations.GetAllOperationTypes();
             var allOperationNames = operations.GetAllOperationNames();
             foreach (var operationName in allOperationNames)

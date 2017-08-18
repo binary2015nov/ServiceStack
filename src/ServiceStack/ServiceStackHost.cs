@@ -33,7 +33,7 @@ namespace ServiceStack
 {
     public abstract partial class ServiceStackHost : IAppHost, IFunqlet, IHasContainer, IDisposable
     {
-        private static ILog Logger = LogManager.GetLogger(typeof(ServiceStackHost));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(ServiceStackHost));
 
         public DateTime CreateAt { get; private set; }
 
@@ -58,7 +58,6 @@ namespace ServiceStack
             ContentTypes = Host.ContentTypes.Default;
             RestPaths = new List<RestPath>();
             Routes = new ServiceRoutes(this);
-            Metadata = new ServiceMetadata(RestPaths);
             PreRequestFilters = new List<Action<IRequest, IResponse>>();
             RequestConverters = new List<Func<IRequest, object, object>>();
             ResponseConverters = new List<Func<IRequest, object, object>>();
@@ -136,19 +135,20 @@ namespace ServiceStack
         /// </summary>
         public virtual ServiceStackHost Init()
         {
-            InitAt = DateTime.UtcNow;
+            this.InitAt = DateTime.UtcNow;
             HostContext.AppHost = this;
             Platform.Instance.InitHostConifg(Config);
-            RootPath = Config.WebHostPhysicalPath;
-            Config.ServiceEndpointsMetadataConfig = ServiceEndpointsMetadataConfig.Create(Config.HandlerFactoryPath);
+            this.RootPath = Config.WebHostPhysicalPath;
+            this.Config.ServiceEndpointsMetadataConfig = ServiceEndpointsMetadataConfig.Create(Config.HandlerFactoryPath);
             JsonDataContractSerializer.Instance.UseBcl = Config.UseBclJsonSerializers;
             JsonDataContractSerializer.Instance.UseBcl = Config.UseBclJsonSerializers;
             AbstractVirtualFileBase.ScanSkipPaths = Config.ScanSkipPaths;
             ResourceVirtualDirectory.EmbeddedResourceTreatAsFiles = Config.EmbeddedResourceTreatAsFiles;
 
             OnBeforeInit();
-            Container.Register<IHashProvider>(c => new SaltedHash()).ReusedWithin(ReuseScope.None);
-            if (Config.DebugMode)
+            this.Metadata = new ServiceMetadata { ApiVersion = Config.ApiVersion, ServiceName = ServiceName };
+            this.Container.Register<IHashProvider>(c => new SaltedHash()).ReusedWithin(ReuseScope.None);
+            if (this.Config.DebugMode)
             {
                 Plugins.Add(new RequestInfoFeature());
             }
@@ -806,34 +806,27 @@ namespace ServiceStack
 
         public virtual string ResolveAbsoluteUrl(string virtualPath, IRequest httpReq)
         {
-            if (httpReq == null)
-                return (Config.WebHostUrl ?? "/").CombineWith(virtualPath.TrimStart('~'));
+            if (virtualPath.IsNullOrEmpty())      
+                return httpReq.AbsoluteUri;
 
-            return httpReq.GetAbsoluteUrl(virtualPath); //Http Listener, TODO: ASP.NET overrides
-        }
+            var baseUrl = httpReq.GetBaseUrl();
+            if (virtualPath.StartsWith("~"))
+                return baseUrl.AppendPath(virtualPath.TrimStart('~'));
 
-        public virtual bool UseHttps(IRequest httpReq)
-        {
-            return Config.UseHttpsLinks || httpReq.GetHeader(HttpHeaders.XForwardedProtocol) == "https";
+            return baseUrl.AppendPath(virtualPath);              
         }
 
         public virtual string GetBaseUrl(IRequest httpReq)
         {
-            var useHttps = UseHttps(httpReq);
-            var baseUrl = HttpHandlerFactory.GetBaseUrl();
-            if (baseUrl != null)
-                return baseUrl.NormalizeScheme(useHttps);
+            if (!Config.WebHostUrl.IsNullOrEmpty())
+                return Config.WebHostUrl;
 
-            baseUrl = httpReq.AbsoluteUri.InferBaseUrl(fromPathInfo: httpReq.PathInfo);
-            if (baseUrl != null)
-                return baseUrl.NormalizeScheme(useHttps);
+            var absoluteUri = httpReq.AbsoluteUri;
+            var index = httpReq.PathInfo.IsNullOrEmpty() || httpReq.PathInfo == "/"
+                ? absoluteUri.IndexOf("?", StringComparison.Ordinal)
+                : absoluteUri.IndexOf(httpReq.PathInfo.TrimEnd('/'), StringComparison.Ordinal);         
 
-            var handlerPath = Config.HandlerFactoryPath;
-
-            return new Uri(httpReq.AbsoluteUri).GetLeftAuthority()
-                .NormalizeScheme(useHttps)
-                .CombineWith(handlerPath)
-                .TrimEnd('/');
+            return index >= 0 ? absoluteUri.Substring(0, index) : absoluteUri;
         }
 
         public virtual string ResolvePhysicalPath(string virtualPath, IRequest httpReq)

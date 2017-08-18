@@ -214,7 +214,7 @@ namespace ServiceStack.Metadata
 
             foreach (var entry in linksMap)
             {
-                var url = entry.Key.StartsWith("#") ? entry.Key : baseUrl.CombineWith(entry.Key);
+                var url = entry.Key.StartsWith("#") ? entry.Key : baseUrl.AppendPath(entry.Key);
                 to[url] = entry.Value;
             }
 

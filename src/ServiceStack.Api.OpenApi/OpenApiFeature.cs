@@ -100,7 +100,7 @@ namespace ServiceStack.Api.OpenApi
                             res.ContentType = MimeTypes.Html;
                             var resourcesUrl = req.ResolveAbsoluteUrl("~/openapi");
                             html = html.Replace("http://petstore.swagger.io/v2/swagger.json", resourcesUrl)
-                                .Replace("ApiDocs", HostContext.ServiceName)
+                                .Replace("ApiDocs", HostContext.AppHost.ServiceName)
                                 .Replace("{LogoUrl}", LogoUrl);
 
                             if (injectJs != null)

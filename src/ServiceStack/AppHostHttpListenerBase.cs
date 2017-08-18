@@ -39,6 +39,17 @@ namespace ServiceStack
             HandlerPath = handlerPath;
         }
 
+        protected override void OnBeforeInit()
+        {
+            Config.HandlerFactoryPath = string.IsNullOrEmpty(HandlerPath)
+                ? null
+                : HandlerPath;
+
+            Config.MetadataRedirectPath = string.IsNullOrEmpty(HandlerPath)
+                ? "metadata"
+                : PathUtils.CombinePaths(HandlerPath, "metadata");
+        }
+
         protected override async Task ProcessRequestAsync(HttpListenerContext context)
         {
             if (string.IsNullOrEmpty(context.Request.RawUrl))
@@ -69,17 +80,6 @@ namespace ServiceStack
             }
 
             throw new NotImplementedException($"Cannot execute handler: {handler} at PathInfo: {httpReq.PathInfo}");
-        }
-
-        protected override void OnBeforeInit()
-        {
-            Config.HandlerFactoryPath = string.IsNullOrEmpty(HandlerPath)
-                ? null
-                : HandlerPath;
-
-            Config.MetadataRedirectPath = string.IsNullOrEmpty(HandlerPath)
-                ? "metadata"
-                : PathUtils.CombinePaths(HandlerPath, "metadata");
         }
     }
 }

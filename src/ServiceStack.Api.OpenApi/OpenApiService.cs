@@ -71,11 +71,7 @@ namespace ServiceStack.Api.OpenApi
 
             var result = new OpenApiDeclaration
             {
-                Info = new OpenApiInfo
-                {
-                    Title = HostContext.ServiceName,
-                    Version = HostContext.Config.ApiVersion,
-                },
+                Info = new OpenApiInfo { Title = meta.ServiceName, Version = meta.ApiVersion },
                 Paths = apiPaths,
                 BasePath = basePath.AbsolutePath,
                 Schemes = new List<string> { basePath.Scheme }, //TODO: get https from config

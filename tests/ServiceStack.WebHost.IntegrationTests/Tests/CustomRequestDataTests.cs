@@ -1,8 +1,6 @@
 ﻿using System.IO;
 using System.Net;
 using NUnit.Framework;
-using ServiceStack.Text;
-using ServiceStack.Web;
 
 namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
@@ -15,7 +13,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_parse_custom_form_data()
         {
-            var webReq = (HttpWebRequest)WebRequest.Create(Constant.ServiceStackBaseHost + "/customformdata?format=json");
+            var webReq = WebRequest.CreateHttp(Constant.ServiceStackBaseHost + "/customformdata?format=json");
             webReq.Method = HttpMethods.Post;
             webReq.ContentType = MimeTypes.FormUrlEncoded;
 
@@ -37,6 +35,5 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
                 Assert.Fail(errorResponse);
             }
         }
-
     }
 }

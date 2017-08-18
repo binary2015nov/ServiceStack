@@ -54,6 +54,5 @@ namespace ServiceStack.Metadata
 
             httpRes.EndHttpHandlerRequest(skipHeaders:true);
         }
-
     }
 }
