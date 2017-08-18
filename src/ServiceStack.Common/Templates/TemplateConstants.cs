@@ -10,7 +10,11 @@ namespace ServiceStack.Templates
         public const string DefaultNewLine = nameof(DefaultNewLine);
         public const string DefaultJsConfig = nameof(DefaultJsConfig);
         public const string DefaultStringComparison = nameof(DefaultStringComparison);
+        public const string DefaultTableClassName = nameof(DefaultTableClassName);
+        public const string DefaultErrorClassName = nameof(DefaultErrorClassName);
         public const string MaxQuota = nameof(MaxQuota);
+        public const string Debug = "debug";
+        public const string AssignError = "assignError";
         public const string HtmlEncode = "htmlencode";
         public const string Model = "model";
         public const string Page = "page";
@@ -20,7 +24,8 @@ namespace ServiceStack.Templates
         public const string Comparer = "comparer";
         public const string Map = "map";
         public const string Request = "Request";
-        public const string DefaultCacheExpiry = nameof(DefaultCacheExpiry);
+        public const string DefaultFileCacheExpiry = nameof(DefaultFileCacheExpiry);
+        public const string DefaultUrlCacheExpiry = nameof(DefaultUrlCacheExpiry);
 
         public static IRawString EmptyRawString { get; } = new RawString("");
         public static IRawString TrueRawString { get; } = new RawString("true");

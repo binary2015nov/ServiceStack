@@ -66,7 +66,20 @@ namespace ServiceStack.Templates
 
         public TimeSpan? CheckForModifiedPagesAfter { get; set; }
         
+        /// <summary>
+        /// Render render filter exceptions in-line where filter is located
+        /// </summary>
         public bool RenderExpressionExceptions { get; set; }
+
+        /// <summary>
+        /// What argument to assign Fitler Exceptions to
+        /// </summary>
+        public string AssignExceptionsTo { get; set; }
+        
+        /// <summary>
+        /// Whether to 
+        /// </summary>
+        public bool SkipExecutingPageFiltersIfError { get; set; }
 
         public Func<PageVariableFragment, byte[]> OnUnhandledExpression { get; set; } = DefaultOnUnhandledExpression;
 
@@ -181,11 +194,14 @@ namespace ServiceStack.Templates
             Args[TemplateConstants.DefaultDateFormat] = "yyyy-MM-dd";
             Args[TemplateConstants.DefaultDateTimeFormat] = "u";
             Args[TemplateConstants.DefaultTimeFormat] = "h\\:mm\\:ss";
-            Args[TemplateConstants.DefaultCacheExpiry] = TimeSpan.FromHours(1);
+            Args[TemplateConstants.DefaultFileCacheExpiry] = TimeSpan.FromMinutes(1);
+            Args[TemplateConstants.DefaultUrlCacheExpiry] = TimeSpan.FromMinutes(1);
             Args[TemplateConstants.DefaultIndent] = "\t";
             Args[TemplateConstants.DefaultNewLine] = Environment.NewLine;
             Args[TemplateConstants.DefaultJsConfig] = "excludetypeinfo";
             Args[TemplateConstants.DefaultStringComparison] = StringComparison.Ordinal;
+            Args[TemplateConstants.DefaultTableClassName] = "table";
+            Args[TemplateConstants.DefaultErrorClassName] = "alert alert-danger";
         }
 
         public bool HasInit { get; private set; }
@@ -195,6 +211,8 @@ namespace ServiceStack.Templates
             if (HasInit)
                 return this;
             HasInit = true;
+
+            Args[TemplateConstants.Debug] = DebugMode;
             
             Container.AddSingleton(() => this);
             Container.AddSingleton(() => Pages);

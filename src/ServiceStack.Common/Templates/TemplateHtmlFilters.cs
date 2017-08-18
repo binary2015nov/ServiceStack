@@ -24,13 +24,12 @@ namespace ServiceStack.Templates
             {
                 scopedParams.TryGetValue("className", out object parentClass);
                 scopedParams.TryGetValue("childClass", out object childClass);
-                var className = depth < childDepth
-                    ? parentClass
-                    : childClass ?? parentClass;
+                var className = ((depth < childDepth ? parentClass : childClass ?? parentClass) 
+                                 ?? Context.Args[TemplateConstants.DefaultTableClassName]).ToString();
 
                 scopedParams.TryGetValue("headerStyle", out object oHeaderStyle);
                 scopedParams.TryGetValue("headerTag", out object oHeaderTag);
-                scopedParams.TryGetValue("emptyCaption", out object emptyCaption);
+                scopedParams.TryGetValue("captionIfEmpty", out object captionIfEmpty);
                 var headerTag = oHeaderTag as string ?? "th";
                 var headerStyle = oHeaderStyle as string ?? "splitCase";
 
@@ -78,7 +77,7 @@ namespace ServiceStack.Templates
                 }
 
                 var isEmpty = sbRows.Length == 0;
-                if (isEmpty && emptyCaption == null)
+                if (isEmpty && captionIfEmpty == null)
                     return RawString.Empty;
 
                 var htmlHeaders = StringBuilderCache.Retrieve(sbHeader);
@@ -89,14 +88,14 @@ namespace ServiceStack.Templates
 
                 if (scopedParams.TryGetValue("id", out object id))
                     sb.Append(" id=\"").Append(id).Append("\"");
-                if (className != null)
+                if (!string.IsNullOrEmpty(className))
                     sb.Append(" class=\"").Append(className).Append("\"");
 
                 sb.Append(">");
 
                 scopedParams.TryGetValue("caption", out object caption);
                 if (isEmpty)
-                    caption = emptyCaption;
+                    caption = captionIfEmpty;
 
                 if (caption != null)
                     sb.Append("<caption>").Append(caption.ToString().HtmlEncode()).Append("</caption>");
@@ -130,19 +129,20 @@ namespace ServiceStack.Templates
                 if (!isComplexType(target))
                     return GetScalarHtml(target).ToRawString();
 
-                scopedParams.TryGetValue("emptyCaption", out object emptyCaption);
+                scopedParams.TryGetValue("captionIfEmpty", out object captionIfEmpty);
+                scopedParams.TryGetValue("headerStyle", out object oHeaderStyle);
                 scopedParams.TryGetValue("className", out object parentClass);
                 scopedParams.TryGetValue("childClass", out object childClass);
-                var className = depth < childDepth
-                    ? parentClass
-                    : childClass ?? parentClass;
+                var headerStyle = oHeaderStyle as string ?? "splitCase";
+                var className = ((depth < childDepth ? parentClass : childClass ?? parentClass) 
+                                 ?? Context.Args[TemplateConstants.DefaultTableClassName]).ToString();
 
                 if (target is IEnumerable e)
                 {
                     var objs = e.Map(x => x);
 
                     var isEmpty = objs.Count == 0;
-                    if (isEmpty && emptyCaption == null)
+                    if (isEmpty && captionIfEmpty == null)
                         return RawString.Empty;
 
                     var first = !isEmpty ? objs[0] : null;
@@ -162,7 +162,7 @@ namespace ServiceStack.Templates
 
                     scopedParams.TryGetValue("caption", out object caption);
                     if (isEmpty)
-                        caption = emptyCaption;
+                        caption = captionIfEmpty;
 
                     if (caption != null)
                         sb.Append("<caption>").Append(caption.ToString().HtmlEncode()).Append("</caption>");
@@ -179,7 +179,7 @@ namespace ServiceStack.Templates
                                 {
                                     sb.Append("<tr>");
                                     sb.Append("<th>");
-                                    sb.Append(kvp.Key.HtmlEncode());
+                                    sb.Append(Context.DefaultFilters?.textStyle(kvp.Key, headerStyle)?.HtmlEncode());
                                     sb.Append("</th>");
                                     sb.Append("<td>");
                                     if (!isComplexType(kvp.Value))
@@ -291,6 +291,63 @@ namespace ServiceStack.Templates
         private static bool isComplexType(object first)
         {
             return !(first == null || first is string || first.GetType().IsValueType());
+        }
+
+        public IRawString htmlError(TemplateScopeContext scope) => htmlError(scope.PageResult.LastFilterError);
+        [HandleUnknownValue] public IRawString htmlError(Exception ex) => htmlError(ex, null);
+        [HandleUnknownValue] public IRawString htmlError(Exception ex, object options) => 
+            Context.DebugMode ? htmlErrorDebug(ex, options) : htmlErrorMessage(ex, options);
+
+        public IRawString htmlErrorMessage(TemplateScopeContext scope) => htmlErrorMessage(scope.PageResult.LastFilterError);
+        [HandleUnknownValue] public IRawString htmlErrorMessage(Exception ex) => htmlErrorMessage(ex, null);
+        [HandleUnknownValue] public IRawString htmlErrorMessage(Exception ex, object options)
+        {
+            if (ex == null)
+                return RawString.Empty;
+
+            var scopedParams = options as Dictionary<string, object> ?? TypeConstants.EmptyObjectDictionary;
+            var className = (scopedParams.TryGetValue("className", out object oClassName) ? oClassName : null) 
+                            ?? Context.Args[TemplateConstants.DefaultErrorClassName];
+           
+            return $"<div class=\"{className}\">{ex.Message}</div>".ToRawString();
+        }
+
+        public IRawString htmlErrorDebug(TemplateScopeContext scope) => htmlErrorDebug(scope.PageResult.LastFilterError);
+        [HandleUnknownValue] public IRawString htmlErrorDebug(Exception ex) => htmlErrorDebug(ex, null);
+        [HandleUnknownValue] public IRawString htmlErrorDebug(Exception ex, object options)
+        {
+            if (ex == null)
+                return RawString.Empty;
+
+            var scopedParams = options as Dictionary<string, object> ?? TypeConstants.EmptyObjectDictionary;
+            var className = (scopedParams.TryGetValue("className", out object oClassName) ? oClassName : null) 
+                            ?? Context.Args[TemplateConstants.DefaultErrorClassName];
+
+            var sb = StringBuilderCache.Allocate();
+            sb.Append($"<pre class=\"{className}\">");
+            sb.AppendLine($"{ex.GetType().Name}: {ex.Message}");
+
+            sb.AppendLine();
+            sb.AppendLine("StackTrace:");
+            sb.AppendLine(ex.StackTrace);
+
+            if (ex.InnerException != null)
+            {
+                sb.AppendLine();
+                sb.AppendLine("Inner Exceptions:");
+                var innerEx = ex.InnerException;
+                while (innerEx != null)
+                {
+                    sb.AppendLine($"{innerEx.GetType().Name}: {innerEx.Message}");
+                    if (Context.DebugMode)
+                        sb.AppendLine(innerEx.StackTrace);
+                    innerEx = innerEx.InnerException;
+                    ;
+                }
+            }
+            sb.AppendLine("</pre>");
+            var html = StringBuilderCache.ReturnAndFree(sb);
+            return html.ToRawString();
         }
     }
 }
