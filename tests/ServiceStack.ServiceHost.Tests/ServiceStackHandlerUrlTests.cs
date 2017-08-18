@@ -88,6 +88,8 @@ namespace ServiceStack.ServiceHost.Tests
             public IHttpFile[] Files { get; private set; }
 
             public string ApplicationFilePath { get; private set; }
+
+            public string PhysicalPath { get; private set; }
         }
 
         readonly List<MockUrlHttpRequest> allResults = new List<MockUrlHttpRequest> {

@@ -125,5 +125,7 @@ namespace ServiceStack.Web
         /// The value of the Referrer, null if not available
         /// </summary>
         Uri UrlReferrer { get; }
+
+        string PhysicalPath { get; }
     }
 }

@@ -148,6 +148,9 @@ namespace ServiceStack.Host.HttpListener
             }
         }
 
+        private string physicalPath;
+        public string PhysicalPath => physicalPath ?? (physicalPath = this.GetPhysicalPath());
+
         private Dictionary<string, Cookie> cookies;
         public IDictionary<string, Cookie> Cookies
         {

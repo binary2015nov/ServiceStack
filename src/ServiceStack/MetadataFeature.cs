@@ -10,7 +10,7 @@ namespace ServiceStack
     {
         public const string PluginLinks = "Plugin Links";
         public const string DebugInfo = "Debug Info";
-        public const string Features = "Features";
+        public const string EnabledFeatures = "EnabledFeatures";
 
         public Dictionary<string, Dictionary<string, string>> Sections { get; private set; }
 
@@ -33,14 +33,17 @@ namespace ServiceStack
 
         public virtual IHttpHandler ProcessRequest(string httpMethod, string pathInfo, string filePath)
         {
-            var pathArray = pathInfo.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-            if (pathArray.Length == 0)
+            if (pathInfo.IsNullOrEmpty())
                 return null;
-            return GetHandlerForPathParts(pathArray);
+
+            return GetHandlerForPathParts(pathInfo.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries));
         }
 
         private IHttpHandler GetHandlerForPathParts(string[] pathParts)
         {
+            if (pathParts == null || pathParts.Length == 0)
+                return null;
+
             var pathController = pathParts[0].ToLowerInvariant();
             if (pathParts.Length == 1)
             {

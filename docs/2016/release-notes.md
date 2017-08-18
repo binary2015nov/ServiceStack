@@ -1956,7 +1956,7 @@ To avoid repetitive noise in each Metadata Operation Page the common `ResposneSt
 you prefer they can now be enabled with:
 
 ```csharp
-this.GetPlugin<MetadataFeature>().ShowResponseStatusInMetadataPages = true;
+this.GetPlugin<MetadataFeature>()?.ShowResponseStatusInMetadataPages = true;
 ```
 
 ## [AutoQuery](https://github.com/ServiceStack/ServiceStack/wiki/Auto-Query)

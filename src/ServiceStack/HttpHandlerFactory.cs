@@ -87,18 +87,19 @@ namespace ServiceStack
             }
             else
             {
-                IHttpHandler metadataHandler;
-                if (AppHostConfig.MetadataRedirectPath.IsNullOrEmpty())
+                var metadataHandler = AppHostConfig.MetadataRedirectPath.IsNullOrEmpty()
+                    ? new IndexPageHttpHandler() as IHttpHandler
+                    : new RedirectHttpHandler { RelativeUrl = AppHostConfig.MetadataRedirectPath };
+               
+                if (hostedAtRootPath)
                 {
-                    metadataHandler = new IndexPageHttpHandler();
+                    if (DefaultHttpHandler == null)
+                        DefaultHttpHandler = metadataHandler;
                 }
                 else
                 {
-                    metadataHandler = new RedirectHttpHandler { RelativeUrl = AppHostConfig.MetadataRedirectPath };
+                    NonRootModeDefaultHttpHandler = metadataHandler;
                 }
-                if (DefaultHttpHandler == null)
-                    DefaultHttpHandler = hostedAtRootPath ? metadataHandler : NotFoundHttpHandler;
-                NonRootModeDefaultHttpHandler = metadataHandler;
             }
 
             var defaultRedirectHanlder = DefaultHttpHandler as RedirectHttpHandler;
@@ -150,7 +151,7 @@ namespace ServiceStack
 
             string location = AppHostConfig.HandlerFactoryPath;
             string pathInfo = httpReq.PathInfo;
-            string physicalPath = httpReq.GetPhysicalPath();
+            string physicalPath = httpReq.PhysicalPath;
             lastHandlerArgs = httpReq.Verb + "|" + httpReq.RawUrl + "|" + physicalPath;
 
             //Default Request /

@@ -430,7 +430,7 @@ namespace ServiceStack
             if (!HasFeature(usesFeatures))
             {
                 throw new UnauthorizedAccessException(
-                    $"'{usesFeatures}' Features have been disabled by your administrator");
+                    $"'{usesFeatures}' EnabledFeatures have been disabled by your administrator");
             }
         }
 

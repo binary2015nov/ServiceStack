@@ -156,5 +156,7 @@ namespace ServiceStack.Testing
         }
 
         public Uri UrlReferrer => null;
+
+        public string PhysicalPath { get; set; }
     }
 }

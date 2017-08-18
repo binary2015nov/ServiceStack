@@ -412,13 +412,13 @@ namespace ServiceStack
             Config.PreferredContentTypes.Insert(0, Config.DefaultContentType);
 
             MetadataFeature metadataFeature = GetPlugin<MetadataFeature>();
-            metadataFeature?.AddSection(MetadataFeature.Features);
+            metadataFeature?.AddSection(MetadataFeature.EnabledFeatures);
             foreach (var plugin in Plugins)
             {
                 try
                 {
                     string title = plugin.GetType().Name;
-                    metadataFeature?.AddLink(MetadataFeature.Features, "#" + title, title);
+                    metadataFeature?.AddLink(MetadataFeature.EnabledFeatures, "#" + title, title);
                     var preInitPlugin = plugin as IPostInitPlugin;
                     if (preInitPlugin != null)
                     {

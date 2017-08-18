@@ -75,7 +75,7 @@ namespace ServiceStack.Api.Swagger
                 : "swagger-ui/";
 
             appHost.GetPlugin<MetadataFeature>()
-                .AddPluginLink(swaggerUrl, "Swagger UI");
+                ?.AddLink(MetadataFeature.PluginLinks, swaggerUrl, "Swagger UI");
 
             appHost.CatchAllHandlers.Add((httpMethod, pathInfo, filePath) =>
             {
@@ -109,9 +109,9 @@ namespace ServiceStack.Api.Swagger
                         var resourcesUrl = req.ResolveAbsoluteUrl("~/resources");
                         var logoHref = LogoHref ?? "./";
                         html = html.Replace("http://petstore.swagger.io/v2/swagger.json", resourcesUrl)
-                            .Replace("ApiDocs", HostContext.ServiceName)
+                            .Replace("ApiDocs", HostContext.AppHost.ServiceName)
                             .Replace("{LogoUrl}", LogoUrl)
-                            .Replace("<a id=\"logo\" href=\"http://swagger.io\">swagger</a>", $"<a id=\"logo\" href=\"{logoHref}\">{HostContext.ServiceName}</a>");
+                            .Replace("<a id=\"logo\" href=\"http://swagger.io\">swagger</a>", $"<a id=\"logo\" href=\"{logoHref}\">{HostContext.AppHost.ServiceName}</a>");
 
                         if (injectJs != null)
                         {

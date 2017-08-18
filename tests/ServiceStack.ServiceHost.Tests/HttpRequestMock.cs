@@ -184,5 +184,7 @@ namespace ServiceStack.ServiceHost.Tests
         {
             get { throw new NotImplementedException(); }
         }
+
+        public string PhysicalPath => throw new NotImplementedException();
     }
 }

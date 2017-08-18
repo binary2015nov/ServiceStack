@@ -287,6 +287,9 @@ namespace ServiceStack.Host.AspNet
         }
 
         public Uri UrlReferrer => request.UrlReferrer;
+
+        private string physicalPath;
+        public string PhysicalPath => physicalPath ?? (physicalPath = this.GetPhysicalPath());
     }
 }
 

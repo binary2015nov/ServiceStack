@@ -1,5 +1,4 @@
 #if !NETSTANDARD1_6
-using System;
 using System.Reflection;
 using System.Web;
 using ServiceStack.Host.AspNet;
@@ -16,15 +15,6 @@ namespace ServiceStack
         protected AppHostBase(string serviceName, params Assembly[] assembliesWithServices)
             : base(serviceName, assembliesWithServices)
         { }
-
-        //public override string ResolveAbsoluteUrl(string virtualPath, IRequest request)
-        //{
-        //    if (request == null)
-        //        return (Config.WebHostUrl ?? "/").CombineWith(virtualPath.TrimStart('~'));
-
-        //    virtualPath = virtualPath.SanitizedVirtualPath();
-        //    return base.ResolveAbsoluteUrl(virtualPath, request);
-        //}
 
         public override string ResolvePhysicalPath(string virtualPath, IRequest request)
         {
@@ -51,29 +41,6 @@ namespace ServiceStack
         {
             return relativePath.MapHostAbsolutePath();
         }
-
-        //public override string GetBaseUrl(IRequest httpReq)
-        //{
-        //    var useHttps = UseHttps(httpReq);
-        //    var baseUrl = Config.WebHostUrl;
-        //    if (baseUrl != null)
-        //        return baseUrl.NormalizeScheme(useHttps);
-
-        //    baseUrl = httpReq.AbsoluteUri.InferBaseUrl(fromPathInfo: httpReq.PathInfo);
-        //    if (baseUrl != null)
-        //        return baseUrl.NormalizeScheme(useHttps);
-
-        //    var handlerPath = Config.HandlerFactoryPath;
-
-        //    var aspReq = (HttpRequestBase)httpReq.OriginalRequest;
-        //    baseUrl = aspReq.Url.Scheme + "://" + aspReq.Url.Authority +
-        //              aspReq.ApplicationPath?.TrimEnd('/') + "/";
-
-        //    return baseUrl
-        //        .NormalizeScheme(useHttps)
-        //        .CombineWith(handlerPath)
-        //        .TrimEnd('/');
-        //}
     }
 }
 #endif

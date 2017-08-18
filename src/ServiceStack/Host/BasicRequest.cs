@@ -101,6 +101,8 @@ namespace ServiceStack.Host
 
         public string PathInfo { get; set; }
 
+        public string PhysicalPath { get; set; }
+
         public IHttpFile[] Files { get; set; }
         
         public Uri UrlReferrer { get; set; }

@@ -267,6 +267,8 @@ namespace ServiceStack.Host.NetCore
             }
         }
 
+        public string PhysicalPath { get; set; }
+
         public IHttpResponse HttpResponse { get; }
 
         private string httpMethod;
