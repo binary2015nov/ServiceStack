@@ -304,7 +304,7 @@ namespace ServiceStack.Razor
         public string RenderToHtml(RazorPage razorPage, out IRazorView razorView, object model = null, string layout = null)
         {
             if (razorPage == null)
-                throw new ArgumentNullException("razorPage");
+                throw new ArgumentNullException(nameof(razorPage));
 
             var httpReq = new BasicRequest();
             if (layout != null)

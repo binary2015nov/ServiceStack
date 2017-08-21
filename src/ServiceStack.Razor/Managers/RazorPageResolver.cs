@@ -235,7 +235,7 @@ namespace ServiceStack.Razor.Managers
             var pageCompileEx = razorPage.CompileException;
             if (pageCompileEx != null)
             {
-                if (Text.Env.IsMono)
+                if (Env.IsMono)
                 {
                     //Additional debug info Working around not displaying default exception in IHttpAsyncHandler
                     var errors = pageCompileEx.Results.Errors;

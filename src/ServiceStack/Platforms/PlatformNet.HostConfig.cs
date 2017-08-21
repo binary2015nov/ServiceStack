@@ -18,10 +18,17 @@ namespace ServiceStack
         public override void InitHostConifg(HostConfig config)
         {
             base.InitHostConifg(config);
-            if (config.HandlerFactoryPath == null)
+            if (HostContext.IsAspNetHost)
             {
-                InferHttpHandlerPath(config);
+                var httpHandlerPath = InferHttpHandlerPath();
+                if (httpHandlerPath == null)
+                    throw new ConfigurationErrorsException("Unable to infer ServiceStack's <httpHandler.Path/> from your application's configuration file.\n"
+                        + "Check with https://github.com/ServiceStack/ServiceStack/wiki/Create-your-first-webservice to ensure you have configured ServiceStack properly.\n"
+                        + "Otherwise you can explicitly set your httpHandler.Path by setting: HostConfig.HandlerFactoryPath.");
+
+                config.HandlerFactoryPath = httpHandlerPath;
             }
+                
         }
 
         public override HashSet<string> GetRazorNamespaces()
@@ -68,133 +75,77 @@ namespace ServiceStack
             return File.Exists(configPath) ? configPath : null;
         }
 
-        private static System.Configuration.Configuration GetAppConfig()
-        {
-            Assembly entryAssembly;
-
-            //Read the user-defined path in the Web.Config
-            if (HostContext.IsAspNetHost)
-                return WebConfigurationManager.OpenWebConfiguration("~/");
-
-            if ((entryAssembly = Assembly.GetEntryAssembly()) != null)
-                return ConfigurationManager.OpenExeConfiguration(entryAssembly.Location);
-
-            return null;
-        }
-
-        private static void InferHttpHandlerPath(HostConfig config)
-        {
-            try
+        public static string InferHttpHandlerPath()
+        {              
+            var appConfig = WebConfigurationManager.OpenWebConfiguration("~/");
+            foreach (ConfigurationLocation locationConfigLocation in appConfig.Locations)
             {
-                var webConfig = GetAppConfig();
-                if (webConfig == null) return;
-
-                SetPathsFromConfiguration(config, webConfig, null);
-
-                if (config.MetadataRedirectPath == null)
+                var handlerPath = GetHandlerPathFromConfiguration(locationConfigLocation.OpenConfiguration());
+                if (handlerPath != null)
                 {
-                    foreach (ConfigurationLocation location in webConfig.Locations)
-                    {
-                        SetPathsFromConfiguration(config, location.OpenConfiguration(), (location.Path ?? "").ToLower());
-
-                        if (config.MetadataRedirectPath != null) { break; }
-                    }
-                }
-
-                if (HostContext.IsAspNetHost && config.MetadataRedirectPath == null)
-                {
-                    throw new ConfigurationErrorsException(
-                        "Unable to infer ServiceStack's <httpHandler.Path/> from the Web.Config\n"
-                        + "Check with https://github.com/ServiceStack/ServiceStack/wiki/Create-your-first-webservice to ensure you have configured ServiceStack properly.\n"
-                        + "Otherwise you can explicitly set your httpHandler.Path by setting: EndpointHostConfig.ServiceStackPath");
+                    return CombineHandlerFactoryPath(locationConfigLocation.Path, handlerPath);
                 }
             }
-            catch (Exception) { }
+            var combinedPath = GetHandlerPathFromConfiguration(appConfig);
+            //In some MVC Hosts auto-inferencing doesn't work, in these cases assume the most likely default of "/api" path
+            //var isMvcHost = Type.GetType("System.Web.Mvc.Controller") != null;
+            //if (isMvcHost)
+            //{
+            //   combinedPath = CombineHandlerFactoryPath("api", null);
+            //}
+            return combinedPath;
         }
 
-        private static void SetPathsFromConfiguration(HostConfig config, System.Configuration.Configuration webConfig, string locationPath)
+        public static string GetHandlerPathFromConfiguration(System.Configuration.Configuration configuration)
         {
-            if (webConfig == null)
-                return;
-
-            //standard config
-            var handlersSection = webConfig.GetSection("system.web/httpHandlers") as HttpHandlersSection;
-            if (handlersSection != null)
-            {
-                for (var i = 0; i < handlersSection.Handlers.Count; i++)
-                {
-                    var httpHandler = handlersSection.Handlers[i];
-                    if (!httpHandler.Type.StartsWith("ServiceStack"))
-                        continue;
-
-                    SetPaths(config, httpHandler.Path, locationPath);
-                    break;
-                }
-            }
-
             //IIS7+ integrated mode system.webServer/handlers
-            var pathsNotSet = config.MetadataRedirectPath == null;
-            if (pathsNotSet)
+            if (Platform.IsIntegratedPipeline)
             {
-                var webServerSection = webConfig.GetSection("system.webServer");
+                var webServerSection = configuration.GetSection("system.webServer");
                 var rawXml = webServerSection?.SectionInformation.GetRawXml();
-                if (!string.IsNullOrEmpty(rawXml))
+                if (!rawXml.IsNullOrEmpty())
+                    return ExtractHandlerPathFromWebServerConfigurationXml(rawXml);            
+            }
+            else
+            {
+                //standard config
+                var handlersSection = configuration.GetSection("system.web/httpHandlers") as HttpHandlersSection;
+                if (handlersSection != null)
                 {
-                    SetPaths(config, ExtractHandlerPathFromWebServerConfigurationXml(rawXml), locationPath);
-                }
-
-                //In some MVC Hosts auto-inferencing doesn't work, in these cases assume the most likely default of "/api" path
-                pathsNotSet = config.MetadataRedirectPath == null;
-                if (pathsNotSet)
-                {
-                    var isMvcHost = Type.GetType("System.Web.Mvc.Controller") != null;
-                    if (isMvcHost)
+                    for (var i = 0; i < handlersSection.Handlers.Count; i++)
                     {
-                        SetPaths(config, "api", null);
+                        var httpHandler = handlersSection.Handlers[i];
+                        if (!httpHandler.Type.StartsWith("ServiceStack"))
+                            continue;
+
+                        return httpHandler.Path;
                     }
                 }
             }
+            return null;
         }
 
         private static string ExtractHandlerPathFromWebServerConfigurationXml(string rawXml)
         {
-            try
-            {
-                return XDocument.Parse(rawXml).Root.Element("handlers")
-                    ?.Descendants("add")
-                    ?.Where(handler => EnsureHandlerTypeAttribute(handler).StartsWith("ServiceStack"))
-                    .Select(handler => handler.Attribute("path").Value)
-                    .FirstOrDefault();
-            }
-            catch (Exception ex)
-            {
-                HostContext.AppHost?.OnStartupException(ex);
-                return null;
-            }
+            return XDocument.Parse(rawXml).Root.Element("handlers")
+                ?.Descendants("add")
+                ?.Where(handler => EnsureHandlerTypeAttribute(handler).StartsWith("ServiceStack"))
+                .Select(handler => handler.Attribute("path").Value)
+                .FirstOrDefault();  
         }
 
         private static string EnsureHandlerTypeAttribute(XElement handler)
         {
-            if (handler.Attribute("type") != null && !String.IsNullOrEmpty(handler.Attribute("type").Value))
+            if (handler.Attribute("type") != null && !string.IsNullOrEmpty(handler.Attribute("type").Value))
             {
                 return handler.Attribute("type").Value;
             }
             return string.Empty;
         }
 
-        private static void SetPaths(HostConfig config, string handlerPath, string locationPath)
+        private static string CombineHandlerFactoryPath(string locationPath, string handlerPath)
         {
-            if (handlerPath == null) return;
-
-            if (locationPath == null)
-            {
-                handlerPath = handlerPath.Replace("*", string.Empty);
-            }
-
-            config.HandlerFactoryPath = locationPath ??
-                (string.IsNullOrEmpty(handlerPath) ? null : handlerPath);
-
-            config.MetadataRedirectPath = "~/metadata";
+            return locationPath.AppendPath(handlerPath.Replace("*", string.Empty)).Trim('/');
         }
     }
 }

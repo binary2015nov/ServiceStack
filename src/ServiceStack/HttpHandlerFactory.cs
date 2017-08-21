@@ -23,20 +23,11 @@ namespace ServiceStack
         private static IHttpHandler ForbiddenHttpHandler;
         private static IHttpHandler NotFoundHttpHandler;
         private static readonly IHttpHandler StaticFilesHandler = new StaticFileHandler();
-        private static bool IsIntegratedPipeline;
         private static bool HostAutoRedirectsDirs;
         protected static HostConfig AppHostConfig;
 
         internal static void Init()
         {
-#if !NETSTANDARD1_6
-            //MONO doesn't implement this property
-            var pi = typeof(HttpRuntime).GetProperty("UsingIntegratedPipeline");
-            if (pi != null)
-            {
-                IsIntegratedPipeline = (bool) pi.GetGetMethod().Invoke(null, TypeConstants.EmptyObjectArray);
-            }
-#endif
             var appHost = HostContext.AppHost;
             AppHostConfig = appHost.Config;
 
@@ -52,7 +43,7 @@ namespace ServiceStack
             var hostedAtRootPath = AppHostConfig.HandlerFactoryPath == null;
 
             //DefaultHttpHandler not supported in IntegratedPipeline mode
-            if (!IsIntegratedPipeline && isAspNetHost && !hostedAtRootPath && !Env.IsMono)
+            if (!Platform.IsIntegratedPipeline && isAspNetHost && !hostedAtRootPath && !Env.IsMono)
                 DefaultHttpHandler = new DefaultHttpHandler();
 
             var rootFiles = appHost.VirtualFileSources.GetRootFiles().ToList();
@@ -109,7 +100,7 @@ namespace ServiceStack
 
             ForbiddenHttpHandler = appHost.GetCustomErrorHttpHandler(HttpStatusCode.Forbidden) ?? new ForbiddenHttpHandler
             {
-                IsIntegratedPipeline = IsIntegratedPipeline,
+                IsIntegratedPipeline = Platform.IsIntegratedPipeline,
                 WebHostPhysicalPath = WebHostPhysicalPath,
                 WebHostRootFileNames = WebHostRootFileNames,
                 WebHostUrl = AppHostConfig.WebHostUrl,
@@ -119,7 +110,7 @@ namespace ServiceStack
             
             NotFoundHttpHandler = appHost.GetCustomErrorHttpHandler(HttpStatusCode.NotFound) ?? new NotFoundHttpHandler
             {
-                IsIntegratedPipeline = IsIntegratedPipeline,
+                IsIntegratedPipeline = Platform.IsIntegratedPipeline,
                 WebHostPhysicalPath = WebHostPhysicalPath,
                 WebHostRootFileNames = WebHostRootFileNames,
                 WebHostUrl = AppHostConfig.WebHostUrl,
@@ -171,8 +162,8 @@ namespace ServiceStack
                 }
 
                 //e.g. CatchAllHandler to Process Markdown files
-                var catchAllHandler = GetCatchAllHandlerIfAny(httpReq.HttpMethod, pathInfo, physicalPath);
-                if (catchAllHandler != null) return catchAllHandler;
+                //var catchAllHandler = GetCatchAllHandlerIfAny(httpReq.HttpMethod, pathInfo, physicalPath);
+                //if (catchAllHandler != null) return catchAllHandler;
 
                 if (location.IsNullOrEmpty())
                     return DefaultHttpHandler;

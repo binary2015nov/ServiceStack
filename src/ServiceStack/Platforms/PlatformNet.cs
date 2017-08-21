@@ -1,12 +1,18 @@
 ﻿#if !NETSTANDARD1_6
-using System;
-using System.Collections.Generic;
 
 namespace ServiceStack
 {
     public partial class PlatformNet : Platform
     {
-
+        public PlatformNet()
+        {
+            //MONO doesn't implement this property
+            var pi = typeof(System.Web.HttpRuntime).GetProperty("UsingIntegratedPipeline");
+            if (pi != null)
+            {
+                IsIntegratedPipeline = (bool) pi.GetGetMethod().Invoke(null, TypeConstants.EmptyObjectArray);
+            }
+        }
     }
 }
 

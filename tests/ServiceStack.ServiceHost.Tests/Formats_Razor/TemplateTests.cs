@@ -164,7 +164,7 @@ namespace ServiceStack.ServiceHost.Tests.Formats_Razor
         [Test]
         public void Can_Use_HtmlHelper_In_Page()
         {
-            const string pageSource = "@Html.TextBox(\"textBox\")";
+            string pageSource = "@Html.TextBox(\"textBox\")";
             var page = RazorFormat.CreatePage(pageSource);
 
             var output = RazorFormat.RenderToHtml(page, model: templateArgs);

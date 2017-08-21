@@ -23,7 +23,7 @@ namespace ServiceStack.Host
 
     public class ServiceController : IServiceController
     {
-        private static ILog Logger = LogManager.GetLogger(typeof(ServiceController));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(ServiceController));
 
         private readonly ServiceStackHost appHost;
 
@@ -89,7 +89,7 @@ namespace ServiceStack.Host
             if (!serviceActionMap.TryGetValue(serviceType, out actionMap))
             {
                 var serviceExecDef = typeof(ServiceExec<>).MakeGenericType(serviceType);
-                serviceExecDef.GetMethod("Reset", BindingFlags.Public | BindingFlags.Static).Invoke(null, new object[] { });
+                serviceExecDef.GetMethod("Reset", BindingFlags.Public | BindingFlags.Static).Invoke(null, new object[] { appHost });
 
                 var property = serviceExecDef.GetProperty("ActionMap", BindingFlags.Public | BindingFlags.Static);
                 actionMap = property.GetValue(null) as Dictionary<Type, List<ActionContext>>;

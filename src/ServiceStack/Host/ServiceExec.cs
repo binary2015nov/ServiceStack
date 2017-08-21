@@ -25,7 +25,7 @@ namespace ServiceStack.Host
 
         private static Dictionary<string, InstanceExecFn> execMap;
 
-        public static void Reset()
+        public static void Reset(IAppHost appHost)
         {
             ActionMap = new Dictionary<Type, List<ActionContext>>();
             execMap = new Dictionary<string, InstanceExecFn>();
@@ -92,18 +92,12 @@ namespace ServiceStack.Host
             }
             foreach (var item in ActionMap)
             {
-                MethodInfo methodInfo = typeof(ServiceExec<>).MakeGenericType(typeof(TService)).
-                    GetMethod("CreateServiceRunnersFor", BindingFlags.NonPublic | BindingFlags.Static).MakeGenericMethod(item.Key);
-                methodInfo.Invoke(null, new object[] { item.Value });
-            }
-        }
-
-        private static void CreateServiceRunnersFor<TRequest>(IEnumerable<ActionContext> collection)
-        {
-            foreach (var actionCtx in collection)
-            {
-                var serviceRunner = HostContext.CreateServiceRunner<TRequest>(actionCtx);
-                execMap[actionCtx.Id] = serviceRunner.Process;
+                var mi = appHost.GetType().GetMethod("CreateServiceRunner", BindingFlags.Public | BindingFlags.Instance).MakeGenericMethod(item.Key);
+                foreach (var actionCtx in item.Value)
+                {
+                    var serviceRunner = (IServiceRunner)mi.Invoke(appHost, new object[] { actionCtx });
+                    execMap[actionCtx.Id] = serviceRunner.Process;
+                }
             }
         }
 

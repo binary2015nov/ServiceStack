@@ -36,37 +36,16 @@ namespace ServiceStack
             if (pathInfo.IsNullOrEmpty())
                 return null;
 
-            return GetHandlerForPathParts(pathInfo.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries));
-        }
-
-        private IHttpHandler GetHandlerForPathParts(string[] pathParts)
-        {
-            if (pathParts == null || pathParts.Length == 0)
+            string metadata = HostContext.Config.MetadataRedirectPath.IsNullOrEmpty()
+                ? "/metadata"
+                : "/" + HostContext.Config.MetadataRedirectPath.TrimStart('/');
+            if (pathInfo.Equals(metadata, StringComparison.OrdinalIgnoreCase))
+                return new IndexMetadataHandler();
+            var pathArray = pathInfo.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+            if (pathArray.Length != 2 || !pathArray[1].Equals("metadata"))
                 return null;
-
-            var pathController = pathParts[0].ToLowerInvariant();
-            if (pathParts.Length == 1)
-            {
-                if (pathController == "metadata")
-                    return new IndexMetadataHandler();
-
-                return null;
-            }
-
-            var pathAction = pathParts[1].ToLowerInvariant();
-#if !NETSTANDARD1_6
-            if (pathAction == "wsdl")
-            {
-                if (pathController == "soap11")
-                    return new Soap11WsdlMetadataHandler();
-                if (pathController == "soap12")
-                    return new Soap12WsdlMetadataHandler();
-            }
-#endif
-
-            if (pathAction != "metadata") return null;
-
-            switch (pathController)
+                ;
+            switch (pathArray[0])
             {
                 case "json":
                     return new JsonMetadataHandler();
@@ -92,15 +71,13 @@ namespace ServiceStack
 
                 default:
                     string contentType;
-                    if (HostContext.ContentTypes
-                        .ContentTypeFormats.TryGetValue(pathController, out contentType))
+                    if (HostContext.ContentTypes.ContentTypeFormats.TryGetValue(pathArray[0], out contentType))
                     {
                         var format = ContentFormat.GetContentFormat(contentType);
                         return new CustomMetadataHandler(contentType, format);
                     }
-                    break;
+                    return null;
             }
-            return null;
         }
 
         public void AddSection(string sectionName)

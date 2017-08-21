@@ -207,7 +207,6 @@ namespace ServiceStack.ServiceHost.Tests.Formats
             Assert.That(html, Is.EqualTo(expectedHtml));
         }
     }
-
 }
 
 

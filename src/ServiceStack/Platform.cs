@@ -14,6 +14,7 @@ namespace ServiceStack
 #else
             new PlatformNet();
 #endif
+        public static bool IsIntegratedPipeline { get; protected set; }
 
         public virtual HashSet<string> GetRazorNamespaces()
         {

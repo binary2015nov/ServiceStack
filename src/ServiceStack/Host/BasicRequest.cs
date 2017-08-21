@@ -33,7 +33,6 @@ namespace ServiceStack.Host
             Message = message ?? new Message();
             ContentType = this.ResponseContentType = MimeTypes.Json;
             this.Headers = PclExportClient.Instance.NewNameValueCollection();
-
             if (Message.Body != null)
             {
                 PathInfo = "/json/oneway/" + OperationName;

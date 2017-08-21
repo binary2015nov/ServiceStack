@@ -52,6 +52,7 @@ namespace ServiceStack
             CreateAt = DateTime.UtcNow;
             ServiceName = serviceName;
             ServiceAssemblies = assembliesWithServices;
+            Metadata = new ServiceMetadata();
             Config = new HostConfig();
             AppSettings = new AppSettings();
             Container = new Container { DefaultOwner = Owner.External };
@@ -146,7 +147,8 @@ namespace ServiceStack
             ResourceVirtualDirectory.EmbeddedResourceTreatAsFiles = Config.EmbeddedResourceTreatAsFiles;
 
             OnBeforeInit();
-            this.Metadata = new ServiceMetadata { ApiVersion = Config.ApiVersion, ServiceName = ServiceName };
+            this.Metadata.ApiVersion = Config.ApiVersion;
+            this.Metadata.ServiceName = ServiceName;
             this.Container.Register<IHashProvider>(c => new SaltedHash()).ReusedWithin(ReuseScope.None);
             if (this.Config.DebugMode)
             {
