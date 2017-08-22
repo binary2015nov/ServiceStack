@@ -434,6 +434,24 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
             return i == 0 ? literal : literal.Subsegment(i < literal.Length ? i : literal.Length);
         }
 
+        internal static string StripQuotes(this StringSegment arg) => arg.HasValue ? StripQuotes(arg.Value) : string.Empty;
+        internal static string StripQuotes(this string arg)
+        {
+            if (arg == null || arg.Length < 2)
+                return arg;
+
+            switch (arg[0])
+            {
+                case '"':
+                case '`':
+                case '\'':
+                case '′':
+                    return arg.Substring(1, arg.Length - 2);
+            }
+
+            return arg;
+        }
+
         public static StringSegment AdvancePastChar(this StringSegment literal, char delim)
         {
             var i = 0;
@@ -832,6 +850,8 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
 
         public override string BindingString => OriginalString ?? ToString();
 
+        public string GetDisplayName() => (BindingString ?? NameString ?? "").Replace('′', '"');
+
         protected bool Equals(JsExpression other)
         {
             return base.Equals(other) 
@@ -887,6 +907,7 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
             var inDoubleQuotes = false;
             var inSingleQuotes = false;
             var inBackTickQuotes = false;
+            var inPrimeQuotes = false;
             var inBrackets = false;
 
             var endBlockPos = commandsString.Length;
@@ -918,6 +939,12 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
                             inBackTickQuotes = false;
                         continue;
                     }
+                    if (inPrimeQuotes)
+                    {
+                        if (c == '′')
+                            inPrimeQuotes = false;
+                        continue;
+                    }
                     switch (c)
                     {
                         case '"':
@@ -928,6 +955,9 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
                             continue;
                         case '`':
                             inBackTickQuotes = true;
+                            continue;
+                        case '′':
+                            inPrimeQuotes = true;
                             continue;
                     }
 
