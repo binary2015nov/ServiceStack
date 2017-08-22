@@ -14,7 +14,7 @@ using System.Runtime.Serialization;
 [assembly: AssemblyTrademark("ServiceStack")]
 [assembly: AssemblyCulture("")]
 
-[assembly: AssemblyVersion("4.5.0.0")]
+[assembly: AssemblyVersion("4.0.0.0")]
 [assembly: AssemblyFileVersion("4.5.0.0")]
 
 [assembly: ContractNamespace("http://schemas.servicestack.net/types", 

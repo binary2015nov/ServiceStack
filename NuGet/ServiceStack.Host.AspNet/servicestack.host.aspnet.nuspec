@@ -19,8 +19,8 @@ ServiceStack is a modern, high-performance, code-first web service framework pro
 	<copyright>Copyright 2017 ServiceStack</copyright>
 	<dependencies>
       <dependency id="WebActivator" version="1.5" />
-      <dependency id="ServiceStack.Server" version="4.5" />
-      <dependency id="ServiceStack.OrmLite.SqlServer" version="4.5" />
+      <dependency id="ServiceStack.Server" version="4.5.0" />
+      <dependency id="ServiceStack.OrmLite.SqlServer" version="4.5.0" />
     </dependencies> 
   </metadata> 
 </package>

@@ -29,8 +29,8 @@
     <language>en-US</language>
     <copyright>Copyright 2017 ServiceStack</copyright>
     <dependencies>
-      <dependency id="ServiceStack" version="4.5" />
-      <dependency id="ServiceStack.OrmLite" version="4.5" />
+      <dependency id="ServiceStack" version="4.5.0" />
+      <dependency id="ServiceStack.OrmLite" version="4.5.0" />
       <dependency id="Microsoft.AspNet.Razor" version="3.2.3" />
     </dependencies>
   </metadata>
