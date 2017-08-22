@@ -29,5 +29,4 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 			return new TestResponse { Result = response.Result };
 		}
 	}
-
 }
