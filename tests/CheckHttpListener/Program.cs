@@ -26,9 +26,11 @@ namespace CheckHttpListener
             new Rockstar { Id = 7, FirstName = "Michael", LastName = "Jackson", Age = 50 },
         };
 
-        public AppSelfHost()
-            : base("DocuRec Services", typeof(TestService).Assembly)
-        { }
+        public AppSelfHost() : base("DocuRec Services", typeof(TestService).Assembly)
+        {
+            Config.CompressFilesWithExtensions = new HashSet<string> { "html", "js" };          ;
+            Config.DebugMode = true;
+        }
 
         public override void Configure(Container container)
         {
@@ -54,12 +56,6 @@ namespace CheckHttpListener
                 ServiceRoutes = new Dictionary<Type, string[]> {
                   { typeof(AuthenticateService), new[] { "/api/auth", "/api/auth/{provider}" } },
                 }
-            });
-
-            SetConfig(new HostConfig
-            {
-                CompressFilesWithExtensions = { "html", "js" },
-                DebugMode = true
             });
         }
 

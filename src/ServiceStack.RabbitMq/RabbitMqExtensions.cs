@@ -59,7 +59,7 @@ namespace ServiceStack.RabbitMq
             if (HostContext.AppHost == null)
                 return null;
 
-            return HostContext.TryResolve<IMessageService>() as RabbitMqServer;
+            return HostContext.AppHost.TryResolve<IMessageService>() as RabbitMqServer;
         }
 
         public static void RegisterQueue(this IModel channel, string queueName)
@@ -170,7 +170,7 @@ namespace ServiceStack.RabbitMq
         {
             if (string.IsNullOrEmpty(queueName))
             {
-                throw new ArgumentNullException("queueName");
+                throw new ArgumentNullException(nameof(queueName));
             }
 
             var lowerCaseQueue = queueName.ToLower();

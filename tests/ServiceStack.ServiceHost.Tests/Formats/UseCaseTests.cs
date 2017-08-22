@@ -123,7 +123,7 @@ namespace ServiceStack.ServiceHost.Tests.Formats
             <h4>Showing Results 1 - 5</h4>
 <div id=""searchresults"">
 <h3>Markdown &gt; <a href=""http://path.com/to/about"">About Docs</a></h3>
-<h3>Markdown &gt; <a href=""http://path.com/to/markdown-features"">Markdown EnabledFeatures</a></h3>
+<h3>Markdown &gt; <a href=""http://path.com/to/markdown-features"">Markdown Features</a></h3>
 <h3>Markdown &gt; <a href=""http://path.com/to/markdown-razor"">Markdown Razor</a></h3>
 <h3>Framework &gt; <a href=""http://path.com/to/home"">Home</a></h3>
 <h3>Framework &gt; <a href=""http://path.com/to/overview"">Overview</a></h3>
@@ -188,7 +188,7 @@ namespace ServiceStack.ServiceHost.Tests.Formats
             <h4>Showing Results 1 - 5</h4>
 <div id=""searchresults"">
 <h3>Markdown &gt; <a href=""http://path.com/to/about"">About Docs</a></h3>
-<h3>Markdown &gt; <a href=""http://path.com/to/markdown-features"">Markdown EnabledFeatures</a></h3>
+<h3>Markdown &gt; <a href=""http://path.com/to/markdown-features"">Markdown Features</a></h3>
 <h3>Markdown &gt; <a href=""http://path.com/to/markdown-razor"">Markdown Razor</a></h3>
 <h3>Framework &gt; <a href=""http://path.com/to/home"">Home</a></h3>
 <h3>Framework &gt; <a href=""http://path.com/to/overview"">Overview</a></h3>

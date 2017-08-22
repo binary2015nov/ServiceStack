@@ -81,7 +81,9 @@ namespace ServiceStack
             OnDisposeCallbacks = new List<Action<IAppHost>>();
             OnEndRequestCallbacks = new List<Action<IRequest>>();
             AddVirtualFileSources = new List<IVirtualPathProvider>();
-            RawHttpHandlers = new List<Func<IHttpRequest, IHttpHandler>>();
+            RawHttpHandlers = new List<Func<IHttpRequest, IHttpHandler>> {
+                ReturnRedirectHandler
+            };
             CatchAllHandlers = new List<HttpHandlerResolverDelegate>();
             CustomErrorHttpHandlers = new Dictionary<HttpStatusCode, IServiceStackHandler> {
                 { HttpStatusCode.Forbidden, new ForbiddenHttpHandler() },
@@ -139,16 +141,17 @@ namespace ServiceStack
             this.InitAt = DateTime.UtcNow;
             HostContext.AppHost = this;
             Platform.Instance.InitHostConifg(Config);
-            this.RootPath = Config.WebHostPhysicalPath;
             this.Config.ServiceEndpointsMetadataConfig = ServiceEndpointsMetadataConfig.Create(Config.HandlerFactoryPath);
+            
+            OnBeforeInit();
             JsonDataContractSerializer.Instance.UseBcl = Config.UseBclJsonSerializers;
             JsonDataContractSerializer.Instance.UseBcl = Config.UseBclJsonSerializers;
             AbstractVirtualFileBase.ScanSkipPaths = Config.ScanSkipPaths;
             ResourceVirtualDirectory.EmbeddedResourceTreatAsFiles = Config.EmbeddedResourceTreatAsFiles;
-
-            OnBeforeInit();
+            this.RootPath = Config.WebHostPhysicalPath;
             this.Metadata.ApiVersion = Config.ApiVersion;
             this.Metadata.ServiceName = ServiceName;
+
             this.Container.Register<IHashProvider>(c => new SaltedHash()).ReusedWithin(ReuseScope.None);
             if (this.Config.DebugMode)
             {
@@ -508,30 +511,6 @@ namespace ServiceStack
             throw new NotImplementedException("Start(listeningAtUrlBase) is not supported by this AppHost");
         }
 
-        /// <summary>
-        /// Retain the same behavior as ASP.NET and redirect requests to directores 
-        /// without a trailing '/'
-        /// </summary>
-        public virtual IHttpHandler RedirectDirectory(IHttpRequest request)
-        {
-            var dir = request.GetVirtualNode() as IVirtualDirectory;
-            if (dir != null)
-            {
-                //Only redirect GET requests for directories which don't have services registered at the same path
-                if (!request.PathInfo.EndsWith("/")
-                    && request.Verb == HttpMethods.Get
-                    && ServiceController.GetRestPathForRequest(request.Verb, request.PathInfo) == null)
-                {
-                    return new RedirectHttpHandler
-                    {
-                        RelativeUrl = request.PathInfo + "/",
-                    };
-                }
-            }
-            return null;
-        }
-
-
         // Rare for a user to auto register all avaialable services in ServiceStack.dll
         // But happens when ILMerged, so exclude autoregistering SS services by default 
         // and let them register them manually
@@ -836,24 +815,6 @@ namespace ServiceStack
             return VirtualFileSources.CombineVirtualPath(VirtualFileSources.RootDirectory.RealPath, virtualPath);
         }
 
-        public virtual IVirtualFile ResolveVirtualFile(string virtualPath, IRequest httpReq)
-        {
-            return VirtualFileSources.GetFile(virtualPath);
-        }
-
-        public virtual IVirtualDirectory ResolveVirtualDirectory(string virtualPath, IRequest httpReq)
-        {
-            return virtualPath == VirtualFileSources.VirtualPathSeparator
-                ? VirtualFileSources.RootDirectory
-                : VirtualFileSources.GetDirectory(virtualPath);
-        }
-
-        public virtual IVirtualNode ResolveVirtualNode(string virtualPath, IRequest httpReq)
-        {
-            return (IVirtualNode)ResolveVirtualFile(virtualPath, httpReq)
-                ?? ResolveVirtualDirectory(virtualPath, httpReq);
-        }
-
         private bool delayLoadPlugin;
         public virtual void LoadPlugin(params IPlugin[] plugins)
         {
@@ -999,6 +960,46 @@ namespace ServiceStack
         public virtual string MapProjectPath(string relativePath)
         {
             return relativePath.MapProjectPath();
+        }
+
+        public virtual string ResolvePathInfo(IRequest request, string originalPathInfo, out bool isDirectory)
+        {
+            var pathInfo = NormalizePathInfo(originalPathInfo, Config.HandlerFactoryPath);
+            isDirectory = VirtualFileSources.DirectoryExists(pathInfo);
+
+            if (!isDirectory && pathInfo.Length > 1 && pathInfo[pathInfo.Length - 1] == '/')
+                pathInfo = pathInfo.TrimEnd('/');
+
+            return pathInfo;
+        }
+
+        public static string NormalizePathInfo(string pathInfo, string mode)
+        {
+            if (mode?.Length > 0 && mode[0] == '/')
+                mode = mode.Substring(1);
+
+            if (string.IsNullOrEmpty(mode))
+                return pathInfo;
+
+            var pathNoPrefix = pathInfo[0] == '/'
+                ? pathInfo.Substring(1)
+                : pathInfo;
+
+            var normalizedPathInfo = pathNoPrefix.StartsWith(mode)
+                ? pathNoPrefix.Substring(mode.Length)
+                : pathInfo;
+
+            return normalizedPathInfo.Length > 0 && normalizedPathInfo[0] != '/'
+                ? '/' + normalizedPathInfo
+                : normalizedPathInfo;
+        }
+
+        public virtual IHttpHandler ReturnRedirectHandler(IHttpRequest httpReq)
+        {
+            var pathInfo = NormalizePathInfo(httpReq.OriginalPathInfo, Config.HandlerFactoryPath);
+            return Config.RedirectPaths.TryGetValue(pathInfo, out string redirectPath)
+                ? new RedirectHttpHandler { RelativeUrl = redirectPath }
+                : null;
         }
 
         protected virtual void Dispose(bool disposing)

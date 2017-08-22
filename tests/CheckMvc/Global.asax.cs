@@ -17,8 +17,10 @@ namespace CheckMvc
 {
     public class AppHost : AppHostBase
     {
-        public AppHost()
-            : base("Check MVC", typeof(ErrorsService).Assembly) {}
+        public AppHost() : base("Check MVC", typeof(ErrorsService).Assembly)
+        {
+            Config.DebugMode = true;
+        }
 
         public override void Configure(Container container)
         {
@@ -29,8 +31,6 @@ namespace CheckMvc
                 new RedisManagerPool());
 
             container.Register(c => c.Resolve<IRedisClientsManager>().GetCacheClient());
-
-            SetConfig(new HostConfig { DebugMode = true });
             
             Plugins.Add(new TemplatePagesFeature());
             

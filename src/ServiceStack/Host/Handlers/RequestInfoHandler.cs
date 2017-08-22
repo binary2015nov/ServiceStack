@@ -304,7 +304,6 @@ namespace ServiceStack.Host.Handlers
                 UserHostAddress = httpReq.UserHostAddress,
                 HttpMethod = httpReq.Verb,
                 AbsoluteUri = httpReq.AbsoluteUri,
-                PathInfo = httpReq.PathInfo,
                 GetPathUrl = httpReq.GetPathUrl(),
                 WebHostUrl = HostContext.Config.WebHostUrl,
                 ApplicationBaseUrl = httpReq.GetBaseUrl(),

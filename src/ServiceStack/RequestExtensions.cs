@@ -207,6 +207,8 @@ namespace ServiceStack
         /// </summary>
         public static object GetItem(this IRequest httpReq, string key)
         {
+            if (httpReq == null) return null;
+
             object value;
             httpReq.Items.TryGetValue(key, out value);
             return value;

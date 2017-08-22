@@ -78,7 +78,8 @@ namespace ServiceStack
             if (DebugMode || EnableDebugTemplate || EnableDebugTemplateToAll)
             {
                 appHost.RegisterService(typeof(MetadataTemplateServices), MetadataTemplateServices.Route);
-                appHost.GetPlugin<MetadataFeature>().AddDebugLink(MetadataTemplateServices.Route, "Debug Templates");
+                appHost.GetPlugin<MetadataFeature>()
+                    ?.AddLink(MetadataFeature.DebugInfo, MetadataTemplateServices.Route, "Debug Templates");
             }
 
             Init();
@@ -149,7 +150,7 @@ namespace ServiceStack
 
         public async Task<HotReloadPageResponse> Any(HotReloadPage request)
         {
-            if (!HostContext.DebugMode)
+            if (!HostContext.Config.DebugMode)
                 throw new NotImplementedException("set 'debug true' in web.settings to enable this service");
 
             var page = Pages.GetPage(request.Path ?? "/");
@@ -220,11 +221,11 @@ User:
                 return null;
 
             var feature = HostContext.GetPlugin<TemplatePagesFeature>();
-            if (!HostContext.DebugMode && !feature.EnableDebugTemplateToAll)
+            if (!HostContext.Config.DebugMode && !feature.EnableDebugTemplateToAll)
             {
                 if (HostContext.Config.AdminAuthSecret == null || HostContext.Config.AdminAuthSecret != request.AuthSecret)
                 {
-                    RequiredRoleAttribute.AssertRequiredRoles(Request, RoleNames.Admin);
+                    RequiredRoleAttribute.AssertRequiredRoles(Request, AuthRepository, RoleNames.Admin);
                 }
             }
             
@@ -252,8 +253,8 @@ User:
         public object GetHtml(MetadataDebugTemplate request)
         {
             var feature = HostContext.GetPlugin<TemplatePagesFeature>();
-            if (!HostContext.DebugMode && !feature.EnableDebugTemplateToAll)
-                RequiredRoleAttribute.AssertRequiredRoles(Request, RoleNames.Admin);
+            if (!HostContext.Config.DebugMode && !feature.EnableDebugTemplateToAll)
+                RequiredRoleAttribute.AssertRequiredRoles(Request, AuthRepository, RoleNames.Admin);
             
             if (request.Template != null)
                 return Any(request);
@@ -364,7 +365,7 @@ User:
     {
         public IRequest Request { get; set; }
 
-        public virtual IResolver GetResolver() => Service.GlobalResolver;
+        public virtual IResolver GetResolver() => Service.DefaultResolver;
 
         public virtual T TryResolve<T>()
         {
@@ -426,7 +427,7 @@ User:
         {
             var req = this.Request;
             if (req.GetSessionId() == null)
-                req.Response.CreateSessionIds(req);
+                req.CreateSessionIds(req.Response);
             return req.GetSession(reload);
         }
 

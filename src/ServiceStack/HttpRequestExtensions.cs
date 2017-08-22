@@ -135,11 +135,14 @@ namespace ServiceStack
 
         public static string GetPhysicalPath(this IRequest httpReq) => HostContext.ResolvePhysicalPath(httpReq.PathInfo, httpReq);
 
-        public static IVirtualFile GetVirtualFile(this IRequest httpReq) => HostContext.ResolveVirtualFile(httpReq.PathInfo, httpReq);
-
-        public static IVirtualDirectory GetVirtualDirectory(this IRequest httpReq) => HostContext.ResolveVirtualDirectory(httpReq.PathInfo, httpReq);
-
-        public static IVirtualNode GetVirtualNode(this IRequest httpReq) => HostContext.ResolveVirtualNode(httpReq.PathInfo, httpReq);
+        public static IVirtualNode GetVirtualNode(this IRequest httpReq) => httpReq is IHasVirtualFiles vfsReq ? 
+            (vfsReq.IsFile
+                ? (IVirtualNode)vfsReq.GetFile()
+                : vfsReq.IsDirectory
+                    ? vfsReq.GetDirectory()
+                    : null)
+            : (IVirtualNode)HostContext.VirtualFileSources.GetFile(httpReq.PathInfo) ?? // non HTTP Requests
+              HostContext.VirtualFileSources.GetDirectory(httpReq.PathInfo);
 
         public static string GetDirectoryPath(this IRequest request)
         {
@@ -341,7 +344,7 @@ namespace ServiceStack
 
         private static readonly ILog Log = LogManager.GetLogger(typeof(HttpRequestExtensions));
 
-        private static readonly string WebHostDirectoryName = Path.GetFileName("~".MapHostAbsolutePath());
+        public static readonly string WebHostDirectoryName = Path.GetFileName("~".MapHostAbsolutePath());
 
         public static string GetOperationNameFromLastPathInfo(string lastPathInfo)
         {
@@ -453,20 +456,6 @@ namespace ServiceStack
         {
             return GetLastPathInfoFromRawUrl(request.RawUrl);
         }
-
-        public static string GetPathInfo(this HttpRequestBase request)
-        {
-            if (!request.PathInfo.IsNullOrEmpty()) return request.PathInfo.TrimEnd('/');
-
-            var mode = HostContext.Config.HandlerFactoryPath;
-            var appPath = request.ApplicationPath.IsNullOrEmpty()
-                          ? WebHostDirectoryName
-                          : request.ApplicationPath.TrimStart('/');
-
-            //mod_mono: /CustomPath35/api//default.htm
-            var path = Env.IsMono ? request.Path.Replace("//", "/") : request.Path;
-            return GetPathInfo(path, mode, appPath);
-        }
 #endif
 
         public static string GetPathInfo(string fullPath, string mode, string appPath)
@@ -513,7 +502,7 @@ namespace ServiceStack
             if (!pathRootFound) return null;
 
             var path = StringBuilderCache.Retrieve(sbPathInfo);
-            return path.Length > 1 ? path.TrimEnd('/') : "/";
+            return path.Length > 1 ? path : "/";
         }
 
         public static bool IsContentType(this IRequest request, string contentType)

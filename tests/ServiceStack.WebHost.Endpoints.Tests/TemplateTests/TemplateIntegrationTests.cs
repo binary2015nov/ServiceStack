@@ -142,12 +142,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
     {
         class AppHost : AppSelfHostBase
         {
-            public AppHost() : base(nameof(TemplateIntegrationTests), typeof(MyTemplateServices).GetAssembly()) {}
+            public AppHost() : base(nameof(TemplateIntegrationTests), typeof(MyTemplateServices).GetAssembly())
+            {
+                Config.DebugMode = true;
+            }
 
             public override void Configure(Container container)
-            {
-                SetConfig(new HostConfig { DebugMode = true });
-                
+            {                
                 container.Register<IDbConnectionFactory>(new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider));
 
                 using (var db = container.Resolve<IDbConnectionFactory>().Open())
@@ -299,7 +300,7 @@ layout: alt/alt-layout
         {
             appHost = new AppHost()
                 .Init()
-                .Start(BaseUrl);
+                .Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -308,7 +309,7 @@ layout: alt/alt-layout
         [Test]
         public void Can_process_home_page()
         {
-            var html = BaseUrl.GetStringFromUrl();
+            var html = Config.ListeningOn.GetStringFromUrl();
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <body id=root>
@@ -338,7 +339,7 @@ layout: alt/alt-layout
         [Test]
         public void Does_return_dir_page_with_dir_layout_by_default()
         {
-            var html = BaseUrl.AppendPath("dir", "dir-page").GetStringFromUrl();
+            var html = BaseUrl.AppendPaths("dir", "dir-page").GetStringFromUrl();
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <body id=dir>
@@ -353,7 +354,7 @@ layout: alt/alt-layout
         [Test]
         public void Does_return_alt_dir_page_with_closest_alt_layout()
         {
-            var html = BaseUrl.AppendPath("dir", "alt-dir-page").GetStringFromUrl();
+            var html = BaseUrl.AppendPaths("dir", "alt-dir-page").GetStringFromUrl();
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <body id=dir-alt-layout>
@@ -367,7 +368,7 @@ layout: alt/alt-layout
         [Test]
         public void Can_request_alt_layout_within_alt_subdir()
         {
-            var html = BaseUrl.AppendPath("dir", "alt-layout-alt-dir-page").GetStringFromUrl();
+            var html = BaseUrl.AppendPaths("dir", "alt-layout-alt-dir-page").GetStringFromUrl();
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <body id=alt-alt-layout>
@@ -424,7 +425,7 @@ layout: alt/alt-layout
         [Test]
         public void Does_execute_RockstarPageView()
         {
-            var html = BaseUrl.AppendPath("rockstar-pages", "1").GetStringFromUrl();
+            var html = BaseUrl.AppendPaths("rockstar-pages", "1").GetStringFromUrl();
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <body id=root>
@@ -441,7 +442,7 @@ layout: alt/alt-layout
         [Test]
         public void Does_execute_RockstarPageView_with_custom_layout()
         {
-            var html = BaseUrl.AppendPath("rockstar-pages", "1").AddQueryParam("layout", "custom_layout").GetStringFromUrl();
+            var html = BaseUrl.AppendPaths("rockstar-pages", "1").AddQueryParam("layout", "custom_layout").GetStringFromUrl();
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
 <body id=custom>
@@ -519,7 +520,7 @@ layout: alt/alt-layout
         [Test]
         public void Can_resolve_closest_partial_starting_from_page_directory()
         {
-            var html = BaseUrl.AppendPath("dir","dir-page-partial").GetStringFromUrl();
+            var html = BaseUrl.AppendPaths("dir","dir-page-partial").GetStringFromUrl();
             
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
@@ -537,7 +538,7 @@ layout: alt/alt-layout
         [Test]
         public void Can_resolve_closest_file_starting_from_page_directory()
         {
-            var html = BaseUrl.AppendPath("dir", "dir-page-file").GetStringFromUrl();
+            var html = BaseUrl.AppendPaths("dir", "dir-page-file").GetStringFromUrl();
 
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>
@@ -555,7 +556,7 @@ layout: alt/alt-layout
         [Test]
         public void Can_resolve_closest_file_with_cache_starting_from_page_directory()
         {
-            var html = BaseUrl.AppendPath("dir", "dir-page-file-cache").GetStringFromUrl();
+            var html = BaseUrl.AppendPaths("dir", "dir-page-file-cache").GetStringFromUrl();
 
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"
 <html>

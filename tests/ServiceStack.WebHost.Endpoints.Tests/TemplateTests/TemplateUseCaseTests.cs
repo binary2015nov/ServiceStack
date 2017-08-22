@@ -72,6 +72,5 @@ Projected Cash Position:
 2017-10-20       <b>$16,200.00</b>
 2017-11-20       <b>$18,700.00</b>".NormalizeNewLines()));
         }
-
     }
 }

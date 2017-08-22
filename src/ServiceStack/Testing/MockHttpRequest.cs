@@ -19,7 +19,7 @@ namespace ServiceStack.Testing
         private IResolver resolver;
         public IResolver Resolver
         {
-            get => resolver ?? Service.GlobalResolver;
+            get => resolver ?? Service.DefaultResolver;
             set => resolver = value;
         }
 
@@ -46,6 +46,7 @@ namespace ServiceStack.Testing
             this.InputStream = inputStream;
             this.QueryString = queryString.InWrapper();
             this.FormData = formData.InWrapper();
+            this.PhysicalPath = this.GetPhysicalPath();
         }
 
         public object OriginalRequest => null;
@@ -152,9 +153,9 @@ namespace ServiceStack.Testing
         public void AddSessionCookies()
         {
             var permSessionId = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
-            this.Cookies[SessionFeature.PermanentSessionId] = new Cookie(SessionFeature.PermanentSessionId, permSessionId);
+            this.Cookies[Keywords.PermanentSessionId] = new Cookie(Keywords.PermanentSessionId, permSessionId);
             var sessionId = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
-            this.Cookies[SessionFeature.SessionId] = new Cookie(SessionFeature.SessionId, sessionId);
+            this.Cookies[Keywords.SessionId] = new Cookie(Keywords.SessionId, sessionId);
         }
 
         public Uri UrlReferrer => null;
@@ -168,5 +169,7 @@ namespace ServiceStack.Testing
 
         private bool? isFile;
         public bool IsFile => isFile ?? (bool)(isFile = HostContext.VirtualFiles.FileExists(PathInfo));
+
+        public string PhysicalPath { get; set; }
     }
 }

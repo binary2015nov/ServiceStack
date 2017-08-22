@@ -10,12 +10,14 @@ using System.Net;
 using System.Web;
 using Funq;
 using ServiceStack.Configuration;
+using ServiceStack.IO;
 using ServiceStack.Logging;
 using ServiceStack.Web;
+using ServiceStack.Text;
 
 namespace ServiceStack.Host.AspNet
 {
-    public class AspNetRequest : IHttpRequest, IHasResolver
+    public class AspNetRequest : IHttpRequest, IHasResolver, IHasVirtualFiles
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(AspNetRequest));
 
@@ -44,6 +46,10 @@ namespace ServiceStack.Host.AspNet
                         Items[(string)key] = httpContext.Items[key];
                 }
             }
+            this.OriginalPathInfo = GetPathInfo();
+            this.PathInfo = HostContext.AppHost.ResolvePathInfo(this, OriginalPathInfo, out bool isDirectory);
+            this.IsDirectory = isDirectory;
+            this.IsFile = !isDirectory && HostContext.VirtualFileSources.FileExists(PathInfo);
         }
 
         [Obsolete("Use Resolver")]
@@ -240,8 +246,24 @@ namespace ServiceStack.Host.AspNet
 
         public string[] AcceptTypes => request.AcceptTypes;
 
-        private string pathInfo;
-        public string PathInfo => pathInfo ?? (pathInfo = request.GetPathInfo());
+        public string PathInfo { get; private set; }
+
+        public string OriginalPathInfo { get; }
+
+        public string GetPathInfo()
+        {
+            if (!request.PathInfo.IsNullOrEmpty())
+                return request.PathInfo;
+
+            var mode = HostContext.Config.HandlerFactoryPath;
+            var appPath = string.IsNullOrEmpty(request.ApplicationPath)
+                ? HttpRequestExtensions.WebHostDirectoryName
+                : request.ApplicationPath.TrimStart('/');
+
+            //mod_mono: /CustomPath35/api//default.htm
+            var path = Env.IsMono ? request.Path.Replace("//", "/") : request.Path;
+            return HttpRequestExtensions.GetPathInfo(path, mode, appPath);
+        }
 
         public string UrlHostName => request.GetUrlHostName();
 
@@ -287,6 +309,14 @@ namespace ServiceStack.Host.AspNet
         }
 
         public Uri UrlReferrer => request.UrlReferrer;
+
+        public IVirtualFile GetFile() => HostContext.VirtualFileSources.GetFile(PathInfo);
+
+        public IVirtualDirectory GetDirectory() => HostContext.VirtualFileSources.GetDirectory(PathInfo);
+
+        public bool IsDirectory { get; private set; }
+
+        public bool IsFile { get; private set; }
 
         private string physicalPath;
         public string PhysicalPath => physicalPath ?? (physicalPath = this.GetPhysicalPath());

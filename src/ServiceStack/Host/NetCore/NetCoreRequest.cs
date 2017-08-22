@@ -27,7 +27,7 @@ namespace ServiceStack.Host.NetCore
         private IResolver resolver;
         public IResolver Resolver
         {
-            get => resolver ?? Service.GlobalResolver;
+            get => resolver ?? Service.DefaultResolver;
             set => resolver = value;
         }
 
@@ -47,6 +47,8 @@ namespace ServiceStack.Host.NetCore
             this.PathInfo = HostContext.AppHost.ResolvePathInfo(this, PathInfo, out bool isDirectory);
             this.IsDirectory = isDirectory;
             this.IsFile = !isDirectory && HostContext.VirtualFileSources.FileExists(PathInfo);
+
+            this.PhysicalPath = this.GetPhysicalPath();
         }
 
         public T TryResolve<T>()
@@ -305,6 +307,8 @@ namespace ServiceStack.Host.NetCore
         public bool IsDirectory{ get; }
 
         public bool IsFile { get; }
+
+        public string PhysicalPath { get; private set; }
     }
 }
 

@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ServiceStack.Logging;
 using ServiceStack.Web;
+using ServiceStack.Text;
 
 namespace ServiceStack.Host.HttpListener
 {
@@ -39,15 +40,13 @@ namespace ServiceStack.Host.HttpListener
 
         public Action<HttpListenerContext> BeforeRequest { get; set; }
 
-        protected HttpListenerBase(string serviceName, params Assembly[] assembliesWithServices) : base(serviceName, assembliesWithServices)
-        {
-            RawHttpHandlers.Add(RedirectDirectory);
-        }
+        protected HttpListenerBase(string serviceName, params Assembly[] assembliesWithServices)
+            : base(serviceName, assembliesWithServices) { }
 
         protected override void OnAfterInit()
         {
             SetAppDomainData();
-            if (ServiceStack.Text.Env.IsMono)
+            if (Env.IsMono)
             {
                 // Required or throws NRE in Xamarin.Mac
                 System.Web.Util.HttpEncoder.Current = System.Web.Util.HttpEncoder.Default;

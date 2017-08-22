@@ -20,7 +20,6 @@ namespace ServiceStack
         public HostConfig()
         {
             WsdlServiceNamespace = DefaultWsdlNamespace;
-            DebugMode = GetType().GetAssembly().IsDebugBuild();
             ApiVersion = "1.0";
             EmbeddedResourceSources = new List<Assembly> { GetType().GetAssembly() };
             EmbeddedResourceTreatAsFiles = new HashSet<string>();
@@ -33,6 +32,7 @@ namespace ServiceStack
             AllowJsonpRequests = true;
             AllowRouteContentTypeExtensions = true;
             AllowNonHttpOnlyCookies = false;
+            DebugMode = GetType().GetAssembly().IsDebugBuild();
             DefaultDocuments = new List<string> {
                 "default.htm",
                 "default.html",
@@ -95,6 +95,7 @@ namespace ServiceStack
             AllowAclUrlReservation = true;
             AddRedirectParamsToQueryString = false;
             RedirectToDefaultDocuments = false;
+            RedirectDirectoriesToTrailingSlashes = true;
             StripApplicationVirtualPath = false;
             ScanSkipPaths = new List<string> {
                 "obj/",
@@ -106,6 +107,9 @@ namespace ServiceStack
 #if !NETSTANDARD1_6 
                 "wwwroot/", //Need to allow VirtualFiles access from ContentRoot Folder
 #endif
+            };
+            RedirectPaths = new Dictionary<string, string> {
+                {"/metadata/", "/metadata"},
             };
             IgnoreWarningsOnPropertyNames = new List<string> {
                 Keywords.Format, Keywords.Callback, Keywords.Debug, Keywords.AuthSecret, Keywords.JsConfig,
@@ -206,8 +210,12 @@ namespace ServiceStack
         public bool StripApplicationVirtualPath { get; set; }
         public bool SkipFormDataInCreatingRequest { get; set; }
 
+        public bool RedirectDirectoriesToTrailingSlashes { get; set; }
+
         //Skip scanning common VS.NET extensions
         public List<string> ScanSkipPaths { get; private set; }
+
+        public Dictionary<string, string> RedirectPaths { get; private set; }
 
         public bool UseHttpsLinks { get; set; }
 

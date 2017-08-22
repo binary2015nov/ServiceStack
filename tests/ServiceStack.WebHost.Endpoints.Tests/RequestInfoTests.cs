@@ -16,20 +16,20 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         
         class AppHost : AppSelfHostBase
         {
-            public AppHost() : base(nameof(RequestInfoTests), typeof(RequestInfoServices).GetAssembly()) {}
+            public AppHost() 
+                : base(nameof(RequestInfoTests), typeof(RequestInfoServices).GetAssembly()) { }
 
-            public override void Configure(Container container)
+            protected override void OnBeforeInit()
             {
                 var useProjectPath = MapProjectPath("~/../");
                 var parentDir = useProjectPath.Replace("\\", "/").TrimEnd('/').LastRightPart('/');
                 Assert.That(parentDir, Is.EqualTo("ServiceStack.WebHost.Endpoints.Tests"));
-                
-                SetConfig(new HostConfig
-                {
-                    DebugMode = true,
-                    WebHostPhysicalPath = useProjectPath
-                });
-                
+                Config.DebugMode = true;
+                Config. WebHostPhysicalPath = useProjectPath;              
+            }
+
+            public override void Configure(Container container)
+            {               
                 Plugins.Add(new OpenApiFeature());
             }
         }

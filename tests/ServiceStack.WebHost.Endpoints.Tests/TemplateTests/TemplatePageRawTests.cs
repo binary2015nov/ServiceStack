@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -929,7 +930,6 @@ model.Dictionary['map-key'].Object.AltNested.Field | lower = 'dictionary altnest
             Assert.That(context.EvaluateTemplate("{{ c.missing }}"), Is.EqualTo(""));
             Assert.That(context.EvaluateTemplate("{{ it.customer | assign: c }}{{ c.missing }}"), Is.EqualTo(""));
         }
-
     }
 
     public static class TestUtils

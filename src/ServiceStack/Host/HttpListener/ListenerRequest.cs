@@ -24,7 +24,7 @@ namespace ServiceStack.Host.HttpListener
         private IResolver resolver;
         public IResolver Resolver
         {
-            get => resolver ?? Service.GlobalResolver;
+            get => resolver ?? Service.DefaultResolver;
             set => resolver = value;
         }
 
@@ -43,6 +43,7 @@ namespace ServiceStack.Host.HttpListener
             this.PathInfo = HostContext.AppHost.ResolvePathInfo(this, OriginalPathInfo, out bool isDirectory);
             this.IsDirectory = isDirectory;
             this.IsFile = !isDirectory && HostContext.VirtualFileSources.FileExists(PathInfo);
+            this.PhysicalPath = this.GetPhysicalPath();
         }
 
         private string GetPathInfo()
@@ -317,8 +318,9 @@ namespace ServiceStack.Host.HttpListener
         public bool IsDirectory { get; }
 
         public bool IsFile { get; }
-    }
 
+        public string PhysicalPath { get; private set; }
+    }
 }
 
 #endif

@@ -102,7 +102,6 @@ namespace ServiceStack
             {
                 IsIntegratedPipeline = Platform.IsIntegratedPipeline,
                 WebHostPhysicalPath = WebHostPhysicalPath,
-                WebHostRootFileNames = WebHostRootFileNames,
                 WebHostUrl = AppHostConfig.WebHostUrl,
                 DefaultRootFileName = defaultRootFileName,
                 DefaultHandler = debugDefaultHandler,
@@ -112,7 +111,6 @@ namespace ServiceStack
             {
                 IsIntegratedPipeline = Platform.IsIntegratedPipeline,
                 WebHostPhysicalPath = WebHostPhysicalPath,
-                WebHostRootFileNames = WebHostRootFileNames,
                 WebHostUrl = AppHostConfig.WebHostUrl,
                 DefaultRootFileName = defaultRootFileName,
                 DefaultHandler = debugDefaultHandler,
@@ -141,7 +139,7 @@ namespace ServiceStack
             }
 
             string location = AppHostConfig.HandlerFactoryPath;
-            string pathInfo = httpReq.PathInfo;
+            var pathInfo = httpReq.PathInfo;
             string physicalPath = httpReq.PhysicalPath;
             lastHandlerArgs = httpReq.Verb + "|" + httpReq.RawUrl + "|" + physicalPath;
 
@@ -161,16 +159,12 @@ namespace ServiceStack
                     }
                 }
 
-                //e.g. CatchAllHandler to Process Markdown files
-                //var catchAllHandler = GetCatchAllHandlerIfAny(httpReq.HttpMethod, pathInfo, physicalPath);
-                //if (catchAllHandler != null) return catchAllHandler;
-
                 if (location.IsNullOrEmpty())
                     return DefaultHttpHandler;
 
                 return NonRootModeDefaultHttpHandler;
             }
-            return GetHandlerForPathInfo(httpReq.HttpMethod, pathInfo, pathInfo, physicalPath) ?? NotFoundHttpHandler;
+            return GetHandlerForPathInfo(httpReq, physicalPath) ?? NotFoundHttpHandler;
         }
 
         // no handler registered 
@@ -193,57 +187,41 @@ namespace ServiceStack
             return false;
         }
 
-        public static IHttpHandler GetHandlerForPathInfo(string httpMethod, string pathInfo, string requestPath, string filePath)
+        public static IHttpHandler GetHandlerForPathInfo(IRequest httpReq, string filePath)
         {
             var appHost = HostContext.AppHost;
 
-            var pathParts = pathInfo.Trim('/').Split('/');
+            var pathInfo = httpReq.PathInfo;
+            var isFile = httpReq.IsFile();
+            var isDirectory = httpReq.IsDirectory();
+
+            if (!isFile && !isDirectory && Env.IsMono)
+                isDirectory = StaticFileHandler.MonoDirectoryExists(filePath, filePath.Substring(0, filePath.Length - pathInfo.Length));
+
+            var httpMethod = httpReq.Verb;
+
+            var pathParts = pathInfo.TrimStart('/').Split('/');
             if (pathParts.Length == 0) return NotFoundHttpHandler;
 
             string contentType;
             var restPath = RestHandler.FindMatchingRestPath(httpMethod, pathInfo, out contentType);
             if (restPath != null)
                 return new RestHandler { RestPath = restPath, RequestName = restPath.RequestType.GetOperationName(), ResponseContentType = contentType };
-            var existingFile = pathParts[0];
-            var matchesRootDirOrFile = appHost.Config.DebugMode
-                ? appHost.VirtualFileSources.FileExists(existingFile) ||
-                  appHost.VirtualFileSources.DirectoryExists(existingFile)
-                : WebHostRootFileNames.Contains(existingFile);
 
-            if (matchesRootDirOrFile)
+            if (isFile || isDirectory)
             {
-                var fileExt = System.IO.Path.GetExtension(filePath);
-                var isFileRequest = !string.IsNullOrEmpty(fileExt);
+                //If pathInfo is for Directory try again with redirect including '/' suffix
+                if (appHost.Config.RedirectDirectoriesToTrailingSlashes && isDirectory && !httpReq.OriginalPathInfo.EndsWith("/"))
+                    return new RedirectHttpHandler { RelativeUrl = pathInfo + "/" };
 
-                if (!isFileRequest && !HostAutoRedirectsDirs)
-                {
-                    //If pathInfo is for Directory try again with redirect including '/' suffix
-                    if (!pathInfo.EndsWith("/"))
-                    {
-                        var appFilePath = filePath.Substring(0, filePath.Length - requestPath.Length);
-                        var redirect = StaticFileHandler.DirectoryExists(filePath, appFilePath);
-                        if (redirect)
-                        {
-                            return new RedirectHttpHandler
-                            {
-                                RelativeUrl = pathInfo + "/",
-                            };
-                        }
-                    }
-                }
-
-                //e.g. CatchAllHandler to Process Markdown files
                 var catchAllHandler = GetCatchAllHandlerIfAny(httpMethod, pathInfo, filePath);
-                if (catchAllHandler != null) return catchAllHandler;
+                if (catchAllHandler != null)
+                    return catchAllHandler;
 
-                if (!isFileRequest)
-                {
-                    return appHost.VirtualFileSources.DirectoryExists(pathInfo)
-                        ? StaticFilesHandler
-                        : NotFoundHttpHandler;
-                }
+                if (isDirectory)
+                    return StaticFilesHandler;
 
-                return ShouldAllow(requestPath)
+                return ShouldAllow(pathInfo)
                     ? StaticFilesHandler
                     : ForbiddenHttpHandler;
             }
@@ -255,9 +233,7 @@ namespace ServiceStack
             {
                 restPath = appHost.Config.FallbackRestPath(httpMethod, pathInfo, filePath);
                 if (restPath != null)
-                {
                     return new RestHandler { RestPath = restPath, RequestName = restPath.RequestType.GetOperationName(), ResponseContentType = contentType };
-                }
             }
 
             return null;
@@ -277,7 +253,6 @@ namespace ServiceStack
 
         public void ReleaseHandler(IHttpHandler handler)
         {
-
         }
     }
 }

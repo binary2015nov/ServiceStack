@@ -20,7 +20,7 @@ namespace ServiceStack.Host
         private IResolver resolver;
         public IResolver Resolver
         {
-            get => resolver ?? Service.GlobalResolver;
+            get => resolver ?? Service.DefaultResolver;
             set => resolver = value;
         }
 
@@ -100,9 +100,14 @@ namespace ServiceStack.Host
 
         public string AbsoluteUri { get; set; }
 
-        public string PathInfo { get; set; }
+        private string pathInfo;
+        public string PathInfo
+        {
+            get { return pathInfo.StartsWith("/") ? pathInfo : (pathInfo = "/" + pathInfo); }
+            set { OriginalPathInfo = pathInfo = value; }
+        }
 
-        public string OriginalPathInfo => PathInfo;
+        public string OriginalPathInfo { get; set; }
 
         public IHttpFile[] Files { get; set; }
         
@@ -156,5 +161,7 @@ namespace ServiceStack.Host
         public bool IsFile { get; set; }
         
         public bool IsDirectory { get; set; }
+
+        public string PhysicalPath { get; set; }
    }
 }

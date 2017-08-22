@@ -29,7 +29,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         readonly Dictionary<string, Type> pathInfoMap = new Dictionary<string, Type>
-		{
+        {
             {"Metadata", typeof(IndexMetadataHandler)},
 #if !NETCORE            
             {"Soap11", typeof(Soap11MessageReplyHttpHandler)},

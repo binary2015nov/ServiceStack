@@ -31,18 +31,16 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
     {
         class AppHost : AppSelfHostBase
         {
-            public AppHost() : base(nameof(TemplateIntegrationTests), typeof(MyTemplateServices).GetAssembly()) {}
+            public AppHost() : base(nameof(TemplateIntegrationTests), typeof(MyTemplateServices).GetAssembly())
+            {
+                Config.DebugMode = true;
+            }
 
             public readonly List<IVirtualPathProvider> TemplateFiles = new List<IVirtualPathProvider> { new MemoryVirtualFiles() };
             public override List<IVirtualPathProvider> GetVirtualFileSources() => TemplateFiles;
 
             public override void Configure(Container container)
             {
-                SetConfig(new HostConfig
-                {
-                    DebugMode = true
-                });
-
                 container.Register<IDbConnectionFactory>(new OrmLiteConnectionFactory(":memory:",
                     SqliteDialect.Provider));
 

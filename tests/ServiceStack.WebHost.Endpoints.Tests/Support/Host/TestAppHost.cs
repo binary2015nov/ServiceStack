@@ -4,7 +4,7 @@ using ServiceStack.WebHost.Endpoints.Tests.Support.Services;
 
 namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 {
-	public class TestAppHost : AppHostBase
+	public class TestAppHost : ServiceStackHost
 	{
         public TestAppHost(params Assembly[] assembliesWithServices)
             : base("Example Service", 

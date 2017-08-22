@@ -41,26 +41,31 @@ namespace ServiceStack
                 : "/" + HostContext.Config.MetadataRedirectPath.TrimStart('/');
             if (pathInfo.Equals(metadata, StringComparison.OrdinalIgnoreCase))
                 return new IndexMetadataHandler();
-            var pathArray = pathInfo.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
-            if (pathArray.Length != 2 || !pathArray[1].Equals("metadata"))
+
+            var pathArray = pathInfo.ToLower().Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
+            if (pathArray.Length != 2)
                 return null;
-                ;
+                    
             switch (pathArray[0])
             {
                 case "json":
-                    return new JsonMetadataHandler();
+                    return pathArray[1] == "metadata" ? new JsonMetadataHandler() : null;
 
                 case "xml":
-                    return new XmlMetadataHandler();
+                    return pathArray[1] == "metadata" ? new XmlMetadataHandler() : null;
 
                 case "jsv":
-                    return new JsvMetadataHandler();
+                    return pathArray[1] == "metadata" ? new JsvMetadataHandler() : null;
 #if !NETSTANDARD1_6
                 case "soap11":
-                    return new Soap11MetadataHandler();
+                    return pathArray[1] == "metadata"
+                        ? new Soap11MetadataHandler() as IHttpHandler
+                        : (pathArray[1] == "wsdl" ? new Soap11WsdlMetadataHandler() : null);
 
                 case "soap12":
-                    return new Soap12MetadataHandler();
+                    return pathArray[1] == "metadata"
+                        ? new Soap12MetadataHandler() as IHttpHandler
+                        : (pathArray[1] == "wsdl" ? new Soap12WsdlMetadataHandler() : null);
 #endif
 
                 case "operations":

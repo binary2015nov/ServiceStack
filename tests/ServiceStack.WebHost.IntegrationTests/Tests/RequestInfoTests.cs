@@ -9,12 +9,10 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     public class RequestInfoServices : Service {}
     
     public partial class RequestInfoTests
-    {
-        public string BaseUrl = Config.ServiceStackBaseUri;
-        
+    {        
         private RequestInfoResponse GetRequestInfoForPath(string path)
         {
-            var url = BaseUrl.CombineWith(path).AddQueryParam("debug", "requestinfo");
+            var url = Constant.ServiceStackBaseHost.CombineWith(path).AddQueryParam("debug", "requestinfo");
             var json = url.GetJsonFromUrl();
             var info = json.FromJson<RequestInfoResponse>();
             return info;
@@ -22,7 +20,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
         private void AssertHasContent(string pathInfo, string accept, string containsContent)
         {
-            var url = BaseUrl.CombineWith(pathInfo);
+            var url = Constant.ServiceStackBaseHost.AppendPath(pathInfo);
             var content = url.GetStringFromUrl(accept: accept);
             Assert.That(content, Does.Contain(containsContent));
         }
@@ -54,27 +52,27 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     {
         private void DoesRedirectToRemoveTrailingSlash(string dirWIthoutSlash)
         {
-            BaseUrl.CombineWith(dirWIthoutSlash)
+            Constant.ServiceStackBaseHost.AppendPath(dirWIthoutSlash)
                 .GetStringFromUrl(accept: MimeTypes.Html,
                     requestFilter: req => req.AllowAutoRedirect = false,
                     responseFilter: res =>
                     {
                         Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
                         Assert.That(res.Headers[HttpHeaders.Location], 
-                            Is.EqualTo(BaseUrl.CombineWith(dirWIthoutSlash + "/")));
+                            Is.EqualTo(Constant.ServiceStackBaseHost.AppendPath(dirWIthoutSlash + "/")));
                     });
         }
 
         private void DoesRedirectToAddTrailingSlash(string dirWithoutSlash)
         {
-            BaseUrl.CombineWith(dirWithoutSlash)
+            Constant.ServiceStackBaseHost.AppendPath(dirWithoutSlash)
                 .GetStringFromUrl(accept: MimeTypes.Html,
                     requestFilter: req => req.AllowAutoRedirect = false,
                     responseFilter: res =>
                     {
                         Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
                         Assert.That(res.Headers[HttpHeaders.Location], 
-                            Is.EqualTo(BaseUrl.CombineWith(dirWithoutSlash.TrimEnd('/'))));
+                            Is.EqualTo(Constant.ServiceStackBaseHost.AppendPath(dirWithoutSlash.TrimEnd('/'))));
                     });
         }
 
@@ -91,5 +89,5 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             DoesRedirectToAddTrailingSlash("metadata/");
         }
-   }
- }
+    }
+}
