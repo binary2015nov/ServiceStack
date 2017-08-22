@@ -47,7 +47,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
                 Is.EqualTo("<var>in filter</var>"));
 
             Assert.That(context.EvaluateTemplate(@"{{ 'in filter' | throw({ assignError: 'myError' }) }}
-<var>{{ myError.Message }}</var><pre>{{ myError.StackTrace }}</pre>"),
+<var>{{ myError.Message }}</var><pre>{{ lastErrorStackTrace }}</pre>"),
                 Does.StartWith("<var>in filter</var><pre>   at "));
         }
 
@@ -166,10 +166,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
 </html>");
             
             context.VirtualFiles.WriteFile("page.html", @"
+{{ skipExecutingFiltersOnError }}
 <h1>Before Error</h1>
 {{ 'in filter' | throw }}
 {{ ifError | select: <h1>FAIL! { it.Message }</h1> }}
-{{ ifErrorSkipExecutingPageFilters }}
 
 <b>{{ 'never executed' }}</b>
 
@@ -185,7 +185,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
 <h1>Before Error</h1>
 <h1>FAIL! in filter</h1>
 
-
 <b></b>
 
 <h1>After Error</h1>
@@ -199,7 +198,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
         {
             var context = new TemplateContext
             {
-                SkipExecutingPageFiltersIfError = true,
+                SkipExecutingFiltersIfError = true,
             }.Init();
 
             context.VirtualFiles.WriteFile("_layout.html", @"
@@ -237,11 +236,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
         }
 
         [Test]
-        public void Does_render_htmlErrorMessage_in_DebugMode()
+        public void Does_render_htmlErrorDebug_in_DebugMode()
         {
             var context = new TemplateContext
             {
-                SkipExecutingPageFiltersIfError = true,
+                SkipExecutingFiltersIfError = true,
                 DebugMode = true,
             }.Init();
 
@@ -278,7 +277,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
         {
             var context = new TemplateContext
             {
-                SkipExecutingPageFiltersIfError = true,
+                SkipExecutingFiltersIfError = true,
                 DebugMode = false,
             }.Init();
 
@@ -315,6 +314,187 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
 </body>
 </html>".NormalizeNewLines()));
         }
-        
+
+        [Test]
+        public void Does_render_htmlErrorDebug_with_StackTraces()
+        {
+            var context = new TemplateContext
+            {
+                SkipExecutingFiltersIfError = true,
+            }.Init();
+            
+            context.VirtualFiles.WriteFile("page.html", @"
+<h1>Before Error</h1>
+{{ 'in filter' | throw }}
+{{ htmlErrorDebug }}
+
+<b>{{ 'never executed' }}</b>
+
+<h1>After Error</h1>
+");
+
+            var page = context.GetPage("page");
+            var output = new PageResult(page).Result;
+            
+            Assert.That(output.NormalizeNewLines(), Is.EqualTo(@"
+<h1>Before Error</h1>
+<pre class=""alert alert-danger"">Exception: in filter
+
+StackTrace:
+   at Expression (String): ""in filter""
+   at Page: page.html
+</pre>
+
+
+<b></b>
+
+<h1>After Error</h1>".NormalizeNewLines()));
+        }
+
+        [Test]
+        public void Can_continue_executing_filters_with_continueExecutingFiltersOnError()
+        {
+            var context = new TemplateContext
+            {
+                SkipExecutingFiltersIfError = true,
+            }.Init();
+            
+            context.VirtualFiles.WriteFile("page.html", @"
+{{ continueExecutingFiltersOnError }}
+<h1>Before Error</h1>
+{{ 'in filter' | throw }}
+{{ htmlErrorDebug }}
+
+<b>{{ 'is evaluated' }}</b>
+
+<h1>After Error</h1>
+");
+
+            var page = context.GetPage("page");
+            var output = new PageResult(page).Result;
+            
+            Assert.That(output.NormalizeNewLines(), Is.EqualTo(@"
+<h1>Before Error</h1>
+<pre class=""alert alert-danger"">Exception: in filter
+
+StackTrace:
+   at Expression (String): ""in filter""
+   at Page: page.html
+</pre>
+
+
+<b>is evaluated</b>
+
+<h1>After Error</h1>".NormalizeNewLines()));
+        }
+
+        [Test]
+        public void Calling_ensureAllArgsNotNull_throws_if_any_args_are_null()
+        {
+            var context = new TemplateContext
+            {
+                SkipExecutingFiltersIfError = true,
+                DebugMode = false,
+                Args =
+                {
+                    ["arg"] = "value",
+                    ["empty"] = "",
+                }
+            }.Init();
+            
+            context.VirtualFiles.WriteFile("page-arg.html", @"{{ { arg }     | ensureAllArgsNotNull | select: { it.arg } }}{{ htmlError }}");
+            context.VirtualFiles.WriteFile("page-empty.html", @"{{ { empty } | ensureAllArgsNotNull | select: { it.empty } }}{{ htmlError }}");
+            context.VirtualFiles.WriteFile("page-noarg.html", @"{{ { noArg } | ensureAllArgsNotNull | select: { it.arg } }}{{ htmlError }}");
+            context.VirtualFiles.WriteFile("page-msg.html", @"{{ { noArg }   | ensureAllArgsNotNull({ message: '{0} required' }) | select: { it.arg } }}{{ htmlError }}");
+            
+            Assert.That(new PageResult(context.GetPage("page-arg")).Result, Is.EqualTo(@"value"));
+            Assert.That(new PageResult(context.GetPage("page-empty")).Result, Is.EqualTo(@""));
+            Assert.That(new PageResult(context.GetPage("page-noarg")).Result.NormalizeNewLines(), 
+                Is.EqualTo("<div class=\"alert alert-danger\">Value cannot be null.\nParameter name: noArg</div>"));
+            Assert.That(new PageResult(context.GetPage("page-msg")).Result.NormalizeNewLines(), 
+                Is.EqualTo("<div class=\"alert alert-danger\">noArg required</div>"));            
+        }
+
+        [Test]
+        public void Calling_ensureAllArgsNotEmpty_throws_if_any_args_are_empty()
+        {
+            var context = new TemplateContext
+            {
+                SkipExecutingFiltersIfError = true,
+                DebugMode = false,
+                Args =
+                {
+                    ["arg"] = "value",
+                    ["empty"] = "",
+                }
+            }.Init();
+            
+            context.VirtualFiles.WriteFile("page-arg.html", @"{{ { arg }     | ensureAllArgsNotEmpty | select: { it.arg } }}{{ htmlError }}");
+            context.VirtualFiles.WriteFile("page-empty.html", @"{{ { empty } | ensureAllArgsNotEmpty | select: { it.empty } }}{{ htmlError }}");
+            context.VirtualFiles.WriteFile("page-noarg.html", @"{{ { noArg } | ensureAllArgsNotEmpty | select: { it.arg } }}{{ htmlError }}");
+            context.VirtualFiles.WriteFile("page-msg.html", @"{{ { noArg }   | ensureAllArgsNotEmpty({ message: '{0} required' }) | select: { it.arg } }}{{ htmlError }}");
+            
+            Assert.That(new PageResult(context.GetPage("page-arg")).Result, Is.EqualTo(@"value"));
+            Assert.That(new PageResult(context.GetPage("page-empty")).Result.NormalizeNewLines(),
+                Is.EqualTo("<div class=\"alert alert-danger\">Value cannot be null.\nParameter name: empty</div>"));
+            Assert.That(new PageResult(context.GetPage("page-noarg")).Result.NormalizeNewLines(), 
+                Is.EqualTo("<div class=\"alert alert-danger\">Value cannot be null.\nParameter name: noArg</div>"));
+            Assert.That(new PageResult(context.GetPage("page-msg")).Result.NormalizeNewLines(), 
+                Is.EqualTo("<div class=\"alert alert-danger\">noArg required</div>"));            
+        }
+ 
+        [Test]
+        public void Calling_ensureAnyArgsNotNull_throws_if_all_args_are_null()
+        {
+            var context = new TemplateContext
+            {
+                SkipExecutingFiltersIfError = true,
+                DebugMode = false,
+                Args =
+                {
+                    ["arg"] = "value",
+                    ["empty"] = "",
+                }
+            }.Init();
+            
+            context.VirtualFiles.WriteFile("page-arg.html", @"{{ { arg }          | ensureAnyArgsNotNull | select: { it.arg } }}{{ htmlError }}");
+            context.VirtualFiles.WriteFile("page-empty.html", @"{{ { arg, noArg } | ensureAnyArgsNotNull | select: { it.arg } }}{{ htmlError }}");
+            context.VirtualFiles.WriteFile("page-noarg.html", @"{{ { noArg }      | ensureAnyArgsNotNull | select: { it.arg } }}{{ htmlError }}");
+            context.VirtualFiles.WriteFile("page-msg.html", @"{{ { noArg, empty } | ensureAnyArgsNotNull({ message: '{0} required' }) | select: { it.empty } }}{{ htmlError }}");
+            
+            Assert.That(new PageResult(context.GetPage("page-arg")).Result, Is.EqualTo(@"value"));
+            Assert.That(new PageResult(context.GetPage("page-empty")).Result, Is.EqualTo(@"value"));
+            Assert.That(new PageResult(context.GetPage("page-noarg")).Result.NormalizeNewLines(), 
+                Is.EqualTo("<div class=\"alert alert-danger\">Value cannot be null.\nParameter name: noArg</div>"));
+            Assert.That(new PageResult(context.GetPage("page-msg")).Result.NormalizeNewLines(), 
+                Is.EqualTo(""));            
+        }
+ 
+        [Test]
+        public void Calling_ensureAnyArgsNotEmpty_throws_if_all_args_are_empty()
+        {
+            var context = new TemplateContext
+            {
+                SkipExecutingFiltersIfError = true,
+                DebugMode = false,
+                Args =
+                {
+                    ["arg"] = "value",
+                    ["empty"] = "",
+                }
+            }.Init();
+            
+            context.VirtualFiles.WriteFile("page-arg.html", @"{{ { arg }          | ensureAnyArgsNotEmpty | select: { it.arg } }}{{ htmlError }}");
+            context.VirtualFiles.WriteFile("page-empty.html", @"{{ { arg, noArg } | ensureAnyArgsNotEmpty | select: { it.arg } }}{{ htmlError }}");
+            context.VirtualFiles.WriteFile("page-noarg.html", @"{{ { noArg }      | ensureAnyArgsNotEmpty | select: { it.arg } }}{{ htmlError }}");
+            context.VirtualFiles.WriteFile("page-msg.html", @"{{ { noArg, empty } | ensureAnyArgsNotEmpty({ message: '{0} required' }) | select: { it.empty } }}{{ htmlError }}");
+            
+            Assert.That(new PageResult(context.GetPage("page-arg")).Result, Is.EqualTo(@"value"));
+            Assert.That(new PageResult(context.GetPage("page-empty")).Result, Is.EqualTo(@"value"));
+            Assert.That(new PageResult(context.GetPage("page-noarg")).Result.NormalizeNewLines(), 
+                Is.EqualTo("<div class=\"alert alert-danger\">Value cannot be null.\nParameter name: noArg</div>"));
+            Assert.That(new PageResult(context.GetPage("page-msg")).Result.NormalizeNewLines(), 
+                Is.EqualTo("<div class=\"alert alert-danger\">empty required</div>"));            
+        }
     }
 }

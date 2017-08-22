@@ -307,19 +307,9 @@ namespace ServiceStack.Host.Handlers
 
         public override bool IsReusable => true;
 
-        public static bool DirectoryExists(string dirPath, string appFilePath)
+        public static bool MonoDirectoryExists(string dirPath, string appFilePath)
         {
             if (dirPath == null) return false;
-
-            try
-            {
-                if (!Env.IsMono)
-                    return Directory.Exists(dirPath);
-            }
-            catch
-            {
-                return false;
-            }
 
             if (allDirs == null)
                 allDirs = CreateDirIndex(appFilePath);
@@ -327,10 +317,9 @@ namespace ServiceStack.Host.Handlers
             var foundDir = allDirs.ContainsKey(dirPath.ToLower());
 
             //log.DebugFormat("Found dirPath {0} in Mono: ", dirPath, foundDir);
-
             return foundDir;
         }
-
+        
         private static Dictionary<string, string> allDirs; //populated by GetFiles()
         private static Dictionary<string, string> allFiles;
 

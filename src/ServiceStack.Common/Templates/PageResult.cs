@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ServiceStack.Text;
@@ -83,19 +84,31 @@ namespace ServiceStack.Templates
         public HashSet<string> ExcludeFiltersNamed { get; } = new HashSet<string>();
 
         /// <summary>
-        /// Whether to skip execution of all page filters and just write template string fragments
-        /// </summary>
-        public bool SkipFilterExecution { get; set; }
-
-        /// <summary>
         /// The last error thrown by a filter
         /// </summary>
         public Exception LastFilterError { get; set; }
         
         /// <summary>
+        /// The StackTrace where the Last Error Occured 
+        /// </summary>
+        public string[] LastFilterStackTrace { get; set; }
+        
+        /// <summary>
         /// What argument errors should be binded to
         /// </summary>
         public string AssignExceptionsTo { get; set; }
+
+        /// <summary>
+        /// Whether to skip execution of all page filters and just write template string fragments
+        /// </summary>
+        public bool SkipFilterExecution { get; set; }
+
+        /// <summary>
+        /// Overrides Context to specify whether to Ignore or Continue executing filters on error 
+        /// </summary>
+        public bool? SkipExecutingFiltersIfError { get; set; }
+        
+        private readonly Stack<string> stackTrace = new Stack<string>();
 
         private PageResult(PageFormat format)
         {
@@ -135,6 +148,8 @@ namespace ServiceStack.Templates
             //If PageResult has any OutputFilters Buffer and chain stream responses to each
             using (var ms = MemoryStreamFactory.GetStream())
             {
+                stackTrace.Push("OutputTransformer");
+                
                 await WriteToAsyncInternal(ms, token);
                 Stream stream = ms;
 
@@ -149,6 +164,8 @@ namespace ServiceStack.Templates
                     stream.Position = 0;
                     await stream.CopyToAsync(responseStream);
                 }
+
+                stackTrace.Pop();
             }
         }
 
@@ -194,6 +211,8 @@ namespace ServiceStack.Templates
 
             if (LayoutPage != null)
             {
+                stackTrace.Push("Layout: " + LayoutPage.VirtualPath);
+                
                 foreach (var fragment in LayoutPage.PageFragments)
                 {
                     if (fragment is PageStringFragment str)
@@ -212,6 +231,8 @@ namespace ServiceStack.Templates
                         }
                     }
                 }
+
+                stackTrace.Pop();
             }
             else
             {
@@ -221,8 +242,10 @@ namespace ServiceStack.Templates
 
         public bool ShouldSkipFilterExecution(PageVariableFragment var)
         {
-            return SkipFilterExecution && 
-                   !TemplateConfig.OnlyEvaluateFiltersWhenSkippingPageFilterExecution.Contains(var.BindingString);
+            return SkipFilterExecution && (var.BindingString != null 
+               ? !TemplateConfig.OnlyEvaluateFiltersWhenSkippingPageFilterExecution.Contains(var.BindingString)
+               : var.InitialExpression?.NameString == null || 
+                 !TemplateConfig.OnlyEvaluateFiltersWhenSkippingPageFilterExecution.Contains(var.InitialExpression.NameString));
         }
 
         public TemplateContext Context => Page?.Context ?? CodePage.Context;
@@ -306,6 +329,8 @@ namespace ServiceStack.Templates
             //If PageResult has any PageFilters Buffer and chain stream responses to each
             using (var ms = MemoryStreamFactory.GetStream())
             {
+                stackTrace.Push("PageTransformer");
+
                 await WritePageAsyncInternal(page, new TemplateScopeContext(this, ms, scope.ScopedParams), token);
                 Stream stream = ms;
 
@@ -320,12 +345,16 @@ namespace ServiceStack.Templates
                     stream.Position = 0;
                     await stream.CopyToAsync(scope.OutputStream);
                 }
+
+                stackTrace.Pop();
             }
         }
 
         internal async Task WritePageAsyncInternal(TemplatePage page, TemplateScopeContext scope, CancellationToken token = default(CancellationToken))
         {
             await page.Init(); //reload modified changes if needed
+
+            stackTrace.Push("Page: " + Page.VirtualPath);
             
             foreach (var fragment in page.PageFragments)
             {
@@ -338,6 +367,8 @@ namespace ServiceStack.Templates
                     await WriteVarAsync(scope, var, token);
                 }
             }
+            
+            stackTrace.Pop();
         }
 
         public async Task WriteCodePageAsync(TemplateCodePage page, TemplateScopeContext scope, CancellationToken token = default(CancellationToken))
@@ -378,8 +409,31 @@ namespace ServiceStack.Templates
             return page.WriteAsync(scope);
         }
 
+        private string toDebugString(object instance)
+        {
+            using (JsConfig.With(excludeTypeInfo:true, includeTypeInfo:false))
+            {
+                if (instance is Dictionary<string, object> d)
+                    return d.ToJsv();
+                if (instance is List<object> l)
+                    return l.ToJsv();
+                if (instance is string s)
+                    return '"' + s.Replace("\"", "\\\"") + '"';
+                return instance.ToJsv();
+            }
+        }
+
         private async Task WriteVarAsync(TemplateScopeContext scope, PageVariableFragment var, CancellationToken token)
         {
+            if (var.BindingString != null)
+                stackTrace.Push("Expression (binding): " + var.BindingString);
+            else if (var.InitialExpression?.NameString != null)
+                stackTrace.Push("Expression (filter): " + var.InitialExpression.NameString);
+            else if (var.InitialValue != null)
+                stackTrace.Push($"Expression ({var.InitialValue.GetType().Name}): " + toDebugString(var.InitialValue).SubstringWithElipsis(0, 200));
+            else 
+                stackTrace.Push("Expression");
+            
             var value = await EvaluateAsync(var, scope, token);
             if (value != IgnoreResult.Value)
             {
@@ -395,6 +449,8 @@ namespace ServiceStack.Templates
                         await scope.OutputStream.WriteAsync(bytes, token);
                 }
             }
+
+            stackTrace.Pop();
         }
 
         private Func<Stream, Task<Stream>> GetFilterTransformer(string name)
@@ -629,8 +685,10 @@ namespace ServiceStack.Templates
                 catch (StopFilterExecutionException ex)
                 {
                     LastFilterError = ex.InnerException;
+                    LastFilterStackTrace = stackTrace.ToArray();
 
-                    if (Context.SkipExecutingPageFiltersIfError)
+                    var skipExecutingFilters = SkipExecutingFiltersIfError.GetValueOrDefault(Context.SkipExecutingFiltersIfError);
+                    if (skipExecutingFilters)
                         this.SkipFilterExecution = true;
 
                     var rethrow = TemplateConfig.FatalExceptions.Contains(ex.InnerException.GetType());
@@ -651,8 +709,10 @@ namespace ServiceStack.Templates
                         }
                     }
                     
-                    if (Context.SkipExecutingPageFiltersIfError)
+                    if (SkipExecutingFiltersIfError.HasValue || Context.SkipExecutingFiltersIfError)
                         return string.Empty;
+                    
+                    // rethrow exceptiosn which aren't handled
 
                     var exResult = Format.OnExpressionException(this, ex);
                     if (exResult != null)

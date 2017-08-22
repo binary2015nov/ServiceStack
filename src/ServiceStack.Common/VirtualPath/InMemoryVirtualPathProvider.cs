@@ -25,11 +25,11 @@ namespace ServiceStack.VirtualPath
             this.rootDirectory = new InMemoryVirtualDirectory(this, null);
         }
 
+        public const char DirSep = '/';
+
         public List<InMemoryVirtualFile> files;
 
         public InMemoryVirtualDirectory rootDirectory;
-
-        public const char DirSep = '/';
 
         public override IVirtualDirectory RootDirectory => rootDirectory;
 
@@ -45,8 +45,12 @@ namespace ServiceStack.VirtualPath
             return files.FirstOrDefault(x => x.FilePath == filePath);
         }
 
-        public override IVirtualDirectory GetDirectory(string dirPath)
+        public override IVirtualDirectory GetDirectory(string virtualPath)
         {
+            var dirPath = SanitizePath(virtualPath);
+            if (string.IsNullOrEmpty(dirPath))
+                return rootDirectory;
+            
             var dir = new InMemoryVirtualDirectory(this, dirPath, GetParentDirectory(dirPath));
             return dir.Files.Any()
                 ? dir
@@ -214,15 +218,6 @@ namespace ServiceStack.VirtualPath
             return fromDirPath.CountOccurrencesOf(DirSep) == subDirPath.CountOccurrencesOf(DirSep) - 1 
                 ? subDirPath
                 : null;
-        }
-
-        public string SanitizePath(string filePath)
-        {
-            var sanitizedPath = string.IsNullOrEmpty(filePath)
-                ? null
-                : (filePath[0] == DirSep ? filePath.Substring(1) : filePath);
-
-            return sanitizedPath?.Replace('\\', DirSep);
         }
     }
 

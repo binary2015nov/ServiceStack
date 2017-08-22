@@ -5,6 +5,7 @@ using ServiceStack.Auth;
 using ServiceStack.Caching;
 using ServiceStack.Configuration;
 using ServiceStack.Host;
+using ServiceStack.IO;
 using ServiceStack.Web;
 
 namespace ServiceStack
@@ -249,5 +250,10 @@ namespace ServiceStack
                 ? hasResolver.Resolver.TryResolve<T>() 
                 : Service.DefaultResolver.TryResolve<T>();
         }
+
+        public static IVirtualFile GetFile(this IRequest request) => request is IHasVirtualFiles vfs ? vfs.GetFile() : null;
+        public static IVirtualDirectory GetDirectory(this IRequest request) => request is IHasVirtualFiles vfs ? vfs.GetDirectory() : null;
+        public static bool IsFile(this IRequest request) => request is IHasVirtualFiles vfs && vfs.IsFile;
+        public static bool IsDirectory(this IRequest request) => request is IHasVirtualFiles vfs && vfs.IsDirectory;
     }
 }

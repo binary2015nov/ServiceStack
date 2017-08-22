@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using ServiceStack.Configuration;
+using ServiceStack.IO;
 using ServiceStack.Messaging;
 using ServiceStack.Text;
 using ServiceStack.Web;
 
 namespace ServiceStack.Host
 {
-    public class BasicRequest : IRequest, IHasResolver
+    public class BasicRequest : IRequest, IHasResolver, IHasVirtualFiles
     {
         public object Dto { get; set; }
         public IMessage Message { get; set; }
@@ -19,8 +20,8 @@ namespace ServiceStack.Host
         private IResolver resolver;
         public IResolver Resolver
         {
-            get { return resolver ?? Service.DefaultResolver; }
-            set { resolver = value; }
+            get => resolver ?? Service.GlobalResolver;
+            set => resolver = value;
         }
 
         public BasicRequest(object requestDto, 
@@ -33,6 +34,7 @@ namespace ServiceStack.Host
             Message = message ?? new Message();
             ContentType = this.ResponseContentType = MimeTypes.Json;
             this.Headers = PclExportClient.Instance.NewNameValueCollection();
+
             if (Message.Body != null)
             {
                 PathInfo = "/json/oneway/" + OperationName;
@@ -55,8 +57,8 @@ namespace ServiceStack.Host
         private string operationName;
         public string OperationName
         {
-            get { return operationName ?? (operationName = Message.Body?.GetType().GetOperationName()); }
-            set { operationName = value; }
+            get => operationName ?? (operationName = Message.Body?.GetType().GetOperationName());
+            set => operationName = value;
         }
 
         public T TryResolve<T>()
@@ -100,7 +102,7 @@ namespace ServiceStack.Host
 
         public string PathInfo { get; set; }
 
-        public string PhysicalPath { get; set; }
+        public string OriginalPathInfo => PathInfo;
 
         public IHttpFile[] Files { get; set; }
         
@@ -146,5 +148,13 @@ namespace ServiceStack.Host
             this.AcceptTypes = request.AcceptTypes;
             return this;
         }
-    }
+
+        public IVirtualFile GetFile() => HostContext.VirtualFileSources.GetFile(PathInfo);
+
+        public IVirtualDirectory GetDirectory() => HostContext.VirtualFileSources.GetDirectory(PathInfo);
+        
+        public bool IsFile { get; set; }
+        
+        public bool IsDirectory { get; set; }
+   }
 }

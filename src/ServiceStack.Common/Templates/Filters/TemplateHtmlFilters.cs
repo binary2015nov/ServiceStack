@@ -6,6 +6,8 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Templates
 {
+    // ReSharper disable InconsistentNaming
+    
     public class TemplateHtmlFilters : TemplateFilter
     {
         public IRawString htmlList(TemplateScopeContext scope, object target) => htmlList(scope, target, null);
@@ -293,10 +295,10 @@ namespace ServiceStack.Templates
             return !(first == null || first is string || first.GetType().IsValueType());
         }
 
-        public IRawString htmlError(TemplateScopeContext scope) => htmlError(scope.PageResult.LastFilterError);
-        [HandleUnknownValue] public IRawString htmlError(Exception ex) => htmlError(ex, null);
-        [HandleUnknownValue] public IRawString htmlError(Exception ex, object options) => 
-            Context.DebugMode ? htmlErrorDebug(ex, options) : htmlErrorMessage(ex, options);
+        public IRawString htmlError(TemplateScopeContext scope) => htmlError(scope, scope.PageResult.LastFilterError);
+        [HandleUnknownValue] public IRawString htmlError(TemplateScopeContext scope, Exception ex) => htmlError(scope, ex, null);
+        [HandleUnknownValue] public IRawString htmlError(TemplateScopeContext scope, Exception ex, object options) => 
+            Context.DebugMode ? htmlErrorDebug(scope, ex, options) : htmlErrorMessage(ex, options);
 
         public IRawString htmlErrorMessage(TemplateScopeContext scope) => htmlErrorMessage(scope.PageResult.LastFilterError);
         [HandleUnknownValue] public IRawString htmlErrorMessage(Exception ex) => htmlErrorMessage(ex, null);
@@ -312,9 +314,12 @@ namespace ServiceStack.Templates
             return $"<div class=\"{className}\">{ex.Message}</div>".ToRawString();
         }
 
-        public IRawString htmlErrorDebug(TemplateScopeContext scope) => htmlErrorDebug(scope.PageResult.LastFilterError);
-        [HandleUnknownValue] public IRawString htmlErrorDebug(Exception ex) => htmlErrorDebug(ex, null);
-        [HandleUnknownValue] public IRawString htmlErrorDebug(Exception ex, object options)
+        public IRawString htmlErrorDebug(TemplateScopeContext scope) => htmlErrorDebug(scope, scope.PageResult.LastFilterError);
+        [HandleUnknownValue] public IRawString htmlErrorDebug(TemplateScopeContext scope, object ex) => 
+            htmlErrorDebug(scope, ex as Exception ?? scope.PageResult.LastFilterError, ex as Dictionary<string, object>);
+        
+        [HandleUnknownValue] 
+        public IRawString htmlErrorDebug(TemplateScopeContext scope, Exception ex, object options)
         {
             if (ex == null)
                 return RawString.Empty;
@@ -322,12 +327,19 @@ namespace ServiceStack.Templates
             var scopedParams = options as Dictionary<string, object> ?? TypeConstants.EmptyObjectDictionary;
             var className = (scopedParams.TryGetValue("className", out object oClassName) ? oClassName : null) 
                             ?? Context.Args[TemplateConstants.DefaultErrorClassName];
-
+            
             var sb = StringBuilderCache.Allocate();
             sb.Append($"<pre class=\"{className}\">");
             sb.AppendLine($"{ex.GetType().Name}: {ex.Message}");
 
-            if (string.IsNullOrEmpty(ex.StackTrace))
+            var stackTrace = scope.Context.DefaultFilters.lastErrorStackTrace(scope);
+            if (!string.IsNullOrEmpty(stackTrace))
+            {
+                sb.AppendLine();
+                sb.AppendLine("StackTrace:");
+                sb.AppendLine(stackTrace);
+            }
+            else if (!string.IsNullOrEmpty(ex.StackTrace))
             {
                 sb.AppendLine();
                 sb.AppendLine("StackTrace:");
@@ -342,10 +354,9 @@ namespace ServiceStack.Templates
                 while (innerEx != null)
                 {
                     sb.AppendLine($"{innerEx.GetType().Name}: {innerEx.Message}");
-                    if (Context.DebugMode)
+                    if (!string.IsNullOrEmpty(innerEx.StackTrace))
                         sb.AppendLine(innerEx.StackTrace);
                     innerEx = innerEx.InnerException;
-                    ;
                 }
             }
             sb.AppendLine("</pre>");

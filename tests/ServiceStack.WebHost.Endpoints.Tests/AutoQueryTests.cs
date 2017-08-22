@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Runtime.Serialization;
 using System.Threading;
 using Funq;
@@ -118,6 +119,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                     UInt = 9,
                     ULong = 10,
                     UShort = 11,
+                    Enum = HttpStatusCode.MethodNotAllowed,
+                    NullableEnum = HttpStatusCode.MethodNotAllowed,
                 });
 
                 db.DropAndCreateTable<Adhoc>();
@@ -542,6 +545,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public List<RockstarAlbum> Albums { get; set; } 
     }
 
+    [Route("/query/all-fields")]
     public class QueryAllFields : QueryDb<AllFields>
     {
         public virtual Guid Guid { get; set; }
@@ -568,8 +572,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public virtual DateTime? NullableDateTime { get; set; }
         public virtual TimeSpan? NullableTimeSpan { get; set; }
         public virtual Guid? NullableGuid { get; set; }
+        public HttpStatusCode Enum { get; set; }
+        public HttpStatusCode? NullableEnum { get; set; }
     }
-
+    
     [DataContract]
     public class Adhoc
     {
@@ -1869,6 +1875,18 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             response.PrintDump();
         }
+
+        //[Test]
+        //public void Can_use_implicit_query_on_enums()
+        //{
+        //    var response = Config.ListeningOn.CombineWith("query", "all-fields")
+        //        .AddQueryParam("EnumContains", "Not")
+        //        .GetJsonFromUrl()
+        //        .FromJson<QueryResponse<AllFields>>();
+
+        //    Assert.That(response.Results[0].Enum, Is.EqualTo(HttpStatusCode.MethodNotAllowed));
+        //}
+
     }
 
     public static class AutoQueryExtensions

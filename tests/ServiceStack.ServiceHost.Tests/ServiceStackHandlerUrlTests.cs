@@ -83,6 +83,7 @@ namespace ServiceStack.ServiceHost.Tests
             public bool IsSecureConnection { get; private set; }
             public string[] AcceptTypes { get; private set; }
             public string PathInfo { get; private set; }
+            public string OriginalPathInfo => PathInfo;
             public Stream InputStream { get; private set; }
             public long ContentLength { get; private set; }
             public IHttpFile[] Files { get; private set; }
@@ -94,17 +95,14 @@ namespace ServiceStack.ServiceHost.Tests
 
         readonly List<MockUrlHttpRequest> allResults = new List<MockUrlHttpRequest> {
             new MockUrlHttpRequest(null, "/handler.all35/json/metadata", "/handler.all35/json/metadata?op=Hello"),
-            new MockUrlHttpRequest(null, "/handler.all35/json/metadata/", "/handler.all35/json/metadata/?op=Hello"),
         };
 
         readonly List<MockUrlHttpRequest> apiResults = new List<MockUrlHttpRequest> {
             new MockUrlHttpRequest(null, "/location.api.wildcard35/api/json/metadata", "/location.api.wildcard35/api/json/metadata?op=Hello"),
-            new MockUrlHttpRequest(null, "/location.api.wildcard35/api/json/metadata/", "/location.api.wildcard35/api/json/metadata/?op=Hello"),
         };
 
         readonly List<MockUrlHttpRequest> serviceStacksResults = new List<MockUrlHttpRequest> {
             new MockUrlHttpRequest(null, "/location.servicestack.wildcard35/servicestack/json/metadata", "/location.servicestack.wildcard35/servicestack/json/metadata?op=Hello"),
-            new MockUrlHttpRequest(null, "/location.servicestack.wildcard35/servicestack/json/metadata/", "/location.servicestack.wildcard35/servicestack/json/metadata/?op=Hello"),
         };
 
         [Test]

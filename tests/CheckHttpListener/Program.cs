@@ -6,6 +6,7 @@ using Check.ServiceModel;
 using Funq;
 using ServiceStack;
 using ServiceStack.Admin;
+using ServiceStack.Api.OpenApi;
 using ServiceStack.Auth;
 using ServiceStack.Data;
 using ServiceStack.OrmLite;
@@ -25,11 +26,9 @@ namespace CheckHttpListener
             new Rockstar { Id = 7, FirstName = "Michael", LastName = "Jackson", Age = 50 },
         };
 
-        public AppSelfHost() : base("DocuRec Services", typeof(TestService).Assembly)
-        {
-            Config.CompressFilesWithExtensions = new HashSet<string> { "html", "js" };
-            Config.DebugMode = false;
-        }
+        public AppSelfHost()
+            : base("DocuRec Services", typeof(TestService).Assembly)
+        { }
 
         public override void Configure(Container container)
         {
@@ -41,6 +40,10 @@ namespace CheckHttpListener
                 db.DropAndCreateTable<Rockstar>();
                 db.InsertAll(SeedRockstars);
             }
+            
+            Plugins.Add(new TemplatePagesFeature());
+            
+            Plugins.Add(new OpenApiFeature());
 
             Plugins.Add(new AutoQueryFeature { MaxLimit = 100 });
             Plugins.Add(new AdminFeature());
@@ -52,14 +55,20 @@ namespace CheckHttpListener
                   { typeof(AuthenticateService), new[] { "/api/auth", "/api/auth/{provider}" } },
                 }
             });
+
+            SetConfig(new HostConfig
+            {
+                CompressFilesWithExtensions = { "html", "js" },
+                DebugMode = true
+            });
         }
 
-        public override RouteAttribute[] GetRouteAttributes(Type requestType)
-        {
-            var routes = base.GetRouteAttributes(requestType);
-            routes.Each(x => x.Path = "/api" + x.Path);
-            return routes;
-        }
+//        public override RouteAttribute[] GetRouteAttributes(Type requestType)
+//        {
+//            var routes = base.GetRouteAttributes(requestType);
+//            routes.Each(x => x.Path = "/api" + x.Path);
+//            return routes;
+//        }
     }
 
     [Route("/query/rockstars")]

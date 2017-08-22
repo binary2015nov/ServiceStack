@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using ServiceStack.Auth;
@@ -11,6 +12,8 @@ using ServiceStack.Web;
 
 namespace ServiceStack
 {
+    // ReSharper disable InconsistentNaming
+    
     public class TemplateInfoFilters : TemplateFilter
     {
 
@@ -45,6 +48,7 @@ namespace ServiceStack
         public Version envVersion() => Environment.Version;
         public string[] envLogicalDrives() => Environment.GetLogicalDrives();
 #elif NETSTANDARD1_3
+        public string envCurrentDirectory() => Directory.GetCurrentDirectory();
         public bool envIsWindows() => System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
         public bool envIsLinux() => System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
         public bool envIsOSX() => System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX);
@@ -68,7 +72,7 @@ namespace ServiceStack
         public bool userHasPermission(TemplateScopeContext scope, string permission) => 
             userSession(scope)?.HasPermission(permission, HostContext.AppHost.GetAuthRepository(req(scope))) == true;
 
-        public List<OperationDto> metaAllDtos() => HostContext.Metadata.GetOperationDtos();
+        public HashSet<Type> metaAllDtos() => HostContext.Metadata.GetAllDtos();
         public List<string> metaAllDtoNames() => HostContext.Metadata.GetOperationDtos().Map(x => x.Name);
         public IEnumerable<Operation> metaAllOperations() => HostContext.Metadata.Operations;
         public List<string> metaAllOperationNames() => HostContext.Metadata.GetAllOperationNames();

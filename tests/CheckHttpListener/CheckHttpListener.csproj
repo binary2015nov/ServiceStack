@@ -81,6 +81,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RequestInfoTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -89,6 +90,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\ServiceStack.Api.OpenApi\ServiceStack.Api.OpenApi.csproj">
+      <Project>{5e258282-86a6-4780-ab25-5e458f2e6f70}</Project>
+      <Name>ServiceStack.Api.OpenApi</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\ServiceStack.Client\ServiceStack.Client.csproj">
       <Project>{c43f583f-abde-4dd4-bbe3-66322817a6ad}</Project>
       <Name>ServiceStack.Client</Name>
@@ -116,6 +121,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="default.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="dir\index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="dir\sub\index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="js\jquery-1.7.1.min.js">

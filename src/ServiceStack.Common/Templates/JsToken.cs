@@ -84,6 +84,8 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
             if (ReferenceEquals(this, obj)) return true;
             return obj.GetType() == this.GetType() && Equals((JsConstant) obj);
         }
+
+        public override string ToString() => ToRawString();
     }
 
     public class JsBinding : JsToken
@@ -108,6 +110,8 @@ namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
             if (obj.GetType() != this.GetType()) return false;
             return Equals((JsBinding) obj);
         }
+
+        public override string ToString() => ToRawString();
     }
 
     public abstract class JsOperator : JsBinding

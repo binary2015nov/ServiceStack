@@ -5,6 +5,7 @@ using System.Web.Routing;
 using Check.ServiceInterface;
 using Funq;
 using ServiceStack;
+using ServiceStack.Api.OpenApi;
 using ServiceStack.Configuration;
 using ServiceStack.Data;
 using ServiceStack.Mvc;
@@ -16,10 +17,8 @@ namespace CheckMvc
 {
     public class AppHost : AppHostBase
     {
-        public AppHost() : base("Check MVC", typeof(ErrorsService).Assembly)
-        {
-            Config.DebugMode = true;
-        }
+        public AppHost()
+            : base("Check MVC", typeof(ErrorsService).Assembly) {}
 
         public override void Configure(Container container)
         {
@@ -30,6 +29,12 @@ namespace CheckMvc
                 new RedisManagerPool());
 
             container.Register(c => c.Resolve<IRedisClientsManager>().GetCacheClient());
+
+            SetConfig(new HostConfig { DebugMode = true });
+            
+            Plugins.Add(new TemplatePagesFeature());
+            
+            Plugins.Add(new OpenApiFeature());
         }
     }
 

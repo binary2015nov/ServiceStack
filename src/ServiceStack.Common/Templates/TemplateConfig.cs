@@ -8,13 +8,29 @@ namespace ServiceStack.Templates
         public static HashSet<string> RemoveNewLineAfterFiltersNamed { get; set; } = new HashSet<string>
         {
             "assignTo",
+            "assignError",
             "do",
             "end",
             "throw",
-            "endIfError",
+            "ifthrow",
+            "throwIf",
+            "throwIf",
+            "ifThrowArgumentException",
+            "ifThrowArgumentNullException",
+            "throwArgumentNullExceptionIf",
+            "throwArgumentException",
+            "throwArgumentNullException",
+            "throwNotSupportedException",
+            "throwNotImplementedException",
+            "throwUnauthorizedAccessException",
+            "throwFileNotFoundException",
+            "throwOptimisticConcurrencyException",
+            "throwNotSupportedException",
             "ifError",
             "ifErrorFmt",
-            "ifErrorSkipExecutingPageFilters",
+            "skipExecutingFiltersOnError",
+            "continueExecutingFiltersOnError",
+            "publishToGateway",
         };
         
         public static HashSet<string> OnlyEvaluateFiltersWhenSkippingPageFilterExecution { get; set; } = new HashSet<string>
@@ -34,6 +50,12 @@ namespace ServiceStack.Templates
             typeof(NotSupportedException),
             typeof(System.Reflection.TargetInvocationException),
             typeof(NotImplementedException),
+        };
+        
+        public static HashSet<Type> CaptureAndEvaluateExceptionsToNull { get; set; } = new HashSet<Type>
+        {
+            typeof(NullReferenceException),
+            typeof(ArgumentNullException),
         };
     }
 }

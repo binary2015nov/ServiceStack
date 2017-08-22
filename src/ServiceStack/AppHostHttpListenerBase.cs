@@ -59,8 +59,9 @@ namespace ServiceStack
 
             var operationName = context.Request.GetOperationName().UrlDecode();
 
-            var httpReq = context.ToRequest(operationName);
+            var httpReq = (ListenerRequest)context.ToRequest(operationName);
             var httpRes = httpReq.Response;
+
             var handler = HttpHandlerFactory.GetHandler(httpReq);
 
             var serviceStackHandler = handler as IServiceStackHandler;

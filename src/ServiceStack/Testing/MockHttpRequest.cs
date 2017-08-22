@@ -6,20 +6,21 @@ using System.Net;
 using Funq;
 using ServiceStack.Configuration;
 using ServiceStack.Host;
+using ServiceStack.IO;
 using ServiceStack.Web;
 
 namespace ServiceStack.Testing
 {
-    public class MockHttpRequest : IHttpRequest, IHasResolver
+    public class MockHttpRequest : IHttpRequest, IHasResolver, IHasVirtualFiles
     {
         [Obsolete("Use Resolver")]
-        public Container Container { get { throw new NotSupportedException("Use Resolver"); } }
+        public Container Container => throw new NotSupportedException("Use Resolver");
 
         private IResolver resolver;
         public IResolver Resolver
         {
-            get { return resolver ?? Service.DefaultResolver; }
-            set { resolver = value; }
+            get => resolver ?? Service.GlobalResolver;
+            set => resolver = value;
         }
 
         public MockHttpRequest()
@@ -32,12 +33,12 @@ namespace ServiceStack.Testing
             this.Response = new MockHttpResponse(this);
         }
 
-        public MockHttpRequest(string requestName, string httpMethod,
+        public MockHttpRequest(string operationName, string httpMethod,
             string contentType, string pathInfo,
             NameValueCollection queryString, Stream inputStream, NameValueCollection formData)
             : this()
         {
-            this.OperationName = requestName;
+            this.OperationName = operationName;
             this.HttpMethod = httpMethod;
             this.ContentType = contentType;
             this.ResponseContentType = contentType;
@@ -132,6 +133,7 @@ namespace ServiceStack.Testing
         public bool IsSecureConnection { get; set; }
         public string[] AcceptTypes { get; set; }
         public string PathInfo { get; set; }
+        public string OriginalPathInfo { get; }
         public Stream InputStream { get; set; }
 
         public long ContentLength
@@ -150,13 +152,21 @@ namespace ServiceStack.Testing
         public void AddSessionCookies()
         {
             var permSessionId = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
-            this.Cookies[Keywords.PermanentSessionId] = new Cookie(Keywords.PermanentSessionId, permSessionId);
+            this.Cookies[SessionFeature.PermanentSessionId] = new Cookie(SessionFeature.PermanentSessionId, permSessionId);
             var sessionId = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
-            this.Cookies[Keywords.SessionId] = new Cookie(Keywords.SessionId, sessionId);
+            this.Cookies[SessionFeature.SessionId] = new Cookie(SessionFeature.SessionId, sessionId);
         }
 
         public Uri UrlReferrer => null;
+        
+        public IVirtualFile GetFile() => HostContext.VirtualFileSources.GetFile(PathInfo);
 
-        public string PhysicalPath { get; set; }
+        public IVirtualDirectory GetDirectory() => HostContext.VirtualFileSources.GetDirectory(PathInfo);
+
+        private bool? isDirectory;
+        public bool IsDirectory => isDirectory ?? (bool)(isDirectory = HostContext.VirtualFiles.DirectoryExists(PathInfo));
+
+        private bool? isFile;
+        public bool IsFile => isFile ?? (bool)(isFile = HostContext.VirtualFiles.FileExists(PathInfo));
     }
 }

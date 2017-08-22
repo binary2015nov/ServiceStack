@@ -15,19 +15,20 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceStack.Configuration;
+using ServiceStack.IO;
 using ServiceStack.NetCore;
 
 namespace ServiceStack.Host.NetCore
 {
-    public class NetCoreRequest : IHttpRequest, IHasResolver
+    public class NetCoreRequest : IHttpRequest, IHasResolver, IHasVirtualFiles
     {
         public static ILog log = LogManager.GetLogger(typeof(NetCoreRequest));
 
         private IResolver resolver;
         public IResolver Resolver
         {
-            get { return resolver ?? Service.DefaultResolver; }
-            set { resolver = value; }
+            get => resolver ?? Service.GlobalResolver;
+            set => resolver = value;
         }
 
         private readonly HttpContext context;
@@ -40,7 +41,12 @@ namespace ServiceStack.Host.NetCore
             this.request = context.Request;
             this.Items = new Dictionary<string, object>();
             this.RequestAttributes = attrs;
-            this.PathInfo = (pathInfo ?? request.Path.Value).Replace("+", " ");  //Kestrel does not decode '+' into space
+
+            //Kestrel does not decode '+' into space
+            this.PathInfo = this.OriginalPathInfo = (pathInfo ?? request.Path.Value).Replace("+", " ");  
+            this.PathInfo = HostContext.AppHost.ResolvePathInfo(this, PathInfo, out bool isDirectory);
+            this.IsDirectory = isDirectory;
+            this.IsFile = !isDirectory && HostContext.VirtualFileSources.FileExists(PathInfo);
         }
 
         public T TryResolve<T>()
@@ -100,14 +106,7 @@ namespace ServiceStack.Host.NetCore
         private string responseContentType;
         public string ResponseContentType
         {
-            get
-            {
-                if (responseContentType == null)
-                {
-                    responseContentType = this.GetResponseContentType();
-                }
-                return responseContentType;
-            }
+            get => responseContentType ?? (responseContentType = this.GetResponseContentType());
             set
             {
                 this.responseContentType = value;
@@ -197,13 +196,10 @@ namespace ServiceStack.Host.NetCore
 
         public bool UseBufferedStream
         {
-            get { return BufferedStream != null; }
-            set
-            {
-                BufferedStream = value
-                    ? BufferedStream ?? new MemoryStream(request.Body.ReadFully())
-                    : null;
-            }
+            get => BufferedStream != null;
+            set => BufferedStream = value
+                ? BufferedStream ?? new MemoryStream(request.Body.ReadFully())
+                : null;
         }
 
         public MemoryStream BufferedStream { get; set; }
@@ -222,7 +218,9 @@ namespace ServiceStack.Host.NetCore
 
         public string[] AcceptTypes => request.Headers[HttpHeaders.Accept].ToArray();
 
-        public string PathInfo { get; set; }
+        public string PathInfo { get; }
+
+        public string OriginalPathInfo { get; }
 
         public Stream InputStream => this.GetInputStream(BufferedStream ?? request.Body);
 
@@ -267,8 +265,6 @@ namespace ServiceStack.Host.NetCore
             }
         }
 
-        public string PhysicalPath { get; set; }
-
         public IHttpResponse HttpResponse { get; }
 
         private string httpMethod;
@@ -300,6 +296,15 @@ namespace ServiceStack.Host.NetCore
             string.IsNullOrEmpty(request.Headers[HttpHeaders.Accept])
                 ? null
                 : request.Headers[HttpHeaders.Accept].ToString();
+
+        
+        public IVirtualFile GetFile() => HostContext.VirtualFileSources.GetFile(PathInfo);
+
+        public IVirtualDirectory GetDirectory() => HostContext.VirtualFileSources.GetDirectory(PathInfo);
+
+        public bool IsDirectory{ get; }
+
+        public bool IsFile { get; }
     }
 }
 

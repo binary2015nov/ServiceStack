@@ -41,7 +41,6 @@ namespace ServiceStack.Api.Swagger
 
         public SwaggerFeature()
         {
-            LogoUrl = "//raw.githubusercontent.com/ServiceStack/Assets/master/img/artwork/logo-64-swagger.png";
             RouteSummary = new Dictionary<string, string>();
             AnyRouteVerbs = new List<string> { HttpMethods.Get, HttpMethods.Post, HttpMethods.Put, HttpMethods.Delete };
         }
@@ -75,7 +74,7 @@ namespace ServiceStack.Api.Swagger
                 : "swagger-ui/";
 
             appHost.GetPlugin<MetadataFeature>()
-                ?.AddLink(MetadataFeature.PluginLinks, swaggerUrl, "Swagger UI");
+                .AddPluginLink(swaggerUrl, "Swagger UI");
 
             appHost.CatchAllHandlers.Add((httpMethod, pathInfo, filePath) =>
             {
@@ -109,9 +108,13 @@ namespace ServiceStack.Api.Swagger
                         var resourcesUrl = req.ResolveAbsoluteUrl("~/resources");
                         var logoHref = LogoHref ?? "./";
                         html = html.Replace("http://petstore.swagger.io/v2/swagger.json", resourcesUrl)
-                            .Replace("ApiDocs", HostContext.AppHost.ServiceName)
-                            .Replace("{LogoUrl}", LogoUrl)
-                            .Replace("<a id=\"logo\" href=\"http://swagger.io\">swagger</a>", $"<a id=\"logo\" href=\"{logoHref}\">{HostContext.AppHost.ServiceName}</a>");
+                            .Replace("ApiDocs", HostContext.ServiceName)
+                            .Replace("<a id=\"logo\" href=\"http://swagger.io\">swagger</a>", $"<a id=\"logo\" href=\"{logoHref}\">{HostContext.ServiceName}</a>");
+
+                        if (LogoUrl != null)
+                        {
+                            html = html.Replace("{LogoUrl}", LogoUrl);
+                        }
 
                         if (injectJs != null)
                         {

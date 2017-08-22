@@ -392,6 +392,11 @@ square = 10 x 10 = 100".NormalizeNewLines()));
         {
             var context = CreateContext().Init();
 
+            Assert.That((((1 + 2) * 3) / 4) - 5, Is.EqualTo(- 3));
+            Assert.That((((1 + 2) * 3) / 4d) - 5, Is.EqualTo(-2.75));
+            Assert.That(1 + 2 * 3 / 4 - 5, Is.EqualTo(-3));
+            Assert.That(1 + 2 * 3 / 4d - 5, Is.EqualTo(-2.5));
+            
             context.VirtualFiles.WriteFile("page-chained.html",
                 @"(((1 + 2) * 3) / 4) - 5 = {{ 1 | add(2) | multiply(3) | divide(4) | subtract(5) }}");
             var result = await new PageResult(context.GetPage("page-chained")).RenderToStringAsync();
@@ -1258,5 +1263,21 @@ dir-file: dir/dir-file.txt
             
         }
 
+        [Test]
+        public void Does_match_pathInfo()
+        {
+            var context = new TemplateContext
+            {
+                Args =
+                {
+                    ["PathInfo"] = "/dir/sub"
+                }
+            }.Init();
+
+            Assert.That(context.EvaluateTemplate("{{ '/dir/sub' | matchesPathInfo }}"), Is.EqualTo("True"));
+            Assert.That(context.EvaluateTemplate("{{ 1 | ifMatchesPathInfo('/dir/sub/') }}"), Is.EqualTo("1"));
+            Assert.That(context.EvaluateTemplate("{{ 1 | ifMatchesPathInfo('/dir/su') | otherwise: 0 }}"), Is.EqualTo("0"));
+        }
+        
     }
 }
