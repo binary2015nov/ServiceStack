@@ -46,6 +46,8 @@ namespace ServiceStack.Templates
             return fmt;
         }
 
+        public IRawString formatRaw(object obj, string fmt) => raw(string.Format(fmt.Replace("{{","{").Replace("}}","}"), obj));
+        
         public string format(object obj, string format) => obj is IFormattable formattable
             ? formattable.ToString(format, null)
             : string.Format(format, obj);
@@ -196,8 +198,11 @@ namespace ServiceStack.Templates
         public string escapePrimeQuotes(string text) => text?.Replace("′", "\\′");
         public string escapeNewLines(string text) => text?.Replace("\r", "\\r").Replace("\n", "\\n");
 
-        public IRawString jsString(string text) => escapeNewLines(escapeSingleQuotes(text)).ToRawString();
-        public IRawString jsQuotedString(string text) => ("'" + escapeNewLines(escapeSingleQuotes(text)) + "'").ToRawString();
+        [HandleUnknownValue] public IRawString jsString(string text) => string.IsNullOrEmpty(text) 
+            ? RawString.Empty 
+            : escapeNewLines(escapeSingleQuotes(text)).ToRawString();
+        [HandleUnknownValue] public IRawString jsQuotedString(string text) => 
+            ("'" + escapeNewLines(escapeSingleQuotes(text ?? "")) + "'").ToRawString();
 
         private async Task serialize(TemplateScopeContext scope, object items, string jsconfig, Func<object, string> fn)
         {

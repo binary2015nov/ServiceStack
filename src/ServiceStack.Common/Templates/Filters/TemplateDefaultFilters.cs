@@ -134,10 +134,6 @@ namespace ServiceStack.Templates
         [HandleUnknownValue] public object endIfTruthy(object ignoreTarget, object target) => !isFalsy(target) ? (object) StopExecution.Value : IgnoreResult.Value;
         [HandleUnknownValue] public object endIf(object test) => isTrue(test) ? (object)StopExecution.Value : IgnoreResult.Value;
 
-        [HandleUnknownValue] public object ifEnd(bool test) => test ? (object)StopExecution.Value : IgnoreResult.Value;
-        [HandleUnknownValue] public object ifEnd(object ignoreTarget, bool test) => test ? (object)StopExecution.Value : IgnoreResult.Value;
-        [HandleUnknownValue] public object ifNotEnd(bool test) => !test ? (object)StopExecution.Value : IgnoreResult.Value;
-        [HandleUnknownValue] public object ifNotEnd(object ignoreTarget, bool test) => !test ? (object)StopExecution.Value : IgnoreResult.Value;
         [HandleUnknownValue] public object endIf(object returnTarget, bool test) => test ? StopExecution.Value : returnTarget;
         [HandleUnknownValue] public object endIfAny(TemplateScopeContext scope, object target, object expression) => any(scope, target, expression) ? StopExecution.Value : target;
         [HandleUnknownValue] public object endIfAll(TemplateScopeContext scope, object target, object expression) => all(scope, target, expression) ? StopExecution.Value : target;
@@ -157,6 +153,53 @@ namespace ServiceStack.Templates
                 ? StopExecution.Value
                 : target;
         }
+        
+        [HandleUnknownValue] public object ifEnd(bool test) => test ? (object)StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object ifEnd(object ignoreTarget, bool test) => test ? (object)StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object ifNotEnd(bool test) => !test ? (object)StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object ifNotEnd(object ignoreTarget, bool test) => !test ? (object)StopExecution.Value : IgnoreResult.Value;
+        
+        [HandleUnknownValue] public object onlyIfNull(object target) => !isNull(target) ? (object) StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object onlyIfNull(object ignoreTarget, object target) => !isNull(target) ? (object) StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object onlyIfNotNull(object target) => isNull(target) ? StopExecution.Value : target;
+        [HandleUnknownValue] public object onlyIfNotNull(object ignoreTarget, object target) => isNull(target) ? StopExecution.Value : target;
+        [HandleUnknownValue] public object onlyIfExists(object target) => isNull(target) ? (object) StopExecution.Value : target;
+        [HandleUnknownValue] public object onlyIfExists(object ignoreTarget, object target) => isNull(target) ? (object) StopExecution.Value : target;
+        [HandleUnknownValue] public object onlyIfEmpty(object target) => !isEmpty(target) ? (object) StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object onlyIfEmpty(object ignoreTarget, object target) => !isEmpty(target) ? (object) StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object onlyIfNotEmpty(object target) => isEmpty(target) ? (object) StopExecution.Value : target;
+        [HandleUnknownValue] public object onlyIfNotEmpty(object ignoreTarget, object target) => isEmpty(target) ? (object) StopExecution.Value : target;
+        [HandleUnknownValue] public object onlyIfFalsy(object target) => !isFalsy(target) ? (object) StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object onlyIfFalsy(object ignoreTarget, object target) => !isFalsy(target) ? (object) StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object onlyIfTruthy(object target) => isFalsy(target) ? (object) StopExecution.Value : target;
+        [HandleUnknownValue] public object onlyIfTruthy(object ignoreTarget, object target) => isFalsy(target) ? (object) StopExecution.Value : target;
+        [HandleUnknownValue] public object onlyIf(object test) => !isTrue(test) ? (object)StopExecution.Value : IgnoreResult.Value;
+
+        [HandleUnknownValue] public object onlyIf(object returnTarget, bool test) => !test ? StopExecution.Value : returnTarget;
+        [HandleUnknownValue] public object onlyIfAny(TemplateScopeContext scope, object target, object expression) => !any(scope, target, expression) ? StopExecution.Value : target;
+        [HandleUnknownValue] public object onlyIfAll(TemplateScopeContext scope, object target, object expression) => !all(scope, target, expression) ? StopExecution.Value : target;
+        [HandleUnknownValue] public object onlyWhere(TemplateScopeContext scope, object target, object expression) => onlyWhere(scope, target, expression, null);
+
+        [HandleUnknownValue]
+        public object onlyWhere(TemplateScopeContext scope, object target, object expression, object scopeOptions)
+        {
+            var literal = scope.AssertExpression(nameof(count), expression);
+            var scopedParams = scope.GetParamsWithItemBinding(nameof(count), scopeOptions, out string itemBinding);
+
+            literal.ParseConditionExpression(out ConditionExpression expr);
+            scope.AddItemToScope(itemBinding, target);
+            var result = expr.Evaluate(scope);
+
+            return result
+                ? target
+                : StopExecution.Value;
+        }
+        
+        [HandleUnknownValue] public object ifOnly(bool test) => !test ? (object)StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object ifOnly(object ignoreTarget, bool test) => !test ? (object)StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object ifNotOnly(bool test) => test ? (object)StopExecution.Value : IgnoreResult.Value;
+        [HandleUnknownValue] public object ifNotOnly(object ignoreTarget, bool test) => test ? (object)StopExecution.Value : IgnoreResult.Value;
+
 
         [HandleUnknownValue] public object ifDo(object test) => isTrue(test) ? (object)IgnoreResult.Value : StopExecution.Value;
         [HandleUnknownValue] public object ifDo(object ignoreTarget, object test) => isTrue(test) ? (object)IgnoreResult.Value : StopExecution.Value;
@@ -164,14 +207,29 @@ namespace ServiceStack.Templates
         [HandleUnknownValue] public object doIf(object ignoreTarget, object test) => isTrue(test) ? (object)IgnoreResult.Value : StopExecution.Value;
 
         [HandleUnknownValue] public object ifUse(object test, object useValue) => isTrue(test) ? useValue : StopExecution.Value;
+        [HandleUnknownValue] public object ifShow(object test, object useValue) => isTrue(test) ? useValue : StopExecution.Value;
+        [HandleUnknownValue] public object ifShowRaw(object test, object useValue) => isTrue(test) ? (object) raw(useValue) : StopExecution.Value;
+
         [HandleUnknownValue] public object useIf(object useValue, object test) => isTrue(test) ? useValue : StopExecution.Value;
+        [HandleUnknownValue] public object showIf(object useValue, object test) => isTrue(test) ? useValue : StopExecution.Value;
 
         public object use(object ignoreTarget, object useValue) => useValue;
         public object show(object ignoreTarget, object useValue) => useValue;
+        public IRawString showRaw(object ignoreTarget, string content) => content.ToRawString();
+
         public object useFmt(object ignoreTarget, string format, object arg) => fmt(format, arg);
         public object useFmt(object ignoreTarget, string format, object arg1, object arg2) => fmt(format, arg1, arg2);
         public object useFmt(object ignoreTarget, string format, object arg1, object arg2, object arg3) => fmt(format, arg1, arg2, arg3);
         public object useFormat(object ignoreTarget, object arg, string fmt) => format(arg, fmt);
+
+        public object showFmt(object ignoreTarget, string format, object arg) => fmt(format, arg);
+        public object showFmt(object ignoreTarget, string format, object arg1, object arg2) => fmt(format, arg1, arg2);
+        public object showFmt(object ignoreTarget, string format, object arg1, object arg2, object arg3) => fmt(format, arg1, arg2, arg3);
+        public object showFormat(object ignoreTarget, object arg, string fmt) => format(arg, fmt);
+
+        public IRawString showFmtRaw(object ignoreTarget, string format, object arg) => raw(fmt(format, arg));
+        public IRawString showFmtRaw(object ignoreTarget, string format, object arg1, object arg2) => raw(fmt(format, arg1, arg2));
+        public IRawString showFmtRaw(object ignoreTarget, string format, object arg1, object arg2, object arg3) => raw(fmt(format, arg1, arg2, arg3));
 
         [HandleUnknownValue] public bool isString(object target) => target is string;
         [HandleUnknownValue] public bool isInt(object target) => target is int;
@@ -259,6 +317,117 @@ namespace ServiceStack.Templates
 
         public IEnumerable<object> reverse(TemplateScopeContext scope, IEnumerable<object> original) => original.Reverse();
 
+        public KeyValuePair<string, object> keyValuePair(string key, object value) => new KeyValuePair<string, object>(key, value);
+
+        public object addToStart(TemplateScopeContext scope, object value, string argName)
+        {
+            if (value == null)
+                return null;
+            
+            if (scope.ScopedParams.TryGetValue(argName, out object collection))
+            {
+                if (collection is IList l)
+                {
+                    l.Insert(0, value);
+                }                
+                else if (collection is IEnumerable e && !(collection is string))
+                {
+                    var to = new List<object> { value };
+                    foreach (var item in e)
+                    {
+                        to.Add(item);
+                    }
+                    scope.ScopedParams[argName] = to;
+                }
+                else throw new NotSupportedException(nameof(addToStart) + " can only add to an IEnumerable not a " + collection.GetType().Name);
+            }
+            else
+            {
+                if (value is IEnumerable && !(value is string))
+                    scope.ScopedParams[argName] = value;
+                else
+                    scope.ScopedParams[argName] = new List<object> { value };
+            }
+            
+            return IgnoreResult.Value;
+        }
+
+        public object addTo(TemplateScopeContext scope, object value, string argName) 
+        {
+            if (value == null)
+                return null;
+            
+            if (scope.ScopedParams.TryGetValue(argName, out object collection))
+            {
+                if (collection is IList l)
+                {
+                    if (value is IEnumerable e && !(value is string))
+                    {
+                        foreach (var item in e)
+                        {
+                            l.Add(item);
+                        }
+                    }
+                    else
+                    {
+                        l.Add(value);
+                    }
+                }                
+                else if (collection is IDictionary d)
+                {
+                    if (value is KeyValuePair<string, object> kvp)
+                    {
+                        d[kvp.Key] = kvp.Value;
+                    }
+                    else if (value is IEnumerable<KeyValuePair<string, object>> kvps)
+                    {
+                        foreach (var entry in kvps)
+                        {
+                            d[entry.Key] = entry.Value;
+                        }
+                    }
+                    else if (value is IDictionary dValue)
+                    {
+                        var keys = dValue.Keys;
+                        foreach (var key in keys)
+                        {
+                            d[key] = dValue[key];
+                        }
+                    }
+                }
+                else if (collection is IEnumerable e && !(collection is string))
+                {
+                    var to = new List<object>();
+                    foreach (var item in e)
+                    {
+                        to.Add(item);
+                    }
+                    if (value is IEnumerable eValues && !(value is string))
+                    {
+                        foreach (var item in eValues)
+                        {
+                            to.Add(item);
+                        }
+                    }
+                    else
+                    {
+                        to.Add(value);
+                    }
+                    scope.ScopedParams[argName] = to;
+                }
+                else throw new NotSupportedException(nameof(addTo) + " can only add to an IEnumerable not a " + collection.GetType().Name);
+            }
+            else
+            {
+                if (value is IEnumerable && !(value is string))
+                    scope.ScopedParams[argName] = value;
+                else
+                    scope.ScopedParams[argName] = new List<object> { value };
+            }
+            
+            return IgnoreResult.Value;
+        }
+        
         public object assign(TemplateScopeContext scope, string argExpr, object value) //from filter
         {
             var targetEndPos = argExpr.IndexOfAny(new[] { '.', '[' });
@@ -278,7 +447,7 @@ namespace ServiceStack.Templates
             return value;
         }
 
-        public object assignTo(TemplateScopeContext scope, object value, string argName) //from filter
+        public object assignTo(TemplateScopeContext scope, object value, string argName)
         {
             scope.ScopedParams[argName] = value;
             return IgnoreResult.Value;
@@ -356,7 +525,7 @@ namespace ServiceStack.Templates
             if (target == null)
                 return null;
             
-            if (target is Dictionary<string, object> objDictionary)
+            if (target is IDictionary<string, object> objDictionary)
                 return objDictionary.Keys.ToList();
             if (target is IDictionary dictionary)
                 return dictionary.Keys.Map(x => x.ToString());
@@ -387,7 +556,7 @@ namespace ServiceStack.Templates
             if (target == null)
                 return null;
             
-            if (target is Dictionary<string, object> objDictionary)
+            if (target is IDictionary<string, object> objDictionary)
                 return objDictionary.Values.ToList();
             if (target is IDictionary dictionary)
                 return dictionary.Values.Map(x => x);
@@ -601,6 +770,70 @@ namespace ServiceStack.Templates
             throw new NotSupportedException($"'{nameof(scopeVars)}' expects a Dictionary but received a '{target.GetType().Name}'");
         }
 
+        public object selectFields(object target, object names)
+        {
+            if (target == null || names == null)
+                return null;
+            
+            if (target is string || target.GetType().IsValueType())
+                throw new NotSupportedException(nameof(selectFields) + " requires an IEnumerable, IDictionary or POCO Target, received instead: " + target.GetType().Name);
+
+            var namesList = names is IEnumerable eKeys
+                ? eKeys.Map(x => x)
+                : null;
+
+            var stringKey = names as string;
+            var stringKeys = namesList?.OfType<string>().ToList();
+            if (stringKeys.IsEmpty())
+                stringKeys = null;
+
+            if (stringKey == null && stringKeys == null)
+                throw new NotSupportedException(nameof(selectFields) + " requires a string or [string] or property names, received instead: " + names.GetType().Name);
+
+            if (stringKey?.IndexOf(',') >= 0)
+            {
+                stringKeys = stringKey.Split(',').Map(x => x.Trim());
+                stringKey = null;
+            }
+            
+            var stringsSet = stringKeys != null
+                ? new HashSet<string>(stringKeys, StringComparer.OrdinalIgnoreCase)
+                : new HashSet<string> { stringKey };
+
+            var singleItem = target is IDictionary || !(target is IEnumerable);
+            if (singleItem)
+            {
+                var objDictionary = target.ToObjectDictionary();
+
+                var to = new Dictionary<string, object>();
+                foreach (var key in objDictionary.Keys)
+                {
+                    if (stringsSet.Contains(key))
+                        to[key] = objDictionary[key];
+                }
+
+                return to;
+            }
+            else 
+            {
+                var to = new List<Dictionary<string,object>>();
+                var e = (IEnumerable) target;
+                foreach (var item in e)
+                {
+                    var objDictionary = item.ToObjectDictionary();
+
+                    var row = new Dictionary<string, object>();
+                    foreach (var key in objDictionary.Keys)
+                    {
+                        if (stringsSet.Contains(key))
+                            row[key] = objDictionary[key];
+                    }
+                    to.Add(row);
+                }
+                return to;
+            }
+        }
+
         [HandleUnknownValue]
         public Task select(TemplateScopeContext scope, object target, object selectTemplate) => select(scope, target, selectTemplate, null);
         [HandleUnknownValue]
@@ -659,15 +892,84 @@ namespace ServiceStack.Templates
                 await scope.WritePageAsync(page, codePage, pageParams);
             }
         }
-        public bool matchesPathInfo(TemplateScopeContext scope, string pathInfo) => 
-            scope.GetValue("PathInfo")?.ToString().TrimEnd('/') == pathInfo?.TrimEnd('/');
+        
+        public object removeKeyFromDictionary(IDictionary dictionary, object keyToRemove)
+        {
+            var removeKeys = keyToRemove is IEnumerable e
+                ? e.Map(x => x)
+                : null;
+            
+            foreach (var key in dictionary.Keys)
+            {
+                if (removeKeys != null)
+                {
+                    foreach (var removeKey in removeKeys)
+                    {
+                        if (Equals(key, removeKey))
+                            dictionary.Remove(key);
+                    }
+                }
+                else if (Equals(key, keyToRemove))
+                {
+                    dictionary.Remove(key);
+                }
+            }
+            return dictionary;
+        }
+        
+        public object remove(object target, object keysToRemove)
+        {
+            var removeKeys = keysToRemove is IEnumerable eKeys
+                ? eKeys.Map(x => x)
+                : null;
 
-        public object ifMatchesPathInfo(TemplateScopeContext scope, object returnTarget, string pathInfo) =>
-            matchesPathInfo(scope, pathInfo) ? returnTarget : null;
+            var stringKey = keysToRemove as string;
+            var stringKeys = removeKeys?.OfType<string>().ToArray();
+            if (stringKeys.IsEmpty())
+                stringKeys = null;
+
+            if (target is IDictionary d)
+                return removeKeyFromDictionary(d, removeKeys);
+            
+            if (target is IEnumerable e)
+            {
+                object first = null;
+                foreach (var item in e)
+                {
+                    if (item == null) 
+                        continue;
+                    
+                    first = item;
+                    break;
+                }
+                if (first == null)
+                    return target;
+
+                var itemType = first.GetType();
+                var props = TypeProperties.Get(itemType);
+                
+                if (!(first is IDictionary))
+                    throw new NotSupportedException(nameof(remove) + " removes keys from a IDictionary or [IDictionary]");
+                
+                foreach (var item in e)
+                {
+                    if (item == null)
+                        continue;
+
+                    if (item is IDictionary ed)
+                    {
+                        removeKeyFromDictionary(ed, removeKeys);
+                    }
+                }
+            }
+            else throw new NotSupportedException(nameof(remove) + " removes keys from a IDictionary or [IDictionary]");
+            
+            return target;
+        }
         
         public object withoutNullValues(object target)
         {
-            if (target is Dictionary<string, object> objDictionary)
+            if (target is IDictionary<string, object> objDictionary)
             {
                 var keys = objDictionary.Keys.ToList();
                 var to = new Dictionary<string, object>();
@@ -696,7 +998,7 @@ namespace ServiceStack.Templates
         
         public object withoutEmptyValues(object target)
         {
-            if (target is Dictionary<string, object> objDictionary)
+            if (target is IDictionary<string, object> objDictionary)
             {
                 var keys = objDictionary.Keys.ToList();
                 var to = new Dictionary<string, object>();

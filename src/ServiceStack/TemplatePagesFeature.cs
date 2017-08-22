@@ -473,7 +473,7 @@ User:
         {
             var reqParams = request.GetRequestParams();
             reqParams["RawUrl"] = request.RawUrl;
-            reqParams["PathInfo"] = request.PathInfo;
+            reqParams["PathInfo"] = request.OriginalPathInfo;
             reqParams["AbsoluteUri"] = request.AbsoluteUri;
             reqParams["Verb"] = request.Verb;
 
