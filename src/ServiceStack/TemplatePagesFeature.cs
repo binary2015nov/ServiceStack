@@ -29,6 +29,8 @@ namespace ServiceStack
         public bool EnableDebugTemplateToAll { get; set; }
 
         public string DebugDefaultTemplate { get; set; }
+        
+        public string ApiPath { get; set; }
 
         public List<string> IgnorePaths { get; set; } = new List<string>
         {
@@ -74,6 +76,10 @@ namespace ServiceStack
 
             if (!DisableHotReload)
                 appHost.RegisterService(typeof(TemplatePagesServices));
+            
+            if (!string.IsNullOrEmpty(ApiPath))
+                appHost.RegisterService(typeof(TemplatePagesApiServices), 
+                    (ApiPath[0] == '/' ? ApiPath : '/' + ApiPath).CombineWith("/{PageName}/{PathInfo*}"));
 
             if (DebugMode || EnableDebugTemplate || EnableDebugTemplateToAll)
             {
@@ -102,13 +108,11 @@ namespace ServiceStack
                 }
             }
 
-            var tryDirMatch = pathInfo[pathInfo.Length - 1] != '/';
-
-            var codePage = Pages.GetCodePage(pathInfo) ?? (tryDirMatch ? Pages.GetCodePage(pathInfo + '/') : null);
+            var codePage = Pages.GetCodePage(pathInfo);
             if (codePage != null)
                 return new TemplateCodePageHandler(codePage);
 
-            var page = Pages.GetPage(pathInfo) ?? (tryDirMatch ? Pages.GetPage(pathInfo + '/') : null);
+            var page = Pages.GetPage(pathInfo);
             if (page != null)
             {
                 if (page.File.Name.StartsWith("_"))
@@ -167,6 +171,69 @@ namespace ServiceStack
 
             var shouldReload = lastModified.Ticks > long.Parse(request.ETag);
             return new HotReloadPageResponse { Reload = shouldReload, ETag = lastModified.Ticks.ToString() };
+        }
+    }
+
+    [ExcludeMetadata]
+    public class ApiPages
+    {
+        public string PageName { get; set; }
+        public string PathInfo { get; set; }
+    }
+
+    [DefaultRequest(typeof(ApiPages))]
+    [Restrict(VisibilityTo = RequestAttributes.None)]
+    public class TemplatePagesApiServices : Service
+    {
+        public async Task<object> Any(ApiPages request) 
+        {
+            if (string.IsNullOrEmpty(request.PageName))
+                throw new ArgumentNullException("PageName");
+
+            var parts = string.IsNullOrEmpty(request.PathInfo)  
+                ? TypeConstants.EmptyStringArray
+                : request.PathInfo.SplitOnLast('.');
+
+            var pathInfo = parts.Length > 1 && Host.ContentTypes.KnownFormats.Contains(parts[1])
+                ? parts[0]
+                : request.PathInfo;
+            
+            var pathArgs = string.IsNullOrEmpty(pathInfo)
+                ? TypeConstants.EmptyStringArray
+                : pathInfo.Split('/');
+            
+            parts = request.PageName.SplitOnLast('.');
+            var pageName = pathArgs.Length == 0 && parts.Length > 1 && Host.ContentTypes.KnownFormats.Contains(parts[1])
+                ? parts[0]
+                : request.PageName;
+
+            var feature = HostContext.GetPlugin<TemplatePagesFeature>();
+
+            var pagePath = feature.ApiPath.CombineWith(pageName).TrimStart('/');
+            var page = base.Request.GetPage(pagePath);
+            if (page == null)
+                throw HttpError.NotFound($"No API Page was found at '{pagePath}'");
+            
+            var requestArgs = base.Request.GetTemplateRequestParams();
+            requestArgs[TemplateConstants.PathInfo] = request.PathInfo;
+            requestArgs[TemplateConstants.PathArgs] = pathArgs; 
+
+            var pageResult = new PageResult(page) {
+                NoLayout = true,
+                RethrowExceptions = true,
+                Args = requestArgs
+            };
+
+            var discardedOutput = await pageResult.RenderToStringAsync();
+
+            if (!pageResult.Args.TryGetValue("return", out object response))
+                throw HttpError.NotFound($"The API Page did not specify a response. Use the 'return' filter to set a return value for the page.");
+
+            var httpResultHeaders = (pageResult.Args.TryGetValue("returnArgs", out object returnArgs) ? returnArgs : null).ToStringDictionary();
+
+            var result = new HttpResult(response);
+            httpResultHeaders.Each(x => result.Options[x.Key] = x.Value);
+            return result;
         }
     }
 
@@ -292,7 +359,7 @@ User:
         {            
             var result = new PageResult(page)
             {
-                Args = httpReq.GetUsefulTemplateParams(),
+                Args = httpReq.GetTemplateRequestParams(),
                 LayoutPage = layoutPage
             };
             try
@@ -325,7 +392,7 @@ User:
 
             var result = new PageResult(page)
             {
-                Args = httpReq.GetUsefulTemplateParams(),
+                Args = httpReq.GetTemplateRequestParams(),
                 LayoutPage = layoutPage
             };
 
@@ -469,13 +536,13 @@ User:
 
     public static class TemplatePagesFeatureExtensions
     {
-        internal static Dictionary<string, object> GetUsefulTemplateParams(this IRequest request)
+        public static Dictionary<string, object> GetTemplateRequestParams(this IRequest request)
         {
             var reqParams = request.GetRequestParams();
             reqParams["RawUrl"] = request.RawUrl;
-            reqParams["PathInfo"] = request.OriginalPathInfo;
+            reqParams[TemplateConstants.PathInfo] = request.OriginalPathInfo;
             reqParams["AbsoluteUri"] = request.AbsoluteUri;
-            reqParams["Verb"] = request.Verb;
+            reqParams["Verb"] = reqParams["Method"] = request.Verb;
 
             var to = reqParams.ToObjectDictionary();
             to[TemplateConstants.Request] = request;

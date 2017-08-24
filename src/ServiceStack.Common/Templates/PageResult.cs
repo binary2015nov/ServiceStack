@@ -33,6 +33,11 @@ namespace ServiceStack.Templates
         /// Use Layout with specified name
         /// </summary>
         public string Layout { get; set; }
+        
+        /// <summary>
+        /// Render without any Layout
+        /// </summary>
+        public bool NoLayout { get; set; }
 
         /// <summary>
         /// 
@@ -108,6 +113,16 @@ namespace ServiceStack.Templates
         /// </summary>
         public bool? SkipExecutingFiltersIfError { get; set; }
         
+        /// <summary>
+        /// Whether to always rethrow Exceptions
+        /// </summary>
+        public bool RethrowExceptions { get; set; }
+
+        /// <summary>
+        /// Immediately halt execution of the page
+        /// </summary>
+        public bool HaltExecution { get; set; }
+        
         private readonly Stack<string> stackTrace = new Stack<string>();
 
         private PageResult(PageFormat format)
@@ -173,35 +188,49 @@ namespace ServiceStack.Templates
         {
             await Init();
 
-            if (LayoutPage != null)
+            if (!NoLayout)
             {
-                await LayoutPage.Init();
+                if (LayoutPage != null)
+                {
+                    await LayoutPage.Init();
                 
-                if (CodePage != null)
-                    InitIfNewPage(CodePage);
+                    if (CodePage != null)
+                        InitIfNewPage(CodePage);
 
-                if (Page != null)
-                    await InitIfNewPage(Page);
+                    if (Page != null)
+                        await InitIfNewPage(Page);
+                }
+                else
+                {
+                    if (Page != null)
+                    {
+                        await InitIfNewPage(Page);
+                        if (Page.LayoutPage != null)
+                        {
+                            LayoutPage = Page.LayoutPage;
+                            await LayoutPage.Init();
+                        }
+                    }
+                    else if (CodePage != null)
+                    {
+                        InitIfNewPage(CodePage);
+                        if (CodePage.LayoutPage != null)
+                        {
+                            LayoutPage = CodePage.LayoutPage;
+                            await LayoutPage.Init();
+                        }
+                    }
+                }
             }
             else
             {
                 if (Page != null)
                 {
                     await InitIfNewPage(Page);
-                    if (Page.LayoutPage != null)
-                    {
-                        LayoutPage = Page.LayoutPage;
-                        await LayoutPage.Init();
-                    }
                 }
                 else if (CodePage != null)
                 {
                     InitIfNewPage(CodePage);
-                    if (CodePage.LayoutPage != null)
-                    {
-                        LayoutPage = CodePage.LayoutPage;
-                        await LayoutPage.Init();
-                    }
                 }
             }
 
@@ -209,12 +238,15 @@ namespace ServiceStack.Templates
 
             var pageScope = CreatePageContext(null, outputStream);
 
-            if (LayoutPage != null)
+            if (!NoLayout && LayoutPage != null)
             {
                 stackTrace.Push("Layout: " + LayoutPage.VirtualPath);
                 
                 foreach (var fragment in LayoutPage.PageFragments)
                 {
+                    if (HaltExecution)
+                        break;
+
                     if (fragment is PageStringFragment str)
                     {
                         await outputStream.WriteAsync(str.ValueBytes, token);
@@ -242,7 +274,7 @@ namespace ServiceStack.Templates
 
         public bool ShouldSkipFilterExecution(PageVariableFragment var)
         {
-            return SkipFilterExecution && (var.BindingString != null 
+            return HaltExecution || SkipFilterExecution && (var.BindingString != null 
                ? !TemplateConfig.OnlyEvaluateFiltersWhenSkippingPageFilterExecution.Contains(var.BindingString)
                : var.InitialExpression?.NameString == null || 
                  !TemplateConfig.OnlyEvaluateFiltersWhenSkippingPageFilterExecution.Contains(var.InitialExpression.NameString));
@@ -358,6 +390,9 @@ namespace ServiceStack.Templates
             
             foreach (var fragment in page.PageFragments)
             {
+                if (HaltExecution)
+                    break;
+
                 if (fragment is PageStringFragment str)
                 {
                     await scope.OutputStream.WriteAsync(str.ValueBytes, token);
@@ -544,7 +579,7 @@ namespace ServiceStack.Templates
             
             for (var i = 0; i < var.FilterExpressions.Length; i++)
             {
-                if (value == StopExecution.Value)
+                if (HaltExecution || value == StopExecution.Value)
                     break;
 
                 var expr = var.FilterExpressions[i];
@@ -687,6 +722,9 @@ namespace ServiceStack.Templates
                     LastFilterError = ex.InnerException;
                     LastFilterStackTrace = stackTrace.ToArray();
 
+                    if (RethrowExceptions)
+                        throw ex.InnerException;
+                    
                     var skipExecutingFilters = SkipExecutingFiltersIfError.GetValueOrDefault(Context.SkipExecutingFiltersIfError);
                     if (skipExecutingFilters)
                         this.SkipFilterExecution = true;
@@ -1060,19 +1098,21 @@ namespace ServiceStack.Templates
             }
         }
 
-        private string pageResult;
+        public string ResultOutput => resultOutput;
+
+        private string resultOutput;
         public string Result
         {
             get
             {
                 try
                 {
-                    if (pageResult != null)
-                        return pageResult;
+                    if (resultOutput != null)
+                        return resultOutput;
     
                     Init().Wait();
-                    pageResult = this.RenderToStringAsync().Result;
-                    return pageResult;
+                    resultOutput = this.RenderToStringAsync().Result;
+                    return resultOutput;
                 }
                 catch (AggregateException e)
                 {
