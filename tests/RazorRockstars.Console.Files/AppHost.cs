@@ -44,7 +44,6 @@ namespace RazorRockstars.Console.Files
                 Plugins.Add(new RazorFormat());
 
             Plugins.Add(new SwaggerFeature());
-            Plugins.Add(new RequestInfoFeature());
             Plugins.Add(new RequestLogsFeature());
             Plugins.Add(new ServerEventsFeature());
 

@@ -89,6 +89,8 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="dir\index.html" />
+    <Content Include="dir\sub\index.html" />
     <Content Include="Global.asax" />
     <Content Include="css\bootstrap.css" />
     <Content Include="css\default.css" />

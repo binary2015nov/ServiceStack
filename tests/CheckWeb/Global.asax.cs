@@ -123,7 +123,7 @@ namespace CheckWeb
 
             dbFactory.RegisterConnection("pgsql",
                 new OrmLiteConnectionFactory(
-                    "Server=localhost;Port=5432;User Id=test;Password=test;Database=test;Pooling=true;MinPoolSize=0;MaxPoolSize=200",
+                    "Server=localhost;Port=5432;User Id=postgres;Password=admin;Database=test;Pooling=true;MinPoolSize=0;MaxPoolSize=200",
                     PostgreSqlDialect.Provider));
 
             using (var db = dbFactory.OpenDbConnection("pgsql"))

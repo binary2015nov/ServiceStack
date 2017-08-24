@@ -11,7 +11,7 @@ namespace CheckWeb
 
     public partial class RequestInfoTests
     {
-        public string BaseUrl = "http://localhost:55799/";
+        public const string BaseUrl = "http://localhost:55799/";
 
         private RequestInfoResponse GetRequestInfoForPath(string path)
         {
@@ -23,7 +23,7 @@ namespace CheckWeb
 
         private void AssertHasContent(string pathInfo, string accept, string containsContent)
         {
-            var url = BaseUrl.CombineWith(pathInfo);
+            var url = BaseUrl.AppendPath(pathInfo);
             var content = url.GetStringFromUrl(accept: accept);
             Assert.That(content, Does.Contain(containsContent));
         }
@@ -31,8 +31,8 @@ namespace CheckWeb
         [Test]
         public void Does_return_expected_content()
         {
-            AssertHasContent("metadata", MimeTypes.Html, "The following operations are supported");
-            AssertHasContent("metadata/", MimeTypes.Html, "The following operations are supported");
+            AssertHasContent("metadata", MimeTypes.Html, "The following operations are supported.");
+            AssertHasContent("metadata/", MimeTypes.Html, "The following operations are supported.");
             AssertHasContent("dir", MimeTypes.Html, "<h1>dir/index.html</h1>");
             AssertHasContent("dir/", MimeTypes.Html, "<h1>dir/index.html</h1>");
             AssertHasContent("dir/sub", MimeTypes.Html, "<h1>dir/sub/index.html</h1>");

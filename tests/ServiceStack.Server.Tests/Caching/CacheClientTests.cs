@@ -150,7 +150,7 @@ namespace ServiceStack.Server.Tests.Caching
     public class SqlServer2016MemoryOptimizedCacheEntry : ICacheEntry
     {
         [PrimaryKey]
-        [StringLength(StringLengthAttribute.MaxText)]
+        [StringLength(512)]
         [SqlServerBucketCount(10000000)]
         public string Id { get; set; }
         [StringLength(StringLengthAttribute.MaxText)]

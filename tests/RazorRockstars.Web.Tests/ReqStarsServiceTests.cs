@@ -14,7 +14,7 @@ namespace RazorRockstars.Web.Tests
 {
     public static class SeedData
     {
-        public static Reqstar[] Reqstars = new[] {
+        public static Reqstar[] Reqstars = {
             new Reqstar(1, "Foo", "Bar", 20),
             new Reqstar(2, "Something", "Else", 30),
             new Reqstar(3, "Foo2", "Bar2", 20),
@@ -149,7 +149,7 @@ namespace RazorRockstars.Web.Tests
     [TestFixture]
     public class ReqStarsServiceTests
     {
-        public const string Host = "http://localhost:1338";
+        public const string Host = "http://localhost:1337";
         private const string BaseUri = Host + "/";
 
         //private AppHost appHost;
@@ -393,7 +393,7 @@ namespace RazorRockstars.Web.Tests
             return client.Send(new AllReqstars());
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_DELETE_Reqstar(IRestClient client)
         {
             var response = client.Delete<EmptyResponse>("/reqstars/1/delete");
@@ -404,7 +404,7 @@ namespace RazorRockstars.Web.Tests
                 Is.EqualTo(SeedData.Reqstars.Length - 1));
         }
 
-        [Test, TestCaseSource("ServiceClients")]
+        [Test, TestCaseSource(nameof(ServiceClients))]
         public void Can_DELETE_Reqstar_PrettyTypedApi(IServiceClient client)
         {
             client.Send(new DeleteReqstar { Id = 1 });
@@ -415,7 +415,7 @@ namespace RazorRockstars.Web.Tests
                 Is.EqualTo(SeedData.Reqstars.Length - 1));
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_DELETE_Reqstar_PrettyRestApi(IRestClient client)
         {
             client.Delete(new DeleteReqstar { Id = 1 });
@@ -427,14 +427,14 @@ namespace RazorRockstars.Web.Tests
         }
 
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_PATCH_UpdateReqstar(IRestClient client)
         {
             var response = client.Patch<Reqstar>("/reqstars/1", new UpdateReqstar(1, 18));
             Assert.That(response.Age, Is.EqualTo(18));
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_PATCH_UpdateReqstar_PrettyRestApi(IRestClient client)
         {
             var response = client.Patch(new UpdateReqstar(1, 18));
@@ -442,7 +442,7 @@ namespace RazorRockstars.Web.Tests
         }
 
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_CREATE_Reqstar(IRestClient client)
         {
             var response = client.Post<List<Reqstar>>("/reqstars", new Reqstar(4, "Just", "Created", 25));
@@ -451,7 +451,7 @@ namespace RazorRockstars.Web.Tests
                 Is.EqualTo(SeedData.Reqstars.Length + 1));
         }
 
-        [Test, TestCaseSource("ServiceClients")]
+        [Test, TestCaseSource(nameof(ServiceClients))]
         public void Can_CREATE_Reqstar_PrettyTypedApi(IServiceClient client)
         {
             var response = client.Send(new Reqstar(4, "Just", "Created", 25));
@@ -460,7 +460,7 @@ namespace RazorRockstars.Web.Tests
                 Is.EqualTo(SeedData.Reqstars.Length + 1));
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_CREATE_Reqstar_PrettyRestApi(IRestClient client)
         {
             var response = client.Post(new Reqstar(4, "Just", "Created", 25));
@@ -469,7 +469,7 @@ namespace RazorRockstars.Web.Tests
                 Is.EqualTo(SeedData.Reqstars.Length + 1));
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Fails_to_CREATE_Empty_Reqstar_PrettyRestApi(IRestClient client)
         {
             try
@@ -489,7 +489,7 @@ namespace RazorRockstars.Web.Tests
             }
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_GET_ResetReqstars(IRestClient client)
         {
             var response = client.Get<EmptyResponse>("/reqstars/reset");
@@ -499,7 +499,7 @@ namespace RazorRockstars.Web.Tests
             Assert.That(reqstarsLeft.Count, Is.EqualTo(SeedData.Reqstars.Length));
         }
 
-        [Test, TestCaseSource("ServiceClients")]
+        [Test, TestCaseSource(nameof(ServiceClients))]
         public void Can_SEND_ResetReqstars_PrettyTypedApi(IServiceClient client)
         {
             client.Send(new ResetReqstar());
@@ -509,7 +509,7 @@ namespace RazorRockstars.Web.Tests
             Assert.That(reqstarsLeft.Count, Is.EqualTo(SeedData.Reqstars.Length));
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_GET_ResetReqstars_PrettyRestApi(IRestClient client)
         {
             client.Get(new ResetReqstar());
@@ -519,7 +519,7 @@ namespace RazorRockstars.Web.Tests
             Assert.That(reqstarsLeft.Count, Is.EqualTo(SeedData.Reqstars.Length));
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_GET_RoutelessReqstar_PrettyRestApi(IRestClient client)
         {
             var request = new RoutelessReqstar
@@ -539,7 +539,7 @@ namespace RazorRockstars.Web.Tests
             Assert.That(response.LastName, Is.EqualTo(request.LastName));
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_POST_RoutelessReqstar_PrettyRestApi(IRestClient client)
         {
             var request = new RoutelessReqstar
@@ -559,21 +559,21 @@ namespace RazorRockstars.Web.Tests
             Assert.That(response.LastName, Is.EqualTo(request.LastName));
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_download_Headers_response(IRestClient client)
         {
             using (HttpWebResponse response = client.Get(new Headers { Text = "Test" }))
                 Assert.That(response.Headers["X-Response"], Is.EqualTo("Test"));
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_download_Strings_response(IRestClient client)
         {
             string response = client.Get(new Strings { Text = "Test" });
             Assert.That(response, Is.EqualTo("Hello, Test"));
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_download_Bytes_response(IRestClient client)
         {
             var guid = Guid.NewGuid();
@@ -581,7 +581,7 @@ namespace RazorRockstars.Web.Tests
             Assert.That(new Guid(response), Is.EqualTo(guid));
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_download_Streams_response(IRestClient client)
         {
             var guid = Guid.NewGuid();

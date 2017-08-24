@@ -198,10 +198,7 @@ namespace ServiceStack.Host.Handlers
 
         public override void ProcessRequest(IRequest httpReq, IResponse httpRes, string operationName)
         {
-            var response = this.RequestInfo ?? GetRequestInfo(httpReq);
-            if (response == null)
-                return;
-
+            var response = GetRequestInfo(httpReq);
             response.HandlerFactoryArgs = HttpHandlerFactory.LastHandlerArgs;
             response.DebugString = "";
 #if !NETSTANDARD1_6
@@ -245,7 +242,7 @@ namespace ServiceStack.Host.Handlers
                         }
                     }
                 }
-        }
+            }
 #endif
 
             var json = JsonSerializer.SerializeToString(response);

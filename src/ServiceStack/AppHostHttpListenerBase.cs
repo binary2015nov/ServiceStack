@@ -67,11 +67,11 @@ namespace ServiceStack
             var serviceStackHandler = handler as IServiceStackHandler;
             if (serviceStackHandler != null)
             {
-                var restHandler = serviceStackHandler as RestHandler;
-                if (restHandler != null)
-                {
-                    httpReq.OperationName = operationName = restHandler.RestPath.RequestType.GetOperationName();
-                }
+                //var restHandler = serviceStackHandler as RestHandler;
+                //if (restHandler != null)
+                //{
+                //    httpReq.OperationName = operationName = restHandler.RestPath.RequestType.GetOperationName();
+                //}
 
                 var task = serviceStackHandler.ProcessRequestAsync(httpReq, httpRes, operationName);
                 await HostContext.Async.ContinueWith(httpReq, task, x => httpRes.Close(), TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.AttachedToParent);

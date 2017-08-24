@@ -68,16 +68,16 @@ namespace ServiceStack.Server.Tests.Auth
         [Test]
         public void Can_not_access_Secured_Pages_without_Authentication()
         {
-            Assert.That(ListeningOn.CombineWith("/secured").GetStringFromUrl(),
+            Assert.That(ListeningOn.AppendPath("/secured").GetStringFromUrl(),
                 Does.Contain("<!--page:Login.cshtml-->"));
 
-            Assert.That(ListeningOn.CombineWith("/SecuredPage").GetStringFromUrl(),
+            Assert.That(ListeningOn.AppendPath("/SecuredPage").GetStringFromUrl(),
                 Does.Contain("<!--page:Login.cshtml-->"));
 
-            Assert.That(ListeningOn.CombineWith("/TestSessionPage").GetStringFromUrl(),
+            Assert.That(ListeningOn.AppendPath("/TestSessionPage").GetStringFromUrl(),
                 Does.Contain("IsAuthenticated:False"));
 
-            Assert.That(ListeningOn.CombineWith("/test/session/view").GetStringFromUrl(),
+            Assert.That(ListeningOn.AppendPath("/test/session/view").GetStringFromUrl(),
                 Does.Contain("IsAuthenticated:False"));
         }
 
@@ -159,11 +159,11 @@ namespace ServiceStack.Server.Tests.Auth
         [Test]
         public async Task Can_access_Secured_Pages_with_ApiKeyAuth_async()
         {
-            Assert.That(await HttpUtils.GetStringFromUrlAsync(ListeningOn.AppendPath("/secured"),
+            Assert.That(await ListeningOn.AppendPath("/secured").GetStringFromUrlAsync(
                 requestFilter: req => req.AddApiKeyAuth(ApiKey)),
                 Does.Contain("<!--view:Secured.cshtml-->"));
 
-            Assert.That(await HttpUtils.GetStringFromUrlAsync(ListeningOn.CombineWith("/SecuredPage"),
+            Assert.That(await ListeningOn.CombineWith("/SecuredPage").GetStringFromUrlAsync(
                 requestFilter: req => req.AddApiKeyAuth(ApiKey)),
                 Does.Contain("<!--page:SecuredPage.cshtml-->"));
 

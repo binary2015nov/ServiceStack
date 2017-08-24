@@ -120,6 +120,5 @@ namespace RazorRockstars.Console.Files
                 GC.Collect();
             }
         }
-
     }
 }

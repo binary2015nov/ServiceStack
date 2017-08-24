@@ -21,7 +21,7 @@ namespace ServiceStack
         {
             WsdlServiceNamespace = DefaultWsdlNamespace;
             ApiVersion = "1.0";
-            EmbeddedResourceSources = new List<Assembly> { GetType().GetAssembly() };
+            EmbeddedResourceSources = new HashSet<Assembly> { GetType().GetAssembly() };
             EmbeddedResourceTreatAsFiles = new HashSet<string>();
             EnableAccessRestrictions = true;
             MetadataRedirectPath = null;
@@ -141,7 +141,7 @@ namespace ServiceStack
             set => metadataVisibility = value.ToAllowedFlagsSet();
         }
 
-        public List<Assembly> EmbeddedResourceSources { get; set; }
+        public HashSet<Assembly> EmbeddedResourceSources { get; set; }
         public HashSet<string> EmbeddedResourceTreatAsFiles { get; set; }
 
         public string DefaultContentType { get; set; }

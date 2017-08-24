@@ -37,7 +37,7 @@ namespace RazorRockstars.Web.Tests
             url.Print();
             try
             {
-                var text = url.GetStringFromUrl(AcceptContentType, responseFilter: r => {
+                var text = url.GetStringFromUrl(accept: AcceptContentType, responseFilter: r => {
                     if (r.StatusCode != statusCode)
                         Assert.Fail("'{0}' returned {1} expected {2}".Fmt(url, r.StatusCode, statusCode));
                 });
@@ -76,7 +76,7 @@ namespace RazorRockstars.Web.Tests
             }
             catch (WebException webEx)
             {
-                var errorResponse = ((HttpWebResponse)webEx.Response);
+                var errorResponse = (HttpWebResponse)webEx.Response;
                 var bytes = errorResponse.GetResponseStream().ReadFully();
                 var text = bytes.FromUtf8Bytes();
                 text.Print();
@@ -96,7 +96,7 @@ namespace RazorRockstars.Web.Tests
 			});
 		}
 
-        public static string Host = "http://localhost:1338";
+        public static string Host = "http://localhost:1337";
 
 		static string ViewRockstars = "<!--view:Rockstars.cshtml-->";
         static string ViewRockstars2 = "<!--view:Rockstars2.cshtml-->";

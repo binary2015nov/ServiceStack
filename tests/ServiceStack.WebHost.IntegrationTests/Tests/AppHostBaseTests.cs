@@ -35,10 +35,10 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         }
 
         [Test]
-        public void Gets_csv_Hello_response()
+        public void Can_Get_Custom_Route_Hello_response()
         {
-            var response = Constant.ServiceStackBaseHost.AppendPath("hello").GetCsvFromUrl();
-            Assert.That(response.Contains("Hello, World"));
+            var response = Constant.ServiceStackBaseHost.AppendPath("hello").GetJsonFromUrl();
+            Assert.AreEqual("{\"result\":\"Hello, World\"}", response);
         }
     }
 }

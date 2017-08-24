@@ -159,6 +159,10 @@ namespace ServiceStack
                     }
                 }
 
+                //e.g. CatchAllHandler to Process Markdown files
+                var catchAllHandler = GetCatchAllHandlerIfAny(httpReq.HttpMethod, pathInfo, httpReq.GetPhysicalPath());
+                if (catchAllHandler != null) return catchAllHandler;
+
                 if (location.IsNullOrEmpty())
                     return DefaultHttpHandler;
 

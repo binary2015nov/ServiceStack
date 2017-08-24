@@ -75,7 +75,7 @@ namespace RazorRockstars.Console.Files
         public void Assert200(string url, params string[] containsItems)
         {
             url.Print();
-            var text = url.GetStringFromUrl(AcceptContentType, responseFilter: r =>
+            var text = url.GetStringFromUrl(accept: AcceptContentType, responseFilter: r =>
             {
                 if (r.StatusCode != HttpStatusCode.OK)
                     Assert.Fail(url + " did not return 200 OK");
@@ -93,7 +93,7 @@ namespace RazorRockstars.Console.Files
         public void Assert200Without(string url, params string[] withoutStrings)
         {
             url.Print();
-            var text = url.GetStringFromUrl(AcceptContentType, responseFilter: r =>
+            var text = url.GetStringFromUrl(accept: AcceptContentType, responseFilter: r =>
             {
                 if (r.StatusCode != HttpStatusCode.OK)
                     Assert.Fail(url + " did not return 200 OK");

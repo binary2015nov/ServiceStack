@@ -2,6 +2,6 @@
 {
     public class Config
     {
-        public static string ServiceStackBaseUri = "http://localhost:1338";
+        public static string ServiceStackBaseUri = "http://localhost:1337/";
     }
 }

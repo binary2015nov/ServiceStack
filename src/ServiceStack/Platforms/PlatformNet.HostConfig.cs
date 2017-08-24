@@ -86,7 +86,7 @@ namespace ServiceStack
                     return CombineHandlerFactoryPath(locationConfigLocation.Path, handlerPath);
                 }
             }
-            var combinedPath = GetHandlerPathFromConfiguration(appConfig);
+            var combinedPath = CombineHandlerFactoryPath(string.Empty, GetHandlerPathFromConfiguration(appConfig));
             //In some MVC Hosts auto-inferencing doesn't work, in these cases assume the most likely default of "/api" path
             //var isMvcHost = Type.GetType("System.Web.Mvc.Controller") != null;
             //if (isMvcHost)

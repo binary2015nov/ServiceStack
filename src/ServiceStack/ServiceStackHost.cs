@@ -138,22 +138,24 @@ namespace ServiceStack
         /// </summary>
         public virtual ServiceStackHost Init()
         {
-            this.InitAt = DateTime.UtcNow;
+            InitAt = DateTime.UtcNow;
             HostContext.AppHost = this;
+
+            Config.EmbeddedResourceSources.Add(GetType().GetAssembly());
             Platform.Instance.InitHostConifg(Config);
-            this.Config.ServiceEndpointsMetadataConfig = ServiceEndpointsMetadataConfig.Create(Config.HandlerFactoryPath);
+            RootPath = Config.WebHostPhysicalPath;
+            Config.ServiceEndpointsMetadataConfig = ServiceEndpointsMetadataConfig.Create(Config.HandlerFactoryPath);
             
             OnBeforeInit();
             JsonDataContractSerializer.Instance.UseBcl = Config.UseBclJsonSerializers;
             JsonDataContractSerializer.Instance.UseBcl = Config.UseBclJsonSerializers;
             AbstractVirtualFileBase.ScanSkipPaths = Config.ScanSkipPaths;
             ResourceVirtualDirectory.EmbeddedResourceTreatAsFiles = Config.EmbeddedResourceTreatAsFiles;
-            this.RootPath = Config.WebHostPhysicalPath;
-            this.Metadata.ApiVersion = Config.ApiVersion;
-            this.Metadata.ServiceName = ServiceName;
+            Metadata.ApiVersion = Config.ApiVersion;
+            Metadata.ServiceName = ServiceName;
 
-            this.Container.Register<IHashProvider>(c => new SaltedHash()).ReusedWithin(ReuseScope.None);
-            if (this.Config.DebugMode)
+            Container.Register<IHashProvider>(c => new SaltedHash()).ReusedWithin(ReuseScope.None);
+            if (Config.DebugMode)
             {
                 Plugins.Add(new RequestInfoFeature());
             }
@@ -478,9 +480,6 @@ namespace ServiceStack
             var pathProviders = new List<IVirtualPathProvider> {
                 new FileSystemVirtualFiles(GetWebRootPath())
             };
-
-            pathProviders.AddRange(Config.EmbeddedResourceSources.Distinct()
-                .Map(x => new ResourceVirtualFiles(x) { LastModified = GetAssemblyLastModified(x) } ));
 
             pathProviders.AddRange(Config.EmbeddedResourceSources.Distinct()
                 .Map(x => new ResourceVirtualFiles(x) { LastModified = GetAssemblyLastModified(x) } ));
@@ -1017,7 +1016,8 @@ namespace ServiceStack
                     Container.Dispose();
                     Container = null;
                 }
-
+                if (HostContext.AppHost == this)
+                    HostContext.AppHost = null;
                 JsConfig.Reset(); //Clears Runtime Attributes
             }
             //clear unmanaged resources here

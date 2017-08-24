@@ -60,7 +60,7 @@ namespace RazorRockstars.Web
 
     public class Rockstar
     {
-        public static Rockstar[] SeedData = new[] {
+        public static Rockstar[] SeedData = {
             new Rockstar(1, "Jimi", "Hendrix", 27), 
             new Rockstar(2, "Janis", "Joplin", 27), 
             new Rockstar(3, "Jim", "Morrisson", 27), 

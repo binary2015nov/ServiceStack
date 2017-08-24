@@ -248,9 +248,9 @@ namespace ServiceStack.Server.Tests.Shared
             var ormliteCache = Cache as OrmLiteCacheClient;
             var key = "int:key";
 
-            var value = Cache.GetOrCreate(key, TimeSpan.FromMilliseconds(100), () => 1);
+            var value = Cache.GetOrCreate(key, TimeSpan.FromMilliseconds(1000), () => 1);
+            
             var ttl = Cache.GetTimeToLive(key);
-
             if (ormliteCache != null)
             {
                 using (var db = ormliteCache.DbFactory.OpenDbConnection())
@@ -264,7 +264,7 @@ namespace ServiceStack.Server.Tests.Shared
             Assert.That(value, Is.EqualTo(1));
             Assert.That(ttl.Value.TotalMilliseconds, Is.GreaterThan(0));
 
-            Thread.Sleep(200);
+            Thread.Sleep(1000);
             value = Cache.Get<int>(key);
             ttl = Cache.GetTimeToLive(key);
 

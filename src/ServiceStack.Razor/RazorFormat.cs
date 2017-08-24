@@ -331,5 +331,4 @@ namespace ServiceStack.Razor
         bool? PrecompilePages { get; set; }
         bool? WaitForPrecompilationOnStartup { get; set; }
     }
-
 }

@@ -165,7 +165,7 @@ namespace RazorRockstars.Console.Files
 
     public class ReqstarsService : Service
     {
-        public static Reqstar[] SeedData = new[] {
+        public static Reqstar[] SeedData = {
             new Reqstar(1, "Foo", "Bar", 20), 
             new Reqstar(2, "Something", "Else", 30), 
             new Reqstar(3, "Foo2", "Bar2", 20), 
@@ -555,13 +555,13 @@ namespace RazorRockstars.Console.Files
 
 
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Does_allow_sending_collections(IServiceClient client)
         {
             var results = client.Send<List<Reqstar>>(new ReqstarsByNames { "Foo", "Foo2" });
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Does_execute_request_and_response_filter_attributes(IRestClient client)
         {
             MyRequestFilterAttribute.Called = MyResponseFilterAttribute.Called = 0;
@@ -588,21 +588,21 @@ namespace RazorRockstars.Console.Files
         }
 
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_GET_AllReqstars(IRestClient client)
         {
             var allReqstars = client.Get<List<Reqstar>>("/reqstars");
             Assert.That(allReqstars.Count, Is.EqualTo(ReqstarsService.SeedData.Length));
         }
 
-        [Test, TestCaseSource("ServiceClients")]
+        [Test, TestCaseSource(nameof(ServiceClients))]
         public void Can_SEND_AllReqstars_PrettyTypedApi(IServiceClient client)
         {
             var allReqstars = client.Send(new AllReqstars());
             Assert.That(allReqstars.Count, Is.EqualTo(ReqstarsService.SeedData.Length));
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_GET_AllReqstars_PrettyRestApi(IRestClient client)
         {
             var request = new AllReqstars();
@@ -622,14 +622,14 @@ namespace RazorRockstars.Console.Files
         }
 
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_GET_SearchReqstars(IRestClient client)
         {
             var response = client.Get<ReqstarsResponse>("/reqstars/search");
             Assert.That(response.Results.Count, Is.EqualTo(ReqstarsService.SeedData.Length));
         }
 
-        [Test, TestCaseSource("ServiceClients")]
+        [Test, TestCaseSource(nameof(ServiceClients))]
         public void Disallows_SEND_SearchReqstars_PrettyTypedApi(IServiceClient client)
         {
             try
@@ -644,7 +644,7 @@ namespace RazorRockstars.Console.Files
             }
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_GET_SearchReqstars_PrettyRestApi(IRestClient client)
         {
             var request = new SearchReqstars();
@@ -654,7 +654,7 @@ namespace RazorRockstars.Console.Files
             Assert.That(response.Results.Count, Is.EqualTo(ReqstarsService.SeedData.Length));
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Invalid_GET_SearchReqstars_throws_typed_Response_PrettyRestApi(IRestClient client)
         {
             try
@@ -675,7 +675,7 @@ namespace RazorRockstars.Console.Files
         }
 
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_GET_SearchReqstars_aged_20(IRestClient client)
         {
             var response = client.Get<ReqstarsResponse>("/reqstars/aged/20");
@@ -683,7 +683,7 @@ namespace RazorRockstars.Console.Files
                 Is.EqualTo(ReqstarsService.SeedData.Count(x => x.Age == 20)));
         }
 
-        [Test, TestCaseSource("ServiceClients")]
+        [Test, TestCaseSource(nameof(ServiceClients))]
         public void Disallows_SEND_SearchReqstars_aged_20_PrettyTypedApi(IServiceClient client)
         {
             try
@@ -698,7 +698,7 @@ namespace RazorRockstars.Console.Files
             }
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_GET_SearchReqstars_aged_20_PrettyRestApi(IRestClient client)
         {
             var request = new SearchReqstars { Age = 20 };
@@ -710,7 +710,7 @@ namespace RazorRockstars.Console.Files
         }
 
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_GET_GetReqstar(IRestClient client)
         {
             var response = client.Get<Reqstar>("/reqstars/1");
@@ -718,7 +718,7 @@ namespace RazorRockstars.Console.Files
                 Is.EqualTo(ReqstarsService.SeedData[0].FirstName));
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_GET_GetReqstar_PrettyRestApi(IRestClient client)
         {
             var request = new GetReqstar { Id = 1 };
@@ -729,7 +729,7 @@ namespace RazorRockstars.Console.Files
                 Is.EqualTo(ReqstarsService.SeedData[0].FirstName));
         }
 
-        [Test, TestCaseSource("ServiceClients")]
+        [Test, TestCaseSource(nameof(ServiceClients))]
         public void Disallows_SEND_GetReqstar_PrettyTypedApi(IServiceClient client)
         {
             try
@@ -756,7 +756,7 @@ namespace RazorRockstars.Console.Files
 
         public class EmptyResponse { }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_DELETE_Reqstar(IRestClient client)
         {
             var response = client.Delete<EmptyResponse>("/reqstars/1/delete");
@@ -767,7 +767,7 @@ namespace RazorRockstars.Console.Files
                 Is.EqualTo(ReqstarsService.SeedData.Length - 1));
         }
 
-        [Test, TestCaseSource("ServiceClients")]
+        [Test, TestCaseSource(nameof(ServiceClients))]
         public void Can_DELETE_Reqstar_PrettyTypedApi(IServiceClient client)
         {
             client.Send(new DeleteReqstar { Id = 1 });
@@ -778,7 +778,7 @@ namespace RazorRockstars.Console.Files
                 Is.EqualTo(ReqstarsService.SeedData.Length - 1));
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_DELETE_Reqstar_PrettyRestApi(IRestClient client)
         {
             client.Delete(new DeleteReqstar { Id = 1 });
@@ -790,7 +790,7 @@ namespace RazorRockstars.Console.Files
         }
 
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Can_PATCH_UpdateReqstar(IRestClient client)
         {
             var response = client.Patch<Reqstar>("/reqstars/1", new UpdateReqstar(1, 18));

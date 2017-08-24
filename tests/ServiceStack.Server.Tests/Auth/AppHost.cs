@@ -42,7 +42,7 @@ namespace ServiceStack.Server.Tests.Auth
             var dbFactory = new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider);
             container.Register<IDbConnectionFactory>(dbFactory);
 
-            dbFactory.RegisterConnection("testdb", MapProjectPath("~/App_Data/test.sqlite"), SqliteDialect.Provider);
+            dbFactory.RegisterConnection("testdb", "~/App_Data/test.sqlite".MapServerPath(), SqliteDialect.Provider);
 
             using (var db = dbFactory.OpenDbConnection())
             {

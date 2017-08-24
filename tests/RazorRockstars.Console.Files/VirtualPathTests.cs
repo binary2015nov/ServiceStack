@@ -11,7 +11,7 @@ namespace RazorRockstars.Console.Files
     [TestFixture]
     public class VirtualPathTests
     {
-        public static string ServiceStackBaseUri = RazorRockstars_FilesTests.Host;
+        public static string ServiceStackBaseHost = RazorRockstars_FilesTests.Host;
         public static string ListeningOn = RazorRockstars_FilesTests.ListeningOn;
 
         private AppHost appHost;
@@ -34,42 +34,42 @@ namespace RazorRockstars.Console.Files
         [Test]
         public void Can_download_static_file_at_root_directory()
         {
-            var contents = "{0}/static-root.txt".Fmt(ServiceStackBaseUri).GetStringFromUrl();
+            var contents = "{0}/static-root.txt".Fmt(ServiceStackBaseHost).GetStringFromUrl();
             Assert.That(contents, Is.EqualTo("static"));
         }
 
         [Test]
         public void Can_download_static_file_at_sub_directory()
         {
-            var contents = "{0}/Content/static-sub.txt".Fmt(ServiceStackBaseUri).GetStringFromUrl();
+            var contents = "{0}/Content/static-sub.txt".Fmt(ServiceStackBaseHost).GetStringFromUrl();
             Assert.That(contents, Is.EqualTo("static"));
         }
 
         [Test]
         public void Can_download_embedded_static_file_at_root_directory()
         {
-            var contents = "{0}/static-root-embedded.txt".Fmt(ServiceStackBaseUri).GetStringFromUrl();
+            var contents = "{0}/static-root-embedded.txt".Fmt(ServiceStackBaseHost).GetStringFromUrl();
             Assert.That(contents, Is.EqualTo("static"));
         }
 
         [Test]
         public void Can_download_embedded_static_file_at_sub_directory()
         {
-            var contents = "{0}/Content/static-sub-embedded.txt".Fmt(ServiceStackBaseUri).GetStringFromUrl();
+            var contents = "{0}/Content/static-sub-embedded.txt".Fmt(ServiceStackBaseHost).GetStringFromUrl();
             Assert.That(contents, Is.EqualTo("static"));
         }
 
         [Test]
         public void Can_download_default_static_file_at_sub_directory()
         {
-            var contents = "{0}/Content/".Fmt(ServiceStackBaseUri).GetStringFromUrl();
+            var contents = "{0}/Content/".Fmt(ServiceStackBaseHost).GetStringFromUrl();
             Assert.That(contents, Is.EqualTo("static"));
         }
 
         [Test]
         public void Can_download_default_document_at_root_directory()
         {
-            var contents = "{0}/".Fmt(ServiceStackBaseUri).GetStringFromUrl();
+            var contents = "{0}/".Fmt(ServiceStackBaseHost).GetStringFromUrl();
             Assert.That(contents, Is.Not.Null);
         }
     }
