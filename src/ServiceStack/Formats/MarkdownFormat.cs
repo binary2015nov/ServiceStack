@@ -106,7 +106,7 @@ namespace ServiceStack.Formats
             if (VirtualPathProvider == null)
                 VirtualPathProvider = AppHost.VirtualFileSources;
 
-            RegisterMarkdownPages(appHost.Config.WebHostPhysicalPath);
+            RegisterMarkdownPages(appHost.WebHostPhysicalPath);
 
             appHost.CatchAllHandlers.Add((httpMethod, pathInfo, filePath) => {
                 MarkdownPage markdownPage = null;

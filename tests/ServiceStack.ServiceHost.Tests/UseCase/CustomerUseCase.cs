@@ -16,7 +16,7 @@ using ServiceStack.ServiceHost.Tests.UseCase.Services;
 
 namespace ServiceStack.ServiceHost.Tests.UseCase
 {
-    //[Ignore("Performance tests")]
+    [Ignore("Performance tests")]
     [TestFixture]
     public class CustomerUseCase
     {
@@ -25,7 +25,7 @@ namespace ServiceStack.ServiceHost.Tests.UseCase
         [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
-            OrmLite.OrmLiteConfig.DialectProvider = new SqliteOrmLiteDialectProvider();
+            OrmLiteConfig.DialectProvider = new SqliteOrmLiteDialectProvider();
         }
 
         public const bool UseCache = false;
@@ -110,7 +110,7 @@ namespace ServiceStack.ServiceHost.Tests.UseCase
             storeCustomers = new StoreCustomers
             {
                 Customers = {
-                    new Customer {Id = 3, FirstName = "Third", LastName = "Customer"},
+                    new Customer { Id = 3, FirstName = "Third", LastName = "Customer" },
                 }
             };
             serviceController.Execute(storeCustomers);
@@ -170,5 +170,4 @@ namespace ServiceStack.ServiceHost.Tests.UseCase
             return container;
         }
     }
-
 }

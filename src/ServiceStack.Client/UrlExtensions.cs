@@ -105,19 +105,24 @@ namespace ServiceStack
             return GetOperationName(type);
         }
 
+        private static Dictionary<Type, string> OperationNameMap = new Dictionary<Type, string>();
+
         public static string GetOperationName(this Type type)
         {
+            if (OperationNameMap.ContainsKey(type))
+                return OperationNameMap[type];
+
             //Need to expand Arrays of Generic Types like Nullable<Byte>[]
             if (type.IsArray)
             {
-                return type.GetElementType().ExpandTypeName() + "[]";
+                return OperationNameMap[type] = type.GetElementType().ExpandTypeName() + "[]";
             }
 
             string fullname = type.FullName;
             int genericPrefixIndex = type.IsGenericParameter ? 1 : 0;
                 
             if (fullname == null)
-                return genericPrefixIndex > 0 ? "'" + type.Name : type.Name;
+                return OperationNameMap[type] = genericPrefixIndex > 0 ? "'" + type.Name : type.Name;
 
             int startIndex = type.Namespace != null ? type.Namespace.Length + 1: 0; //trim namespace + "."
             int endIndex = fullname.IndexOf("[[", startIndex);  //Generic Fullname
@@ -135,8 +140,8 @@ namespace ServiceStack
 
             if (genericPrefixIndex > 0)
                 op[0] = '\'';
-            
-            return new string(op);
+
+            return OperationNameMap[type] = new string(op);
         }
 
         public static string GetFullyQualifiedName(this Type type)

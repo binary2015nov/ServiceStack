@@ -1,10 +1,9 @@
-﻿using ServiceStack;
+﻿using System.Net;
+using NUnit.Framework;
+using ServiceStack.Text;
+using ServiceStack;
 using ServiceStack.Configuration;
 using ServiceStack.Host.Handlers;
-using System.Net;
-using NUnit.Framework;
-using ServiceStack.Host.Handlers;
-using ServiceStack.Text;
 
 namespace CheckMvc
 {

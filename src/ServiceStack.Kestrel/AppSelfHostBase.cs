@@ -36,7 +36,7 @@ namespace ServiceStack
             {
                 //Initialize VFS
                 var env = app.ApplicationServices.GetService<IHostingEnvironment>();
-                Config.WebHostPhysicalPath = env.WebRootPath ?? env.ContentRootPath;
+                WebHostPhysicalPath = env.WebRootPath ?? env.ContentRootPath;
 
                 AppHostBase.RegisterLicenseFromAppSettings(AppSettings);
 

@@ -35,7 +35,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 	{
 		public object Any(Hello request)
 		{
-            return new HelloResponse { Result = "Hello, " + (request.Name.IsNullOrEmpty() ? "World" : request.Name) };
+            return new HelloResponse { Result = "Hello, {0}".Fmt(request.Name ?? "World") };
 		}
 	}
 

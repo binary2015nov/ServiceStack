@@ -97,17 +97,11 @@ namespace ServiceStack.ServiceHost.Tests
         [Test]
         public void GetPhysicalPath_Honours_WebHostPhysicalPath()
         {
-            using (var appHost = new BasicAppHost
-            {
-                ConfigFilter = c =>
-                {
-                    c.WebHostPhysicalPath = "c:/Windows/Temp";
-                }
-            }.Init())
+            using (var appHost = new BasicAppHost { WebHostPhysicalPath = "c:/Windows/Temp" }.Init())
             {
                 var mock = new HttpRequestMock();
 
-                string originalPath = appHost.Config.WebHostPhysicalPath;
+                string originalPath = appHost.WebHostPhysicalPath;
                 string path = mock.GetPhysicalPath();
 
                 var normalizePaths = (Func<string, string>)(p => p == null ? null : p.Replace('\\', '/'));

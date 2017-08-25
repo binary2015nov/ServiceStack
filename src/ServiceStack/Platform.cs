@@ -6,7 +6,7 @@ using ServiceStack.Web;
 
 namespace ServiceStack
 {
-    public class Platform
+    public abstract class Platform
     {
         public static Platform Instance =
 #if NETSTANDARD1_6
@@ -23,7 +23,7 @@ namespace ServiceStack
 
         public virtual void InitHostConifg(HostConfig config)
         {
-            config.WebHostPhysicalPath = "~".MapServerPath();
+
         }
 
         public virtual string GetNullableAppSetting(string key)

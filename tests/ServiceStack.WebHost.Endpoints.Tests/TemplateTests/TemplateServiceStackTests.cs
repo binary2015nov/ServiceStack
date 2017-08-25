@@ -75,7 +75,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
                     },
                     TemplateFilters =
                     {
-                        new TemplateDbFiltersAsync(),
+                        //new TemplateDbFiltersAsync(),
                         new TemplateAutoQueryFilters(),
                     },
                 });

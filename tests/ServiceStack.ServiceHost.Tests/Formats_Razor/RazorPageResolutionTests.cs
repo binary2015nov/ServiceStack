@@ -274,16 +274,15 @@ namespace ServiceStack.ServiceHost.Tests.Formats_Razor
         }
 
         [Test]
-        [Ignore("Backwards compatibility requirement")]
         public void Content_page_does_not_resolve_root_view_folder_default_layout()
         {
             SetupRootViewLayout();
 
-            const string contentBody = "ArbitraryContentPage";
+            var contentBody = "ArbitraryContentPage";
             RazorFormat.AddFileAndPage("/content/arbitrary-content.cshtml", contentBody);
 
             var result = ExecuteContentPage("/content/arbitrary-content");
-            Assert.That(result, Is.EqualTo(contentBody));
+            Assert.That(result, Is.EqualTo(RootViewLayout.Replace("@RenderBody()", contentBody)));
         }
 
         [Test]

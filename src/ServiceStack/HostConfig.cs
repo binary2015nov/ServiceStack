@@ -164,7 +164,7 @@ namespace ServiceStack
         public List<string> AllowFilePaths { get; set; }
 
         public string WebHostUrl { get; set; }
-        public string WebHostPhysicalPath { get; set; }
+        //public string WebHostPhysicalPath { get; set; }
         public string HandlerFactoryPath { get; set; }
         public string DefaultRedirectPath { get; set; }
         public string MetadataRedirectPath { get; set; }

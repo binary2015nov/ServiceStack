@@ -381,7 +381,7 @@ namespace ServiceStack.Host
         /// </summary>
         public object Execute(object requestDto)
         {
-            return Execute(requestDto, new BasicRequest());
+            return Execute(requestDto, new BasicRequest(requestDto));
         }
 
         public virtual object Execute(object requestDto, IRequest req)
@@ -393,8 +393,7 @@ namespace ServiceStack.Host
                 AssertServiceRestrictions(requestType, req.RequestAttributes);
 
             var handlerFn = GetService(requestType);
-            var response = appHost.OnAfterExecute(req, requestDto, handlerFn(req, requestDto));
-            return response;
+            return appHost.OnAfterExecute(req, requestDto, handlerFn(req, requestDto));
         }
 
         public object Execute(object requestDto, IRequest req, bool applyFilters)

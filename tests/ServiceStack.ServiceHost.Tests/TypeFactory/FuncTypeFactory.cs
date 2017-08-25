@@ -6,8 +6,7 @@ using ServiceStack.Configuration;
 
 namespace ServiceStack.ServiceHost.Tests.TypeFactory
 {
-    public class FuncTypeFactory
-        : ITypeFactory
+    public class FuncTypeFactory : ITypeFactory
     {
         private readonly Container container;
         private readonly Dictionary<Type, Func<object>> resolveFnMap = new Dictionary<Type, Func<object>>();

@@ -71,7 +71,7 @@ namespace ServiceStack.Host
                         .AsTaskException();
                 }
                 httpReq.SetRoute(restPath as RestPath);
-                httpReq.OperationName = operationName = restPath.RequestType.GetOperationName();
+                httpReq.OperationName = restPath.RequestType.GetOperationName();
 
                 var appHost = HostContext.AppHost;
                 if (appHost.ApplyPreRequestFilters(httpReq, httpRes))

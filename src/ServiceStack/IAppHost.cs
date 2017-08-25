@@ -30,7 +30,7 @@ namespace ServiceStack
         /// </summary>
         IAppSettings AppSettings { get; }
 
-        string RootPath { get; }
+        string WebHostPhysicalPath { get; }
 
         /// <summary>
         /// Access Service Controller for ServiceStack

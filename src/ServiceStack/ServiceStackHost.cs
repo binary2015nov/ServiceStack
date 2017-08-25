@@ -45,7 +45,7 @@ namespace ServiceStack
 
         public Assembly[] ServiceAssemblies { get; private set; }
 
-        public string RootPath { get; private set; }
+        public string WebHostPhysicalPath { get; set; }
 
         protected ServiceStackHost(string serviceName, params Assembly[] assembliesWithServices)
         {
@@ -140,13 +140,13 @@ namespace ServiceStack
         {
             InitAt = DateTime.UtcNow;
             HostContext.AppHost = this;
-
+            if (WebHostPhysicalPath.IsNullOrEmpty())
+                WebHostPhysicalPath = GetWebRootPath();
             Config.EmbeddedResourceSources.Add(GetType().GetAssembly());
             Platform.Instance.InitHostConifg(Config);
-            RootPath = Config.WebHostPhysicalPath;
-            Config.ServiceEndpointsMetadataConfig = ServiceEndpointsMetadataConfig.Create(Config.HandlerFactoryPath);
             
             OnBeforeInit();
+            Config.ServiceEndpointsMetadataConfig = ServiceEndpointsMetadataConfig.Create(Config.HandlerFactoryPath);
             JsonDataContractSerializer.Instance.UseBcl = Config.UseBclJsonSerializers;
             JsonDataContractSerializer.Instance.UseBcl = Config.UseBclJsonSerializers;
             AbstractVirtualFileBase.ScanSkipPaths = Config.ScanSkipPaths;
@@ -464,21 +464,21 @@ namespace ServiceStack
             }
         }
 
+        /// <summary>
+        /// Gets Full Directory Path of where the app is running
+        /// </summary>
+        protected virtual string GetWebRootPath() => "~".MapServerPath();
+
         [Obsolete("Renamed to GetVirtualFileSources")]
         public virtual List<IVirtualPathProvider> GetVirtualPathProviders()
         {
             return GetVirtualFileSources();
         }
 
-        /// <summary>
-        /// Gets Full Directory Path of where the app is running
-        /// </summary>
-        public virtual string GetWebRootPath() => Config.WebHostPhysicalPath;
-
         public virtual List<IVirtualPathProvider> GetVirtualFileSources()
         {
             var pathProviders = new List<IVirtualPathProvider> {
-                new FileSystemVirtualFiles(GetWebRootPath())
+                new FileSystemVirtualFiles(WebHostPhysicalPath)
             };
 
             pathProviders.AddRange(Config.EmbeddedResourceSources.Distinct()

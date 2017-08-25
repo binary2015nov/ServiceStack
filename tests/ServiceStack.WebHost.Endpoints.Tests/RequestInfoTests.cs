@@ -24,8 +24,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 var useProjectPath = MapProjectPath("~/../");
                 var parentDir = useProjectPath.Replace("\\", "/").TrimEnd('/').LastRightPart('/');
                 Assert.That(parentDir, Is.EqualTo("ServiceStack.WebHost.Endpoints.Tests"));
+                WebHostPhysicalPath = useProjectPath;
                 Config.DebugMode = true;
-                Config. WebHostPhysicalPath = useProjectPath;              
             }
 
             public override void Configure(Container container)

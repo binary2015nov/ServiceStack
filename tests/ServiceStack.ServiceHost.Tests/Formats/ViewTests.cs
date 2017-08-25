@@ -32,12 +32,8 @@ namespace ServiceStack.ServiceHost.Tests.Formats
 
             appHost = new BasicAppHost
             {
+                WebHostPhysicalPath = "~".MapProjectPath(),
                 Plugins = { new MarkdownFormat() },
-                ConfigFilter = config =>
-                {
-                    //Files aren't copied, set RootDirectory to ProjectPath instead.
-                    config.WebHostPhysicalPath = "~".MapProjectPath();
-                }
             }.Init();
             markdownFormat = appHost.GetPlugin<MarkdownFormat>();
         }

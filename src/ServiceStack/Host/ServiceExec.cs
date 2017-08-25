@@ -28,7 +28,7 @@ namespace ServiceStack.Host
         public static void Reset(IAppHost appHost)
         {
             ActionMap = new Dictionary<Type, List<ActionContext>>();
-            execMap = new Dictionary<string, InstanceExecFn>();
+            execMap = new Dictionary<string, InstanceExecFn>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var mi in Service.GetActions(typeof(TService)))
             {
@@ -136,20 +136,18 @@ namespace ServiceStack.Host
 
         public object Execute(IRequest request, TService service, object requestDto)
         {
-            var actionName = request.Verb
-                ?? HttpMethods.Post; //MQ Services
+            var actionName = request.Verb ?? HttpMethods.Post; //MQ Services
 
             var overrideVerb = request.GetItem(Keywords.InvokeVerb) as string;
             if (overrideVerb != null)
                 actionName = overrideVerb;
 
-            var format = request.ResponseContentType.ToContentFormat()?.ToUpper();
-            var operationName = requestDto.GetType().GetOperationName();
+            string format = request.ResponseContentType.ToContentFormat()?.ToUpper();        
             InstanceExecFn action;
-            if (execMap.TryGetValue(ActionContext.Key(actionName + format, operationName), out action) ||
-            execMap.TryGetValue(ActionContext.AnyFormatKey(format, operationName), out action) ||
-            execMap.TryGetValue(ActionContext.Key(actionName, operationName), out action) ||
-            execMap.TryGetValue(ActionContext.AnyKey(operationName), out action))
+            if (execMap.TryGetValue(ActionContext.Key(actionName + format, request.OperationName), out action) ||
+            execMap.TryGetValue(ActionContext.AnyFormatKey(format,request.OperationName), out action) ||
+            execMap.TryGetValue(ActionContext.Key(actionName, request.OperationName), out action) ||
+            execMap.TryGetValue(ActionContext.AnyKey(request.OperationName), out action))
             {
                 return action(request, service, requestDto);
             }

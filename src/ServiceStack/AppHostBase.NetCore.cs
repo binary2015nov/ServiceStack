@@ -50,7 +50,7 @@ namespace ServiceStack
         /// <summary>
         /// The FilePath used in Virtual File Sources
         /// </summary>
-        public override string GetWebRootPath()
+        protected override string GetWebRootPath()
         {
             if (app == null)
                 return base.GetWebRootPath();
@@ -65,7 +65,7 @@ namespace ServiceStack
             {
                 //Initialize VFS
                 var env = app.ApplicationServices.GetService<IHostingEnvironment>();
-                Config.WebHostPhysicalPath = env.ContentRootPath;
+                WebHostPhysicalPath = env.ContentRootPath;
 
                 //Set VirtualFiles to point to ContentRootPath (Project Folder)
                 VirtualFiles = new FileSystemVirtualFiles(env.ContentRootPath);

@@ -145,7 +145,7 @@ namespace ServiceStack
                 responseStatus = ex.ToResponseStatus();
             }
 
-            if (HostContext.Config.DebugMode)
+            if (HostContext.AppHost != null && HostContext.AppHost.Config.DebugMode)
             {
                 // View stack trace in tests and on the client
                 responseStatus.StackTrace = GetRequestErrorBody(request) + "\n" + ex;

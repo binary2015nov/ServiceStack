@@ -38,7 +38,7 @@ COPY ..\..\ServiceStack.OrmLite\src\ServiceStack.OrmLite\bin\%BUILD%\net45\Servi
 COPY ..\..\ServiceStack.OrmLite\src\ServiceStack.OrmLite\bin\%BUILD%\netstandard1.3\ServiceStack.OrmLite.* netstandard1.3
 COPY ..\..\ServiceStack.OrmLite\src\ServiceStack.OrmLite\bin\Signed\net45\ServiceStack.OrmLite.* signed
 
-COPY ..\..\ServiceStack.OrmLite\src\ServiceStack.OrmLite.Sqlite\bin\%BUILD%\net45\System.Data.SQLite.dll net45\System.Data.SQLite.dll
+COPY ..\..\ServiceStack.OrmLite\src\ServiceStack.OrmLite.Sqlite\bin\%BUILD%\net45\System.Data.SQLite.dll net45
 COPY ..\..\ServiceStack.OrmLite\src\ServiceStack.OrmLite.Sqlite\bin\%BUILD%\net45\x64\* net45\x64
 COPY ..\..\ServiceStack.OrmLite\src\ServiceStack.OrmLite.Sqlite\bin\%BUILD%\net45\x86\* net45\x86
 COPY ..\..\ServiceStack.OrmLite\src\ServiceStack.OrmLite.Sqlite\bin\%BUILD%\net45\ServiceStack.OrmLite.Sqlite.* net45
@@ -50,6 +50,7 @@ COPY ..\..\ServiceStack.OrmLite\src\ServiceStack.OrmLite.SqlServer\bin\%BUILD%\n
 COPY ..\..\ServiceStack.OrmLite\src\ServiceStack.OrmLite.PostgreSQL\bin\%BUILD%\net45\ServiceStack.OrmLite.PostgreSQL.* net45
 COPY ..\..\ServiceStack.OrmLite\src\ServiceStack.OrmLite.PostgreSQL\bin\%BUILD%\netstandard1.3\ServiceStack.OrmLite.PostgreSQL.* netstandard1.3
 
+COPY ..\..\ServiceStack.OrmLite\src\ServiceStack.OrmLite.MySql\bin\%BUILD%\net45\MySql.Data.dll net45
 COPY ..\..\ServiceStack.OrmLite\src\ServiceStack.OrmLite.MySql\bin\%BUILD%\net45\ServiceStack.OrmLite.MySql.* net45
 COPY ..\..\ServiceStack.OrmLite\src\ServiceStack.OrmLite.MySql\bin\%BUILD%\netstandard1.6\ServiceStack.OrmLite.MySql.* netstandard1.6
 

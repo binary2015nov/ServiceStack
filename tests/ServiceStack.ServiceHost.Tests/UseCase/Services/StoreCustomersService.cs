@@ -12,19 +12,16 @@ namespace ServiceStack.ServiceHost.Tests.UseCase.Services
         public StoreCustomersService(IDbConnection dbConn)
         {
             this.db = dbConn;
-            //Console.WriteLine("StoreCustomersService()");
         }
 
         public object Any(StoreCustomers request)
         {
-            db.DropAndCreateTable<Customer>();
+            db.CreateTableIfNotExists<Customer>();
             foreach (var customer in request.Customers)
             {
                 db.Insert(customer);
             }
-
-            return null;
+            return request.Customers.Count;
         }
     }
-
 }

@@ -69,7 +69,9 @@ namespace ServiceStack.Testing
             return this.GetSession() as AuthUserSession;
         }
 
-        public string OperationName { get; set; }
+        private string operationName;
+        public string OperationName { get { return operationName ?? Dto?.GetType().GetOperationName(); } set { operationName = value; } }
+
         public RequestAttributes RequestAttributes { get; set; }
 
         private IRequestPreferences requestPreferences;

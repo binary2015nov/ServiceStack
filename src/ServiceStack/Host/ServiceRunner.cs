@@ -73,7 +73,7 @@ namespace ServiceStack.Host
             {
                 BeforeEachRequest(req, requestDto);
 
-                var container = HostContext.Container;
+                var container = ((ServiceStackHost)AppHost).Container;
 
                 if (RequestFilters != null)
                 {
@@ -88,7 +88,7 @@ namespace ServiceStack.Host
                 }
 
                 var response = AfterEachRequest(req, requestDto, ServiceAction(instance, requestDto));
-                if (HostContext.StrictMode)
+                if (AppHost.Config.StrictMode)
                 {
                     if (response != null && response.GetType().IsValueType())
                         throw new StrictModeException($"'{requestDto.GetType().Name}' Service cannot return Value Types for its Service Responses. " +
@@ -209,7 +209,7 @@ namespace ServiceStack.Host
 
         public virtual object HandleException(IRequest request, TRequest requestDto, Exception ex)
         {
-            var errorResponse = HostContext.RaiseServiceException(request, requestDto, ex)
+            var errorResponse = ((ServiceStackHost)AppHost).OnServiceException(request, requestDto, ex)
                 ?? DtoUtils.CreateErrorResponse(requestDto, ex);
 
             AfterEachRequest(request, requestDto, errorResponse ?? ex);

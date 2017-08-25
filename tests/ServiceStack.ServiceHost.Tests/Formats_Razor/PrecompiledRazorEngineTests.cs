@@ -35,7 +35,7 @@ namespace ServiceStack.ServiceHost.Tests.Formats_Razor
         [Test]
         public void New_pages_begin_compilation_when_added()
         {
-            const string template = "This is my sample template, Hello @Model.Name!";
+            string template = "This is my sample template, Hello @Model.Name!";
             RazorFormat.AddFileAndPage("/simple.cshtml", template);
 
             var page = RazorFormat.GetContentPage("/simple.cshtml");
@@ -46,7 +46,7 @@ namespace ServiceStack.ServiceHost.Tests.Formats_Razor
         [Test]
         public void Pages_with_errors_dont_cause_exceptions_on_thread_starting_the_precompilation()
         {
-            const string template = "This is a bad template, Hello @SomeInvalidMember.Name!";
+            string template = "This is a bad template, Hello @SomeInvalidMember.Name!";
             RazorFormat.AddFileAndPage("/simple.cshtml", template);
 
             var page = RazorFormat.GetContentPage("/simple.cshtml");
@@ -57,7 +57,7 @@ namespace ServiceStack.ServiceHost.Tests.Formats_Razor
         [Test]
         public void Pages_with_errors_still_throw_exceptions_when_rendering()
         {
-            const string template = "This is a bad template, Hello @SomeInvalidMember.Name!";
+            string template = "This is a bad template, Hello @SomeInvalidMember.Name!";
 
             Assert.Throws<HttpCompileException>(() => {
                 RazorFormat.AddFileAndPage("/simple.cshtml", template);

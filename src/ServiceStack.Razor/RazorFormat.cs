@@ -108,7 +108,7 @@ namespace ServiceStack.Razor
 
         public void Register(IAppHost appHost)
         {
-            this.ScanRootPath = this.ScanRootPath ?? appHost.Config.WebHostPhysicalPath;
+            this.ScanRootPath = this.ScanRootPath ?? appHost.WebHostPhysicalPath;
             this.VirtualFileSources = VirtualFileSources ?? appHost.VirtualFileSources;
             this.WebHostUrl = WebHostUrl ?? appHost.Config.WebHostUrl;
             this.EnableLiveReload = this.EnableLiveReload ?? appHost.Config.DebugMode;
