@@ -386,7 +386,7 @@ namespace ServiceStack.Templates
         {
             await page.Init(); //reload modified changes if needed
 
-            stackTrace.Push("Page: " + Page.VirtualPath);
+            stackTrace.Push("Page: " + page.VirtualPath);
             
             foreach (var fragment in page.PageFragments)
             {
@@ -655,7 +655,8 @@ namespace ServiceStack.Templates
 
                         try
                         {
-                            await (Task)contextBlockInvoker(filter, args);
+                            var taskResponse = (Task)contextBlockInvoker(filter, args);
+                            await taskResponse;
 
                             if (hasFilterTransformers)
                             {
@@ -716,6 +717,9 @@ namespace ServiceStack.Templates
 
                         return IgnoreResult.Value;
                     }
+
+                    if (value is Task<object> valueTask)
+                        value = await valueTask;
                 }
                 catch (StopFilterExecutionException ex)
                 {
