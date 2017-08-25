@@ -270,7 +270,7 @@ namespace ServiceStack
                 }
                 else
                 {
-                    state.WebRequest.BeginGetResponse(ResponseCallback<TResponse>, state);
+                    client.BeginGetResponse(ResponseCallback<TResponse>, state);
                 }
             }
             catch (Exception ex)
@@ -298,7 +298,7 @@ namespace ServiceStack
 
                 PclExportClient.Instance.CloseWriteStream(stream);
 
-                requestState.WebRequest.BeginGetResponse(ResponseCallback<T>, requestState);
+                req.BeginGetResponse(ResponseCallback<T>, requestState);
             }
             catch (Exception ex)
             {

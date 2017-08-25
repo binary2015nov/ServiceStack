@@ -250,7 +250,7 @@ namespace ServiceStack
             var hasResolver = request as IHasResolver;
             return hasResolver != null 
                 ? hasResolver.Resolver.TryResolve<T>() 
-                : Service.DefaultResolver.TryResolve<T>();
+                : request.TryResolve<T>();
         }
 
         public static IVirtualFile GetFile(this IRequest request) => request is IHasVirtualFiles vfs ? vfs.GetFile() : null;

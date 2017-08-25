@@ -87,7 +87,7 @@ namespace ServiceStack.Common.Tests
                 var services = appHost.Container;
                 services.AddTransient<IFoo, Foo>();
 
-                var typeFactory = new ContainerResolveCache(appHost.Container);
+                var typeFactory = new ContainerResolveCache();
 
                 var foo = typeFactory.CreateInstance(services, typeof(IFoo), tryResolve: true);
                 Assert.That(foo, Is.Not.Null);

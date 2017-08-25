@@ -189,13 +189,5 @@ namespace ServiceStack.WebHost.IntegrationTests
             else
                 authRepo.InitSchema();
         }
-
-        public override object OnPreExecuteServiceFilter(IService service, object requestDto, IRequest request, IResponse response)
-        {
-            if (service is IocScopeService)
-                service.InjectRequestIntoDependencies(request);
-
-            return requestDto;
-        }
     }
 }

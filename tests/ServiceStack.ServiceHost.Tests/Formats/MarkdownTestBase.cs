@@ -63,10 +63,10 @@ namespace ServiceStack.ServiceHost.Tests.Formats
 
     public static class MarkdownTestExtensions
     {
-        public static string NormalizeNewLines(this string text)
-        {
-            return text.Replace("\r\n", "\n");
-        }
+        //public static string NormalizeNewLines(this string text)
+        //{
+        //    return text.Replace("\r\n", "\n");
+        //}
 
         public static string StripLinesAndWhitespace(this string text)
         {

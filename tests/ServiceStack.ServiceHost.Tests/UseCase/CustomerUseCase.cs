@@ -16,7 +16,7 @@ using ServiceStack.ServiceHost.Tests.UseCase.Services;
 
 namespace ServiceStack.ServiceHost.Tests.UseCase
 {
-    [Ignore("Performance tests")]
+    //[Ignore("Performance tests")]
     [TestFixture]
     public class CustomerUseCase
     {
@@ -34,7 +34,7 @@ namespace ServiceStack.ServiceHost.Tests.UseCase
         [SetUp]
         public void OnBeforeEachTest()
         {
-            serviceController = new ServiceController(null);
+            serviceController = new ServiceController(new ServiceStack.Testing.BasicAppHost());
         }
 
         [Test]
@@ -151,9 +151,9 @@ namespace ServiceStack.ServiceHost.Tests.UseCase
         {
             var container = GetContainerWithDependencies();
 
-            container.RegisterAutoWiredType(typeof(StoreCustomersService), typeof(GetCustomerService));
-
-            return new ContainerResolveCache(container);
+            container.RegisterAutoWiredTypes(new[] { typeof(StoreCustomersService), typeof(GetCustomerService) });
+            Service.DefaultResolver = container;
+            return new ContainerResolveCache();
         }
 
         private static Container GetContainerWithDependencies()

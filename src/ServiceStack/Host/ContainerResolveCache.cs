@@ -9,13 +9,7 @@ namespace ServiceStack.Host
 {
     public class ContainerResolveCache : ITypeFactory
     {
-        private readonly Container container;
         private static Dictionary<Type, Func<IResolver, object>> resolveFnMap = new Dictionary<Type, Func<IResolver, object>>();
-
-        public ContainerResolveCache(Container container)
-        {
-            this.container = container;
-        }
 
         private Func<IResolver, object> GenerateServiceFactory(Type type)
         {

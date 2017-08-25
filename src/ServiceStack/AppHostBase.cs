@@ -20,7 +20,7 @@ namespace ServiceStack
         {
             if (request is AspNetRequest)
 	        {
-                return ((AspNetRequest)request).HttpRequest.PhysicalPath;	    ;
+                return ((AspNetRequest)request).HttpRequest.PhysicalPath;
 	        }
             return base.ResolvePhysicalPath(virtualPath, request);
         }

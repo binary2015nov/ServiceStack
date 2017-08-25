@@ -727,7 +727,7 @@ Plain text in a comment
             Assert.That(templateOutput.NormalizeNewLines(), Is.EqualTo(expectedHtml));
 
             var sectionHtml = razorView.RenderSectionToHtml("Salutations");
-            Assert.That(sectionHtml.NormalizeNewLines(), Is.EqualTo("<p>Hello BELLOT, Demis</p>"));
+            Assert.That(sectionHtml.NormalizeNewLines(), Is.EqualTo("\n<p>Hello BELLOT, Demis</p>\n"));
         }
 
 

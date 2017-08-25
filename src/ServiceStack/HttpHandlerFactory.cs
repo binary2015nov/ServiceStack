@@ -123,7 +123,7 @@ namespace ServiceStack
         {
             var httpContext = context.Request.RequestContext.HttpContext;
             var opeationName = AppHostConfig.StripApplicationVirtualPath? url.TrimPrefixes(context.Request.ApplicationPath) : url;
-            var httpReq = new ServiceStack.Host.AspNet.AspNetRequest(httpContext, opeationName);
+            var httpReq = new ServiceStack.Host.AspNet.AspNetRequest(httpContext, opeationName) { PhysicalPath = pathTranslated };
             return GetHandler(httpReq);
         }
 #endif
@@ -155,7 +155,8 @@ namespace ServiceStack
                     var restPath = AppHostConfig.FallbackRestPath(httpReq.HttpMethod, sanitizedPath, physicalPath);
                     if (restPath != null)
                     {
-                        return new RestHandler { RestPath = restPath, RequestName = restPath.RequestType.GetOperationName(), ResponseContentType = contentType };
+                        return new RestHandler { RestPath = restPath, Request = httpReq,
+                            RequestName = restPath.RequestType.GetOperationName(), ResponseContentType = contentType };
                     }
                 }
 

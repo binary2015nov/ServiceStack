@@ -149,11 +149,11 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         }
     }
 
-    public static class TestExtensions
-    {
-        public static string NormalizeNewLines(this string text)
-        {
-            return text.Replace("\r\n", "\n");
-        }
-    }
+    //public static class TestExtensions
+    //{
+    //    public static string NormalizeNewLines(this string text)
+    //    {
+    //        return text.Replace("\r\n", "\n");
+    //    }
+    //}
 }

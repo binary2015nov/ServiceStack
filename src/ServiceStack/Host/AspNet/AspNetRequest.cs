@@ -318,8 +318,7 @@ namespace ServiceStack.Host.AspNet
 
         public bool IsFile { get; private set; }
 
-        private string physicalPath;
-        public string PhysicalPath => physicalPath ?? (physicalPath = this.GetPhysicalPath());
+        public string PhysicalPath { get; set; }
     }
 }
 

@@ -37,7 +37,7 @@ namespace ServiceStack.Host
         {
             this.appHost = appHost;
             appHost.Container.DefaultOwner = Owner.External;
-            typeFactory = new ContainerResolveCache(appHost.Container);
+            typeFactory = new ContainerResolveCache();
             this.RequestTypeFactoryMap = new Dictionary<Type, Func<IRequest, object>>();
             this.ResolveServicesFn = resolveServicesFn ?? (() => GetServiceTypes(assembliesWithServices));
         }
@@ -99,7 +99,7 @@ namespace ServiceStack.Host
                 {
                     ServiceExecFn handlerFn = (req, dto) =>
                     {
-                        var service = serviceFactoryFn.CreateInstance(req, serviceType) as IService;
+                        var service = (serviceFactoryFn ?? typeFactory).CreateInstance(req, serviceType) as IService;
 
                         ServiceExecFn serviceExec = (reqCtx, requestDto) =>
                             iserviceExec.Execute(reqCtx, service, requestDto);
@@ -124,11 +124,10 @@ namespace ServiceStack.Host
                     }
                     foreach (var actionContext in actionMap[requestType])
                     {
-                        Type responseType = actionContext.ResponseType;
-                        appHost.Metadata.Add(serviceType, requestType, responseType);
+                        appHost.Metadata.Add(serviceType, requestType, actionContext.ResponseType);
                         if (Logger.IsDebugEnabled)
                             Logger.DebugFormat("Registering {0} service '{1}' with request '{2}'",
-                                responseType != null ? "Reply" : "OneWay", serviceType.GetOperationName(), requestType.GetOperationName());
+                                actionContext.ResponseType != null ? "Reply" : "OneWay", serviceType.GetOperationName(), requestType.GetOperationName());
                     }
                 }
                 serviceActionMap[serviceType] = actionMap;

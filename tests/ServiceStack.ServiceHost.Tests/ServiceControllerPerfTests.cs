@@ -7,7 +7,7 @@ using ServiceStack.ServiceHost.Tests.TypeFactory;
 
 namespace ServiceStack.ServiceHost.Tests
 {
-    [Ignore("Perf Test Only")]
+    //[Ignore("Perf Test Only")]
     [TestFixture]
     public class ServiceControllerPerfTests
     {

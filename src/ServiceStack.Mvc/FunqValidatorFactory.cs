@@ -7,16 +7,18 @@ namespace ServiceStack.Mvc
 {
 	public class FunqValidatorFactory : ValidatorFactoryBase
 	{
-		private readonly ContainerResolveCache funqBuilder;
+		private readonly ContainerResolveCache funqBuilder = new ContainerResolveCache();
 
-		public FunqValidatorFactory(Container container=null)
+        private Container container;
+
+		public FunqValidatorFactory(Container container)
 		{
-            this.funqBuilder = new ContainerResolveCache(container ?? HostContext.Container);
+            this.container = container;
 		}
 
 		public override IValidator CreateInstance(Type validatorType)
 		{
-			return funqBuilder.CreateInstance(HostContext.Container, validatorType, true) as IValidator;
+			return funqBuilder.CreateInstance(container ?? HostContext.Container, validatorType, true) as IValidator;
 		}
 	}
 }

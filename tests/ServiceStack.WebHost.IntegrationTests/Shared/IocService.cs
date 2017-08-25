@@ -393,7 +393,7 @@ namespace ServiceStack.Shared.Tests
     }
 
     [IocRequestFilter]
-    public class IocScopeService : IService, IDisposable
+    public class IocScopeService : Service, IDisposable
     {
         public FunqRequestScope FunqRequestScope { get; set; }
         public FunqSingletonScope FunqSingletonScope { get; set; }

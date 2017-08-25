@@ -21,7 +21,7 @@ namespace ServiceStack.Mvc
         /// <param name="assemblies">The assemblies to reflect for IController discovery.</param>
         public FunqControllerFactory(Container container, params Assembly[] assemblies)
         {
-            this.funqBuilder = new ContainerResolveCache(container);
+            this.funqBuilder = new ContainerResolveCache();
 
             // aggregate the local and external assemblies for processing (unless ignored)
             IEnumerable<Assembly> targetAssemblies = assemblies.Concat(new[] { Assembly.GetCallingAssembly() });

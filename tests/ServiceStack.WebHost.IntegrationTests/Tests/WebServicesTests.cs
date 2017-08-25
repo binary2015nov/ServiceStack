@@ -180,5 +180,4 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             return new Soap12ServiceClient(ServiceClientBaseUri);
         }
     }
-
 }

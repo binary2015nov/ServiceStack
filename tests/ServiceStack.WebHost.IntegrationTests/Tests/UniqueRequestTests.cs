@@ -38,9 +38,9 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         public void Can_handle_encoded_chars()
         {
             var response = Constant.ServiceStackBaseHost.AppendPath("request/123%20456").GetStringFromUrl();
-            Assert.That(response, Is.EqualTo("123%20456"));
+            Assert.That(response, Is.EqualTo("123 456"));
             response = Constant.ServiceStackBaseHost.AppendPath("request/123%7C456").GetStringFromUrl();
-            Assert.That(response, Is.EqualTo("123%7C456"));
+            Assert.That(response, Is.EqualTo("123|456"));
         }
 
         [Test]

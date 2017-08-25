@@ -11,8 +11,8 @@ namespace ServiceStack.Common.Tests
         [Test]
         public void Func_Container_Hash_provider_is_Equal()
         {
-            var source = new ServiceKey { FactoryType = typeof(Func<Container, IHashProvider>) };
-            var other = new ServiceKey { FactoryType = typeof(Func<Container, IHashProvider>) };
+            var source = new ServiceKey(typeof(Func<Container, IHashProvider>), string.Empty);
+            var other = new ServiceKey(typeof(Func<Container, IHashProvider>), string.Empty);
             Assert.IsTrue(source.Equals(other));
             Assert.That(source, Is.EqualTo(other));
         }

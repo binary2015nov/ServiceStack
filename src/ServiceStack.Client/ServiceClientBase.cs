@@ -916,9 +916,9 @@ namespace ServiceStack
                 client.UserAgent = UserAgent;
                 client.AllowAutoRedirect = AllowAutoRedirect;
                 if (Timeout.HasValue) 
-                    client.Timeout = (int)Timeout.Value.TotalMilliseconds;
+                    client.Timeout = (int)(((TimeSpan)Timeout).TotalMilliseconds);
                 if (ReadWriteTimeout.HasValue)
-                client.ReadWriteTimeout = (int)ReadWriteTimeout.Value.TotalMilliseconds;
+                client.ReadWriteTimeout = (int)(((TimeSpan)ReadWriteTimeout).TotalMilliseconds);
 
 #else
 
@@ -926,7 +926,7 @@ namespace ServiceStack
 
 #endif
 
-                if (this.authInfo != null && !string.IsNullOrEmpty(this.UserName))
+                if (this.authInfo != null && !this.UserName.IsNullOrEmpty())
                     client.AddAuthInfo(this.UserName, this.Password, authInfo);
                 else if (this.BearerToken != null)
                     client.Headers[HttpHeaders.Authorization] = "Bearer " + this.BearerToken;
