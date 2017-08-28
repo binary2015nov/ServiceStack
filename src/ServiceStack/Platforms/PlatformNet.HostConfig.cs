@@ -15,22 +15,6 @@ namespace ServiceStack
     {
         const string NamespacesAppSettingsKey = "servicestack.razor.namespaces";
 
-        public override void InitHostConifg(HostConfig config)
-        {
-            base.InitHostConifg(config);
-            if (HostContext.IsAspNetHost)
-            {
-                var httpHandlerPath = InferHttpHandlerPath();
-                if (httpHandlerPath == null)
-                    throw new ConfigurationErrorsException("Unable to infer ServiceStack's <httpHandler.Path/> from your application's configuration file.\n"
-                        + "Check with https://github.com/ServiceStack/ServiceStack/wiki/Create-your-first-webservice to ensure you have configured ServiceStack properly.\n"
-                        + "Otherwise you can explicitly set your httpHandler.Path by setting: HostConfig.HandlerFactoryPath.");
-
-                config.HandlerFactoryPath = httpHandlerPath;
-            }
-                
-        }
-
         public override HashSet<string> GetRazorNamespaces()
         {
             var razorNamespaces = new HashSet<string>();

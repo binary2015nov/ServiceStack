@@ -142,8 +142,8 @@ namespace ServiceStack
             HostContext.AppHost = this;
             if (WebHostPhysicalPath.IsNullOrEmpty())
                 WebHostPhysicalPath = GetWebRootPath();
+
             Config.EmbeddedResourceSources.Add(GetType().GetAssembly());
-            Platform.Instance.InitHostConifg(Config);
             
             OnBeforeInit();
             Config.ServiceEndpointsMetadataConfig = ServiceEndpointsMetadataConfig.Create(Config.HandlerFactoryPath);

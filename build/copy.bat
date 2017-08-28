@@ -81,6 +81,6 @@ COPY ..\src\ServiceStack\bin\%BUILD%\ServiceStack.Client.dll ..\..\Stripe\lib
 COPY ..\src\ServiceStack\bin\%BUILD%\ServiceStack.Client.pdb ..\..\Stripe\lib
 COPY ..\lib\ServiceStack.Interfaces.dll ..\..\Stripe\lib
 
-COPY ..\src\ServiceStack.Razor.BuildTask\bin\%BUILD%\ServiceStack.Razor.BuildTask.dll ..\lib
+COPY ..\src\ServiceStack.Razor.BuildTask\bin\%BUILD%\ServiceStack.Razor.BuildTask.dll ..\lib\net45
 
 REM COPY ..\src\ServiceStack.DtoGen\*.cs  ..\src\ServiceStack\DtoGen

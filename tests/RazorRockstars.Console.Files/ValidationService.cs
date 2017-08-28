@@ -106,7 +106,6 @@ namespace RazorRockstars.Console.Files
         {
             Process.Start(BaseUri.CombineWith("/validation"));
             Thread.Sleep(TimeSpan.FromMinutes(10));
-        }
-        
+        }        
     }
 }

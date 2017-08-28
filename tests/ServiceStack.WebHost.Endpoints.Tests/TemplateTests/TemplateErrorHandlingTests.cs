@@ -450,7 +450,7 @@ StackTrace:
             context.VirtualFiles.WriteFile("page-empty.html", @"{{ { empty } | ensureAllArgsNotEmpty | select: { it.empty } }}{{ htmlError }}");
             context.VirtualFiles.WriteFile("page-noarg.html", @"{{ { noArg } | ensureAllArgsNotEmpty | select: { it.arg } }}{{ htmlError }}");
             context.VirtualFiles.WriteFile("page-msg.html", @"{{ { noArg }   | ensureAllArgsNotEmpty({ message: '{0} required' }) | select: { it.arg } }}{{ htmlError }}");
-            
+
             Assert.That(new PageResult(context.GetPage("page-arg")).Result, Is.EqualTo(@"value"));
             Assert.That(new PageResult(context.GetPage("page-empty")).Result.NormalizeNewLines(),
                 Is.EqualTo("<div class=\"alert alert-danger\">Value cannot be null.\nParameter name: empty</div>"));

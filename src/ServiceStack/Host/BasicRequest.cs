@@ -12,8 +12,33 @@ namespace ServiceStack.Host
 {
     public class BasicRequest : IRequest, IHasResolver, IHasVirtualFiles
     {
-        public object Dto { get; set; }
-        public IMessage Message { get; set; }
+        private object dto;
+        public object Dto
+        {
+            get { return dto; }
+            set
+            {
+                OperationName = value?.GetType().GetOperationName();
+                PathInfo = "/json/oneway/" + OperationName;
+                RawUrl = AbsoluteUri = "mq://" + PathInfo;
+                dto = value;
+            }
+        }
+
+        private IMessage message;
+        public IMessage Message
+        {
+            get { return message; }
+            set {
+                message = value;
+                if (value.Body != null)
+                {
+                    Dto = value.Body;
+                    Headers = new NameValueCollectionWrapper(value.ToHeaders().ToNameValueCollection());
+                }
+            }
+        }
+
         public object OriginalRequest { get; private set; }
         public IResponse Response { get; set; }
 
@@ -35,13 +60,6 @@ namespace ServiceStack.Host
             ContentType = this.ResponseContentType = MimeTypes.Json;
             this.Headers = PclExportClient.Instance.NewNameValueCollection();
 
-            if (Message.Body != null)
-            {
-                PathInfo = "/json/oneway/" + OperationName;
-                RawUrl = AbsoluteUri = "mq://" + PathInfo;
-                Headers = new NameValueCollectionWrapper(Message.ToHeaders().ToNameValueCollection());
-            }
-
             this.IsLocal = true;
             Response = new BasicResponse(this);
             this.RequestAttributes = requestAttributes;
@@ -54,12 +72,7 @@ namespace ServiceStack.Host
             this.Files = TypeConstants<IHttpFile>.EmptyArray;
         }
 
-        private string operationName;
-        public string OperationName
-        {
-            get => operationName ?? (operationName = (Message.Body?.GetType().GetOperationName()));
-            set => operationName = value;
-        }
+        public string OperationName { get; set; }
 
         public T TryResolve<T>()
         {

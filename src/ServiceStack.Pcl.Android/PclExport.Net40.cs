@@ -480,6 +480,7 @@ namespace ServiceStack
         public override HttpWebRequest CreateWebRequest(string urlString)
         {
             var webReq = base.CreateWebRequest(urlString);
+            webReq.Accept = "*/*";
             webReq.UserAgent = Env.ServerUserAgent ?? "ServiceStack.Text";
             webReq.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
             webReq.KeepAlive = false;
@@ -508,21 +509,6 @@ namespace ServiceStack
         public override void EndThreadAffinity()
         {
             Thread.EndThreadAffinity();
-        }
-
-        public override void SetContentLength(HttpWebRequest httpReq, long value)
-        {
-            httpReq.ContentLength = value;
-        }
-
-        public override void SetAllowAutoRedirect(HttpWebRequest httpReq, bool value)
-        {
-            httpReq.AllowAutoRedirect = value;
-        }
-
-        public override void SetKeepAlive(HttpWebRequest httpReq, bool value)
-        {
-            httpReq.KeepAlive = value;
         }
 
         public override string GetStackTrace()

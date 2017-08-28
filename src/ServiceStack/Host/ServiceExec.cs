@@ -142,12 +142,13 @@ namespace ServiceStack.Host
             if (overrideVerb != null)
                 actionName = overrideVerb;
 
-            string format = request.ResponseContentType.ToContentFormat()?.ToUpper();        
+            var operationName = requestDto.GetType().GetOperationName();
+            string format = request.ResponseContentType.ToContentFormat()?.ToUpper();
             InstanceExecFn action;
-            if (execMap.TryGetValue(ActionContext.Key(actionName + format, request.OperationName), out action) ||
-            execMap.TryGetValue(ActionContext.AnyFormatKey(format,request.OperationName), out action) ||
-            execMap.TryGetValue(ActionContext.Key(actionName, request.OperationName), out action) ||
-            execMap.TryGetValue(ActionContext.AnyKey(request.OperationName), out action))
+            if (execMap.TryGetValue(ActionContext.Key(actionName + format, operationName), out action) ||
+            execMap.TryGetValue(ActionContext.AnyFormatKey(format, operationName), out action) ||
+            execMap.TryGetValue(ActionContext.Key(actionName, operationName), out action) ||
+            execMap.TryGetValue(ActionContext.AnyKey(operationName), out action))
             {
                 return action(request, service, requestDto);
             }
@@ -155,7 +156,7 @@ namespace ServiceStack.Host
             var expectedMethodName = actionName.Substring(0, 1) + actionName.Substring(1).ToLowerInvariant();
             throw new NotImplementedException(
                 "Could not find method named {1}({0}) or Any({0}) on Service {2}"
-                .Fmt(request.OperationName, expectedMethodName, typeof(TService).GetOperationName()));
+                .Fmt(operationName, expectedMethodName, typeof(TService).GetOperationName()));
         }
 
         object IServiceExec.Execute(IRequest request, IService service, object requestDto)

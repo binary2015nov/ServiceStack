@@ -4,7 +4,6 @@
 
 using NUnit.Framework;
 using ServiceStack;
-using ServiceStack.Text;
 
 namespace RazorRockstars.Console.Files
 {
@@ -30,7 +29,6 @@ namespace RazorRockstars.Console.Files
             appHost.Dispose();
         }
         
-
         [Test]
         public void Can_download_static_file_at_root_directory()
         {

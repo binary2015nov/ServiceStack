@@ -238,6 +238,5 @@ Some Content @stringContainingHtml
             Console.WriteLine(html);
             Assert.That(html, Is.EqualTo(expectedHtml));
         }
-
     }
 }

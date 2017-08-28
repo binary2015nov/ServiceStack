@@ -35,6 +35,7 @@ namespace ServiceStack
 
         public static MemoryDataSource<T> ServiceSource<T>(this QueryDataContext ctx, object requestDto)
         {
+            var temp = HostContext.AppHost.GetType().Name;
             var response = HostContext.AppHost.GetServiceGateway(ctx.Request).Send<object>(requestDto);
             var results = GetResults<T>(response);
             if (results == null)
