@@ -13,6 +13,7 @@ namespace ServiceStack.Validation
     {
         public Func<ValidationResult, object, object> ErrorResponseFilter { get; set; }
 
+        //TODO: v5 make this true by default
         public bool ScanAppHostAssemblies { get; set; }
 
         /// <summary>
@@ -36,7 +37,7 @@ namespace ServiceStack.Validation
 
             if (ScanAppHostAssemblies)
             {
-                appHost.GetContainer().RegisterValidators(((ServiceStackHost)appHost).ServiceAssemblies);
+                appHost.GetContainer().RegisterValidators(((ServiceStackHost)appHost).ServiceAssemblies.ToArray());
             }
         }
        
