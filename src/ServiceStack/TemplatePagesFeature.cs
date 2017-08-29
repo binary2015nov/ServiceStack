@@ -29,8 +29,9 @@ namespace ServiceStack
         public bool EnableDebugTemplateToAll { get; set; }
 
         public string DebugDefaultTemplate { get; set; }
-        
+
         public string ApiPath { get; set; }
+        public string ApiDefaultContentType { get; set; } = MimeTypes.Json;
 
         public List<string> IgnorePaths { get; set; } = new List<string>
         {
@@ -75,17 +76,17 @@ namespace ServiceStack
             appHost.CatchAllHandlers.Add(RequestHandler);
 
             if (!DisableHotReload)
-                appHost.RegisterService(typeof(TemplatePagesServices));
-            
+                appHost.RegisterService(typeof(TemplateHotReloadService));
+
             if (!string.IsNullOrEmpty(ApiPath))
-                appHost.RegisterService(typeof(TemplatePagesApiServices), 
+                appHost.RegisterService(typeof(TemplateApiPagesService),
                     (ApiPath[0] == '/' ? ApiPath : '/' + ApiPath).CombineWith("/{PageName}/{PathInfo*}"));
 
             if (DebugMode || EnableDebugTemplate || EnableDebugTemplateToAll)
             {
-                appHost.RegisterService(typeof(MetadataTemplateServices), MetadataTemplateServices.Route);
+                appHost.RegisterService(typeof(TemplateMetadataDebugService), TemplateMetadataDebugService.Route);
                 appHost.GetPlugin<MetadataFeature>()
-                    ?.AddLink(MetadataFeature.DebugInfo, MetadataTemplateServices.Route, "Debug Templates");
+                    ?.AddLink(MetadataFeature.DebugInfo, TemplateMetadataDebugService.Route, "Debug Templates");
             }
 
             Init();
@@ -126,7 +127,7 @@ namespace ServiceStack
                     catchAllPathsNotFound.Clear();
                 catchAllPathsNotFound[pathInfo] = 1;
             }
-            
+
             return null;
         }
     }
@@ -148,7 +149,7 @@ namespace ServiceStack
 
     [DefaultRequest(typeof(HotReloadPage))]
     [Restrict(VisibilityTo = RequestAttributes.None)]
-    public class TemplatePagesServices : Service
+    public class TemplateHotReloadService : Service
     {
         public ITemplatePages Pages { get; set; }
 
@@ -183,42 +184,56 @@ namespace ServiceStack
 
     [DefaultRequest(typeof(ApiPages))]
     [Restrict(VisibilityTo = RequestAttributes.None)]
-    public class TemplatePagesApiServices : Service
+    public class TemplateApiPagesService : Service
     {
-        public async Task<object> Any(ApiPages request) 
+        public async Task<object> Any(ApiPages request)
         {
             if (string.IsNullOrEmpty(request.PageName))
                 throw new ArgumentNullException("PageName");
 
-            var parts = string.IsNullOrEmpty(request.PathInfo)  
+            var parts = string.IsNullOrEmpty(request.PathInfo)
                 ? TypeConstants.EmptyStringArray
                 : request.PathInfo.SplitOnLast('.');
 
-            var pathInfo = parts.Length > 1 && Host.ContentTypes.KnownFormats.Contains(parts[1])
+            var hasPathContentType = parts.Length > 1 && Host.ContentTypes.KnownFormats.Contains(parts[1]);
+            var pathInfo = hasPathContentType
                 ? parts[0]
                 : request.PathInfo;
-            
+
             var pathArgs = string.IsNullOrEmpty(pathInfo)
                 ? TypeConstants.EmptyStringArray
                 : pathInfo.Split('/');
-            
+
             parts = request.PageName.SplitOnLast('.');
-            var pageName = pathArgs.Length == 0 && parts.Length > 1 && Host.ContentTypes.KnownFormats.Contains(parts[1])
+            var hasPageContentType = pathArgs.Length == 0 && parts.Length > 1 && Host.ContentTypes.KnownFormats.Contains(parts[1]);
+            var pageName = hasPageContentType
                 ? parts[0]
                 : request.PageName;
 
+            // Change .csv download file name
+            base.Request.OperationName = pageName + (pathArgs.Length > 0 ? "_" + string.Join("_", pathArgs) : "");
+
             var feature = HostContext.GetPlugin<TemplatePagesFeature>();
+
+            if (feature.ApiDefaultContentType != null &&
+                !hasPathContentType &&
+                !hasPageContentType &&
+                base.Request.QueryString["format"] == null && base.Request.ResponseContentType == MimeTypes.Html)
+            {
+                base.Request.ResponseContentType = feature.ApiDefaultContentType;
+            }
 
             var pagePath = feature.ApiPath.CombineWith(pageName).TrimStart('/');
             var page = base.Request.GetPage(pagePath);
             if (page == null)
                 throw HttpError.NotFound($"No API Page was found at '{pagePath}'");
-            
+
             var requestArgs = base.Request.GetTemplateRequestParams();
             requestArgs[TemplateConstants.PathInfo] = request.PathInfo;
-            requestArgs[TemplateConstants.PathArgs] = pathArgs; 
+            requestArgs[TemplateConstants.PathArgs] = pathArgs;
 
-            var pageResult = new PageResult(page) {
+            var pageResult = new PageResult(page)
+            {
                 NoLayout = true,
                 RethrowExceptions = true,
                 Args = requestArgs
@@ -231,7 +246,7 @@ namespace ServiceStack
 
             if (response is Task<object> responseTask)
                 response = await responseTask;
-            
+
             var httpResultHeaders = (pageResult.Args.TryGetValue("returnArgs", out object returnArgs) ? returnArgs : null).ToStringDictionary();
 
             var result = new HttpResult(response);
@@ -241,18 +256,19 @@ namespace ServiceStack
     }
 
     [ExcludeMetadata]
-    public class MetadataDebugTemplate : IReturn<string>
+    public class TemplateMetadataDebug : IReturn<string>
     {
         public string Template { get; set; }
         public string AuthSecret { get; set; }
     }
 
-    [DefaultRequest(typeof(MetadataDebugTemplate))]
+    [ReturnExceptionsInJsonAttribute]
+    [DefaultRequest(typeof(TemplateMetadataDebug))]
     [Restrict(VisibilityTo = RequestAttributes.None)]
-    public class MetadataTemplateServices : Service
+    public class TemplateMetadataDebugService : Service
     {
-        public static string Route = "/metadata/debug"; 
-        
+        public static string Route = "/metadata/debug";
+
         public static string DefaultTemplate = @"<table><tr><td style='width:50%'><pre>
 Service Name              {{ appHost.ServiceName }}
 Handler Path              {{ appConfig.HandlerFactoryPath }}
@@ -278,14 +294,16 @@ User:
   - LastName              {{ userSession | select: { it.LastName } }}
   - Is Admin              {{ userHasRole('Admin') }}
   - Has Permission        {{ userHasPermission('ThePermission') }}
+
+Plugins: {{ plugins | select: \n  - { it | typeName } }}
 </pre></td><td style='width:50%'> 
 {{ meta.Operations | take(10) | map('{ Request: it.Name, Response: it.ResponseType.Name, Service: it.ServiceType.Name }') | htmlDump({ caption: 'First 10 Services'}) }}
 <table><caption>Network Information</caption>
 <tr><th>    IPv4 Addresses                            </th><th>              IPv6 Addresses                            </th></tr>
 <td><pre>{{ networkIpv4Addresses | select: \n{ it } }}</pre></td><td><pre>{{ networkIpv6Addresses | select: \n{ it } }}</pre><td></tr></pre></td>
 </tr></table>";
-        
-        public object Any(MetadataDebugTemplate request)
+
+        public object Any(TemplateMetadataDebug request)
         {
             if (string.IsNullOrEmpty(request.Template))
                 return null;
@@ -298,7 +316,7 @@ User:
                     RequiredRoleAttribute.AssertRequiredRoles(Request, AuthRepository, RoleNames.Admin);
                 }
             }
-            
+
             var context = new TemplateContext
             {
                 TemplateFilters = { new TemplateInfoFilters() },
@@ -317,15 +335,15 @@ User:
             feature.Args.Each(x => context.Args[x.Key] = x.Value);
 
             var result = context.EvaluateTemplate(request.Template);
-            return new HttpResult(result) { ContentType = MimeTypes.PlainText }; 
+            return new HttpResult(result) { ContentType = MimeTypes.PlainText };
         }
 
-        public object GetHtml(MetadataDebugTemplate request)
+        public object GetHtml(TemplateMetadataDebug request)
         {
             var feature = HostContext.GetPlugin<TemplatePagesFeature>();
             if (!HostContext.Config.DebugMode && !feature.EnableDebugTemplateToAll)
                 RequiredRoleAttribute.AssertRequiredRoles(Request, AuthRepository, RoleNames.Admin);
-            
+
             if (request.Template != null)
                 return Any(request);
 
@@ -338,10 +356,10 @@ User:
             if (HostContext.Config.AdminAuthSecret != null &&
                 HostContext.Config.AdminAuthSecret == authsecret)
             {
-                html = html.Replace("{ template: template }", 
+                html = html.Replace("{ template: template }",
                     "{ template: template, authsecret:" + feature.DefaultFilters.jsQuotedString(authsecret).ToRawString() + " }");
             }
- 
+
             return html;
         }
     }
@@ -359,7 +377,7 @@ User:
         }
 
         public override async Task ProcessRequestAsync(IRequest httpReq, IResponse httpRes, string operationName)
-        {            
+        {
             var result = new PageResult(page)
             {
                 Args = httpReq.GetTemplateRequestParams(),
@@ -508,7 +526,7 @@ User:
                 var mockSession = TryResolve<TUserSession>();
                 if (Equals(mockSession, default(TUserSession)))
                     mockSession = TryResolve<IAuthSession>() is TUserSession
-                        ? (TUserSession) TryResolve<IAuthSession>()
+                        ? (TUserSession)TryResolve<IAuthSession>()
                         : default(TUserSession);
 
                 if (!Equals(mockSession, default(TUserSession)))
@@ -533,7 +551,7 @@ User:
             db?.Dispose();
             redis?.Dispose();
             messageProducer?.Dispose();
-            using (authRepository as IDisposable) {}
+            using (authRepository as IDisposable) { }
         }
     }
 
@@ -551,17 +569,22 @@ User:
             to[TemplateConstants.Request] = request;
             return to;
         }
-        
+
         public static TemplateCodePage GetCodePage(this IRequest request, string virtualPath)
         {
-            return HostContext.GetPlugin<TemplatePagesFeature>().GetCodePage(virtualPath).With(request);
+            return HostContext.AssertPlugin<TemplatePagesFeature>().GetCodePage(virtualPath).With(request);
         }
-        
+
         public static TemplatePage GetPage(this IRequest request, string virtualPath)
         {
-            return HostContext.GetPlugin<TemplatePagesFeature>().GetPage(virtualPath);
+            return HostContext.AssertPlugin<TemplatePagesFeature>().GetPage(virtualPath);
         }
-        
+
+        public static TemplatePage OneTimePage(this IRequest request, string contents, string ext = null)
+        {
+            return HostContext.AssertPlugin<TemplatePagesFeature>().OneTimePage(contents, ext);
+        }
+
         public static TemplateCodePage With(this TemplateCodePage page, IRequest request)
         {
             if (page is IRequiresRequest requiresRequest)

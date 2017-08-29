@@ -1,32 +1,30 @@
-﻿using Funq;
+﻿using System.Collections.Generic;
+using Funq;
 using NUnit.Framework;
 using ServiceStack.Api.OpenApi;
 using ServiceStack.Auth;
 using ServiceStack.Data;
-using ServiceStack.Logging;
 using ServiceStack.OpenApi.Tests.Services;
 using ServiceStack.OrmLite;
-using ServiceStack.Redis;
 using ServiceStack.Text;
-using System.Collections.Generic;
 
 namespace ServiceStack.OpenApi.Tests.Host
 {
     [TestFixture]
-    public class GeneratedClientTestBase
+    public abstract class GeneratedClientTestBase
     {
         TestAppHost appHost;
 
         [OneTimeSetUp]
-        public void OnTestFixtureSetUp()
+        public void TestFixtureSetUp()
         {
             appHost = new TestAppHost();
             appHost.Init();
-            appHost.Start(Config.AbsoluteBaseUri);
+            appHost.Start(Constant.AbsoluteBaseUri);
         }
 
         [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
+        public void TestFixtureTearDown()
         {
             appHost.Dispose();
         }
@@ -101,8 +99,8 @@ namespace ServiceStack.OpenApi.Tests.Host
             */
         }
 
-        private void CreateUser(OrmLiteAuthRepository authRepo,
-    int id, string username, string password, List<string> roles = null, List<string> permissions = null)
+        private void CreateUser(OrmLiteAuthRepository authRepo, int id, string username, string password, 
+            List<string> roles = null, List<string> permissions = null)
         {
             string hash;
             string salt;
@@ -124,6 +122,5 @@ namespace ServiceStack.OpenApi.Tests.Host
 
             authRepo.AssignRoles(id.ToString(), roles, permissions);
         }
-
     }
 }

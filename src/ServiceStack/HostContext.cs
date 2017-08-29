@@ -142,13 +142,22 @@ namespace ServiceStack
             return AssertAppHost().ExecuteService(requestDto, request);           
         }
 
-        public static TPlugin GetPlugin<TPlugin>() where TPlugin : class, IPlugin
+        public static TPlugin AssertPlugin<TPlugin>() 
+            where TPlugin : class, IPlugin
+        {
+            return GetPlugin<TPlugin>()
+                ?? throw new NotImplementedException($"Plugin '{typeof(TPlugin).Name}' has not been registered.");
+        }
+
+        public static TPlugin GetPlugin<TPlugin>()
+            where TPlugin : class, IPlugin
         {
             var appHost = AppHost;
             return appHost?.GetPlugin<TPlugin>();
         }
 
-        public static bool HasPlugin<TPlugin>() where TPlugin : class, IPlugin
+        public static bool HasPlugin<TPlugin>() 
+            where TPlugin : class, IPlugin
         {
             var appHost = AppHost;
             return appHost != null && appHost.HasPlugin<TPlugin>();
@@ -292,24 +301,6 @@ namespace ServiceStack
         public static IRequest TryGetCurrentRequest()
         {
             return AssertAppHost().TryGetCurrentRequest();
-        }
-
-        public static int FindFreeTcpPort(int startingFrom=5000, int endingAt=65535)
-        {
-            var tcpEndPoints = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners();
-            var activePorts = new HashSet<int>();
-            foreach (var endPoint in tcpEndPoints)
-            {
-                activePorts.Add(endPoint.Port);
-            }
-
-            for (var port = startingFrom; port < endingAt; port++)
-            {
-                if (!activePorts.Contains(port))
-                    return port;
-            }
-
-            return -1;
         }
     }
 }

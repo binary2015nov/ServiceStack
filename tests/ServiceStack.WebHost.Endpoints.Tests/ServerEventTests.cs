@@ -1320,8 +1320,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             return client;
         }
 
-        private readonly ServiceStackHost appHost;
-        public AuthMemoryServerEventsTests()
+        private ServiceStackHost appHost;
+
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
             appHost = CreateAppHost();
         }
@@ -1413,7 +1415,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
     }
-
 
     public class TestNamedReceiver : ServerEventReceiver
     {

@@ -374,7 +374,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     public class AuthTests
     {
         protected virtual string VirtualDirectory { get { return ""; } }
-        protected virtual string ListeningOn { get { return "http://localhost:1337/"; } }
+        protected virtual string ListeningOn { get { return Config.ListeningOn; } }
         protected virtual string WebHostUrl { get { return "http://mydomain.com"; } }
 
         public const string UserName = "user";
@@ -389,7 +389,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         ServiceStackHost appHost;
 
         [OneTimeSetUp]
-        public void OnTestFixtureSetUp()
+        public void TestFixtureSetUp()
         {
             appHost = new AuthAppHost(WebHostUrl, Configure);
             appHost.Init();
@@ -397,7 +397,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
+        public void TestFixtureTearDown()
         {
             appHost.Dispose();
         }
@@ -1288,7 +1288,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 Is.EqualTo(1)
             );
         }
-
 
         [Test]
         public void Meaningful_Exception_for_Unknown_Auth_Header()

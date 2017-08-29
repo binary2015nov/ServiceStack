@@ -26,12 +26,6 @@ namespace RazorRockstars.Web.Tests
             "Time Taken {0}ms".Fmt(startedAt.ElapsedMilliseconds).Print();
         }
 
-        [Ignore("Debug Run")][Test]
-	    public void RunFor10Mins()
-	    {
-	        Thread.Sleep(TimeSpan.FromMinutes(10));
-	    }
-
         public void AssertStatus(string url, HttpStatusCode statusCode)
         {
             url.Print();

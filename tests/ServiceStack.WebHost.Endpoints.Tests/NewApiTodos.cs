@@ -140,6 +140,5 @@ namespace NewApi.Todos
             all = restClient.Get(new Todos());
             Assert.That(all.Count, Is.EqualTo(0));
         }
-
     }
 }

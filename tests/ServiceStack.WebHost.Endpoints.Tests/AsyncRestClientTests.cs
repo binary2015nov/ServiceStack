@@ -8,12 +8,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 {
     public abstract class AsyncRestClientTests
     {
-        private const string ListeningOn = "http://localhost:1337/";
+        private string ListeningOn = Config.ListeningOn;
 
         ServiceStackHost appHost;
 
         [OneTimeSetUp]
-        public void OnTestFixtureSetUp()
+        public void TestFixtureSetUp()
         {
             appHost = new ExampleAppHostHttpListener()
                 .Init()
@@ -21,7 +21,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
+        public void TestFixtureTearDown()
         {
             appHost.Dispose();
         }

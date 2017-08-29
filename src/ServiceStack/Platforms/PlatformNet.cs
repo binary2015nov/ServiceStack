@@ -4,7 +4,7 @@ namespace ServiceStack
 {
     public partial class PlatformNet : Platform
     {
-        public PlatformNet()
+        static PlatformNet()
         {
             //MONO doesn't implement this property
             var pi = typeof(System.Web.HttpRuntime).GetProperty("UsingIntegratedPipeline");

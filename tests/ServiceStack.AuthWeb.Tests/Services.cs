@@ -7,7 +7,6 @@ using ServiceStack.Auth;
 using ServiceStack.Data;
 using ServiceStack.DataAnnotations;
 using ServiceStack.OrmLite;
-using ServiceStack.Text;
 
 #if HTTP_LISTENER
 namespace ServiceStack.Auth.Tests

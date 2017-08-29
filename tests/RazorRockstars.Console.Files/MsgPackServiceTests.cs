@@ -6,7 +6,6 @@ using NUnit.Framework;
 using ServiceStack;
 using ServiceStack.Logging;
 using ServiceStack.MsgPack;
-using ServiceStack.Text;
 
 namespace RazorRockstars.Console.Files
 {
@@ -70,7 +69,7 @@ namespace RazorRockstars.Console.Files
     [TestFixture]
     public class MsgPackServiceTests
     {
-        protected const string ListeningOn = "http://localhost:1337/";
+        protected const string ListeningOn = "http://localhost:1338/";
 
         AppHost appHost;
 
@@ -160,7 +159,7 @@ namespace RazorRockstars.Console.Files
     [TestFixture]
     public class WireServiceTests
     {
-        protected const string ListeningOn = "http://localhost:1337/";
+        protected const string ListeningOn = "http://localhost:1339/";
 
         AppHost appHost;
 

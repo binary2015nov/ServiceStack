@@ -1,5 +1,4 @@
-﻿#if !NETCORE
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Threading;
 using NUnit.Framework;
@@ -36,4 +35,3 @@ namespace ServiceStack.Common.Tests
         }
     }
 }
-#endif

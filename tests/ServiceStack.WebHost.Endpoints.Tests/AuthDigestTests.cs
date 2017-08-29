@@ -9,7 +9,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     public class AuthDigestTests
     {
         protected virtual string VirtualDirectory { get { return ""; } }
-        protected virtual string ListeningOn { get { return "http://localhost:1337/"; } }
+        protected virtual string ListeningOn { get { return Config.ListeningOn; } }
         protected virtual string WebHostUrl { get { return "http://mydomain.com"; } }
 
         public class AuthDigestAppHost : AuthAppHost
@@ -23,10 +23,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 return new[] { new DigestAuthProvider(AppSettings) };
             }
         }
+
         ServiceStackHost appHost;
 
         [OneTimeSetUp]
-        public void OnTestFixtureSetUp()
+        public void TestFixtureSetUp()
         {
             appHost = new AuthDigestAppHost(WebHostUrl, Configure);
             appHost.Init();
@@ -34,7 +35,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
+        public void TestFixtureTearDown()
         {
             appHost.Dispose();
         }

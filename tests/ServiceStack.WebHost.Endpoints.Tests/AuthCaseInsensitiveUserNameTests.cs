@@ -1,6 +1,4 @@
-﻿using System;
-using System.Reflection;
-using Funq;
+﻿using Funq;
 using NUnit.Framework;
 using ServiceStack.Auth;
 using ServiceStack.Data;
@@ -12,7 +10,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         public class AppHost : AppSelfHostBase
         {
-            public AppHost() : base(nameof(AuthCaseInsensitiveUserNameTests), typeof(AuthCaseInsensitiveUserNameTests).GetAssembly()) {}
+            public AppHost() 
+                : base(nameof(AuthCaseInsensitiveUserNameTests), typeof(AuthCaseInsensitiveUserNameTests).GetAssembly()) { }
 
             public override void Configure(Container container)
             {
@@ -35,8 +34,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        private readonly ServiceStackHost appHost;
-        public AuthSaveUserNameAsLowerCaseTests()
+        private ServiceStackHost appHost;
+
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
             appHost = new AppHost()
                 .Init()
@@ -44,7 +45,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OneTimeTearDown() => appHost.Dispose();
+        public void TestFixtureTearDown() => appHost.Dispose();
 
         [Test]
         public void Can_register_and_authenticate_with_exact_UserName()
@@ -101,7 +102,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         public class AppHost : AppSelfHostBase
         {
-            public AppHost() : base(nameof(AuthCaseInsensitiveUserNameTests), typeof(AuthCaseInsensitiveUserNameTests).GetAssembly()) {}
+            public AppHost()
+                : base(nameof(AuthCaseInsensitiveUserNameTests), typeof(AuthCaseInsensitiveUserNameTests).GetAssembly()) { }
 
             public override void Configure(Container container)
             {
@@ -124,8 +126,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        private readonly ServiceStackHost appHost;
-        public AuthCaseInsensitiveUserNameTests()
+        private ServiceStackHost appHost;
+
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
             appHost = new AppHost()
                 .Init()
@@ -133,7 +137,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OneTimeTearDown() => appHost.Dispose();
+        public void TestFixtureTearDown() => appHost.Dispose();
 
         [Test]
         public void Can_register_and_authenticate_with_exact_UserName()
@@ -190,7 +194,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         public class AppHost : AppSelfHostBase
         {
-            public AppHost() : base(nameof(AuthCaseInsensitiveUserNameTests), typeof(AuthCaseInsensitiveUserNameTests).GetAssembly()) {}
+            public AppHost() 
+                : base(nameof(AuthCaseInsensitiveUserNameTests), typeof(AuthCaseInsensitiveUserNameTests).GetAssembly()) { }
 
             public override void Configure(Container container)
             {
@@ -216,8 +221,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        private readonly ServiceStackHost appHost;
-        public AuthCaseSensitiveUserNameTests()
+        private ServiceStackHost appHost;
+
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
             appHost = new AppHost()
                 .Init()
@@ -278,8 +285,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 
                 Assert.Fail("Should fail");
             }
-            catch (WebServiceException e) {}
+            catch (WebServiceException) { }
         }
     }
-
 }

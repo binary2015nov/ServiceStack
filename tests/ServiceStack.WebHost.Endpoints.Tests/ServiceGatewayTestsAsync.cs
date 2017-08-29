@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Funq;
 using NUnit.Framework;
 using ServiceStack.Messaging;
-using ServiceStack.Text;
 using ServiceStack.Web;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
@@ -245,7 +242,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
-    //AppHosts
+    [TestFixture]
     public class MixedServiceGatewayNativeAsyncTests : ServiceGatewayAsyncTests
     {
         class MixedServiceGatewayFactory : ServiceGatewayFactoryBase
@@ -278,6 +275,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
+    [TestFixture]
     public class MixedServiceGatewayAsyncTests : ServiceGatewayAsyncTests
     {
         class MixedServiceGatewayFactory : IServiceGatewayFactory, IServiceGateway
@@ -338,11 +336,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
+    [TestFixture]
     public class AllExternalServiceGatewayAsyncTests : ServiceGatewayAsyncTests
     {
         class AllExternalAppHost : AppSelfHostBase
         {
-            public AllExternalAppHost() : base(typeof(ServiceGatewayTests).Name, typeof(ServiceGatewayServices).GetAssembly()) { }
+            public AllExternalAppHost()
+                : base(typeof(ServiceGatewayTests).Name, typeof(ServiceGatewayServices).GetAssembly()) { }
 
             public override void Configure(Container container)
             {
@@ -357,12 +357,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
-    //Tests
+    [TestFixture]
     public class AllInternalServiceGatewayAsyncTests : ServiceGatewayAsyncTests
     {
         class AllInternalAppHost : AppSelfHostBase
         {
-            public AllInternalAppHost() : base(typeof(ServiceGatewayTests).Name, typeof(ServiceGatewayServices).GetAssembly()) { }
+            public AllInternalAppHost()
+                : base(typeof(ServiceGatewayTests).Name, typeof(ServiceGatewayServices).GetAssembly()) { }
 
             public override void Configure(Container container)
             {
@@ -405,9 +406,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         protected abstract ServiceStackHost CreateAppHost();
 
-        readonly IServiceClient client;
-        private readonly ServiceStackHost appHost;
-        public ServiceGatewayAsyncTests()
+        private IServiceClient client;
+        private ServiceStackHost appHost;
+
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
             appHost = CreateAppHost()
                 .Init()

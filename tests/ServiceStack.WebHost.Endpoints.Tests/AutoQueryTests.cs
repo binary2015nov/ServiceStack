@@ -748,13 +748,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     [TestFixture]
     public class AutoQueryTests
     {
-        private readonly ServiceStackHost appHost;
+        private ServiceStackHost appHost;
         public IServiceClient client;
 
         private static readonly int TotalRockstars = AutoQueryAppHost.SeedRockstars.Length;
         private static readonly int TotalAlbums = AutoQueryAppHost.SeedAlbums.Length;
 
-        public AutoQueryTests()
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
             appHost = new AutoQueryAppHost()
                 .Init()

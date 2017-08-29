@@ -12,19 +12,18 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 {
     public class AsyncProgressTests
     {
-        private const string ListeningOn = "http://localhost:1337/";
-
         ExampleAppHostHttpListener appHost;
 
         [OneTimeSetUp]
         public void OnTestFixtureSetUp()
         {
             appHost = new ExampleAppHostHttpListener();
-            appHost.Init();
-            appHost.Start(ListeningOn);
-#if NETCORE            
+#if NETCORE
             appHost.Config.DisableChunkedEncoding = true;
 #endif
+            appHost.Init();
+            appHost.Start(Config.ListeningOn);
+
         }
 
         [OneTimeTearDown]
@@ -41,7 +40,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             try
             {
-                var asyncClient = new JsonServiceClient(ListeningOn);
+                var asyncClient = new JsonServiceClient(Config.ListeningOn);
 
                 var progress = new List<string>();
 
@@ -90,14 +89,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             await AsyncDownloadWithProgress(new TestProgressTextFile());
         }
 
-        private static async Task AsyncDownloadWithProgress<TResponse>(IReturn<TResponse> requestDto)
+        private async Task AsyncDownloadWithProgress<TResponse>(IReturn<TResponse> requestDto)
         {
             var hold = AsyncServiceClient.BufferSize;
             AsyncServiceClient.BufferSize = 100;
 
             try
             {
-                var asyncClient = new JsonServiceClient(ListeningOn);
+                var asyncClient = new JsonServiceClient(Config.ListeningOn);
 
                 var progress = new List<string>();
 

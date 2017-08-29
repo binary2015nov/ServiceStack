@@ -1,6 +1,5 @@
-using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using Funq;
 using NUnit.Framework;
@@ -8,8 +7,6 @@ using ServiceStack.Data;
 using ServiceStack.IO;
 using ServiceStack.OrmLite;
 using ServiceStack.Templates;
-using ServiceStack.Text;
-using ServiceStack.IO;
 
 namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
 {
@@ -145,6 +142,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
             public AppHost() : base(nameof(TemplateIntegrationTests), typeof(MyTemplateServices).GetAssembly())
             {
                 Config.DebugMode = true;
+                Config.ForbiddenPaths.Add("/plugins");
             }
 
             public override void Configure(Container container)
@@ -667,5 +665,18 @@ StackTrace:
    at Expression (Dictionary`2): {id:".NormalizeNewLines()));
         }
 
+        [Test]
+        public void Should_not_be_allowed_to_access_plugins_folder()
+        {
+            try
+            {
+                var contents = BaseUrl.AppendPaths("plugins", "dll.txt").GetStringFromUrl();
+                Assert.Fail("Should throw");
+            }
+            catch (WebException ex)
+            {
+                Assert.That(ex.GetStatus(), Is.EqualTo(HttpStatusCode.Forbidden));
+            }
+        }
     }
 }

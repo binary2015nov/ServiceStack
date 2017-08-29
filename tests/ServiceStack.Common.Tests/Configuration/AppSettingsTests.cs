@@ -1,12 +1,10 @@
-﻿#if !NETCORE_SUPPORT
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using NUnit.Framework;
 using ServiceStack.Configuration;
 using ServiceStack.OrmLite;
-using ServiceStack.Text;
 
 namespace ServiceStack.Common.Tests
 {
@@ -28,6 +26,7 @@ namespace ServiceStack.Common.Tests
         }
     }
 
+    [TestFixture]
     public class MultiAppSettingsTest : AppSettingsTest
     {
         public override AppSettingsBase GetAppSettings()
@@ -45,6 +44,7 @@ namespace ServiceStack.Common.Tests
         }
     }
 
+    [TestFixture]
     public class AppConfigAppSettingsTest : AppSettingsTest
     {
         public override AppSettingsBase GetAppSettings()
@@ -59,7 +59,8 @@ namespace ServiceStack.Common.Tests
             return configMap;
         }
     }
-
+    
+    [TestFixture]
     public class OrmLiteAppSettingsTest : AppSettingsTest
     {
         private OrmLiteAppSettings settings;
@@ -148,6 +149,7 @@ namespace ServiceStack.Common.Tests
         }
     }
 
+    [TestFixture]
     public class DictionarySettingsTest : AppSettingsTest
     {
         [Test]
@@ -422,4 +424,3 @@ ObjectKey {SomeSetting:Test,SomeOtherSetting:12,FinalSetting:Final}";
         }
     }
 }
-#endif

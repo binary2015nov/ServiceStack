@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Funq;
+using NUnit.Framework;
 using ServiceStack.Caching;
 using ServiceStack.Common.Tests.ServiceClient.Web;
-using NUnit.Framework;
 using ServiceStack.Support.WebHost;
 using ServiceStack.Text;
 using ServiceStack.Web;
@@ -227,29 +228,50 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
+    public class ExecutedFirstAttribute : RequestFilterAttribute
+    {
+        public ExecutedFirstAttribute()
+        {
+            Priority = int.MinValue;
+        }
+
+        public override void Execute(IRequest req, IResponse res, object requestDto)
+        {
+            var dto = (AttributeFiltered)requestDto;
+            dto.AttrsExecuted.Add(GetType().Name);
+        }
+    }
+
+    [ExecutedFirst]
+    [FilterTest]
+    [RequiredRole("test")]
+    [Authenticate]
+    [RequiredPermission("test")]
+    public class DummyHolder { }
+
     [TestFixture]
     public class AttributeFiltersTest
     {
-        private const string ListeningOn = "http://localhost:1337/";
-        private const string ServiceClientBaseUri = "http://localhost:1337/";
+        private static string ListeningOn = Config.ListeningOn;
+
+        AttributeFiltersAppHostHttpListener appHost;
 
         public class AttributeFiltersAppHostHttpListener : AppHostHttpListenerBase
         {
-            public AttributeFiltersAppHostHttpListener() : base("Attribute Filters Tests", typeof(AttributeAttributeFilteredService).GetAssembly())
+            public AttributeFiltersAppHostHttpListener() 
+                : base("Attribute Filters Tests", typeof(AttributeAttributeFilteredService).GetAssembly())
             {
                 Config.DebugMode = true;
             }
 
-            public override void Configure(Funq.Container container)
+            public override void Configure(Container container)
             {
                 container.Register<ICacheClient>(c => new MemoryCacheClient()).ReusedWithin(Funq.ReuseScope.None);
             }
         }
 
-        AttributeFiltersAppHostHttpListener appHost;
-
         [OneTimeSetUp]
-        public void OnTestFixtureSetUp()
+        public void TestFixtureSetUp()
         {
             appHost = new AttributeFiltersAppHostHttpListener();
             appHost.Init();
@@ -257,24 +279,24 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
+        public void TestFixtureTearDown()
         {
             appHost.Dispose();
         }
 
         public IServiceClient GetServiceClient()
         {
-            return new JsonServiceClient(ServiceClientBaseUri);
+            return new JsonServiceClient(ListeningOn);
         }
 
         static IServiceClient[] ServiceClients =
         {
-            new JsonServiceClient(ServiceClientBaseUri),
-            new XmlServiceClient(ServiceClientBaseUri),
-            new JsvServiceClient(ServiceClientBaseUri)
+            new JsonServiceClient(ListeningOn),
+            new XmlServiceClient(ListeningOn),
+            new JsvServiceClient(ListeningOn)
 			//SOAP not supported in HttpListener
-			//new Soap11ServiceClient(ServiceClientBaseUri),
-			//new Soap12ServiceClient(ServiceClientBaseUri)
+			//new Soap11ServiceClient(ListeningOn),
+			//new Soap12ServiceClient(ListeningOn)
         };
 
         [Test, TestCaseSource("ServiceClients")]
@@ -294,16 +316,16 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         static IRestClient[] RestClients =
         {
-            new JsonServiceClient(ServiceClientBaseUri),
-            new XmlServiceClient(ServiceClientBaseUri),
-            new JsvServiceClient(ServiceClientBaseUri)
+            new JsonServiceClient(ListeningOn),
+            new XmlServiceClient(ListeningOn),
+            new JsvServiceClient(ListeningOn)
         };
 
         [Test]
         public void Proper_exception_is_serialized_to_client()
         {
-            var client = new HtmlServiceClient(ServiceClientBaseUri);
-            client.SetBaseUri(ServiceClientBaseUri);
+            var client = new HtmlServiceClient(ListeningOn);
+            client.SetBaseUri(ListeningOn);
 
             try
             {
@@ -363,27 +385,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             Assert.That(response.Names, Is.EqualTo(new[] { "1st", "2nd", "3rd" }));
         }
-
-        public class ExecutedFirstAttribute : RequestFilterAttribute
-        {
-            public ExecutedFirstAttribute()
-            {
-                Priority = int.MinValue;
-            }
-
-            public override void Execute(IRequest req, IResponse res, object requestDto)
-            {
-                var dto = (AttributeFiltered)requestDto;
-                dto.AttrsExecuted.Add(GetType().Name);
-            }
-        }
-
-        [ExecutedFirst]
-        [FilterTest]
-        [RequiredRole("test")]
-        [Authenticate]
-        [RequiredPermission("test")]
-        public class DummyHolder { }
 
         [Test]
         public void RequestFilters_are_prioritized()

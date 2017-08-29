@@ -8,12 +8,10 @@ namespace ServiceStack.Common.Tests.Perf
 {
     [Ignore("Benchmarks")]
     [TestFixture]
-    public class AdhocFastPerfTests
-        : PerfTestBase
+    public class AdhocFastPerfTests : PerfTestBase
     {
         public AdhocFastPerfTests()
         {
-            //this.MultipleIterations = new List<int> { 1000, 10000, 100000, 1000000 };
             this.MultipleIterations = new List<int> { 10000 };
         }
 
@@ -67,8 +65,6 @@ namespace ServiceStack.Common.Tests.Perf
                 "TestClassWithFunc", () => testClassWithFunc.GetValue("test")
             );
         }
-
-
     }
 
     public class TestClassWithType

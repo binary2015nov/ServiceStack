@@ -5,14 +5,19 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Common.Tests.Text
 {
-	public enum EnumValues
-	{
-		Enum1,
-		Enum2,
-		Enum3,
-	}
+    public enum EnumValues
+    {
+        Enum1,
+        Enum2,
+        Enum3,
+    }
 
-	[TestFixture]
+    class A
+    {
+        public string Value { get; set; }
+    }
+
+    [TestFixture]
     public class AdhocJsTests
 	{
 		[Test]
@@ -20,7 +25,7 @@ namespace ServiceStack.Common.Tests.Text
 		{
 			var items = TypeSerializer.DeserializeFromString<List<string>>(
 				"/CustomPath35/api,/CustomPath40/api,/RootPath35,/RootPath40,:82,:83,:5001/api,:5002/api,:5003,:5004");
-
+            Assert.That(items.Count, Is.EqualTo(10));
 			Console.WriteLine(items.Dump());
 		}
 
@@ -56,11 +61,6 @@ namespace ServiceStack.Common.Tests.Text
             }
 		}
 
-		class A
-		{
-			public string Value { get; set; }
-		}
-
 		[Test]
 		public void DumpFail()
 		{
@@ -73,6 +73,7 @@ namespace ServiceStack.Common.Tests.Text
 		{
 			var json = "[{\"Value\": \"a\"},null,{\"Value\": \"b\"}]";
 			var o = JsonSerializer.DeserializeFromString<A[]>(json);
+            Assert.That(o.Length, Is.EqualTo(3));
 		}
-	}
+    }
 }

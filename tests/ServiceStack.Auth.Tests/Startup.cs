@@ -9,17 +9,18 @@ namespace ServiceStack.Auth.Tests
     [TestFixture]
     public class RazorAppHostTests
     {
+        [Ignore("")]
         [Test]
         public void Run_for_10Mins()
         {
             using (var appHost = new AppHost())
             {
                 appHost.Init();
-                appHost.Start("http://localhost:11001/");
+                appHost.Start("http://localhost:11002/");
 
-                Process.Start("http://localhost:11001/");
+                //Process.Start("http://localhost:11002/");
 
-                Thread.Sleep(TimeSpan.FromMinutes(10));
+                //Thread.Sleep(TimeSpan.FromMinutes(10));
             }
         }
     }

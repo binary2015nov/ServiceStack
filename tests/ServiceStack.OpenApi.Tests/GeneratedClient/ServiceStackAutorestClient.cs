@@ -2,17 +2,14 @@
 // Changes may cause incorrect behavior and will be lost if the code is
 // regenerated.
 
+using System.Collections.Generic;
+using System.Net.Http;
+using Microsoft.Rest;
+using Microsoft.Rest.Serialization;
+using Newtonsoft.Json;
+
 namespace AutorestClient
 {
-    using Microsoft.Rest;
-    using Microsoft.Rest.Serialization;
-    using Models;
-    using Newtonsoft.Json;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Net.Http;
-
     public partial class ServiceStackAutorestClient : ServiceClient<ServiceStackAutorestClient>, IServiceStackAutorestClient
     {
         /// <summary>
@@ -224,10 +221,9 @@ namespace AutorestClient
         /// </exception>
         public ServiceStackAutorestClient(System.Uri baseUri, params DelegatingHandler[] handlers) : this(handlers)
         {
-            if (baseUri == null)
-            {
-                throw new System.ArgumentNullException("baseUri");
-            }
+            if (baseUri == null)         
+                throw new System.ArgumentNullException(nameof(baseUri));
+            
             BaseUri = baseUri;
         }
 
@@ -304,10 +300,9 @@ namespace AutorestClient
                 NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore,
                 ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Serialize,
                 ContractResolver = new ReadOnlyJsonContractResolver(),
-                Converters = new  List<JsonConverter>
-                    {
-                        new Iso8601TimeSpanConverter()
-                    }
+                Converters = new  List<JsonConverter> {
+                    new Iso8601TimeSpanConverter()
+                }
             };
             DeserializationSettings = new JsonSerializerSettings
             {
@@ -316,10 +311,9 @@ namespace AutorestClient
                 NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore,
                 ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Serialize,
                 ContractResolver = new ReadOnlyJsonContractResolver(),
-                Converters = new List<JsonConverter>
-                    {
-                        new Iso8601TimeSpanConverter()
-                    }
+                Converters = new List<JsonConverter> {
+                    new Iso8601TimeSpanConverter()
+                }
             };
             CustomInitialize();
         }

@@ -68,7 +68,10 @@ namespace CheckWeb
                     CaptureSynchronizationContext = true,
                 });
 
-            Plugins.Add(new TemplatePagesFeature());
+            Plugins.Add(new TemplatePagesFeature
+            {
+                EnableDebugTemplateToAll = true
+            });
 
             //ProxyFetureTests
             Plugins.Add(new ProxyFeature(
@@ -115,7 +118,7 @@ namespace CheckWeb
 
             dbFactory.RegisterConnection("SqlServer",
                 new OrmLiteConnectionFactory(
-                    "Server=localhost;Database=test;User Id=test;Password=test;",
+                    @"Server=.\SQLEXPRESS;Database=test;",
                     SqlServerDialect.Provider)
                 {
                     ConnectionFilter = x => new ProfiledDbConnection(x, Profiler.Current)

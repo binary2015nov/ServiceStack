@@ -224,7 +224,7 @@
     <Compile Include="Services\AnnotatedService.cs" />
     <Compile Include="Services\AsyncService.cs" />
     <Compile Include="Services\CodeGenTestTypes.cs" />
-    <Compile Include="Host\Config.cs" />
+    <Compile Include="Host\Constant.cs" />
     <Compile Include="Host\GeneratedClientTestBase.cs" />
     <Compile Include="Services\InheritedDtoService.cs" />
     <Compile Include="Services\NativeTypesTestService.cs" />
@@ -236,7 +236,6 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-    <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

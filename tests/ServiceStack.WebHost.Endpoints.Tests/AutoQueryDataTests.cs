@@ -19,8 +19,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     public class AutoQueryDataAppHost : AppSelfHostBase
     {
         public AutoQueryDataAppHost()
-            : base("AutoQuerData", typeof(AutoQueryService).GetAssembly())
-        { }
+            : base("AutoQuerData", typeof(AutoQueryService).GetAssembly()) { }
 
         public override void Configure(Container container)
         {

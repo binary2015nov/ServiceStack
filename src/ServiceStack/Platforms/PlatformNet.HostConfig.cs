@@ -80,10 +80,15 @@ namespace ServiceStack
             return combinedPath;
         }
 
+        private static string CombineHandlerFactoryPath(string locationPath, string handlerPath)
+        {
+            return locationPath.AppendPath(handlerPath.Replace("*", string.Empty)).Trim('/');
+        }
+
         public static string GetHandlerPathFromConfiguration(System.Configuration.Configuration configuration)
         {
             //IIS7+ integrated mode system.webServer/handlers
-            if (Platform.IsIntegratedPipeline)
+            if (IsIntegratedPipeline)
             {
                 var webServerSection = configuration.GetSection("system.webServer");
                 var rawXml = webServerSection?.SectionInformation.GetRawXml();
@@ -125,11 +130,6 @@ namespace ServiceStack
                 return handler.Attribute("type").Value;
             }
             return string.Empty;
-        }
-
-        private static string CombineHandlerFactoryPath(string locationPath, string handlerPath)
-        {
-            return locationPath.AppendPath(handlerPath.Replace("*", string.Empty)).Trim('/');
         }
     }
 }

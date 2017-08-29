@@ -114,8 +114,8 @@ namespace ServiceStack.Host.HttpListener
 
             foreach (var urlBase in urlBases)
             {
-                if (HostContext.Config.HandlerFactoryPath == null)
-                    HostContext.Config.HandlerFactoryPath = ListenerRequest.GetHandlerPathIfAny(urlBase);
+                if (Config.HandlerFactoryPath == null)
+                    Config.HandlerFactoryPath = ListenerRequest.GetHandlerPathIfAny(urlBase);
 
                 Listener.Prefixes.Add(urlBase);
             }

@@ -40,6 +40,5 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
                 Assert.That(session.Id, Is.EqualTo("mock-session-id"));
             }
         }
-
     }
 }

@@ -11,7 +11,7 @@ namespace ServiceStack.OpenApi.Tests
         [Test]
         public void Can_get_generic_list()
         {
-            var client = new ServiceStackAutorestClient(new Uri(Config.AbsoluteBaseUri));
+            var client = new ServiceStackAutorestClient(new Uri(Constant.AbsoluteBaseUri));
 
             var result = client.ReturnListRequest.Get();
 
@@ -24,7 +24,7 @@ namespace ServiceStack.OpenApi.Tests
         [Test]
         public void Can_get_array()
         {
-            var client = new ServiceStackAutorestClient(new Uri(Config.AbsoluteBaseUri));
+            var client = new ServiceStackAutorestClient(new Uri(Constant.AbsoluteBaseUri));
 
             var result = client.ReturnArrayRequest.Get();
 
@@ -37,7 +37,7 @@ namespace ServiceStack.OpenApi.Tests
         [Test]
         public void Can_get_keyvaluepair()
         {
-            var client = new ServiceStackAutorestClient(new Uri(Config.AbsoluteBaseUri));
+            var client = new ServiceStackAutorestClient(new Uri(Constant.AbsoluteBaseUri));
 
             var result = client.ReturnKeyValuePairRequest.Get();
 
@@ -48,7 +48,7 @@ namespace ServiceStack.OpenApi.Tests
         [Test]
         public void Can_get_returned_dto_dictionary()
         {
-            using (var client = new ServiceStackAutorestClient(new Uri(Config.AbsoluteBaseUri)))
+            using (var client = new ServiceStackAutorestClient(new Uri(Constant.AbsoluteBaseUri)))
             {
                 var result = client.ReturnDictionaryDtoRequest.Get();
 
@@ -61,7 +61,7 @@ namespace ServiceStack.OpenApi.Tests
         [Test]
         public void Can_get_returned_string_dictionary()
         {
-            using (var client = new ServiceStackAutorestClient(new Uri(Config.AbsoluteBaseUri)))
+            using (var client = new ServiceStackAutorestClient(new Uri(Constant.AbsoluteBaseUri)))
             {
                 var result = client.ReturnDictionaryStringRequest.Get();
 
@@ -75,7 +75,7 @@ namespace ServiceStack.OpenApi.Tests
         [Test]
         public void Can_Get_Returned_KeyPair()
         {
-            using (var client = new ServiceStackAutorestClient(new Uri(Config.AbsoluteBaseUri)))
+            using (var client = new ServiceStackAutorestClient(new Uri(Constant.AbsoluteBaseUri)))
             {
                 var result = client.ReturnKeyValuePairRequest.Get();
 

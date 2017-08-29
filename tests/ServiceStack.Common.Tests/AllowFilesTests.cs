@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using ServiceStack.Host.Handlers;
 using ServiceStack.Testing;
 
 namespace ServiceStack.Common.Tests

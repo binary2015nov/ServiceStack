@@ -187,7 +187,8 @@ namespace ServiceStack
         private void SendWebRequest<TResponse>(string httpMethod, string absoluteUrl, object request, CancellationToken token, 
             Action<TResponse> onSuccess, Action<object, Exception> onError, Action<WebResponse> onResponseInit = null)
         {
-            if (httpMethod == null) throw new ArgumentNullException(nameof(httpMethod));
+            if (httpMethod == null)
+                throw new ArgumentNullException(nameof(httpMethod));
 
             this.PopulateRequestMetadata(request);
 
@@ -203,7 +204,6 @@ namespace ServiceStack
             }
 
             var webRequest = this.CreateHttpWebRequest(requestUri);
-
             var requestState = new AsyncState<TResponse>(BufferSize)
             {
                 HttpMethod = httpMethod,

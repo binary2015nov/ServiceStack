@@ -15,6 +15,14 @@ namespace CSharpEval
             return null;
         }
 
+        [Test]
+        public void A()
+        {
+            var str = "https://github.com/ServiceStack/ServiceStack.Redis/wiki/RedisPubSub";
+            var pos = str.IndexOf("/wiki");
+            Console.WriteLine(str.Substring(pos));
+        }
+
         //[Test]
         public void Compare_access()
         {
@@ -41,14 +49,6 @@ namespace CSharpEval
             }
             timeTaken = DateTime.Now - start;
             Console.WriteLine("FileInfo.LastWriteTime: Times {0}: {1}ms", Times, timeTaken.TotalMilliseconds);
-        }
-
-        [Test]
-        public void A()
-        {
-            var str = "https://github.com/ServiceStack/ServiceStack.Redis/wiki/RedisPubSub";
-            var pos = str.IndexOf("/wiki");
-            Console.WriteLine(str.Substring(pos));
         }
     }
 }

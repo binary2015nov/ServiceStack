@@ -45,7 +45,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [Route("/customhtml")]
-        public class CustomHtml {}
+        public class CustomHtml { }
 
         public class EchoService : Service
         {
@@ -149,7 +149,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_force_default_UTF8_encoding()
         {
-            const string param = "привіт";
+            string param = "привіт";
 
             var json = Config.AbsoluteBaseUri.CombineWith("/echo").PostStringToUrl(
                 requestBody: "Param=" + param.UrlEncode(),
@@ -161,5 +161,4 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             Assert.That(value, Is.EqualTo(param));
         }
     }
-
 }

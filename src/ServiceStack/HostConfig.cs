@@ -60,6 +60,9 @@ namespace ServiceStack
             AllowFilePaths = new List<string> {
                 "jspm_packages/**/*.json"
             };
+            ForbiddenPaths = new List<string> {
+                "/App_Code",
+            };
             DebugAspNetHostEnvironment = Env.IsMono ? "FastCGI" : "IIS7";
             DebugHttpListenerHostEnvironment = Env.IsMono ? "XSP" : "WebServer20";
             EnableFeatures = Feature.All;
@@ -161,7 +164,9 @@ namespace ServiceStack
         public HashSet<string> AllowFileExtensions { get; set; }
         public HashSet<string> CompressFilesWithExtensions { get; set; }
         public long? CompressFilesLargerThanBytes { get; set; }
-        public List<string> AllowFilePaths { get; set; }
+        public List<string> AllowFilePaths { get; private set; }
+
+        public List<string> ForbiddenPaths { get; private set; }
 
         public string WebHostUrl { get; set; }
         //public string WebHostPhysicalPath { get; set; }

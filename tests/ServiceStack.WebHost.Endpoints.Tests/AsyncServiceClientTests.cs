@@ -6,12 +6,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 {
     public abstract class AsyncServiceClientTests
     {
-        protected const string ListeningOn = "http://localhost:1337/";
+        protected string ListeningOn = Config.ListeningOn;
 
         ExampleAppHostHttpListener appHost;
 
         [OneTimeSetUp]
-        public void OnTestFixtureSetUp()
+        public void TestFixtureSetUp()
         {
             appHost = new ExampleAppHostHttpListener();
             appHost.Init();
@@ -19,7 +19,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
+        public void TestFixtureTearDown()
         {
             appHost.Dispose();
         }
@@ -74,6 +74,4 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
     }
-
-
 }

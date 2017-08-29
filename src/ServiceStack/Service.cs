@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 using ServiceStack.Auth;
 using ServiceStack.Caching;
@@ -29,11 +30,17 @@ namespace ServiceStack
         {
             foreach (var methodInfo in type.GetMethods(BindingFlags.Public | BindingFlags.Instance))
             {
-                if (methodInfo.GetParameters().Length != 1)
+                if (methodInfo.IsGenericMethod || methodInfo.GetParameters().Length != 1)
+                    continue;
+
+                var paramType = methodInfo.GetParameters()[0].ParameterType;
+                if (paramType.IsValueType() || paramType == typeof(string))
                     continue;
 
                 string actionName = methodInfo.Name.ToUpper();
-                if (!HttpMethods.AllVerbs.Contains(actionName) && actionName != ActionContext.AnyAction)
+                if (!HttpMethods.AllVerbs.Contains(actionName) && actionName != ActionContext.AnyAction &&
+                !HttpMethods.AllVerbs.Any(verb => ContentTypes.KnownFormats.Any(format => actionName.EqualsIgnoreCase(verb + format))) &&
+                !ContentTypes.KnownFormats.Any(format => actionName.EqualsIgnoreCase(ActionContext.AnyAction + format)))
                     continue;
 
                 yield return methodInfo;

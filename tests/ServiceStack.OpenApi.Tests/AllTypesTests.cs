@@ -1,22 +1,14 @@
-﻿using AutorestClient;
+﻿using System;
+using AutorestClient;
 using AutorestClient.Models;
 using NUnit.Framework;
 using ServiceStack.OpenApi.Tests.Host;
-using System;
-using System.Threading;
 
 namespace ServiceStack.OpenApi.Tests
 {
     [TestFixture]
     class AllTypesTests : GeneratedClientTestBase
     {
-        [Explicit, Test]
-        public void Sleep()
-        {
-            Thread.Sleep(1000000);
-        }
-
-
         [Test]
         public void Can_post_all_types()
         {
@@ -27,7 +19,7 @@ namespace ServiceStack.OpenApi.Tests
                 AllCollectionTypes = DtoHelper.GetAllCollectionTypes()
             };
 
-            using (var client = new ServiceStackAutorestClient(new Uri(Config.AbsoluteBaseUri)))
+            using (var client = new ServiceStackAutorestClient(new Uri(Constant.AbsoluteBaseUri)))
             {
                 var result = client.HelloAllTypes.Post("123", null, null, dto);
             }
@@ -43,7 +35,7 @@ namespace ServiceStack.OpenApi.Tests
                 AllCollectionTypes = DtoHelper.GetAllCollectionTypes()
             };
 
-            using (var client = new ServiceStackAutorestClient(new Uri(Config.AbsoluteBaseUri)))
+            using (var client = new ServiceStackAutorestClient(new Uri(Constant.AbsoluteBaseUri)))
             {
                 var result = client.HelloAllTypes.Get("123", dto.AllTypes.ToJsv(), null);
             }
@@ -59,7 +51,7 @@ namespace ServiceStack.OpenApi.Tests
                 AllCollectionTypes = DtoHelper.GetAllCollectionTypes()
             };
 
-            using (var client = new ServiceStackAutorestClient(new Uri(Config.AbsoluteBaseUri)))
+            using (var client = new ServiceStackAutorestClient(new Uri(Constant.AbsoluteBaseUri)))
             {
                 var at = dto.AllTypes.ToJsv();
 
@@ -81,7 +73,7 @@ namespace ServiceStack.OpenApi.Tests
                 AllCollectionTypes = DtoHelper.GetAllCollectionTypes()
             };
 
-            using (var client = new ServiceStackAutorestClient(new Uri(Config.AbsoluteBaseUri)))
+            using (var client = new ServiceStackAutorestClient(new Uri(Constant.AbsoluteBaseUri)))
             {
                 var result = client.HelloAllTypesWithResult.Post(body: dto);
 

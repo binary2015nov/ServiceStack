@@ -453,7 +453,6 @@ namespace ServiceStack
 
         public Type GetFromType(Type requestDtoType)
         {
-            Type fromType;
             var intoTypeDef = requestDtoType.GetTypeWithGenericTypeDefinitionOf(typeof(IQueryDb<,>));
             if (intoTypeDef != null)
             {

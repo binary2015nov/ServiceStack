@@ -461,7 +461,6 @@ namespace ServiceStack.Common.Tests.OAuth
             userAuth = userAuthRepository.GetUserAuthByUserName(RegisterDto.UserName);
             Assert.That(userAuth, Is.Null);
         }
-
     }
 }
 #endif

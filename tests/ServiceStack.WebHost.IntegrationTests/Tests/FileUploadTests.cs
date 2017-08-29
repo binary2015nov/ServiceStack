@@ -17,7 +17,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             string boundary = "----------------------------" +
             DateTime.Now.Ticks.ToString("x");
 
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create(base.ServiceClientBaseUri + pathInfo);
+            var httpWebRequest = WebRequest.CreateHttp(base.ServiceClientBaseUri + pathInfo);
             httpWebRequest.ContentType = "multipart/form-data; boundary=" + boundary;
             httpWebRequest.Accept = MimeTypes.Json;
             httpWebRequest.Method = "POST";

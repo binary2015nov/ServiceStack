@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using NUnit.Framework;
-using ServiceStack.Text;
 using ServiceStack;
 using ServiceStack.Configuration;
 using ServiceStack.Host.Handlers;
@@ -30,31 +29,6 @@ namespace CheckMvc
             Assert.That(content, Does.Contain(containsContent));
         }
 
-        [Test]
-        public void Does_return_expected_content()
-        {
-            AssertHasContent("metadata", MimeTypes.Html, "The following operations are supported");
-            AssertHasContent("metadata/", MimeTypes.Html, "The following operations are supported");
-            AssertHasContent("dir", MimeTypes.Html, "<h1>dir/index.html</h1>");
-            AssertHasContent("dir/", MimeTypes.Html, "<h1>dir/index.html</h1>");
-            AssertHasContent("dir/sub", MimeTypes.Html, "<h1>dir/sub/index.html</h1>");
-            AssertHasContent("dir/sub/", MimeTypes.Html, "<h1>dir/sub/index.html</h1>");
-            AssertHasContent("swagger-ui", MimeTypes.Html, "<title>Swagger UI</title>");
-            AssertHasContent("swagger-ui/", MimeTypes.Html, "<title>Swagger UI</title>");
-        }
-
-        [Test]
-        public void Does_have_correct_path_info()
-        {
-            Assert.That(GetRequestInfoForPath("dir/").PathInfo, Is.EqualTo("/dir/"));
-            Assert.That(GetRequestInfoForPath("dir/sub/").PathInfo, Is.EqualTo("/dir/sub/"));
-            Assert.That(GetRequestInfoForPath("dir/sub/").PathInfo, Is.EqualTo("/dir/sub/"));
-            Assert.That(GetRequestInfoForPath("swagger-ui/").PathInfo, Is.EqualTo("/swagger-ui/"));
-        }
-    }
-
-    public partial class RequestInfoTests
-    {
         private void DoesRedirectToRemoveTrailingSlash(string dirWIthoutSlash)
         {
             BaseUrl.CombineWith(dirWIthoutSlash)
@@ -79,6 +53,31 @@ namespace CheckMvc
                         Assert.That(res.Headers[HttpHeaders.Location],
                             Is.EqualTo(BaseUrl.CombineWith(dirWithoutSlash.TrimEnd('/'))));
                     });
+        }
+    }
+
+    public partial class RequestInfoTests
+    {
+        [Test]
+        public void Does_return_expected_content()
+        {
+            AssertHasContent("metadata", MimeTypes.Html, "The following operations are supported");
+            AssertHasContent("metadata/", MimeTypes.Html, "The following operations are supported");
+            AssertHasContent("dir", MimeTypes.Html, "<h1>dir/index.html</h1>");
+            AssertHasContent("dir/", MimeTypes.Html, "<h1>dir/index.html</h1>");
+            AssertHasContent("dir/sub", MimeTypes.Html, "<h1>dir/sub/index.html</h1>");
+            AssertHasContent("dir/sub/", MimeTypes.Html, "<h1>dir/sub/index.html</h1>");
+            AssertHasContent("swagger-ui", MimeTypes.Html, "<title>Swagger UI</title>");
+            AssertHasContent("swagger-ui/", MimeTypes.Html, "<title>Swagger UI</title>");
+        }
+
+        [Test]
+        public void Does_have_correct_path_info()
+        {
+            Assert.That(GetRequestInfoForPath("dir/").PathInfo, Is.EqualTo("/dir/"));
+            Assert.That(GetRequestInfoForPath("dir/sub/").PathInfo, Is.EqualTo("/dir/sub/"));
+            Assert.That(GetRequestInfoForPath("dir/sub/").PathInfo, Is.EqualTo("/dir/sub/"));
+            Assert.That(GetRequestInfoForPath("swagger-ui/").PathInfo, Is.EqualTo("/swagger-ui/"));
         }
 
         [Test]

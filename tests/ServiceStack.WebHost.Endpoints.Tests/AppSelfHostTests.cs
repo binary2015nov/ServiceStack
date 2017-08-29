@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Funq;
 using NUnit.Framework;
-using ServiceStack.Text;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
@@ -43,23 +41,26 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
     public class AppHostSmartPool : AppHostHttpListenerSmartPoolBase
     {
-        public AppHostSmartPool() : base("SmartPool Test", typeof(PerfServices).GetAssembly()) { }
+        public AppHostSmartPool() 
+            : base("SmartPool Test", typeof(PerfServices).GetAssembly()) { }
 
         public override void Configure(Container container)
         {
+
         }
     }
 
     [TestFixture]
     public class AppSelfHostTests
     {
-        private readonly ServiceStackHost appHost;
+        private ServiceStackHost appHost;
 
-        private readonly string ListeningOn;
+        private string ListeningOn;
 
-        public AppSelfHostTests()
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
-            var port = HostContext.FindFreeTcpPort(startingFrom: 5000);
+            var port = Platform.FindFreeTcpPort(startingFrom: 5000);
             if (port < 5000)
                 throw new Exception("Expected port >= 5000, got: " + port);
 

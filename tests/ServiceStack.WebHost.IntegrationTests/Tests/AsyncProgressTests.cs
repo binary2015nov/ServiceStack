@@ -10,6 +10,7 @@ using ServiceStack.WebHost.IntegrationTests.Services;
 
 namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
+    [TestFixture]
     public class AsyncProgressTests
     {
         [Test]
@@ -45,7 +46,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             await AsyncDownloadWithProgress(new TestProgressTextFile());
         }
 
-        private static async Task AsyncDownloadWithProgress<TResponse>(IReturn<TResponse> requestDto)
+        private async Task AsyncDownloadWithProgress<TResponse>(IReturn<TResponse> requestDto)
         {
             AsyncServiceClient.BufferSize = 100;          
             var asyncClient = new JsonServiceClient(Constant.ServiceStackBaseHost);

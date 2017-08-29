@@ -16,6 +16,8 @@ namespace ServiceStack
         [ThreadStatic] private static string lastHandlerArgs;
         public static string LastHandlerArgs => lastHandlerArgs;
 
+        public static string DefaultRootFileName { get; private set; }
+
         public static HashSet<string> WebHostRootFileNames { get; private set; }
         private static string WebHostPhysicalPath;
         private static IHttpHandler DefaultHttpHandler;
@@ -40,23 +42,23 @@ namespace ServiceStack
             HostAutoRedirectsDirs = isAspNetHost && !Env.IsMono;
 
             //Apache+mod_mono treats path="servicestack*" as path="*" so takes over root path, so we need to serve matching resources
-            var hostedAtRootPath = AppHostConfig.HandlerFactoryPath == null;
+            var hostedAtRootPath = AppHostConfig.HandlerFactoryPath.IsNullOrEmpty();
 
             //DefaultHttpHandler not supported in IntegratedPipeline mode
             if (!Platform.IsIntegratedPipeline && isAspNetHost && !hostedAtRootPath && !Env.IsMono)
                 DefaultHttpHandler = new DefaultHttpHandler();
 
             var rootFiles = appHost.VirtualFileSources.GetRootFiles().ToList();
-            string defaultRootFileName = null;
+            DefaultRootFileName = null;
             foreach (var file in rootFiles)
             {
                 var fileNameLower = file.Name.ToLowerInvariant();
-                if (defaultRootFileName == null && AppHostConfig.DefaultDocuments.Contains(fileNameLower))
+                if (DefaultRootFileName == null && AppHostConfig.DefaultDocuments.Contains(fileNameLower))
                 {
                     //Can't serve Default.aspx pages so ignore and allow for next default document
                     if (!fileNameLower.EndsWith(".aspx"))
                     {
-                        defaultRootFileName = file.Name;
+                        DefaultRootFileName = file.Name;
                         StaticFileHandler.SetDefaultFile(file.VirtualPath, file.ReadAllBytes(), file.LastModified);
 
                         if (DefaultHttpHandler == null)
@@ -103,7 +105,7 @@ namespace ServiceStack
                 IsIntegratedPipeline = Platform.IsIntegratedPipeline,
                 WebHostPhysicalPath = WebHostPhysicalPath,
                 WebHostUrl = AppHostConfig.WebHostUrl,
-                DefaultRootFileName = defaultRootFileName,
+                DefaultRootFileName = DefaultRootFileName,
                 DefaultHandler = debugDefaultHandler,
             };
             
@@ -112,7 +114,7 @@ namespace ServiceStack
                 IsIntegratedPipeline = Platform.IsIntegratedPipeline,
                 WebHostPhysicalPath = WebHostPhysicalPath,
                 WebHostUrl = AppHostConfig.WebHostUrl,
-                DefaultRootFileName = defaultRootFileName,
+                DefaultRootFileName = DefaultRootFileName,
                 DefaultHandler = debugDefaultHandler,
             };          
         }
@@ -128,7 +130,7 @@ namespace ServiceStack
         }
 #endif
 
-        // Entry point for HttpListener
+        // Entry point for HttpListener and .NET Core
         public static IHttpHandler GetHandler(IHttpRequest httpReq)
         {
             var appHost = HostContext.AppHost;
@@ -176,8 +178,17 @@ namespace ServiceStack
         // serve the file from the filesystem, restricting to a safelist of extensions
         public static bool ShouldAllow(string filePath)
         {
+            if (filePath.IsNullOrEmpty() || filePath == "/")
+                return true;
+
+            foreach (var path in AppHostConfig.ForbiddenPaths)
+            {
+                if (filePath.StartsWith(path))
+                    return false;
+            }
+
             var parts = filePath.SplitOnLast('.');
-            if (parts.Length == 1 || string.IsNullOrEmpty(parts[1]))
+            if (parts.Length == 1 || parts[1].IsNullOrEmpty())
                 return false;
 
             var fileExt = parts[1];

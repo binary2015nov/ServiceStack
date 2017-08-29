@@ -27,11 +27,14 @@ namespace ServiceStack.Host
 
         private readonly ServiceStackHost appHost;
 
-        public ServiceController(ServiceStackHost appHost) : this(appHost, appHost.ServiceAssemblies) { }
+        public ServiceController(ServiceStackHost appHost) : 
+            this(appHost, appHost.ServiceAssemblies) { }
 
-        public ServiceController(ServiceStackHost appHost, Assembly[] assembliesWithServices) : this(appHost, assembliesWithServices, null) { }
+        public ServiceController(ServiceStackHost appHost, Assembly[] assembliesWithServices) : 
+            this(appHost, assembliesWithServices, null) { }
 
-        public ServiceController(ServiceStackHost appHost, Func<IEnumerable<Type>> resolveServicesFn) : this(appHost, appHost.ServiceAssemblies, resolveServicesFn) { }
+        public ServiceController(ServiceStackHost appHost, Func<IEnumerable<Type>> resolveServicesFn) : 
+            this(appHost, appHost.ServiceAssemblies, resolveServicesFn) { }
 
         public ServiceController(ServiceStackHost appHost, Assembly[] assembliesWithServices, Func<IEnumerable<Type>> resolveServicesFn)
         {

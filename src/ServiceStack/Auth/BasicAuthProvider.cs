@@ -16,17 +16,15 @@ namespace ServiceStack.Auth
         }
 
         public BasicAuthProvider(IAppSettings appSettings)
-            : base(appSettings, Realm, Name) {}
+            : base(appSettings, Realm, Name) { }
 
         public override object Authenticate(IServiceBase authService, IAuthSession session, Authenticate request)
         {
-            var httpReq = authService.Request;
-            var basicAuth = httpReq.GetBasicAuthUserAndPassword();
-            if (basicAuth == null)
-                throw HttpError.Unauthorized(ErrorMessages.InvalidBasicAuthCredentials);
+            var userName = request.UserName;
+            var password = request.Password;
 
-            var userName = basicAuth.Value.Key;
-            var password = basicAuth.Value.Value;
+            if (userName.IsNullOrEmpty() || password.IsNullOrEmpty())
+                throw HttpError.Unauthorized(ErrorMessages.InvalidBasicAuthCredentials);
 
             return Authenticate(authService, session, userName, password, request.Continue);
         }
@@ -50,6 +48,8 @@ namespace ServiceStack.Auth
                     });
                 }
             }
+            //res.AddHeader('WWW-Authenticate: Basic realm="My Realm"');
+            //header('HTTP/1.1 401 Unauthorized');
         }
     }
 }

@@ -804,9 +804,9 @@ namespace ServiceStack
             var absoluteUri = httpReq.AbsoluteUri;
             var index = httpReq.PathInfo.IsNullOrEmpty() || httpReq.PathInfo == "/"
                 ? absoluteUri.IndexOf("?", StringComparison.Ordinal)
-                : absoluteUri.IndexOf(httpReq.PathInfo.TrimEnd('/'), StringComparison.Ordinal);         
+                : absoluteUri.IndexOf(httpReq.PathInfo.TrimEnd('/'), StringComparison.Ordinal) + 1;         
 
-            return index >= 0 ? absoluteUri.Substring(0, index) : absoluteUri;
+            return index > 0 ? absoluteUri.Substring(0, index) : absoluteUri;
         }
 
         public virtual string ResolvePhysicalPath(string virtualPath, IRequest httpReq)
@@ -1016,9 +1016,10 @@ namespace ServiceStack
                     Container.Dispose();
                     Container = null;
                 }
+              
+                JsConfig.Reset(); //Clears Runtime Attributes
                 if (HostContext.AppHost == this)
                     HostContext.AppHost = null;
-                JsConfig.Reset(); //Clears Runtime Attributes
             }
             //clear unmanaged resources here
         }

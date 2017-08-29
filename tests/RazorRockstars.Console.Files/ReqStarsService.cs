@@ -440,7 +440,7 @@ namespace RazorRockstars.Console.Files
             //appHost.Plugins.Add(new NetSerializerFormat());
             //Fast
             appHost.Init();
-            HostContext.Config.DebugMode = true;
+            appHost.Config.DebugMode = true;
             appHost.Start(ListeningOn);
         }
 
@@ -465,13 +465,6 @@ namespace RazorRockstars.Console.Files
         {
             "Time Taken {0}ms".Fmt(startedAt.ElapsedMilliseconds).Print();
             appHost.Dispose();
-        }
-
-        [Explicit("Debug Run")]
-        [Test]
-        public void RunFor10Mins()
-        {
-            Thread.Sleep(TimeSpan.FromMinutes(10));
         }
 
         [Explicit("Concurrent Run")]

@@ -67,15 +67,11 @@ namespace RazorRockstars.Console.Files
         }
     }
 
-
     [TestFixture]
     public class ValidationTests
     {
-        public const string ListeningOn = "http://*:1337/";
-        public const string Host = "http://localhost:1337";
-
-        //private const string ListeningOn = "http://*:1337/subdir/subdir2/";
-        //private const string Host = "http://localhost:1337/subdir/subdir2";
+        public const string ListeningOn = "http://*:1338/";
+        public const string Host = "http://localhost:1338";
 
         private const string BaseUri = Host + "/";
 
@@ -99,13 +95,5 @@ namespace RazorRockstars.Console.Files
             "Time Taken {0}ms".Fmt(startedAt.ElapsedMilliseconds).Print();
             appHost.Dispose();
         }
-
-        [Ignore("Debug Run")]
-        [Test]
-        public void RunFor10Mins()
-        {
-            Process.Start(BaseUri.CombineWith("/validation"));
-            Thread.Sleep(TimeSpan.FromMinutes(10));
-        }        
     }
 }

@@ -1,5 +1,5 @@
+using Funq;
 using NUnit.Framework;
-using ServiceStack.Text;
 using ServiceStack.WebHost.Endpoints.Tests.Support.Host;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
@@ -7,8 +7,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 	[TestFixture]
 	public class AppHostConfigTests
 	{
-		protected const string ListeningOn = "http://localhost:1337/";
-
 		ServiceStackHost appHost;
 
 		[OneTimeSetUp]
@@ -16,11 +14,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		{
 			appHost = new TestConfigAppHostHttpListener()
 			    .Init()
-			    .Start(ListeningOn);
+			    .Start(Config.ListeningOn);
 		}
 
 		[OneTimeTearDown]
-		public void OnTestFixtureTearDown()
+		public void TestFixtureTearDown()
 		{
             appHost.Dispose();
         }
@@ -28,11 +26,24 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		[Test]
 		public void Actually_uses_the_BclJsonSerializers()
 		{
-			var json = (ListeningOn + "login/user/pass").GetJsonFromUrl();
+			var json = (Config.ListeningOn + "login/user/pass").GetJsonFromUrl();
 
 			json.Print();
 			Assert.That(json, Is.EqualTo("{\"pwd\":\"pass\",\"uname\":\"user\"}")
-								.Or.EqualTo("{\"uname\":\"user\",\"pwd\":\"pass\"}"));
+                .Or.EqualTo("{\"uname\":\"user\",\"pwd\":\"pass\"}"));
 		}
 	}
+
+    public class TestConfigAppHostHttpListener : AppHostHttpListenerBase
+    {
+        public TestConfigAppHostHttpListener() : base("TestConfigAppHost Service", typeof(BclDto).GetAssembly())
+        {
+            Config.UseBclJsonSerializers = true;
+        }
+
+        public override void Configure(Container container)
+        {
+
+        }
+    }
 }

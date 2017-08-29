@@ -321,7 +321,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
-    //AppHosts
+    [TestFixture]
     public class MixedServiceGatewayTests : ServiceGatewayTests
     {
         class MixedServiceGatewayFactory : IServiceGatewayFactory, IServiceGateway
@@ -385,6 +385,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
+    [TestFixture]
     public class AllExternalServiceGatewayTests : ServiceGatewayTests
     {
         class AllExternalAppHost : AppSelfHostBase
@@ -407,7 +408,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
-    //Tests
+    [TestFixture]
     public class AllInternalServiceGatewayTests : ServiceGatewayTests
     {
         class AllInternalAppHost : AppSelfHostBase
@@ -428,7 +429,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             return new AllInternalAppHost();
         }
     }
-
 
     public abstract class ServiceGatewayTests
     {

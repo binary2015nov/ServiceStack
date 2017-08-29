@@ -39,14 +39,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             appHost.Dispose();
         }
 
-        [Ignore("Debug Run")]
-        [Test]
-        public void RunFor10Mins()
-        {
-            Process.Start(Config.AbsoluteBaseUri);
-            Thread.Sleep(TimeSpan.FromMinutes(10));
-        }
-
         [Test]
         public void Can_download_metadata_page()
         {

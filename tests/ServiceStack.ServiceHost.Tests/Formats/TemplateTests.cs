@@ -7,7 +7,6 @@ using ServiceStack.Formats;
 using ServiceStack.Html;
 using ServiceStack.Markdown;
 using ServiceStack.Support.Markdown;
-using ServiceStack.Testing;
 using ServiceStack.Text;
 using ServiceStack.IO;
 
@@ -954,6 +953,5 @@ paragraph";
             Console.WriteLine(templateOutput);
             Assert.That(templateOutput, Is.EqualTo(expectedHtml));
         }
-
     }
 }

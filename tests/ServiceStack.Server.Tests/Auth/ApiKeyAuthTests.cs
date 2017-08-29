@@ -5,7 +5,6 @@ using NUnit.Framework;
 using ServiceStack.Auth;
 using ServiceStack.Data;
 using ServiceStack.OrmLite;
-using ServiceStack.Text;
 
 namespace ServiceStack.Server.Tests.Auth
 {
@@ -51,7 +50,8 @@ namespace ServiceStack.Server.Tests.Auth
         {
             public static ApiKey LastApiKey;
 
-            public AppHost() : base(nameof(ApiKeyAuthTests), typeof(AppHost).GetAssembly()) { }
+            public AppHost()
+                : base(nameof(ApiKeyAuthTests), typeof(AppHost).GetAssembly()) { }
 
             public override void Configure(Container container)
             {
@@ -86,9 +86,9 @@ namespace ServiceStack.Server.Tests.Auth
         private ApiKey liveKey;
         private ApiKey testKey;
 
-        public ApiKeyAuthTests()
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
-            //System.Diagnostics.Debugger.Break();
             appHost = new AppHost()
                .Init()
                .Start("http://*:2337/");
@@ -112,7 +112,7 @@ namespace ServiceStack.Server.Tests.Auth
         }
 
         [OneTimeTearDown]
-        public void OneTimeTearDown() => appHost.Dispose();
+        public void TestFixtureTearDown() => appHost.Dispose();
 
         [Test]
         public void Does_return_APIKey_for_ApiKey_request_in_GlobalRequestFilters()

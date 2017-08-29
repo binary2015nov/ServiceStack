@@ -1,5 +1,4 @@
 using System.Runtime.Serialization;
-using Funq;
 
 namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 {
@@ -33,19 +32,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 				UserName = request.UserName,
 				Password = request.Password
 			};
-		}
-	}
-
-	public class TestConfigAppHostHttpListener : AppHostHttpListenerBase
-	{
-		public TestConfigAppHostHttpListener() : base("TestConfigAppHost Service", typeof(BclDto).GetAssembly())
-		{
-            Config.UseBclJsonSerializers = true;
-		}
-
-        public override void Configure(Container container)
-		{
-
 		}
 	}
 }

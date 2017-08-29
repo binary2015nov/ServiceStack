@@ -1,11 +1,8 @@
 ﻿// Copyright (c) ServiceStack, Inc. All Rights Reserved.
 // License: https://raw.github.com/ServiceStack/ServiceStack/master/license.txt
 
-#if !NETCORE
 using System;
-using System.ComponentModel;
 using NUnit.Framework;
-using ServiceStack.Text;
 
 namespace ServiceStack.Common.Tests
 {
@@ -81,7 +78,9 @@ namespace ServiceStack.Common.Tests
             var o = new ManyAttr();
 
             Assert.That(o.GetType().AllAttributes<NormalAttribute>().Length, Is.EqualTo(2));
+#if !NETCORE
             Assert.That(o.GetType().AllAttributes<INormalAttribute>().Length, Is.EqualTo(2));
+#endif
         }
 
         [Test]
@@ -90,7 +89,9 @@ namespace ServiceStack.Common.Tests
             var o = new ManyAttr();
 
             Assert.That(o.GetType().AllAttributes<BaseAttribute>().Length, Is.EqualTo(2));
+#if !NETCORE
             Assert.That(o.GetType().AllAttributes<IBaseAttribute>().Length, Is.EqualTo(2));
+#endif
         }
 
         [Test]
@@ -101,8 +102,9 @@ namespace ServiceStack.Common.Tests
             var o = new RuntimeManyBaseAttr();
 
             Assert.That(o.GetType().AllAttributes<BaseAttribute>().Length, Is.EqualTo(3));
+#if !NETCORE
             Assert.That(o.GetType().AllAttributes<IBaseAttribute>().Length, Is.EqualTo(3));
+#endif
         }
     }
 }
-#endif
