@@ -387,6 +387,9 @@ namespace ServiceStack.Host
             return Execute(requestDto, new BasicRequest(requestDto));
         }
 
+        /// <summary>
+        /// External HTTP Request called from HTTP handlers
+        /// </summary>
         public virtual object Execute(object requestDto, IRequest req)
         {
             req.Dto = requestDto;
@@ -399,20 +402,30 @@ namespace ServiceStack.Host
             return appHost.OnAfterExecute(req, requestDto, handlerFn(req, requestDto));
         }
 
+        // Only Used internally by TypedFilterTests 
         public object Execute(object requestDto, IRequest req, bool applyFilters)
         {
-            if (applyFilters)
+            try
             {
-                requestDto = appHost.ApplyRequestConverters(req, requestDto);
-                if (appHost.ApplyRequestFilters(req, req.Response, requestDto))
-                    return null;
+                req.SetInProcessRequest();
+                
+                if (applyFilters)
+                {
+                    requestDto = appHost.ApplyRequestConverters(req, requestDto);
+                    if (appHost.ApplyRequestFilters(req, req.Response, requestDto))
+                        return null;
+                }
+
+                var response = Execute(requestDto, req);
+
+                return applyFilters
+                    ? ApplyResponseFilters(response, req)
+                    : response;
             }
-
-            var response = Execute(requestDto, req);
-
-            return applyFilters
-                ? ApplyResponseFilters(response, req)
-                : response;
+            finally 
+            {
+                req.ReleaseIfInProcessRequest();
+            }
         }
 
         [Obsolete("Use Execute(IRequest, applyFilters:true)")]
@@ -423,25 +436,34 @@ namespace ServiceStack.Host
 
         public object Execute(IRequest req, bool applyFilters)
         {
-            string contentType;
-            var restPath = RestHandler.FindMatchingRestPath(req.Verb, req.PathInfo, out contentType);
-            req.SetRoute(restPath as RestPath);
-            req.OperationName = restPath.RequestType.GetOperationName();
-            var requestDto = RestHandler.CreateRequest(req, restPath);
-            req.Dto = requestDto;
-
-            if (applyFilters)
+            try
             {
-                requestDto = appHost.ApplyRequestConverters(req, requestDto);
-                if (appHost.ApplyRequestFilters(req, req.Response, requestDto))
-                    return null;
+                req.SetInProcessRequest();
+                
+                string contentType;
+                var restPath = RestHandler.FindMatchingRestPath(req.Verb, req.PathInfo, out contentType);
+                req.SetRoute(restPath as RestPath);
+                req.OperationName = restPath.RequestType.GetOperationName();
+                var requestDto = RestHandler.CreateRequest(req, restPath);
+                req.Dto = requestDto;
+
+                if (applyFilters)
+                {
+                    requestDto = appHost.ApplyRequestConverters(req, requestDto);
+                    if (appHost.ApplyRequestFilters(req, req.Response, requestDto))
+                        return null;
+                }
+
+                var response = Execute(requestDto, req);
+
+                return applyFilters 
+                    ? ApplyResponseFilters(response, req) 
+                    : response;
             }
-
-            var response = Execute(requestDto, req);
-
-            return applyFilters 
-                ? ApplyResponseFilters(response, req) 
-                : response;
+            finally 
+            {
+                req.ReleaseIfInProcessRequest();
+            }
         }
 
         public Task<object> ExecuteAsync(object requestDto, IRequest req, bool applyFilters)
