@@ -48,8 +48,10 @@ namespace ServiceStack.Auth
                     });
                 }
             }
-            //res.AddHeader('WWW-Authenticate: Basic realm="My Realm"');
-            //header('HTTP/1.1 401 Unauthorized');
+            //else
+            //{
+            //    res.AddHeader("WWW-Authenticate", $"Basic realm=\"{Realm}\"");
+            //}
         }
     }
 }
