@@ -173,7 +173,7 @@ namespace ServiceStack.Auth
             var user = req.GetUser();
             if (user != null)
             {
-                SessionFeature.AddSessionIdToRequestFilter(req, res, null); //Required to get req.GetSessionId()
+                //SessionFeature.AddSessionIdToRequestFilter(req, res, null); //Required to get req.GetSessionId()
                 using (var authService = HostContext.ResolveService<AuthenticateService>(req))
                 {
                     var session = req.GetSession();

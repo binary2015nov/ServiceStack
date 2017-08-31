@@ -72,7 +72,7 @@ namespace ServiceStack.AuthWeb.Tests
             {
                 container.Register<IDbConnectionFactory>(
                     new OrmLiteConnectionFactory(
-                        "Server=localhost;Port=5432;User Id=test;Password=test;Database=test;Pooling=true;MinPoolSize=0;MaxPoolSize=200",
+                        "Server=localhost;Port=5432;Username=postgres;Password=admin;Database=test;Pooling=true;MinPoolSize=0;MaxPoolSize=200",
                         PostgreSqlDialect.Provider)
                     {
                         ConnectionFilter = x => new ProfiledDbConnection(x, Profiler.Current)
@@ -110,7 +110,7 @@ namespace ServiceStack.AuthWeb.Tests
         {
             //Enable and register existing services you want this host to make use of.
             //Look in Web.config for examples on how to configure your oauth providers, e.g. oauth.facebook.AppId, etc.
-            var appSettings = new AppSettings();
+            var appSettings = AppSettings;
 
             Plugins.Add(new EncryptedMessagesFeature
             {
@@ -218,7 +218,7 @@ namespace ServiceStack.AuthWeb.Tests
             return (IUserAuthRepository)container.Resolve<IAuthRepository>();
         }
 
-        private static IUserAuthRepository CreateRedisAuthRepo(Container container, AppSettings appSettings)
+        private static IUserAuthRepository CreateRedisAuthRepo(Container container, IAppSettings appSettings)
         {
             container.Register<IRedisClientsManager>(c =>
                 new RedisManagerPool());
@@ -235,7 +235,7 @@ namespace ServiceStack.AuthWeb.Tests
             return authRepo;
         }
 
-        private static IUserAuthRepository CreateOrmLiteAuthRepo(Container container, AppSettings appSettings)
+        private static IUserAuthRepository CreateOrmLiteAuthRepo(Container container, IAppSettings appSettings)
         {
             //Store User Data into the referenced SqlServer database
             container.Register<IAuthRepository>(c =>

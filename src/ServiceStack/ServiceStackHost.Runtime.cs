@@ -68,18 +68,6 @@ namespace ServiceStack
         }
 
         /// <summary>
-        /// Apply PreAuthenticate Filters from IAuthWithRequest AuthProviders
-        /// </summary>
-        public virtual void ApplyPreAuthenticateFilters(IRequest httpReq, IResponse httpRes)
-        {
-            httpReq.Items[Keywords.HasPreAuthenticated] = true;
-            foreach (var authProvider in AuthenticateService.AuthWithRequestProviders)
-            {
-                authProvider.PreAuthenticate(httpReq, httpRes);
-            }
-        }
-
-        /// <summary>
         /// Applies the raw request filters. Returns whether or not the request has been handled 
         /// and no more processing should be done.
         /// </summary>

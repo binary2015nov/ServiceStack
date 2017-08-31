@@ -312,8 +312,6 @@ namespace ServiceStack.Auth
             var isEmail = userNameOrEmail.Contains("@");
             var lowerUserName = userNameOrEmail.ToLower();
             
-            TUserAuth userAuth = null;
-
             if (ForceCaseInsensitiveUserNameSearch)
             {
                 return isEmail

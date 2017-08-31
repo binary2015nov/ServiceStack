@@ -10,16 +10,17 @@ namespace ServiceStack.AuthWeb.Tests
         public const string BaseUri = "http://localhost:11001/";
 
         [Test]
-        public void Can_authenticate_with_WindowsAuth()
+        public void Can_authenticate_with_HTTP_Basic_Authentication()
         {
             var client = new JsonServiceClient(BaseUri);
+            client.UserName = "mythz";
+            client.Password = "test";
             var response = client.Get(new RequiresAuth { Name = "Haz Access!" });
-
             Assert.That(response.Name, Is.EqualTo("Haz Access!"));
         }
 
-        [Test]
-        public void Can_authenticate_with_DefaultCredentials()
+        [Test, Ignore("only supported on ASP.NET IIS")]
+        public void Can_authenticate_with_ASPNET_Windows_Authentication()
         {
             var client = new JsonServiceClient(BaseUri)
             {

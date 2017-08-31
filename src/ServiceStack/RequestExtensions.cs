@@ -25,21 +25,20 @@ namespace ServiceStack
             if (!reload)
                 request.Items.TryGetValue(Keywords.Session, out oSession);
 
+            // Apply PreAuthenticate Filters from IAuthWithRequest AuthProviders
             if (oSession == null && !request.Items.ContainsKey(Keywords.HasPreAuthenticated))
             {
-                try
+                request.Items[Keywords.HasPreAuthenticated] = true;
+                foreach (var authProvider in AuthenticateService.AuthWithRequestProviders)
                 {
-                    HostContext.AppHost.ApplyPreAuthenticateFilters(request, request.Response);
-                    request.Items.TryGetValue(Keywords.Session, out oSession);
+                    try { authProvider.PreAuthenticate(request, request.Response); } catch { }                  
+                    //throw new Exception("Error in GetSession() when ApplyPreAuthenticateFilters", ex);
+                    /*treat errors as non-existing session*/                   
                 }
-                catch (Exception ex)
-                {
-                    throw new Exception("Error in GetSession() when ApplyPreAuthenticateFilters", ex);
-                    /*treat errors as non-existing session*/
-                }
+                request.Items.TryGetValue(Keywords.Session, out oSession);
             }
 
-            var sessionId = request.GetSessionId();
+            var sessionId = request.GetSessionId() ?? request.CreateSessionIds(request.Response);
             var session = oSession as IAuthSession;
             if (session != null)
                 session = HostContext.AppHost.OnSessionFilter(session, sessionId);

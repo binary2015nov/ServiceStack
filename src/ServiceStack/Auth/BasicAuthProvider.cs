@@ -31,12 +31,13 @@ namespace ServiceStack.Auth
 
         public void PreAuthenticate(IRequest req, IResponse res)
         {
+            res.AddHeader("WWW-Authenticate", $"Basic realm=\"{Realm}\"");
             //API Keys are sent in Basic Auth Username and Password is Empty
             var userPass = req.GetBasicAuthUserAndPassword();
             if (!string.IsNullOrEmpty(userPass?.Value))
             {
                 //Need to run SessionFeature filter since its not executed before this attribute (Priority -100)			
-                SessionFeature.AddSessionIdToRequestFilter(req, res, null); //Required to get req.GetSessionId()
+                //SessionFeature.AddSessionIdToRequestFilter(req, res, null); //Required to get req.GetSessionId()
 
                 using (var authService = HostContext.ResolveService<AuthenticateService>(req))
                 {
@@ -48,10 +49,6 @@ namespace ServiceStack.Auth
                     });
                 }
             }
-            //else
-            //{
-            //    res.AddHeader("WWW-Authenticate", $"Basic realm=\"{Realm}\"");
-            //}
         }
     }
 }
