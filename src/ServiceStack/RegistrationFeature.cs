@@ -7,7 +7,7 @@ namespace ServiceStack
     /// <summary>
     /// Enable the Registration feature and configure the RegistrationService.
     /// </summary>
-    public class RegistrationFeature : IPlugin, IPostInitPlugin
+    public class RegistrationFeature : IPlugin
     {
         public string AtRestPath { get; set; }
 
@@ -20,13 +20,6 @@ namespace ServiceStack
         {
             appHost.RegisterService<RegisterService>(AtRestPath);
             appHost.RegisterAs<RegistrationValidator, IValidator<Register>>();
-        }
-
-        public void AfterPluginsLoaded(IAppHost appHost)
-        {
-            var authRepository = appHost.TryResolve<RegisterService>().AuthRepository as IUserAuthRepository;
-            if (authRepository == null)
-                throw new Exception("There is no user auth repository in register service.");
         }
     }
 }

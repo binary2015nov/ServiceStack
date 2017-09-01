@@ -111,21 +111,21 @@ namespace ServiceStack
             };
         }
 
-        protected virtual void OnBeforeInit() { }
-
-        protected virtual void OnAfterInit() { }
-
         /// <summary>
         /// Collection of added plugins.
         /// </summary>
         public List<IPlugin> Plugins { get; set; }
 
+        protected virtual void OnBeforeInit() { }
+
+        protected virtual void OnAfterInit() { }
+
+        public abstract void Configure(Container container);
+
         /// <summary>
         /// The AppHost.Container. Note: it is not thread safe to register dependencies after AppStart.
         /// </summary>
         public Container Container { get; private set; }
-
-        public abstract void Configure(Container container);
 
         public DateTime InitAt { get; private set; }
 
@@ -394,7 +394,7 @@ namespace ServiceStack
             }
 
             //Sync the RestPaths collections
-            RestPaths.Clear();
+            //RestPaths.Clear();
             RestPaths.AddRange(ServiceController.RestPathMap.Values.SelectMany(x => x));
 
             foreach (var restPath in RestPaths)

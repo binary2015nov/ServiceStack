@@ -13,9 +13,9 @@ using ServiceStack.Text;
 
 namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
 {
-    public class QueryProducts : QueryData<Product> {}
-    
-    public class GetAllProducts : IReturn<GetAllProductsResponse> {}
+    public class QueryProducts : QueryData<Product> { }
+
+    public class GetAllProducts : IReturn<GetAllProductsResponse> { }
 
     public class GetAllProductsResponse
     {
@@ -29,21 +29,22 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
             Results = TemplateQueryData.Products
         };
     }
-    
-    public class QueryTemplateRockstars : QueryDb<Rockstar> {}
-    
-    public class QueryCustomers : QueryDb<Customer> 
+
+    public class QueryTemplateRockstars : QueryDb<Rockstar> { }
+
+    public class QueryCustomers : QueryDb<Customer>
     {
         public string CustomerId { get; set; }
         public string CompanyNameContains { get; set; }
         public string[] CountryIn { get; set; }
     }
-    
+
     public class TemplateServiceStackTests
     {
         class AppHost : AppSelfHostBase
         {
-            public AppHost() : base(nameof(TemplateIntegrationTests), typeof(MyTemplateServices).GetAssembly())
+            public AppHost() 
+                : base(nameof(TemplateIntegrationTests), typeof(MyTemplateServices).GetAssembly())
             {
                 Config.DebugMode = true;
             }
@@ -64,7 +65,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
                 {
                     db.DropAndCreateTable<Rockstar>();
                     db.InsertAll(UnitTestExample.SeedData);
-                    
+
                     db.DropAndCreateTable<Customer>();
                     db.InsertAll(TemplateQueryData.Customers);
                 }
@@ -78,19 +79,19 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
                     },
                     TemplateFilters =
                     {
-                        //new TemplateDbFiltersAsync(),
+                        new TemplateDbFiltersAsync(),
                         new TemplateAutoQueryFilters(),
                     },
                 });
-                
+
                 Plugins.Add(new AutoQueryDataFeature { MaxLimit = 100 }
                     .AddDataSource(ctx => ctx.ServiceSource<Product>(ctx.ConvertTo<GetAllProducts>()))
                 );
-                
+
                 Plugins.Add(new AutoQueryFeature { MaxLimit = 100 });
 
                 var files = TemplateFiles[0];
-                
+
                 files.WriteFile("_layout.html", @"
 <html>
 <body id=root>
@@ -118,7 +119,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
                 files.WriteFile("autoquery-top5-de-uk.html", @"
 {{ { countryIn:['UK','Germany'], orderBy:'customerId', take:5 } | sendToAutoQuery('QueryCustomers') 
      | toResults | select: { it.CustomerId }: { it.CompanyName }, { it.Country }\n }}");
-                
+
                 files.WriteFile("api/customers.html", @"
 {{ limit | default(100) | assignTo: limit }}
 
@@ -140,7 +141,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
         }
 
         public static string BaseUrl = Config.ListeningOn;
-        
+
         private readonly ServiceStackHost appHost;
         public TemplateServiceStackTests()
         {
@@ -150,7 +151,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
         }
 
         [OneTimeTearDown]
-        public void OneTimeTearDown() => appHost.Dispose();
+        public void TestFixtureTearDown() => appHost.Dispose();
 
         [Test]
         public void Can_call_AutoQuery_Data_services()
@@ -267,8 +268,8 @@ Jim Morrison
         public void Can_call_AutoQuery_QueryCustomer_service_by_CityIn()
         {
             var html = BaseUrl.CombineWith("autoquery-customers")
-                .AddQueryParam("countryIn","UK,Germany")
-                .AddQueryParam("orderBy","customerId")
+                .AddQueryParam("countryIn", "UK,Germany")
+                .AddQueryParam("orderBy", "customerId")
                 .GetStringFromUrl();
             html.Print();
             Assert.That(html.NormalizeNewLines(), Is.EqualTo(@"<html>
@@ -320,7 +321,7 @@ CONSH: Consolidated Holdings, UK
         [Test]
         public void Can_call_customers_api_page_without_arguments()
         {
-            var url = BaseUrl.CombineWith("api", "customers");
+            var url = BaseUrl.AppendPaths("api", "customers");
 
             var json = url.GetJsonFromUrl();
             var customers = json.FromJson<List<Customer>>();
@@ -359,10 +360,10 @@ CONSH: Consolidated Holdings, UK
         {
             var json = BaseUrl.CombineWith("api", "customers").AddQueryParam("limit", 1).GetStringFromUrl();
             Assert.That(json, Does.StartWith("["));
-            
+
             var html = BaseUrl.CombineWith("api", "customers.html").AddQueryParam("limit", 1).GetStringFromUrl();
             Assert.That(html, Does.StartWith("<"));
-            
+
             var csv = BaseUrl.CombineWith("api", "customers.csv").AddQueryParam("limit", 1).GetStringFromUrl();
             Assert.That(csv, Does.StartWith("CustomerId,"));
         }
@@ -395,7 +396,7 @@ CONSH: Consolidated Holdings, UK
                     }
                 }
             }.Init();
-            
+
             Assert.That(context.EvaluateTemplate("{{ isAuthenticated }}"), Is.EqualTo("True"));
             Assert.That(context.EvaluateTemplate("{{ ifAuthenticated | show: Y }}"), Is.EqualTo("Y"));
             Assert.That(context.EvaluateTemplate("{{ ifNotAuthenticated | show: N }}"), Is.EqualTo(""));
@@ -410,7 +411,7 @@ CONSH: Consolidated Holdings, UK
             {
                 TemplateFilters = { new TemplateServiceStackFilters() },
             }.Init();
-            
+
             Assert.That(context.EvaluateTemplate("{{ isAuthenticated }}"), Is.EqualTo("False"));
             Assert.That(context.EvaluateTemplate("{{ ifAuthenticated | show: Y }}"), Is.EqualTo(""));
             Assert.That(context.EvaluateTemplate("{{ ifNotAuthenticated | show: N }}"), Is.EqualTo("N"));

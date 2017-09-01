@@ -285,6 +285,8 @@ layout: alt/alt-layout
 {{ { id, firstName, lastName, age } | ensureAllArgsNotNull | publishToGateway('AddRockstarTemplate') }}
 {{ 'rockstar-gateway' | partial({ firstName }) }}
 {{ htmlError }}");
+
+                files.WriteFile("plugins/dll.txt", "Forbidden File");
             }
 
             public readonly List<IVirtualPathProvider> TemplateFiles = new List<IVirtualPathProvider> { new MemoryVirtualFiles() };
@@ -302,7 +304,7 @@ layout: alt/alt-layout
         }
 
         [OneTimeTearDown]
-        public void OneTimeTearDown() => appHost.Dispose();
+        public void TestFixtureTearDown() => appHost.Dispose();
 
         [Test]
         public void Can_process_home_page()
@@ -471,7 +473,7 @@ layout: alt/alt-layout
                 </tr>
             </thead>
             <tr><th>Beverages</th><td>Chai</td><td>$18.00</td></tr>
-<tr><th>Beverages</th><td>Chang</td><td>$19.00</td></tr>".NormalizeNewLines()));
+<tr><th>Beverages</th><td>Chang</td><td>$19.00</td></tr>".NormalizeNewLines().ToString(System.Globalization.CultureInfo.CurrentCulture)));
         }
 
         [Test]

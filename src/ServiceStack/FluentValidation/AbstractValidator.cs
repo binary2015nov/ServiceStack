@@ -384,6 +384,5 @@ namespace ServiceStack.FluentValidation
 	/// Container class for dependent rule definitions
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class	DependentRules<T> : AbstractValidator<T> {
-	}
+	public class DependentRules<T> : AbstractValidator<T> { }
 }

@@ -10,7 +10,8 @@ namespace NewApi.Customers
 {
     public class AppHost : AppSelfHostBase
     {
-        public AppHost() : base("Customer REST Example", typeof(CustomerService).GetAssembly()) {}
+        public AppHost() 
+            : base("Customer REST Example", typeof(CustomerService).GetAssembly()) { }
 
         public override void Configure(Container container)
         {
@@ -25,7 +26,7 @@ namespace NewApi.Customers
     }
 
     [Route("/customers", "GET")]
-    public class GetCustomers : IReturn<GetCustomersResponse> {}
+    public class GetCustomers : IReturn<GetCustomersResponse> { }
 
     public class GetCustomersResponse
     {
@@ -103,11 +104,10 @@ namespace NewApi.Customers
         }
     }
 
-
     [TestFixture]
     public class CustomerRestExample
     {
-        const string BaseUri = "http://localhost:1337/";
+        const string BaseUri = "http://localhost:20000/";
 
         ServiceStackHost appHost;
 
@@ -155,6 +155,5 @@ namespace NewApi.Customers
             all = client.Get(new GetCustomers());
             Assert.That(all.Results.Count, Is.EqualTo(0));
         }
-
     }
 }

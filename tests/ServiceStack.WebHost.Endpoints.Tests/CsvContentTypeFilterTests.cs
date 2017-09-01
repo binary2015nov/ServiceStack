@@ -5,9 +5,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using ServiceStack.Common;
 using ServiceStack.Text;
-using ServiceStack.Web;
 using ServiceStack.WebHost.Endpoints.Tests.Support.Host;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
@@ -21,7 +19,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         ExampleAppHostHttpListener appHost;
 
         [OneTimeSetUp]
-        public void OnTestFixtureSetUp()
+        public void TestFixtureSetUp()
         {
             appHost = new ExampleAppHostHttpListener();
             appHost.Init();
@@ -29,17 +27,17 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
+        public void TestFixtureTearDown()
         {
             appHost.Dispose();
         }
 
-        [Test]
-        [Explicit("Helps debugging when you need to find out WTF is going on")]
-        public void Run_for_30secs()
-        {
-            Thread.Sleep(30000);
-        }
+        //[Test]
+        //[Explicit("Helps debugging when you need to find out WTF is going on")]
+        //public void Run_for_30secs()
+        //{
+        //    Thread.Sleep(30000);
+        //}
 
         private static void FailOnAsyncError<T>(T response, Exception ex)
         {

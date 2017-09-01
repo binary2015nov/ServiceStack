@@ -12,7 +12,7 @@ namespace ServiceStack.Auth
         public OrmLiteAuthRepository(IDbConnectionFactory dbFactory) : base(dbFactory) { }
 
         public OrmLiteAuthRepository(IDbConnectionFactory dbFactory, string namedConnnection = null) 
-            : base(dbFactory, namedConnnection) {}
+            : base(dbFactory, namedConnnection) { }
     }
 
     public class OrmLiteAuthRepository<TUserAuth, TUserAuthDetails> : OrmLiteAuthRepositoryBase<TUserAuth, TUserAuthDetails>
@@ -166,7 +166,7 @@ namespace ServiceStack.Auth
 
         public bool UseDistinctRoleTables { get; set; }
 
-        public bool ForceCaseInsensitiveUserNameSearch { get; set; }
+        public bool ForceCaseInsensitiveUserNameSearch { get; set; } = true;
 
         public abstract void Exec(Action<IDbConnection> fn);
 

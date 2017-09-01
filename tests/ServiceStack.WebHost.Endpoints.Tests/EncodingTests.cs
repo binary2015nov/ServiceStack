@@ -31,8 +31,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
     public class EncodingTestsAppHost : AppHostHttpListenerBase
     {
-        public EncodingTestsAppHost() : base("EncodingTests", typeof(HelloWorldService).GetAssembly()) { }
-        public override void Configure(Funq.Container container) {}
+        public EncodingTestsAppHost()
+            : base("EncodingTests", typeof(HelloWorldService).GetAssembly()) { }
+
+        public override void Configure(Funq.Container container) { }
     }
 
     [TestFixture]
@@ -85,5 +87,4 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             Assert.That(PerformRequest(firstName, lastName).Greeting, Is.EqualTo(string.Format("Hello {0} {1}", firstName, lastName)));
         }
     }
-
 }

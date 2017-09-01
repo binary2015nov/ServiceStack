@@ -1,10 +1,4 @@
-﻿#if !NETCORE_SUPPORT
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ServiceStack.Common;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace ServiceStack.Common.Tests
 {
@@ -46,4 +40,3 @@ namespace ServiceStack.Common.Tests
         }
     }
 }
-#endif

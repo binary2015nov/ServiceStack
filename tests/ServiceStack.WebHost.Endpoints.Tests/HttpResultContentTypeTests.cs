@@ -3,7 +3,6 @@ using System.IO;
 using System.Net;
 using NUnit.Framework;
 using ServiceStack.Logging;
-using ServiceStack.Web;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
@@ -58,8 +57,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 #endregion
 
-
-		private const string ListeningOn = "http://localhost:1337/";
+		private static string ListeningOn = Config.ListeningOn;
 		SimpleAppHostHttpListener appHost;
 
         public HttpResultContentTypeTests()
@@ -102,7 +100,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public void TestHttpRestulSettingContentType(bool setContentTypeBrutally) {
             string text = "Some text";
             string url = string.Format("{0}/test/plaintext?SetContentTypeBrutally={1}&Text={2}", ListeningOn, setContentTypeBrutally,text);
-            HttpWebRequest req = WebRequest.Create(url) as HttpWebRequest;
+            HttpWebRequest req = WebRequest.CreateHttp(url);
 
             HttpWebResponse res = null;
             try {

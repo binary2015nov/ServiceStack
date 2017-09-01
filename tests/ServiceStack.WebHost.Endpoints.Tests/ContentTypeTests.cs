@@ -22,13 +22,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     [TestFixture]
     public class ContentTypeTests
     {
-        private const string ListeningOn = "http://localhost:1337/";
+        private static string ListeningOn = Config.ListeningOn;
 
         ExampleAppHostHttpListener appHost;
         readonly JsonServiceClient client = new JsonServiceClient(ListeningOn);
 
         [OneTimeSetUp]
-        public void OnTestFixtureSetUp()
+        public void TestFixtureSetUp()
         {
             appHost = new ExampleAppHostHttpListener();
             appHost.Init();
@@ -36,7 +36,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
+        public void TestFixtureTearDown()
         {
             appHost.Dispose();
         }
@@ -90,7 +90,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             var dto = json.FromJson<TestContentType>();
             Assert.That(dto.Id, Is.EqualTo(1));
-        }
-         
+        }       
     }
 }

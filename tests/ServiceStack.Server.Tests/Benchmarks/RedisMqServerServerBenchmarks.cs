@@ -4,11 +4,10 @@ using System.Threading;
 using NUnit.Framework;
 using ServiceStack.Messaging.Redis;
 using ServiceStack.Redis;
-using ServiceStack.Text;
 
 namespace ServiceStack.Server.Tests.Benchmarks
 {
-    [Ignore("Benchmarks")]
+    //[Ignore("Benchmarks")]
     [Explicit]
     [TestFixture, Category("Benchmarks")]
     public class RedisMqServerServerBenchmarks

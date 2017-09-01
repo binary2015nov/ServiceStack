@@ -149,9 +149,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        private readonly ServiceStackHost appHost;
+        private ServiceStackHost appHost;
 
-        public CustomOrmLiteAuthRepositoryTests()
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
             appHost = new AppHost()
                 .Init()
@@ -159,7 +160,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OneTimeTearDown() => appHost.Dispose();
+        public void TestFixtureTearDown() => appHost.Dispose();
 
         [Test]
         public void Can_resgiter_user_using_Custom_UserAuth_and_UserAuthDetails()

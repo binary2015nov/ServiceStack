@@ -170,9 +170,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     /// </summary>
     [TestFixture]
     public abstract class WebServicesTests
-    //: TestBase
     {
-        public const string ListeningOn = "http://localhost:1337/";
+        public static string ListeningOn = Config.ListeningOn;
         private const string TestString = "ServiceStack";
 
         private ServiceStackHost appHost;

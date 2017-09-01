@@ -30,6 +30,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                     })
                 {
                     IncludeRegistrationService = true,
+                    SaveUserNamesInLowerCase = true,
                 });
             }
         }

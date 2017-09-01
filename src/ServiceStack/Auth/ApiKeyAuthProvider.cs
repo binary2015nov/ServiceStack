@@ -266,13 +266,13 @@ namespace ServiceStack.Auth
         protected virtual void ValidateApiKey(ApiKey apiKey)
         {
             if (apiKey == null)
-                throw HttpError.Unauthorized("ApiKey does not exist");
+                throw new HttpError(HttpStatusCode.Unauthorized, "NotFound", "ApiKey does not exist");
 
             if (apiKey.CancelledDate != null)
-                throw HttpError.Unauthorized("ApiKey has been cancelled");
+                throw new HttpError(HttpStatusCode.Unauthorized, "Forbidden", "ApiKey has been cancelled");
 
             if (apiKey.ExpiryDate != null && DateTime.UtcNow > apiKey.ExpiryDate.Value)
-                throw HttpError.Unauthorized("ApiKey has expired");
+                throw new HttpError(HttpStatusCode.Unauthorized, "Expired", "ApiKey has expired");
         }
 
         private void PreAuthenticateWithApiKey(IRequest req, IResponse res, ApiKey apiKey)

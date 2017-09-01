@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using ServiceStack.Text;
-using ServiceStack.Web;
 using ServiceStack.WebHost.Endpoints.Tests.Support.Host;
 using ServiceStack.WebHost.Endpoints.Tests.Support.Services;
 
@@ -38,12 +37,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             appHost.Dispose();
         }
 
-        [Test]
-        [Explicit("Helps debugging when you need to find out WTF is going on")]
-        public void Run_for_30secs()
-        {
-            Thread.Sleep(30000);
-        }
+        //[Test]
+        //[Explicit("Helps debugging when you need to find out WTF is going on")]
+        //public void Run_for_30secs()
+        //{
+        //    Thread.Sleep(30000);
+        //}
 
         public void AssertResponse<T>(HttpWebResponse response, Action<T> customAssert)
         {

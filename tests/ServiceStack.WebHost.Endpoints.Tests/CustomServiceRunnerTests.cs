@@ -29,7 +29,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             public CustomServiceRunnerAppHost()
                 : base("CustomServiceRunner", typeof(CustomServiceRunnerAppHost).GetAssembly()) { }
 
-            public override void Configure(Container container) {}
+            public override void Configure(Container container) { }
 
             public override Web.IServiceRunner<TRequest> CreateServiceRunner<TRequest>(ActionContext actionContext)
             {

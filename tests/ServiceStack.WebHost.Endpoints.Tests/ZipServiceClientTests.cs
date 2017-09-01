@@ -7,8 +7,6 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Funq;
 using NUnit.Framework;
-using ServiceStack;
-using ServiceStack.Web;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
@@ -43,9 +41,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     [TestFixture]
     public class ZipServiceClientTests
     {
-        private readonly ServiceStackHost appHost;
+        private ServiceStackHost appHost;
 
-        public ZipServiceClientTests()
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
             appHost = new AppHost()
                 .Init()
@@ -53,14 +52,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OneTimeTearDown() => appHost.Dispose();
+        public void TestFixtureTearDown() => appHost.Dispose();
 
         class AppHost : AppSelfHostBase
         {
             public AppHost()
                 : base(nameof(ZipServiceClientTests), typeof(HelloZipService).GetAssembly()) { }
 
-            public override void Configure(Container container) {}
+            public override void Configure(Container container) { }
         }
 
         [Test]
@@ -155,7 +154,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Explicit, Test]
         public void Can_send_gzip_client_request_ASPNET()
         {
-            var client = new JsonServiceClient(Config.AspNetServiceStackBaseUri)
+            var client = new JsonServiceClient(Config.ListeningOn)
             {
                 RequestCompressionType = CompressionTypes.GZip,
             };

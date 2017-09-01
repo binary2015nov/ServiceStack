@@ -205,7 +205,8 @@ Text".NormalizeNewLines();
 <div id=""searchresults"">
 <h3>Markdown &gt; <a href=""http://path.com/to/about"">About Docs</a></h3>
 </div>
-<p>Text</p>".NormalizeNewLines();
+<p>Text</p>
+".NormalizeNewLines();
 
             var textBlock = new TextBlock("");
             var page = new MarkdownPage { Markdown = new MarkdownFormat() };

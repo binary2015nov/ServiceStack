@@ -1,7 +1,5 @@
-﻿using System.Reflection;
-using Funq;
+﻿using Funq;
 using NUnit.Framework;
-using ServiceStack.Text;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
@@ -31,7 +29,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         public class AppHost : AppHostHttpListenerBase
         {
-            public AppHost() : base(typeof(CustomFormatTests).Name, typeof(CustomFormatTests).GetAssembly())
+            public AppHost()
+                : base(typeof(CustomFormatTests).Name, typeof(CustomFormatTests).GetAssembly())
             {
                 Config.DefaultContentType = MimeTypes.Json;
                 Config.EnableFeatures = Feature.All.Remove(Feature.Html);

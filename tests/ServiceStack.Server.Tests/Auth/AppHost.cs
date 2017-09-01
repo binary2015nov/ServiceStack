@@ -35,15 +35,11 @@ namespace ServiceStack.Server.Tests.Auth
         {
             Use?.Invoke(container);
 
-#if !NETCORE
-            Plugins.Add(new Razor.RazorFormat());
-#endif
-
             var dbFactory = new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider);
             container.Register<IDbConnectionFactory>(dbFactory);
 
             dbFactory.RegisterConnection("testdb", "~/App_Data/test.sqlite".MapServerPath(), SqliteDialect.Provider);
-
+           
             using (var db = dbFactory.OpenDbConnection())
             {
                 db.DropAndCreateTable<Rockstar>(); //Create table if not exists
@@ -55,6 +51,10 @@ namespace ServiceStack.Server.Tests.Auth
                 db.DropAndCreateTable<Rockstar>(); //Create table if not exists
                 db.Insert(new Rockstar(1, "Test", "Database", 27));
             }
+
+#if !NETCORE
+            Plugins.Add(new ServiceStack.Razor.RazorFormat());
+#endif
 
             Plugins.Add(new AuthFeature(() => new AuthUserSession(),
                 new IAuthProvider[] {

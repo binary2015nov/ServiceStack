@@ -3,9 +3,6 @@ using System.IO;
 using System.Net;
 using System.Web;
 using NUnit.Framework;
-using ServiceStack.Common;
-using ServiceStack.Text;
-using ServiceStack.Web;
 using ServiceStack.WebHost.Endpoints.Tests.Support.Host;
 using ServiceStack.WebHost.Endpoints.Tests.Support.Operations;
 
@@ -14,7 +11,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 	[TestFixture]
 	public class CustomRequestDataTests
 	{
-		private const string ListeningOn = "http://localhost:1337/";
+		private static string ListeningOn = Config.ListeningOn;
 
 		ExampleAppHostHttpListener appHost;
 		readonly JsonServiceClient client = new JsonServiceClient(ListeningOn);
@@ -22,7 +19,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		private string predefinedUrl = ListeningOn.CombineWith("json/reply/customrequestbinder");
 
 		[OneTimeSetUp]
-		public void OnTestFixtureSetUp()
+		public void TestFixtureSetUp()
 		{
 			appHost = new ExampleAppHostHttpListener();
 			appHost.Init();
@@ -30,7 +27,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		}
 
 		[OneTimeTearDown]
-		public void OnTestFixtureTearDown()
+		public void TestFixtureTearDown()
 		{
 			appHost.Dispose();
 		}
@@ -41,7 +38,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		[Test]
 		public void Can_parse_custom_form_data()
 		{
-			var webReq = (HttpWebRequest)WebRequest.Create("http://localhost:1337/customformdata?format=json");
+			var webReq = WebRequest.CreateHttp(Config.ListeningOn + "customformdata?format=json");
 			webReq.Method = HttpMethods.Post;
             webReq.ContentType = MimeTypes.FormUrlEncoded;
 

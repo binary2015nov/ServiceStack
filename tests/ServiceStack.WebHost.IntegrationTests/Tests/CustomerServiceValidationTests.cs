@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Net;
 using NUnit.Framework;
-using ServiceStack.Text;
 using ServiceStack.WebHost.IntegrationTests.Services;
 
 namespace ServiceStack.WebHost.IntegrationTests.Tests
@@ -113,7 +112,5 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             var response = client.Send(validRequest);
             Assert.That(response.ResponseStatus, Is.Null);
         }
-
     }
-
 }

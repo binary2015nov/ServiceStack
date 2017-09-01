@@ -56,7 +56,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         class AppHost : AppSelfHostBase
         {
-            public AppHost() : base(nameof(ContentTypeRouteTests), typeof(ContentRouteService).GetAssembly()) { }
+            public AppHost()
+                : base(nameof(ContentTypeRouteTests), typeof(ContentRouteService).GetAssembly()) { }
 
             public override void Configure(Container container) { }
         }
@@ -64,14 +65,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         private ServiceStackHost appHost;
 
         [OneTimeSetUp]
-        public void OneTimeSetUp()
+        public void TextFixtureSetUp()
         {
             appHost = new AppHost()
                 .Init()
                 .Start(Config.ListeningOn);
         }
     
-        [OneTimeTearDown] public void OneTimeTearDown() => appHost.Dispose();
+        [OneTimeTearDown] public void TextFixtureTearDown() => appHost.Dispose();
 
         [Test]
         public void GET_Html_Request_calls_GetHtml()

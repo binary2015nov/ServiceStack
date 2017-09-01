@@ -1,28 +1,26 @@
 ﻿using System.Diagnostics;
-using System.Reflection;
 using Funq;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Net;
-using ServiceStack.Text;
 
 namespace ServiceStack.WebHost.Endpoints.Tests.Issues
 {
-    [Explicit,Ignore("Regression Test")]
+    [Explicit, Ignore("Regression Test")]
     [TestFixture]
     public class ClientMemoryLeak
     {
         class AppHost : AppSelfHostBase
         {
             public AppHost()
-                : base(typeof(ClientMemoryLeak).Name, typeof(LeakServices).GetAssembly())
-            { }
+                : base(typeof(ClientMemoryLeak).Name, typeof(LeakServices).GetAssembly()) { }
 
             public override void Configure(Container container) { }
         }
 
-        private readonly ServiceStackHost appHost;
-        public ClientMemoryLeak()
+        private ServiceStackHost appHost;
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
             appHost = new AppHost()
                 .Init()
@@ -30,7 +28,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Issues
         }
 
         [OneTimeTearDown]
-        public void TearDown()
+        public void TestFixtureTearDown()
         {
             appHost.Dispose();
         }

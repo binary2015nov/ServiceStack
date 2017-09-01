@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using Funq;
 using NUnit.Framework;
 using ServiceStack.FluentValidation;
-using ServiceStack.Text;
 using ServiceStack.Validation;
 using ServiceStack.WebHost.Endpoints.Tests.Support;
 
@@ -105,7 +104,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
     [TestFixture]
     public class CustomerServiceValidationTests
     {
-        private const string ListeningOn = "http://localhost:1337/";
+        private const string ListeningOn = "http://localhost:20000/";
 
         public class ValidationAppHostHttpListener
             : AppHostHttpListenerBase
@@ -124,7 +123,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
         static ValidationAppHostHttpListener appHost;
 
         [OneTimeSetUp]
-        public void OnTestFixtureSetUp()
+        public void TestFixtureSetUp()
         {
             appHost = new ValidationAppHostHttpListener();
             appHost.Init();
@@ -132,7 +131,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
         }
 
         [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
+        public void TestFixtureTearDown()
         {
             appHost.Dispose();
         }
@@ -367,6 +366,5 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
             var response = client.Send<ValidCustomersResponse>(validRequest);
             Assert.That(response.ResponseStatus, Is.Null);
         }
-
     }
 }

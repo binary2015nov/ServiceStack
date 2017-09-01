@@ -11,9 +11,7 @@ namespace ServiceStack.Common.Tests
         public int Value { get; set; }
     }
 
-    public class TestUserSession : AuthUserSession
-    {
-    }
+    public class TestUserSession : AuthUserSession { }
 
     [TestFixture]
     public class MessagingTests

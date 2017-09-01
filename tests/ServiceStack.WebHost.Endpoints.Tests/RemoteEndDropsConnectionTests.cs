@@ -11,7 +11,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 	[TestFixture]
 	public class RemoteEndDropsConnectionTests
 	{
-		private const string ListeningOn = "http://localhost:1337/";
+		private string ListeningOn = Config.ListeningOn;
 		ExampleAppHostHttpListener appHost;
 
 		public RemoteEndDropsConnectionTests()

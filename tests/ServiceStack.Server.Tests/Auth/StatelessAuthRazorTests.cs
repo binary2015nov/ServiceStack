@@ -135,8 +135,9 @@ namespace ServiceStack.Server.Tests.Auth
         [Test]
         public void Can_access_Secured_Pages_with_ApiKeyAuth()
         {
-            Assert.That(ListeningOn.CombineWith("/secured").GetStringFromUrl(
-                requestFilter: req => req.AddApiKeyAuth(ApiKey)),
+            var actual = ListeningOn.CombineWith("/secured").GetStringFromUrl(
+                 requestFilter: req => req.AddApiKeyAuth(ApiKey));
+            Assert.That(actual,
                 Does.Contain("<!--view:Secured.cshtml-->"));
 
             Assert.That(ListeningOn.CombineWith("/SecuredPage").GetStringFromUrl(

@@ -6,7 +6,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.WebHost.Endpoints.Tests.IntegrationTests
 {
-    [Explicit]
+    [Ignore("Needs access tokens, twitter facebook github twitter")]
     public class OAuthIntegrationTests
     {
         private Dictionary<string,string> AccessTokens { get; set; }

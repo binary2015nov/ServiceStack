@@ -22,9 +22,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     }
 
     [Route("/globalcorsfeature")]
-    public class GlobalCorsFeatureRequest
-    {
-    }
+    public class GlobalCorsFeatureRequest { }
 
     public class GlobalCorsFeatureResponse
     {
@@ -48,13 +46,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             public CorsFeatureAppHostHttpListener()
                 : base("Cors Feature Tests", typeof(CorsFeatureService).GetAssembly()) { }
 
-            public override void Configure(Funq.Container container) {}
+            public override void Configure(Funq.Container container) { }
         }
 
         ServiceStackHost appHost;
 
         [OneTimeSetUp]
-        public void OnTestFixtureSetUp()
+        public void TestFixtureSetUp()
         {
             appHost = new CorsFeatureAppHostHttpListener()
                 .Init()
@@ -62,7 +60,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
+        public void TestFixtureTearDown()
         {
             appHost.Dispose();
         }
@@ -73,12 +71,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             new XmlServiceClient(Config.AbsoluteBaseUri),
             new JsvServiceClient(Config.AbsoluteBaseUri)
         };
-
-        [Test, Explicit]
-        public void RunFor5Mins()
-        {
-            Thread.Sleep(TimeSpan.FromMinutes(5));
-        }
 
         [Test, TestCaseSource("RestClients")]
         public void CorsMethodHasAccessControlHeaders(IRestClient client)

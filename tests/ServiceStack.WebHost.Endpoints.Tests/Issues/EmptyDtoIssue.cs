@@ -39,7 +39,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Issues
         {
             public class AppHost : AppHostHttpListenerBase
             {
-                public AppHost() : base(typeof(EmptyArrayDtoTest).Name, typeof(GetEmptyArray).GetAssembly()) { }
+                public AppHost()
+                    : base(typeof(EmptyArrayDtoTest).Name, typeof(GetEmptyArray).GetAssembly()) { }
 
                 public override void Configure(Container container) { }
             }
@@ -70,7 +71,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Issues
             [Test]
             public void Can_GET_empty_array()
             {
-
                 var client = new JsonServiceClient(Config.AbsoluteBaseUri);
                 client.Get(new GetEmptyArray { Ids = new int[] { } });
             }

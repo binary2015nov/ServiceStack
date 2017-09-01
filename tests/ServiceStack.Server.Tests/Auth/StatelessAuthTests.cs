@@ -269,7 +269,8 @@ namespace ServiceStack.Server.Tests.Auth
 
         class JwtAuthProviderReaderAppHost : AppHostHttpListenerBase
         {
-            public JwtAuthProviderReaderAppHost() : base(typeof(FallbackAuthKeyTests).Name, typeof(AppHost).GetAssembly()) { }
+            public JwtAuthProviderReaderAppHost()
+                : base(typeof(FallbackAuthKeyTests).Name, typeof(AppHost).GetAssembly()) { }
 
             public override void Configure(Container container)
             {
@@ -724,13 +725,13 @@ namespace ServiceStack.Server.Tests.Auth
             appHost.Dispose();
         }
 
-        [Ignore("Debug Run")]
-        [Test]
-        public void RunFor10Mins()
-        {
-            Process.Start(ListeningOn);
-            Thread.Sleep(TimeSpan.FromMinutes(10));
-        }
+        //[Ignore("Debug Run")]
+        //[Test]
+        //public void RunFor10Mins()
+        //{
+        //    Process.Start(ListeningOn);
+        //    Thread.Sleep(TimeSpan.FromMinutes(10));
+        //}
 
         public const string Username = "user";
         public const string Password = "p@55word";
@@ -827,7 +828,8 @@ namespace ServiceStack.Server.Tests.Auth
             }
             catch (WebServiceException ex)
             {
-                Assert.That(ex.StatusCode, Is.EqualTo((int)HttpStatusCode.Forbidden));
+                Assert.That(ex.StatusCode, Is.EqualTo((int)HttpStatusCode.Unauthorized));
+                Assert.That(ex.ErrorCode, Is.EqualTo("Forbidden"));
             }
 
             //Change to new Valid Key
@@ -877,7 +879,8 @@ namespace ServiceStack.Server.Tests.Auth
             }
             catch (WebServiceException ex)
             {
-                Assert.That(ex.StatusCode, Is.EqualTo((int)HttpStatusCode.Forbidden));
+                Assert.That(ex.StatusCode, Is.EqualTo((int)HttpStatusCode.Unauthorized));
+                Assert.That(ex.ErrorCode, Is.EqualTo("Expired"));
             }
 
             client = new JsonServiceClient(ListeningOn)

@@ -17,7 +17,7 @@ namespace ServiceStack.ServiceHost.Tests.Routes
             typeof(NewApiRequestDto)
                 .AddAttributes(new RouteAttribute("/custom/NewApiRequestDto"))
                 .AddAttributes(new RouteAttribute("/custom/NewApiRequestDto/get-only", "GET"));
-
+            Assert.That(typeof(NewApiRequestDto).AllAttributes<RouteAttribute>().Count(), Is.EqualTo(2));
             using (var appHost = new BasicAppHost(typeof(NewApiRestServiceWithAllVerbsImplemented).Assembly).Init())
             {
                 var allVerbs = appHost.RestPaths.First(x => x.Path == "/custom/NewApiRequestDto");

@@ -68,9 +68,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
     [TestFixture]
     public class BasicEncryptedMessagesTests
     {
-        private readonly ServiceStackHost appHost;
+        private ServiceStackHost appHost;
 
-        public BasicEncryptedMessagesTests()
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
             appHost = new BasicEncryptedMessagesAppHost()
                 .Init()
@@ -124,5 +125,4 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
             Assert.That(response.Result, Is.EqualTo("Hello, World!"));
         }
     }
-
 }

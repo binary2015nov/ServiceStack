@@ -364,7 +364,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public void Should_list_services(IRestClient client)
         {
             var resources = client.Get<SwaggerResourcesResponse>("/resources");
-            Assert.That(resources.BasePath, Is.EqualTo(BaseUrl));
+            Assert.That(resources.BasePath, Is.EqualTo(ListeningOn));
             Assert.That(resources.SwaggerVersion, Is.EqualTo("1.2"));
             Assert.That(resources.Apis, Is.Not.Null);
 
@@ -445,7 +445,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public void Should_retrieve_service_parameters(IRestClient client)
         {
             var resource = client.Get<SwaggerApiDeclaration>("/resource/swagger");
-            Assert.That(resource.BasePath, Is.EqualTo(BaseUrl));
+            Assert.That(resource.BasePath, Is.EqualTo(ListeningOn));
             Assert.That(resource.ResourcePath, Is.EqualTo("/swagger"));
             Assert.That(resource.Apis, Is.Not.Empty);
 

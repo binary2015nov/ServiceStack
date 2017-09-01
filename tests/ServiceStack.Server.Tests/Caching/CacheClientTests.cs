@@ -153,7 +153,7 @@ namespace ServiceStack.Server.Tests.Caching
         [StringLength(512)]
         [SqlServerBucketCount(10000000)]
         public string Id { get; set; }
-        [StringLength(StringLengthAttribute.MaxText)]
+        [StringLength(400)]
         public string Data { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? ExpiryDate { get; set; }

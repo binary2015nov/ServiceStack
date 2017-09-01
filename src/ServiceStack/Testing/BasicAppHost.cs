@@ -9,7 +9,7 @@ namespace ServiceStack.Testing
     public class BasicAppHost : ServiceStackHost
     {
         public BasicAppHost(params Assembly[] serviceAssemblies)
-            : base(typeof (BasicAppHost).GetOperationName(),
+            : base(typeof(BasicAppHost).GetOperationName(),
                    serviceAssemblies.Length > 0 ? serviceAssemblies : new[]
                    {
 #if !NETSTANDARD1_6

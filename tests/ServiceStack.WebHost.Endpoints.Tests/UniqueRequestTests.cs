@@ -38,14 +38,16 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
     public class UniqueRequestAppHost : AppHostHttpListenerBase
     {
-        public UniqueRequestAppHost() : base("Unique Request Tests", typeof(UniqueRequestService).GetAssembly()) {}
-        public override void Configure(Container container) {}
+        public UniqueRequestAppHost()
+            : base("Unique Request Tests", typeof(UniqueRequestService).GetAssembly()) { }
+
+        public override void Configure(Container container) { }
     }
 
     [TestFixture]
     public class UniqueRequestTests
     {
-        private const string BaseUri = "http://localhost:8001";
+        private static string BaseUri = Config.ListeningOn;
         private UniqueRequestAppHost appHost;
 
         [OneTimeSetUp]
@@ -53,7 +55,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             appHost = new UniqueRequestAppHost();
             appHost.Init();
-            appHost.Start(BaseUri + "/");
+            appHost.Start(BaseUri);
         }
 
         [OneTimeTearDown]

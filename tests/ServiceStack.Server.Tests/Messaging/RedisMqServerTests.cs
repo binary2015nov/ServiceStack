@@ -280,7 +280,7 @@ namespace ServiceStack.Server.Tests.Messaging
             var incr = new Incr { Value = 5 };
             mqClient.Publish(incr);
 
-            Thread.Sleep(1000);
+            Thread.Sleep(2000);
 
             Assert.That(called, Is.EqualTo(1 + incr.Value));
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using ServiceStack.FluentValidation;
 using ServiceStack.Validation;
+using ServiceStack.Web;
 
 namespace ServiceStack.Auth
 {
@@ -39,9 +40,12 @@ namespace ServiceStack.Auth
             {
                 var existingUser = AuthRepository.GetUserAuth(session, null);
                 registerNewUser = existingUser == null;
-                if (HostContext.GetPlugin<ValidationFeature>() == null)
+                if (!HostContext.HasPlugin<ValidationFeature>() && RegistrationValidator != null)
                 {
-                    RegistrationValidator?.ValidateAndThrow(request, registerNewUser ? ApplyTo.Post : ApplyTo.Put);
+                    if (RegistrationValidator is IRequiresRequest)
+                        ((IRequiresRequest)RegistrationValidator).Request = base.Request;
+
+                    RegistrationValidator.ValidateAndThrow(request, registerNewUser ? ApplyTo.Post : ApplyTo.Put);
                 }
                 var newUserAuth = ConvertToUserAuth(request);
 

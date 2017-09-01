@@ -11,7 +11,7 @@ using ServiceStack.Text;
 
 namespace RazorRockstars.Console.Files
 {
-    [Explicit("Ignore benchmarks")]
+    [Ignore("Ignore benchmarks")]
     [TestFixture]
     public class Benchmarks
     {

@@ -120,7 +120,6 @@ namespace ServiceStack.Server.Tests.Shared
         }
     }
 
-
     public class CustomAuthSession : AuthUserSession
     {
         [DataMember]

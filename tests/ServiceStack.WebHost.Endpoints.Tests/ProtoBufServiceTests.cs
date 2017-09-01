@@ -79,12 +79,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 	[TestFixture]
     public class ProtoBufServiceTests
 	{
-		protected const string ListeningOn = "http://localhost:1337/";
+		protected static string ListeningOn = Config.ListeningOn;
 
 		ExampleAppHostHttpListener appHost;
 
 		[OneTimeSetUp]
-		public void OnTestFixtureSetUp()
+		public void TestFixtureSetUp()
 		{
 			LogManager.LogFactory = new ConsoleLogFactory();
 
@@ -95,16 +95,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		}
 
 		[OneTimeTearDown]
-		public void OnTestFixtureTearDown()
+		public void TestFixtureTearDown()
 		{
-			Dispose();
-		}
-
-		public void Dispose()
-		{
-			if (appHost == null) return;
-			appHost.Dispose();
-		}
+            appHost.Dispose();
+        }
 
         private static ProtoBufEmail CreateProtoBufEmail()
         {

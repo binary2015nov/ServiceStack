@@ -190,7 +190,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
-    public class ErrorStream {}
+    public class ErrorStream { }
     public class ErrorStreamService : Service
     {
         [AddHeader(ContentType = "application/pdf")]
@@ -203,11 +203,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     [TestFixture]
     public class ExceptionHandlingTests
     {
-        private const string ListeningOn = "http://localhost:1337/";
+        private static string ListeningOn = Config.ListeningOn;
 
         public class ExceptionHandlingAppHostHttpListener : AppHostHttpListenerBase
         {
-            public ExceptionHandlingAppHostHttpListener(): base("Exception handling tests", typeof(UserService).GetAssembly())
+            public ExceptionHandlingAppHostHttpListener()
+                : base("Exception handling tests", typeof(UserService).GetAssembly())
             {
                 JsConfig.EmitCamelCaseNames = true;
                 Config.DebugMode = false;
@@ -252,7 +253,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         ExceptionHandlingAppHostHttpListener appHost;
 
         [OneTimeSetUp]
-        public void OnTestFixtureSetUp()
+        public void TestFixtureSetUp()
         {
             appHost = new ExceptionHandlingAppHostHttpListener();
             appHost.Init();
@@ -260,7 +261,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
+        public void TestFixtureTearDown()
         {
             appHost.Dispose();
             appHost.UncaughtExceptionHandlers = null;

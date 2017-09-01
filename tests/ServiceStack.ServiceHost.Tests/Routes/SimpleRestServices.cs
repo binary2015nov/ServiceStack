@@ -1,5 +1,4 @@
 using System.Net;
-using ServiceStack.Web;
 
 namespace ServiceStack.ServiceHost.Tests.Routes
 {
@@ -101,5 +100,4 @@ namespace ServiceStack.ServiceHost.Tests.Routes
             return new HttpResult { StatusCode = HttpStatusCode.OK };
         }
     }
-
 }

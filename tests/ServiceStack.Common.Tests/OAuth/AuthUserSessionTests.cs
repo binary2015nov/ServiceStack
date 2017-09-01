@@ -55,7 +55,7 @@ namespace ServiceStack.Common.Tests.OAuth
     {
         public override IUserAuthRepository CreateAuthRepo()
         {
-            var connStr = @"Server=localhost;Database=test;User Id=test;Password=test;";
+            var connStr = @"Data Source=.\SQLEXPRESS;database=test;Integrated Security=True;";
             var sqlServerFactory = new OrmLiteConnectionFactory(connStr, SqlServerDialect.Provider);
             var sqlServerRepo = new OrmLiteAuthRepository(sqlServerFactory);
             sqlServerRepo.InitSchema();

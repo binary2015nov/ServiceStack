@@ -79,6 +79,5 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
                 Assert.Fail(webEx.Message);
             }
         }
-
     }
 }

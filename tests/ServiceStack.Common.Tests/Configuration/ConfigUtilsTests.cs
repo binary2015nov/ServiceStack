@@ -1,8 +1,6 @@
-﻿using System.Reflection;
-using Funq;
+﻿using Funq;
 using NUnit.Framework;
 using ServiceStack.Configuration;
-using ServiceStack.Testing;
 
 namespace ServiceStack.Common.Tests
 {
@@ -12,9 +10,9 @@ namespace ServiceStack.Common.Tests
         public class AppHostTest : AppSelfHostBase
         {
             public AppHostTest() 
-                : base("Test Config AppHost", typeof(AppHostTest).GetAssembly()) {}
+                : base("Test Config AppHost", typeof(AppHostTest).GetAssembly()) { }
 
-            public override void Configure(Container container) {}
+            public override void Configure(Container container) { }
         }
 
         [Test]
@@ -38,6 +36,5 @@ namespace ServiceStack.Common.Tests
                 }));
             }
         }
-
     }
 }

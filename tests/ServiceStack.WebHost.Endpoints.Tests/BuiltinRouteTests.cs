@@ -13,7 +13,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public class BuiltinPathAppHost : AppSelfHostBase
         {
             public BuiltinPathAppHost()
-                : base(typeof(BuiltinPathAppHost).Name, typeof(BuiltinRouteServices).GetAssembly()) {}
+                : base(typeof(BuiltinPathAppHost).Name, typeof(BuiltinRouteServices).GetAssembly()) { }
 
             public override void Configure(Container container)
             {
@@ -25,8 +25,9 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        readonly ServiceStackHost appHost;
-        public BuiltinRouteTests()
+        ServiceStackHost appHost;
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
             appHost = new BuiltinPathAppHost()
                 .Init()
@@ -34,7 +35,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
+        public void TestFixtureTearDown()
         {
             appHost.Dispose();
         }

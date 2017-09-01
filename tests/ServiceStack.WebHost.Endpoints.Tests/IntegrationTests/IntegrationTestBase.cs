@@ -12,10 +12,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests.IntegrationTests
 {
 	public class IntegrationTestBase
 	{
-		protected const string BaseUrl = "http://localhost:1337/";
+		protected string BaseUrl = Config.ListeningOn;
 
-        private readonly IntegrationTestAppHost appHost;
-	    public IntegrationTestBase()
+        private IntegrationTestAppHost appHost;
+
+        [OneTimeSetUp]
+	    public void TestFixtureSetUp()
 	    {
             appHost = new IntegrationTestAppHost();
 	        appHost.Init();

@@ -32,15 +32,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
-
     public abstract class HttpErrorAsyncTests
     {
-        private const string ListeningOn = "http://localhost:1337/";
+        private static string ListeningOn = Config.ListeningOn;
 
         ExampleAppHostHttpListener appHost;
 
         [OneTimeSetUp]
-        public void OnTestFixtureSetUp()
+        public void TestFixtureSetUp()
         {
             appHost = new ExampleAppHostHttpListener();
             appHost.Init();
@@ -48,7 +47,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
+        public void TestFixtureTearDown()
         {
             appHost.Dispose();
         }

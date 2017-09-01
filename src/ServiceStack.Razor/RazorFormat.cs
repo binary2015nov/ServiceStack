@@ -142,17 +142,10 @@ namespace ServiceStack.Razor
                 }
             }
 
-            try
-            {
-                Init();
+            Init();
 
-                BindToAppHost(appHost);
-            }
-            catch (Exception ex)
-            {
-                appHost.NotifyStartupException(ex);
-                throw;
-            }
+            BindToAppHost(appHost);
+
         }
 
         private void BindToAppHost(IAppHost appHost)

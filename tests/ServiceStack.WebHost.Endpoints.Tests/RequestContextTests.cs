@@ -4,9 +4,7 @@ using System.IO;
 using System.Net;
 using Funq;
 using NUnit.Framework;
-using ServiceStack.Common;
 using ServiceStack.Text;
-using ServiceStack.Web;
 using ServiceStack.WebHost.Endpoints.Tests.Support.Services;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
@@ -14,11 +12,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 	[TestFixture]
 	public class RequestContextTests
 	{
-		private const string ListeningOn = "http://localhost:1337/";
+		private static string ListeningOn = Config.ListeningOn;
 
 		public class HeadersAppHostHttpListener : AppHostHttpListenerBase
 		{
-			public HeadersAppHostHttpListener() : base("Request Filters Tests", typeof(HeadersService).GetAssembly())
+			public HeadersAppHostHttpListener() 
+                : base("Request Filters Tests", typeof(HeadersService).GetAssembly())
             {
                 //Signal advanced web browsers what HTTP Methods you accept
                 Config.GlobalResponseHeaders = new Dictionary<string, string> {
@@ -47,7 +46,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		HeadersAppHostHttpListener appHost;
 
 		[OneTimeSetUp]
-		public void OnTestFixtureSetUp()
+		public void TestFixtureSetUp()
 		{
 			appHost = new HeadersAppHostHttpListener();
 			appHost.Init();
@@ -55,7 +54,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		}
 
 		[OneTimeTearDown]
-		public void OnTestFixtureTearDown()
+		public void TestFixtureTearDown()
 		{
 			appHost.Dispose();
 		}

@@ -3,8 +3,7 @@ using NUnit.Framework;
 
 namespace ServiceStack.Common.Tests
 {
-    public interface ISomeService
-    { }
+    public interface ISomeService { }
 
     public class SomeService : ISomeService
     {

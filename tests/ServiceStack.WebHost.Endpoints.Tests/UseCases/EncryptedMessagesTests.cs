@@ -14,8 +14,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
     public class EncryptedMessagesAppHost : AppSelfHostBase
     {
         public EncryptedMessagesAppHost()
-            : base(typeof(EncryptedMessagesAppHost).Name, typeof(SecureServices).GetAssembly())
-        { }
+            : base(typeof(EncryptedMessagesAppHost).Name, typeof(SecureServices).GetAssembly()) { }
 
         public override void Configure(Container container)
         {
@@ -56,9 +55,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
 
     public abstract class EncryptedMessagesTests
     {
-        private readonly ServiceStackHost appHost;
+        private ServiceStackHost appHost;
 
-        protected EncryptedMessagesTests()
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
             appHost = new EncryptedMessagesAppHost()
                 .Init()
@@ -99,37 +99,30 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
         [Test]
         public void Can_authenticate_and_call_authenticated_Service()
         {
-            try
+            var client = CreateClient();
+            IEncryptedClient encryptedClient = client.GetEncryptedClient(client.Get<string>("/publickey"));
+
+            var authResponse = encryptedClient.Send(new Authenticate
             {
-                var client = CreateClient();
-                IEncryptedClient encryptedClient = client.GetEncryptedClient(client.Get<string>("/publickey"));
+                provider = CredentialsAuthProvider.Name,
+                UserName = "test@gmail.com",
+                Password = "p@55word",
+            });
 
-                var authResponse = encryptedClient.Send(new Authenticate
-                {
-                    provider = CredentialsAuthProvider.Name,
-                    UserName = "test@gmail.com",
-                    Password = "p@55word",
-                });
+            var encryptedClientCookies = client.GetCookieValues();
+            Assert.That(encryptedClientCookies.Count, Is.EqualTo(0));
 
-                var encryptedClientCookies = client.GetCookieValues();
-                Assert.That(encryptedClientCookies.Count, Is.EqualTo(0));
-
-                var response = encryptedClient.Send(new HelloAuthenticated
-                {
-                    SessionId = authResponse.SessionId,
-                });
-
-                Assert.That(response.IsAuthenticated);
-                Assert.That(response.Email, Is.EqualTo("test@gmail.com"));
-                Assert.That(response.SessionId, Is.EqualTo(authResponse.SessionId));
-
-                encryptedClientCookies = client.GetCookieValues();
-                Assert.That(encryptedClientCookies.Count, Is.EqualTo(0));
-            }
-            catch (Exception ex)
+            var response = encryptedClient.Send(new HelloAuthenticated
             {
-                throw ex;
-            }
+                SessionId = authResponse.SessionId,
+            });
+
+            Assert.That(response.IsAuthenticated);
+            Assert.That(response.Email, Is.EqualTo("test@gmail.com"));
+            Assert.That(response.SessionId, Is.EqualTo(authResponse.SessionId));
+
+            encryptedClientCookies = client.GetCookieValues();
+            Assert.That(encryptedClientCookies.Count, Is.EqualTo(0));
         }
 
         [Test]

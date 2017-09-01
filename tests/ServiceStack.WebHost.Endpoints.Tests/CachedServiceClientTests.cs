@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Funq;
 using NUnit.Framework;
 using ServiceStack.Caching;
-using ServiceStack.Text;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
@@ -33,14 +32,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         class AppHost : AppSelfHostBase
         {
             public AppHost()
-                : base(typeof(CacheServerFeatureTests).Name, typeof(CacheEtagServices).GetAssembly())
-            { }
+                : base(typeof(CacheServerFeatureTests).Name, typeof(CacheEtagServices).GetAssembly()) { }
 
             public override void Configure(Container container) { }
         }
 
-        private readonly ServiceStackHost appHost;
-        protected CachedServiceClientTests()
+        private ServiceStackHost appHost;
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
             appHost = new AppHost()
                 .Init()

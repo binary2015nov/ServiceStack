@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using ServiceStack.Templates;
-using ServiceStack.Text;
 
 namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
 {
@@ -44,24 +43,24 @@ Monthly Savings: <b>{{ totalSavings | currency }}</b>
             var output = context.EvaluateTemplate(template);
             
             Assert.That(output.NormalizeNewLines(), Is.EqualTo(@"
-Current Balance: <b>$11,200.00</b>
+Current Balance: <b>&#165;11,200.00</b>
 
 Monthly Revenues:
-Salary           $4,000.00
-App Royalties    $200.00
+Salary           &#165;4,000.00
+App Royalties    &#165;200.00
 
-Total            <b>$4,200.00</b> 
+Total            <b>&#165;4,200.00</b> 
 
 Monthly Expenses:
-Rent             $1,000.00
-Internet         $50.00
-Mobile           $50.00
-Food             $400.00
-Misc             $200.00
+Rent             &#165;1,000.00
+Internet         &#165;50.00
+Mobile           &#165;50.00
+Food             &#165;400.00
+Misc             &#165;200.00
 
-Total            <b>$1,700.00</b>
+Total            <b>&#165;1,700.00</b>
 
-Monthly Savings: <b>$2,500.00</b>".NormalizeNewLines()));
+Monthly Savings: <b>&#165;2,500.00</b>".NormalizeNewLines()));
         }
     }
 }

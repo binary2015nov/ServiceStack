@@ -2,14 +2,13 @@
 using System.Net;
 using NUnit.Framework;
 using ServiceStack.Logging;
-using ServiceStack.Text;
 using ServiceStack.WebHost.Endpoints.Tests.Support.Host;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
 	public class JsonpTests
 	{
-		protected const string ListeningOn = "http://localhost:1337/";
+		protected static string ListeningOn = Config.ListeningOn;
 
 		ExampleAppHostHttpListener appHost;
 

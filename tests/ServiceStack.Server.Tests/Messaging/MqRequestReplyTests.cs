@@ -9,7 +9,6 @@ using ServiceStack.Messaging;
 using ServiceStack.Messaging.Redis;
 using ServiceStack.RabbitMq;
 using ServiceStack.Redis;
-using ServiceStack.Text;
 
 namespace ServiceStack.Server.Tests.Messaging
 {
@@ -159,7 +158,7 @@ namespace ServiceStack.Server.Tests.Messaging
         public void Can_handle_multiple_rpc_clients()
         {
             int NoOfClients = 10;
-            int TimeMs = 5000;
+            int TimeMs = 10000;
 
             var errors = new ConcurrentDictionary<long, string>();
             using (var mqServer = CreateMqServer())
@@ -203,6 +202,7 @@ namespace ServiceStack.Server.Tests.Messaging
                                 }
                                 catch (Exception ex)
                                 {
+                                    Console.WriteLine(ex.StackTrace);
                                     errors[next] = ex.Message + "\nStackTrace:\n" + ex.StackTrace;
                                 }
                             }
@@ -224,7 +224,7 @@ namespace ServiceStack.Server.Tests.Messaging
                 "Stopping Server...".Print();
                 "Requests: {0}".Print(counter);
             }
-
+            
             Assert.That(errors.Count, Is.EqualTo(0));
         }
     }
