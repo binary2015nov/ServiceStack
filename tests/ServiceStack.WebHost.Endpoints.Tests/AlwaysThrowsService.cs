@@ -6,7 +6,6 @@ using Funq;
 using NUnit.Framework;
 using ServiceStack.FluentValidation;
 using ServiceStack.Host;
-using ServiceStack.Text;
 using ServiceStack.Validation;
 
 namespace ServiceStack.WebHost.Endpoints.Tests

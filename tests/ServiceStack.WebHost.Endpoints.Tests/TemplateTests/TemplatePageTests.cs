@@ -160,7 +160,7 @@ title: We encode < & >
         [Test]
         public void Request_for_noprefix_page_returns_alt_layout()
         {
-            var html = Config.ListeningOn.CombineWith("noprefix-page")
+            var html = Config.ListeningOn.AppendPath("noprefix-page")
                 .GetStringFromUrl(accept: MimeTypes.Html);
 
             Assert.That(html, Does.StartWith("<html><head><title>"));
@@ -171,7 +171,7 @@ title: We encode < & >
         [Test]
         public void Request_for_variable_page_returns_complete_page_with_alt_layout()
         {
-            var html = Config.ListeningOn.CombineWith("variable-layout-page.html")
+            var html = Config.ListeningOn.AppendPath("variable-layout-page.html")
                 .GetStringFromUrl(accept: MimeTypes.Html);
 
             Assert.That(html, Does.StartWith("<html><head><title>Variable Layout</title>"));
@@ -182,7 +182,7 @@ title: We encode < & >
         [Test]
         public void Request_for_htmlencode_pages_returns_htmlencoded_variables()
         {
-            var html = Config.ListeningOn.CombineWith("htmlencode-page.html")
+            var html = Config.ListeningOn.AppendPath("htmlencode-page.html")
                 .GetStringFromUrl(accept: MimeTypes.Html);
 
             Assert.That(html, Does.StartWith("<html><head><title>We encode &lt; &amp; &gt;</title>"));
@@ -194,22 +194,22 @@ title: We encode < & >
         [Test]
         public void Request_for_dir_index_page_using_supported_conventions()
         {
-            var htmlOrig = Config.ListeningOn.CombineWith("dir/index.html")
+            var htmlOrig = Config.ListeningOn.AppendPath("dir/index.html")
                 .GetStringFromUrl(accept: MimeTypes.Html);
             
             Assert.That(htmlOrig, Does.StartWith("<html><head><title>no prefix @ /dir</title>"));
             Assert.That(htmlOrig, Does.Contain("id='dir-alt-layout'"));
             Assert.That(htmlOrig, Does.Contain("<h1>/dir/noprefix page!</h1>"));
             
-            var html = Config.ListeningOn.CombineWith("dir/index")
+            var html = Config.ListeningOn.AppendPath("dir/index")
                 .GetStringFromUrl(accept: MimeTypes.Html);
             Assert.That(html, Is.EqualTo(htmlOrig));
             
-            html = Config.ListeningOn.CombineWith("dir/")
+            html = Config.ListeningOn.AppendPath("dir/")
                 .GetStringFromUrl(accept: MimeTypes.Html);
             Assert.That(html, Is.EqualTo(htmlOrig));
             
-            html = Config.ListeningOn.CombineWith("dir")
+            html = Config.ListeningOn.AppendPath("dir")
                 .GetStringFromUrl(accept: MimeTypes.Html);
             Assert.That(html, Is.EqualTo(htmlOrig));
         }
@@ -234,7 +234,7 @@ title: We encode < & >
         {
             try
             {
-                Config.ListeningOn.CombineWith("_layout.html")
+                Config.ListeningOn.AppendPath("_layout.html")
                     .GetStringFromUrl(accept: MimeTypes.Html);
                 
                 Assert.Fail("Should throw");

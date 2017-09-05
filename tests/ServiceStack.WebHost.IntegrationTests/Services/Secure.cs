@@ -27,7 +27,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
         public string Value { get; set; }
     }
 
-    [Authenticate]
+    [RequiredRole(RoleNames.Admin)]
     [Route("/requiresadmin")]
     public class RequiresRoleInService
     {
@@ -143,8 +143,6 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 
         public object Any(RequiresRoleInService request)
         {
-            RequiredRoleAttribute.AssertRequiredRoles(Request, AuthRepository, request.Role ?? RoleNames.Admin);
-
             return request;
         }
 

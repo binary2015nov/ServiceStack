@@ -67,7 +67,9 @@ namespace ServiceStack
                 var handlerPath = GetHandlerPathFromConfiguration(locationConfigLocation.OpenConfiguration());
                 if (handlerPath != null)
                 {
-                    return CombineHandlerFactoryPath(locationConfigLocation.Path, handlerPath);
+                    return CombineHandlerFactoryPath(locationConfigLocation.Path, handlerPath) ??
+                        throw new ConfigurationErrorsException("Unable to infer ServiceStack's <httpHandler.Path/> from your application's configuration file.\n"
+                            + "Check with https://github.com/ServiceStack/ServiceStack/wiki/Create-your-first-webservice to ensure you have configured ServiceStack properly.\n");
                 }
             }
             var combinedPath = CombineHandlerFactoryPath(string.Empty, GetHandlerPathFromConfiguration(appConfig));
@@ -77,7 +79,9 @@ namespace ServiceStack
             //{
             //   combinedPath = CombineHandlerFactoryPath("api", null);
             //}
-            return combinedPath;
+            return combinedPath ??
+                throw new ConfigurationErrorsException("Unable to infer ServiceStack's <httpHandler.Path/> from your application's configuration file.\n"
+                + "Check with https://github.com/ServiceStack/ServiceStack/wiki/Create-your-first-webservice to ensure you have configured ServiceStack properly.\n");
         }
 
         private static string CombineHandlerFactoryPath(string locationPath, string handlerPath)

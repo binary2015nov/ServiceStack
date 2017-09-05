@@ -114,7 +114,7 @@ namespace ServiceStack.Server.Tests.Auth
         }
     }
 
-    [Explicit]
+    [Ignore("Requires DynamoDb Dependency")]
     public class DynamoDbAuthRepoStatelessAuthTests : StatelessAuthTests
     {
         public static AmazonDynamoDBClient CreateDynamoDBClient()
@@ -167,7 +167,7 @@ namespace ServiceStack.Server.Tests.Auth
     }
 
 #if !NETCORE_SUPPORT
-    [Explicit("Requires MongoDB Dependency")]
+    [Ignore("Requires MongoDB Dependency, please start it")]
     public class MongoDbAuthRepoStatelessAuthTests : StatelessAuthTests
     {
         protected override ServiceStackHost CreateAppHost()
@@ -258,6 +258,67 @@ namespace ServiceStack.Server.Tests.Auth
         }
     }
 
+    public class RsaJwtStatelessAuthTests : StatelessAuthTests
+    {
+        protected override ServiceStackHost CreateAppHost()
+        {
+            return new AppHost
+            {
+                JwtRsaPrivateKey = RsaUtils.CreatePrivateKeyParams(),
+                Use = container => container.Register<IAuthRepository>(c =>
+                    new OrmLiteAuthRepository(c.Resolve<IDbConnectionFactory>()))
+            };
+        }
+    }
+
+    public class RsaJwtWithEncryptedPayloadsStatelessAuthTests : StatelessAuthTests
+    {
+        private RSAParameters privateKey;
+        private RSAParameters publicKey;
+
+        protected override ServiceStackHost CreateAppHost()
+        {
+            privateKey = RsaUtils.CreatePrivateKeyParams();
+            publicKey = privateKey.ToPublicRsaParameters();
+
+            return new AppHost
+            {
+                JwtRsaPrivateKey = privateKey,
+                JwtEncryptPayload = true,
+                Use = container => container.Register<IAuthRepository>(c =>
+                    new OrmLiteAuthRepository(c.Resolve<IDbConnectionFactory>()))
+            };
+        }
+
+        [Test]
+        public void Can_populate_entire_session_using_JWE_Token()
+        {
+            var jwtProvider = (JwtAuthProviderReader)AuthenticateService.GetAuthProvider(JwtAuthProvider.Name);
+
+            var payload = JwtAuthProvider.CreateJwtPayload(new AuthUserSession
+            {
+                UserAuthId = "1",
+                DisplayName = "Test",
+                Email = "as@if.com",
+                Roles = new List<string> { "TheRole", "Role 2" },
+                Permissions = new List<string> { "ThePermission", "Perm 2" },
+                ProfileUrl = "http://example.org/profile.jpg"
+            }, "external-jwt", TimeSpan.FromDays(14));
+
+            JwtAuthProviderReaderTests.PopulateWithAdditionalMetadata(payload);
+
+            var jweToken = JwtAuthProvider.CreateEncryptedJweToken(payload, privateKey);
+            var client = new JsonServiceClient(ListeningOn)
+            {
+                BearerToken = jweToken
+            };
+
+            var session = client.Get(new GetAuthUserSession());
+
+            JwtAuthProviderReaderTests.AssertAdditionalMetadataWasPopulated(session);
+        }
+    }
+
     public class FallbackAuthKeyTests
     {
         public const string ListeningOn = "http://localhost:2337/";
@@ -331,67 +392,6 @@ namespace ServiceStack.Server.Tests.Auth
 
             response = client.Send(request);
             Assert.That(response.Result, Is.EqualTo(request.Name));
-        }
-    }
-
-    public class RsaJwtStatelessAuthTests : StatelessAuthTests
-    {
-        protected override ServiceStackHost CreateAppHost()
-        {
-            return new AppHost
-            {
-                JwtRsaPrivateKey = RsaUtils.CreatePrivateKeyParams(),
-                Use = container => container.Register<IAuthRepository>(c =>
-                    new OrmLiteAuthRepository(c.Resolve<IDbConnectionFactory>()))
-            };
-        }
-    }
-
-    public class RsaJwtWithEncryptedPayloadsStatelessAuthTests : StatelessAuthTests
-    {
-        private RSAParameters privateKey;
-        private RSAParameters publicKey;
-
-        protected override ServiceStackHost CreateAppHost()
-        {
-            privateKey = RsaUtils.CreatePrivateKeyParams();
-            publicKey = privateKey.ToPublicRsaParameters();
-
-            return new AppHost
-            {
-                JwtRsaPrivateKey = privateKey,
-                JwtEncryptPayload = true,
-                Use = container => container.Register<IAuthRepository>(c =>
-                    new OrmLiteAuthRepository(c.Resolve<IDbConnectionFactory>()))
-            };
-        }
-
-        [Test]
-        public void Can_populate_entire_session_using_JWE_Token()
-        {
-            var jwtProvider = (JwtAuthProviderReader)AuthenticateService.GetAuthProvider(JwtAuthProvider.Name);
-
-            var payload = JwtAuthProvider.CreateJwtPayload(new AuthUserSession
-            {
-                UserAuthId = "1",
-                DisplayName = "Test",
-                Email = "as@if.com",
-                Roles = new List<string> { "TheRole", "Role 2" },
-                Permissions = new List<string> { "ThePermission", "Perm 2" },
-                ProfileUrl = "http://example.org/profile.jpg"
-            }, "external-jwt", TimeSpan.FromDays(14));
-
-            JwtAuthProviderReaderTests.PopulateWithAdditionalMetadata(payload);
-
-            var jweToken = JwtAuthProvider.CreateEncryptedJweToken(payload, privateKey);
-            var client = new JsonServiceClient(ListeningOn)
-            {
-                BearerToken = jweToken
-            };
-
-            var session = client.Get(new GetAuthUserSession());
-
-            JwtAuthProviderReaderTests.AssertAdditionalMetadataWasPopulated(session);
         }
     }
 

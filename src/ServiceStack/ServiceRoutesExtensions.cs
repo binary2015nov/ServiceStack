@@ -32,9 +32,7 @@ namespace ServiceStack
 
         private static void AddNewApiRoutes(IServiceRoutes routes, Assembly assembly)
         {
-            var services = assembly.GetExportedTypes()
-                .Where(t => !t.IsAbstract()
-                            && t.HasInterface(typeof(IService)));
+            var services = Service.GetServiceTypes(assembly);
 
             foreach (Type serviceType in services)
             {
@@ -79,7 +77,7 @@ namespace ServiceStack
             return routes.Add(requestType, restPath, verbs.ToVerbsString());
         }
 
-        private static string ToVerbsString(this ApplyTo verbs)
+        public static string ToVerbsString(this ApplyTo verbs)
         {
             var allowedMethods = new List<string>();
             foreach (var entry in ApplyToUtils.ApplyToVerbs)
@@ -89,20 +87,6 @@ namespace ServiceStack
             }
 
             return string.Join(" ", allowedMethods.ToArray());
-        }
-
-        public static bool IsSubclassOfRawGeneric(this Type toCheck, Type generic)
-        {
-            while (toCheck != typeof(object))
-            {
-                Type cur = toCheck.IsGenericType() ? toCheck.GetGenericTypeDefinition() : toCheck;
-                if (generic == cur)
-                {
-                    return true;
-                }
-                toCheck = toCheck.BaseType();
-            }
-            return false;
         }
 
         private static string FormatRoute<T>(string restPath, params Expression<Func<T, object>>[] propertyExpressions)

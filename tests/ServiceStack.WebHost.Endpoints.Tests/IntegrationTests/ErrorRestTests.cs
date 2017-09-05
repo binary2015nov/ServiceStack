@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net;
 using NUnit.Framework;
-using ServiceStack.Text;
 using ServiceStack.Web;
 
 namespace ServiceStack.WebHost.Endpoints.Tests.IntegrationTests
@@ -112,7 +111,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.IntegrationTests
         [Test]
         public void Does_handle_304_NotModified_Response_HttpUtils()
         {
-            var url = BaseUrl.CombineWith("/customresponse/304?StatusDescription=NotModified&Body=NOT+MODIFIED");
+            var url = BaseUrl.AppendPath("/customresponse/304?StatusDescription=NotModified&Body=NOT+MODIFIED");
             try
             {
                 var response = url.GetStringFromUrl();

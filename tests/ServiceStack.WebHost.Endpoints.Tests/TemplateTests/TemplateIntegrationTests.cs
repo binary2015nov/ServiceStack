@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -473,7 +474,8 @@ layout: alt/alt-layout
                 </tr>
             </thead>
             <tr><th>Beverages</th><td>Chai</td><td>$18.00</td></tr>
-<tr><th>Beverages</th><td>Chang</td><td>$19.00</td></tr>".NormalizeNewLines().ToString(System.Globalization.CultureInfo.CurrentCulture)));
+<tr><th>Beverages</th><td>Chang</td><td>$19.00</td></tr>".NormalizeNewLines()
+.Replace("$", System.Globalization.NumberFormatInfo.CurrentInfo.CurrencySymbol)));
         }
 
         [Test]
@@ -498,7 +500,8 @@ layout: alt/alt-layout
                 </tr>
             </thead>
             <tr><th>Beverages</th><td>Chai</td><td>$18.00</td></tr>
-<tr><th>Beverages</th><td>Chang</td><td>$19.00</td></tr>".NormalizeNewLines()));
+<tr><th>Beverages</th><td>Chang</td><td>$19.00</td></tr>".NormalizeNewLines()
+.Replace("$", System.Globalization.NumberFormatInfo.CurrentInfo.CurrencySymbol)));
         }
 
         [Test]
@@ -601,27 +604,26 @@ Kurt Cobain (27)
         public void Does_handle_error_calling_sendToGateway()
         {
             var html = BaseUrl.AppendPath("rockstar-gateway").GetStringFromUrl();
-            Assert.That(html.NormalizeNewLines(), Does.StartWith(@"<html>
+            Assert.That(html.NormalizeNewLines(), Does.StartWith((@"<html>
 <body id=root>
 
 
 
-<pre class=""alert alert-danger"">ArgumentNullException: Value cannot be null.
-Parameter name: firstName
+<pre class=""alert alert-danger"">" + typeof(ArgumentNullException).Name + ": " + new ArgumentNullException("firstName").Message + @"
 
 StackTrace:
-   at Expression (Dictionary`2): {id:".NormalizeNewLines()));
+   at Expression (Dictionary`2): {id:").NormalizeNewLines()));
             
             html = BaseUrl.AppendPath("rockstar-gateway").AddQueryParam("id","Kurt").GetStringFromUrl();
-            Assert.That(html.NormalizeNewLines(), Does.StartWith(@"<html>
+            Assert.That(html.NormalizeNewLines(), Does.StartWith((@"<html>
 <body id=root>
 
 
 
-<pre class=""alert alert-danger"">FormatException: Input string was not in a correct format.
+<pre class=""alert alert-danger"">" + typeof(FormatException).Name + ": Input string was not in a correct format." + @"
 
 StackTrace:
-   at Expression (Dictionary`2): {id:".NormalizeNewLines()));
+   at Expression (Dictionary`2): {id:").NormalizeNewLines()));
         }
 
         [Test]
@@ -655,16 +657,14 @@ Amy Winehouse (27)
                 .AddQueryParam("firstName","Amy")
                 .AddQueryParam("age","27")
                 .GetStringFromUrl();
-
-            Assert.That(html.NormalizeNewLines(), Does.StartWith(@"<html>
+  
+            Assert.That(html.NormalizeNewLines(), Does.StartWith((@"<html>
 <body id=root>
 
 
-<pre class=""alert alert-danger"">ArgumentNullException: Value cannot be null.
-Parameter name: lastName
-
-StackTrace:
-   at Expression (Dictionary`2): {id:".NormalizeNewLines()));
+<pre class=""alert alert-danger"">" + typeof(ArgumentNullException).Name + ": " + new ArgumentNullException("lastName").Message + "\r\n\r\n" +
+ @"StackTrace:
+   at Expression (Dictionary`2): {id:").NormalizeNewLines()));
         }
 
         [Test]

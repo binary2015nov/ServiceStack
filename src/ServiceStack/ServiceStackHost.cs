@@ -56,9 +56,8 @@ namespace ServiceStack
             Config = new HostConfig();
             AppSettings = new AppSettings();
             Container = new Container { DefaultOwner = Owner.External };
-            ContentTypes = Host.ContentTypes.Default;
-            RestPaths = new List<RestPath>();
-            Routes = new ServiceRoutes(this);
+            ContentTypes = ServiceStack.Host.ContentTypes.Default;
+            Routes = new ServiceRoutes();
             PreRequestFilters = new List<Action<IRequest, IResponse>>();
             RequestConverters = new List<Func<IRequest, object, object>>();
             ResponseConverters = new List<Func<IRequest, object, object>>();
@@ -91,7 +90,6 @@ namespace ServiceStack
             };
             StartUpErrors = new List<ResponseStatus>();
             AsyncErrors = new List<ResponseStatus>();
-            PluginsLoaded = new List<string>();
             Plugins = new List<IPlugin> {
                 new HtmlFormat(),
                 new CsvFormat(),
@@ -114,7 +112,7 @@ namespace ServiceStack
         /// <summary>
         /// Collection of added plugins.
         /// </summary>
-        public List<IPlugin> Plugins { get; set; }
+        public List<IPlugin> Plugins { get; private set; }
 
         protected virtual void OnBeforeInit() { }
 
@@ -146,6 +144,7 @@ namespace ServiceStack
             Config.EmbeddedResourceSources.Add(GetType().GetAssembly());
             
             OnBeforeInit();
+
             Config.ServiceEndpointsMetadataConfig = ServiceEndpointsMetadataConfig.Create(Config.HandlerFactoryPath);
             JsonDataContractSerializer.Instance.UseBcl = Config.UseBclJsonSerializers;
             JsonDataContractSerializer.Instance.UseBcl = Config.UseBclJsonSerializers;
@@ -220,7 +219,7 @@ namespace ServiceStack
         {
             return new ServiceController(this, ServiceAssemblies);
             //Alternative way to inject Service Resolver strategy
-            //return new ServiceController(this, () => ServiceAssemblies.ToList().SelectMany(x => x.GetTypes()));
+            //return new ServiceController(this, () => ServiceAssemblies.SelectMany(x => x.GetTypes()));
         }
 
         private void ConfigurePlugins()
@@ -379,7 +378,7 @@ namespace ServiceStack
                 callback(this);
             }
             //Register any routes configured on Metadata.Routes
-            foreach (var restPath in RestPaths)
+            foreach (var restPath in Routes.RestPaths)
             {
                 ServiceController.RegisterRestPath(restPath);
 
@@ -392,10 +391,6 @@ namespace ServiceStack
                         Notes = restPath.Notes,
                     });
             }
-
-            //Sync the RestPaths collections
-            //RestPaths.Clear();
-            RestPaths.AddRange(ServiceController.RestPathMap.Values.SelectMany(x => x));
 
             foreach (var restPath in RestPaths)
             {
@@ -515,9 +510,9 @@ namespace ServiceStack
         // and let them register them manually
         public HashSet<Type> ExcludeAutoRegisteringServiceTypes { get; set; }
 
-        public IServiceRoutes Routes { get; set; }
+        public ServiceRoutes Routes { get; set; }
 
-        public List<RestPath> RestPaths { get; private set; }
+        public IEnumerable<RestPath> RestPaths { get { return ServiceController?.RestPathMap.SelectMany(x => x.Value); } }
 
         public Dictionary<Type, Func<IRequest, object>> RequestBinders => ServiceController.RequestTypeFactoryMap;
 
@@ -596,8 +591,6 @@ namespace ServiceStack
         public List<ResponseStatus> StartUpErrors { get; set; }
 
         public List<ResponseStatus> AsyncErrors { get; set; }
-
-        public List<string> PluginsLoaded { get; set; }
 
         public IVirtualFiles VirtualFiles { get; set; }
 
@@ -838,7 +831,6 @@ namespace ServiceStack
                 try
                 {
                     plugin.Register(this);
-                    PluginsLoaded.Add(plugin.GetType().Name);
                 }
                 catch (Exception ex)
                 {
@@ -1016,8 +1008,8 @@ namespace ServiceStack
                     Container.Dispose();
                     Container = null;
                 }
-              
-                JsConfig.Reset(); //Clears Runtime Attributes
+                JsConfig.Reset();
+                PlatformExtensions.ClearRuntimeAttributes(); //Clears Runtime Attributes
                 if (HostContext.AppHost == this)
                     HostContext.AppHost = null;
             }

@@ -9,7 +9,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_download_metadata_page()
         {
-            var html = Constant.ServiceStackBaseHost.AppendPath("metadata").GetHtmlFromUrl();
+            var html = Constant.ServiceStackBaseHost.AppendPath("metadata").GetStringFromUrl();
             Assert.That(html.Contains("The following operations are supported."));
         }
 

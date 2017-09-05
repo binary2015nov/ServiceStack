@@ -133,7 +133,7 @@ namespace ServiceStack
             return results;
         }
        
-        public IAuthSession userSession(TemplateScopeContext scope) => req(scope).GetSession();
+        public IAuthSession userSession(TemplateScopeContext scope) => req(scope)?.GetSession();
 
         public bool isAuthenticated(TemplateScopeContext scope) => userSession(scope)?.IsAuthenticated == true;
         

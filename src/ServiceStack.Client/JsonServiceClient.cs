@@ -9,7 +9,7 @@ namespace ServiceStack
     {
         public override string Format => "json";
 
-        public JsonServiceClient() {}
+        public JsonServiceClient() { }
 
         public JsonServiceClient(string baseUri) 
         {
@@ -17,7 +17,7 @@ namespace ServiceStack
         }
 
         public JsonServiceClient(string syncReplyBaseUri, string asyncOneWayBaseUri) 
-            : base(syncReplyBaseUri, asyncOneWayBaseUri) {}
+            : base(syncReplyBaseUri, asyncOneWayBaseUri) { }
 
         public override string ContentType => $"application/{Format}";
 

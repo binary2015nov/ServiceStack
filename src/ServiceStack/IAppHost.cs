@@ -66,7 +66,7 @@ namespace ServiceStack
         /// <summary>
         /// Register user-defined custom routes.
         /// </summary>
-        IServiceRoutes Routes { get; }
+        ServiceRoutes Routes { get; }
 
         /// <summary>
         /// Inferred Metadata available from existing services 

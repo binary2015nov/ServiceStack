@@ -8,7 +8,7 @@ using ServiceStack.Host.Handlers;
 namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
     [Route("/reqtests")]
-    [Route("/reqtests/{PathInfoParam}")]
+    [Route("/reqtests/{PathInfo}")]
     public class Reqtests : IReturn<Reqtests>
     {
         public string PathInfo { get; set; }

@@ -169,7 +169,6 @@ namespace ServiceStack
         public List<string> ForbiddenPaths { get; private set; }
 
         public string WebHostUrl { get; set; }
-        //public string WebHostPhysicalPath { get; set; }
         public string HandlerFactoryPath { get; set; }
         public string DefaultRedirectPath { get; set; }
         public string MetadataRedirectPath { get; set; }

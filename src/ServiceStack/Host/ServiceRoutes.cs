@@ -1,26 +1,27 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using ServiceStack.Logging;
-using ServiceStack.Text;
 using ServiceStack.Web;
 
 namespace ServiceStack.Host
 {
     public class ServiceRoutes : IServiceRoutes
     {
-        private static ILog log = LogManager.GetLogger(typeof(ServiceRoutes));
+        private readonly static ILog Logger = LogManager.GetLogger(typeof(ServiceRoutes));
 
-        private readonly ServiceStackHost appHost;
-        public ServiceRoutes(ServiceStackHost appHost)
+        public List<RestPath> RestPaths { get; private set; }
+
+        public ServiceRoutes()
         {
-            this.appHost = appHost;
+            RestPaths = new List<RestPath>();
         }
 
         public IServiceRoutes Add<TRequest>(string restPath)
         {
             if (HasExistingRoute(typeof(TRequest), restPath)) return this;
 
-            appHost.RestPaths.Add(new RestPath(typeof(TRequest), restPath));
+            RestPaths.Add(new RestPath(typeof(TRequest), restPath));
             return this;
         }
 
@@ -28,7 +29,7 @@ namespace ServiceStack.Host
         {
             if (HasExistingRoute(typeof(TRequest), restPath)) return this;
 
-            appHost.RestPaths.Add(new RestPath(typeof(TRequest), restPath, verbs));
+            RestPaths.Add(new RestPath(typeof(TRequest), restPath, verbs));
             return this;
         }
 
@@ -36,7 +37,7 @@ namespace ServiceStack.Host
         {
             if (HasExistingRoute(requestType, restPath)) return this;
 
-            appHost.RestPaths.Add(new RestPath(requestType, restPath, verbs));
+            RestPaths.Add(new RestPath(requestType, restPath, verbs));
             return this;
         }
 
@@ -44,7 +45,7 @@ namespace ServiceStack.Host
         {
             if (HasExistingRoute(requestType, restPath)) return this;
 
-            appHost.RestPaths.Add(new RestPath(requestType, restPath, verbs)
+            RestPaths.Add(new RestPath(requestType, restPath, verbs)
             {
                 Priority = priority
             });
@@ -55,23 +56,20 @@ namespace ServiceStack.Host
         {
             if (HasExistingRoute(requestType, restPath)) return this;
 
-            appHost.RestPaths.Add(new RestPath(requestType, restPath, verbs, summary, notes));
+            RestPaths.Add(new RestPath(requestType, restPath, verbs, summary, notes));
             return this;
         }
 
-        private bool HasExistingRoute(Type requestType, string restPath)
+        public bool HasExistingRoute(Type requestType, string restPath)
         {
-            var existingRoute = appHost.RestPaths.FirstOrDefault(
+            var existingRoute = RestPaths.FirstOrDefault(
                 x => x.RequestType == requestType && x.Path == restPath);
 
             if (existingRoute != null)
             {
                 var existingRouteMsg = "Existing Route for '{0}' at '{1}' already exists".Fmt(requestType.GetOperationName(), restPath);
 
-                //if (!EndpointHostConfig.SkipRouteValidation) //wait till next deployment
-                //    throw new Exception(existingRouteMsg);
-
-                log.Warn(existingRouteMsg);
+                Logger.Warn(existingRouteMsg);
                 return true;
             }
 

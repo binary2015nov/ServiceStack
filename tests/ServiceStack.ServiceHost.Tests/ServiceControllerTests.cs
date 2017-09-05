@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Funq;
 using NUnit.Framework;
 using ServiceStack.Host;
@@ -141,11 +142,11 @@ namespace ServiceStack.ServiceHost.Tests
             var appHost = new AppHost();
             appHost.ServiceController = new ServiceController(appHost);
 
-            Assert.That(appHost.RestPaths.Count, Is.EqualTo(0));
+            Assert.That(appHost.RestPaths.Count(), Is.EqualTo(0));
 
             appHost.RegisterService<GetMarkerService>("/route");
 
-            Assert.That(appHost.RestPaths.Count, Is.EqualTo(1));
+            Assert.That(appHost.RestPaths.Count(), Is.EqualTo(1));
         }
     }
 

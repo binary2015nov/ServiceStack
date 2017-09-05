@@ -25,7 +25,7 @@ namespace ServiceStack.ServiceHost.Tests.Routes
         [Test]
         public void Can_Register_NewApi_Routes_From_Assembly()
         {
-            var routes = new ServiceRoutes(appHost);
+            var routes = new ServiceRoutes();
             routes.AddFromAssembly(typeof(NewApiRestServiceWithAllVerbsImplemented).Assembly);
 
             RestPath restWithAllMethodsRoute =
@@ -58,7 +58,7 @@ namespace ServiceStack.ServiceHost.Tests.Routes
         [Test]
         public void Can_Register_NewApi_Routes_With_Id_and_Any_Fallback_From_Assembly()
         {
-            var routes = new ServiceRoutes(appHost);
+            var routes = new ServiceRoutes();
             routes.AddFromAssembly(typeof(NewApiRequestDtoWithIdService).Assembly);
 
             var route = (from r in appHost.RestPaths
@@ -79,7 +79,7 @@ namespace ServiceStack.ServiceHost.Tests.Routes
         [Test]
         public void Can_Register_NewApi_Routes_With_Field_Id_and_Any_Fallback_From_Assembly()
         {
-            var routes = new ServiceRoutes(appHost);
+            var routes = new ServiceRoutes();
             routes.AddFromAssembly(typeof(NewApiRequestDtoWithFieldIdService).Assembly);
 
             var route = (from r in appHost.RestPaths
@@ -100,7 +100,7 @@ namespace ServiceStack.ServiceHost.Tests.Routes
         [Test]
         public void Can_Register_Routes_Using_Add_Extension()
         {
-            var routes = new ServiceRoutes(appHost);
+            var routes = new ServiceRoutes();
             routes.Add<Customer>("/Users/{0}/Orders/{1}", ApplyTo.Get, x => x.Name, x => x.OrderId);
             var route = appHost.RestPaths.Last();
             Assert.That(route.Path, Is.EqualTo("/Users/{Name}/Orders/{OrderId}"));

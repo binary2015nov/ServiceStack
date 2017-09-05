@@ -322,7 +322,7 @@ namespace ServiceStack.Host.Handlers
                 RequestAttributes = httpReq.GetAttributes().ToString(),
                 Ipv4Addresses = ipv4Addr,
                 Ipv6Addresses = ipv6Address,
-                PluginsLoaded = HostContext.AppHost.PluginsLoaded,
+                PluginsLoaded = HostContext.AppHost.Plugins.Select(p => p.GetType().Name).ToList(),
                 StartUpErrors = HostContext.AppHost.StartUpErrors,
                 AsyncErrors = HostContext.AppHost.AsyncErrors,
                 LastRequestInfo = LastRequestInfo,
@@ -339,7 +339,7 @@ namespace ServiceStack.Host.Handlers
                     {"RequestTypes", HostContext.AppHost.Metadata.RequestTypes.Count.ToString() },
                     {"ResponseTypes", HostContext.AppHost.Metadata.ResponseTypes.Count.ToString() },
                     {"ServiceTypes", HostContext.AppHost.Metadata.ServiceTypes.Count.ToString() },
-                    {"RestPaths", HostContext.AppHost.RestPaths.Count.ToString() },
+                    {"RestPaths", HostContext.AppHost.RestPaths.Count().ToString() },
                     {"ContentTypes", HostContext.AppHost.ContentTypes.ContentTypeFormats.Count.ToString() },
                     {"EnableFeatures", HostContext.Config.EnableFeatures.ToString() },
                     {"VirtualPathProvider", HostContext.AppHost.VirtualFileSources.ToString() }

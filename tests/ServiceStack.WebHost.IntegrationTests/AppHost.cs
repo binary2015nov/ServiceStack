@@ -16,7 +16,6 @@ using ServiceStack.MiniProfiler.Data;
 using ServiceStack.OrmLite;
 using ServiceStack.ProtoBuf;
 using ServiceStack.Redis;
-using ServiceStack.Shared.Tests;
 using ServiceStack.Text;
 using ServiceStack.Validation;
 using ServiceStack.Web;
@@ -53,8 +52,6 @@ namespace ServiceStack.WebHost.IntegrationTests
 
         public override void Configure(Container container)
         {
-            IocShared.Configure(this);
-
             this.PreRequestFilters.Add((req, res) =>
             {
                 req.Items["_DataSetAtPreRequestFilters"] = true;
@@ -90,7 +87,7 @@ namespace ServiceStack.WebHost.IntegrationTests
                 });
 
             container.Register<ICacheClient>(new MemoryCacheClient());
-            //container.AdminRegister<ICacheClient>(new BasicRedisClientManager());
+            //container.Register<ICacheClient>(new BasicRedisClientManager());
 
             ConfigureAuth(container);
 

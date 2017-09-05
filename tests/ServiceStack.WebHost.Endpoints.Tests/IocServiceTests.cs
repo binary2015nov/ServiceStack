@@ -6,7 +6,6 @@ using NUnit.Framework;
 using ServiceStack.Common.Tests;
 using ServiceStack.Configuration;
 using ServiceStack.Shared.Tests;
-using ServiceStack.Text;
 using ServiceStack.Web;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
@@ -39,19 +38,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
-#if !NETCORE
-    //[Ignore("Causes dll conflicts in ASP.NET Host projects when run from this test project")]
-    public class IocServiceAspNetTests : IocServiceTests
-    {
-        public override IServiceClient CreateClient(ResetIoc request = null)
-        {
-            var client = new JsonServiceClient(Config.AspNetServiceStackBaseUri);
-            client.Post(request ?? new ResetIoc());
-            return client;
-        }
-    }
-#endif
-
+    [TestFixture]
     public class IocServiceHttpListenerTests : IocServiceTests
     {
         private const string ListeningOn = "http://localhost:1082/";
@@ -69,10 +56,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [OneTimeTearDown]
         public void TestFixtureTearDown()
         {
-            if (appHost != null)
-            {
-                appHost.Dispose();
-            }
+            appHost.Dispose();
         }
 
         public override IServiceClient CreateClient(ResetIoc request = null)
@@ -83,7 +67,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
-    [TestFixture]
     public abstract class IocServiceTests
     {
         private const int WaitForRequestCleanup = 200;
@@ -191,7 +174,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             Assert.That(response2.Results[typeof(FunqRequestScope).Name], Is.EqualTo(2));
             Assert.That(response2.Results[typeof(FunqNoneScope).Name], Is.EqualTo(4));
 
-            Assert.That(response2.InjectsRequest, Is.EqualTo(0));
+            Assert.That(response2.InjectsRequest, Is.EqualTo(2));
 
             Thread.Sleep(WaitForRequestCleanup);
 

@@ -10,14 +10,6 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     [TestFixture]
     public class AssertValidAccessTests : AuthTestsBase
     {
-        protected Register AdminRegister;
-
-        [OneTimeSetUp]
-        public void TestFixtureSetUp()
-        {
-            AdminRegister = CreateAdminUser();
-        }
-
         [Test]
         public void Authentication_does_return_session_cookies()
         {
@@ -30,7 +22,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Cannot_assign_roles_and_permissions_when_unthenticate()
         {
-            var newUser = RegisterNewUser(autoLogin: true);
+            var newUser = RegisterNewUser(autoLogin: false);
 
             try
             {
@@ -258,12 +250,14 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             try
             {
-                HttpUtils.GetStringFromUrl(Constant.ServiceStackBaseHost.AppendPath("requiresadmin"));
+                var jsonServiceClient = new JsonServiceClient(Constant.ServiceStackBaseHost);
+                jsonServiceClient.Send<RequiresRoleInService>(new RequiresRoleInService());
+
                 Assert.Fail("Should not allow access to protected resource");
             }
             catch (Exception ex)
             {
-                if (ex.IsUnauthorized() || ex.IsAny400()) //redirect to login
+                if (ex.IsUnauthorized()|| ex.IsAny400()) //redirect to login
                     return;
 
                 throw;
@@ -272,10 +266,9 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
         [Test]
         public void Can_access_Admin_service_with_AuthSecret()
-        {
-            var urlString = Constant.ServiceStackBaseHost.AppendPath("requiresadmin")
-                .AddQueryParam("authsecret", Constant.AuthSecret);
-            HttpUtils.GetStringFromUrl(urlString);           
+        {            
+            Constant.ServiceStackBaseHost.AppendPath("requiresadmin")
+                .AddQueryParam("authsecret", Constant.AuthSecret).GetStringFromUrl();
         }
     }
 }

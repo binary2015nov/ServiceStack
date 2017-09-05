@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using ServiceStack.Common.Tests;
-using ServiceStack.Text;
 using ServiceStack.Validation;
 using ServiceStack.WebHost.IntegrationTests.Services;
 
@@ -12,14 +11,12 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     /// This base class executes all Web Services ignorant of the endpoints its hosted on.
     /// The same tests below are re-used by the Unit and Integration TestFixture's declared below
     /// </summary>
-    [TestFixture]
     public abstract class WebServicesTests : TestBase
     {
         private const string TestString = "ServiceStack";
 
-        protected WebServicesTests() : base(Constant.ServiceStackBaseHost, typeof(ReverseService).Assembly)
-        {
-        }
+        protected WebServicesTests()
+            : base(Constant.ServiceStackBaseHost, typeof(ReverseService).Assembly) { }
 
         protected override void Configure(Funq.Container container) { }
 
@@ -127,6 +124,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     /// Unit tests simulates an in-process ServiceStack host where all services
     /// are executed all in-memory so DTO's are not even serialized.
     /// </summary>
+    [TestFixture]
     public class UnitTests : WebServicesTests
     {
         public UnitTests()
@@ -141,6 +139,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         }
     }
 
+    [TestFixture]
     public class XmlIntegrationTests : WebServicesTests
     {
         protected override IServiceClient CreateNewServiceClient()
@@ -149,6 +148,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         }
     }
 
+    [TestFixture]
     public class JsonIntegrationTests : WebServicesTests
     {
         protected override IServiceClient CreateNewServiceClient()
@@ -157,6 +157,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         }
     }
 
+    [TestFixture]
     public class JsvIntegrationTests : WebServicesTests
     {
         protected override IServiceClient CreateNewServiceClient()
@@ -165,6 +166,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         }
     }
 
+    [TestFixture]
     public class Soap11IntegrationTests : WebServicesTests
     {
         protected override IServiceClient CreateNewServiceClient()
@@ -173,6 +175,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         }
     }
 
+    [TestFixture]
     public class Soap12IntegrationTests : WebServicesTests
     {
         protected override IServiceClient CreateNewServiceClient()

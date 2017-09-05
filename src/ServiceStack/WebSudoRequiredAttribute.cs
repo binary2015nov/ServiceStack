@@ -14,11 +14,11 @@ namespace ServiceStack
         }
 
         public WebSudoRequiredAttribute()
-            : this(ApplyTo.All) {}
+            : this(ApplyTo.All) { }
 
         public override void Execute(IRequest req, IResponse res, object requestDto)
         {
-            if (HostContext.AppHost.HasValidAuthSecret(req))
+            if (HostContext.HasValidAuthSecret(req))
                 return;
 
             base.Execute(req, res, requestDto);

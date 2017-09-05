@@ -28,14 +28,14 @@ namespace ServiceStack.Common.Tests
 
         protected TestBase(string serviceClientBaseUri, params Assembly[] serviceAssemblies)
         {
+            LogManager.LogFactory = new ConsoleLogFactory();
+
             if (serviceAssemblies.Length == 0)
                 serviceAssemblies = new[] { GetType().GetAssembly() };
 
             ServiceClientBaseUri = serviceClientBaseUri;
             ServiceAssemblies = serviceAssemblies;
-
-            this.AppHost = new BasicAppHost(serviceAssemblies).Init();
-            LogManager.LogFactory = new ConsoleLogFactory();
+            this.AppHost = new BasicAppHost(ServiceAssemblies).Init();
         }
 
         [OneTimeTearDown]
@@ -46,9 +46,9 @@ namespace ServiceStack.Common.Tests
 
         protected abstract void Configure(Funq.Container container);
 
-        protected Funq.Container Container => HostContext.Container;
+        protected Funq.Container Container => AppHost.Container;
 
-        protected IServiceRoutes Routes => HostContext.AppHost.Routes;
+        protected IServiceRoutes Routes => AppHost.Routes;
 
         //All integration tests call the Webservices hosted at the following location:
         protected string ServiceClientBaseUri { get; set; }

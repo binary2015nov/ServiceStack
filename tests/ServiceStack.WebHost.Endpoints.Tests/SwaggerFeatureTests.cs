@@ -325,14 +325,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             //new XmlServiceClient(ServiceClientBaseUri),
         };
 
-        [Test, Explicit]
-        public void RunFor5Mins()
-        {
-            appHost.LoadPlugin(new CorsFeature("http://localhost:50000"));
+        //[Test, Explicit]
+        //public void RunFor5Mins()
+        //{
+        //    appHost.LoadPlugin(new CorsFeature("http://localhost:50000"));
 
-            Debug.WriteLine(ListeningOn + "resources");
-            Thread.Sleep(TimeSpan.FromMinutes(5));
-        }
+        //    Debug.WriteLine(ListeningOn + "resources");
+        //    Thread.Sleep(TimeSpan.FromMinutes(5));
+        //}
 
         [Test, TestCaseSource("RestClients")]
         public void Should_get_default_name_from_property(IRestClient client)

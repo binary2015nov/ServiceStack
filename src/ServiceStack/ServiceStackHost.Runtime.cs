@@ -507,13 +507,10 @@ namespace ServiceStack
 
         public bool HasValidAuthSecret(IRequest httpReq)
         {
-            if (Config.AdminAuthSecret != null)
-            {
-                var authSecret = httpReq.GetParam(Keywords.AuthSecret);
-                return authSecret == Config.AdminAuthSecret;
-            }
+            if (Config.AdminAuthSecret == null)
+                return false;
 
-            return false;
+            return httpReq.GetParam(Keywords.AuthSecret) == Config.AdminAuthSecret;
         }
 
         public virtual Exception ResolveResponseException(Exception ex)

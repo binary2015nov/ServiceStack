@@ -37,7 +37,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             var reqInfoResponse = url.AddQueryParam("debug", "requestinfo")
                 .GetJsonFromUrl().FromJson<RequestInfoResponse>();
             Assert.That(reqInfoResponse.ApplicationBaseUrl, Is.EqualTo(url));
-            Assert.That(reqInfoResponse.ResolveAbsoluteUrl, Is.EqualTo(url + "/resolve"));
+            Assert.That(reqInfoResponse.ResolveAbsoluteUrl, Is.EqualTo(url.AppendPath("resolve")));
 
             var response = url.AppendPath("/routeinfo").GetJsonFromUrl().FromJson<GetRouteInfoResponse>();
             Assert.That(response.BaseUrl, Is.EqualTo(url));

@@ -17,8 +17,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 		public string Result { get; set; }
 	}
 
-	public class ReverseService 
-		: Service
+	public class ReverseService : Service
 	{
 		public object Any(Reverse request)
 		{

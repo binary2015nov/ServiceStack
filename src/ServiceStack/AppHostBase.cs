@@ -1,5 +1,4 @@
 #if !NETSTANDARD1_6
-using System.Configuration;
 using System.Reflection;
 using System.Web;
 using ServiceStack.Host.AspNet;
@@ -18,23 +17,13 @@ namespace ServiceStack
 
         public override ServiceStackHost Init()
         {
-            var httpHandlerPath = PlatformNet.InferHttpHandlerPath();
-            if (httpHandlerPath == null)
-                throw new ConfigurationErrorsException("Unable to infer ServiceStack's <httpHandler.Path/> from your application's configuration file.\n"
-                    + "Check with https://github.com/ServiceStack/ServiceStack/wiki/Create-your-first-webservice to ensure you have configured ServiceStack properly.\n"
-                    + "Otherwise you can explicitly set your httpHandler.Path by setting: HostConfig.HandlerFactoryPath.");
-
-            Config.HandlerFactoryPath = httpHandlerPath;
+            Config.HandlerFactoryPath = PlatformNet.InferHttpHandlerPath();
             return base.Init();
         }
 
         public override string ResolvePhysicalPath(string virtualPath, IRequest request)
         {
-            if (request is AspNetRequest)
-	        {
-                return ((AspNetRequest)request).HttpRequest.PhysicalPath;
-	        }
-            return base.ResolvePhysicalPath(virtualPath, request);
+            return ((HttpRequestBase)request.OriginalRequest).PhysicalPath;
         }
 
         public override IRequest TryGetCurrentRequest()

@@ -42,7 +42,7 @@ namespace ServiceStack.Host
             appHost.Container.DefaultOwner = Owner.External;
             typeFactory = new ContainerResolveCache();
             this.RequestTypeFactoryMap = new Dictionary<Type, Func<IRequest, object>>();
-            this.ResolveServicesFn = resolveServicesFn ?? (() => GetServiceTypes(assembliesWithServices));
+            this.ResolveServicesFn = resolveServicesFn ?? (() => Service.GetServiceTypes(assembliesWithServices ?? appHost.ServiceAssemblies));
         }
 
         readonly Dictionary<Type, ServiceExecFn> requestExecMap
@@ -70,8 +70,11 @@ namespace ServiceStack.Host
 
         public void RegisterServicesInAssembly(Assembly assembly)
         {
-            foreach (var serviceType in GetServiceTypes(assembly))
+            foreach (var serviceType in Service.GetServiceTypes(assembly))
             {
+                if (appHost.ExcludeAutoRegisteringServiceTypes.Contains(serviceType))
+                    continue;
+
                 RegisterService(serviceType);
             }
         }
@@ -651,36 +654,6 @@ namespace ServiceStack.Host
             throw new UnauthorizedAccessException(
                 $"Could not execute service '{requestType.GetOperationName()}', The following restrictions were not met: " +
                 $"'{StringBuilderCache.Retrieve(failedScenarios)}'{internalDebugMsg}");
-        }
-
-        public static List<Type> GetServiceTypes(params Assembly[] assembliesWithServices)
-        {
-            if (assembliesWithServices == null || assembliesWithServices.Length == 0)
-                throw new ArgumentException("No Assemblies provided to extract the service.\n"
-                    + "To register your services, please provide the assemblies where your services are defined.");
-
-            string assemblyName = string.Empty, typeName = string.Empty;
-            try
-            {
-                var results = new List<Type>();
-                foreach (var assembly in assembliesWithServices)
-                {
-                    assemblyName = assembly.FullName;
-                    foreach (var type in assembly.GetTypes().Where(Service.IsServiceType))
-                    {
-                        if (HostContext.AppHost != null && HostContext.AppHost.ExcludeAutoRegisteringServiceTypes.Contains(type))
-                            continue;
-
-                        typeName = type.GetOperationName();
-                        results.Add(type);
-                    }
-                }
-                return results;
-            }
-            catch (Exception ex)
-            {
-                throw new TypeLoadException($"Failed loading types, last assembly '{assemblyName}', type: '{typeName}'", ex);
-            }
         }
     }
 }

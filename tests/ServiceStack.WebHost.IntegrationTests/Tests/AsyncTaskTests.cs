@@ -7,8 +7,6 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
     public abstract class AsyncTaskTests
     {
-        private const string ListeningOn = Constant.ServiceStackBaseHost;
-
         protected abstract IServiceClient CreateServiceClient();
 
         private const int Param = 3;
@@ -127,7 +125,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             protected override IServiceClient CreateServiceClient()
             {
-                return new JsonServiceClient(ListeningOn);
+                return new JsonServiceClient(Constant.ServiceStackBaseHost);
             }
         }
 
@@ -136,7 +134,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             protected override IServiceClient CreateServiceClient()
             {
-                return new JsvServiceClient(ListeningOn);
+                return new JsvServiceClient(Constant.ServiceStackBaseHost);
             }
         }
 
@@ -145,7 +143,16 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             protected override IServiceClient CreateServiceClient()
             {
-                return new XmlServiceClient(ListeningOn);
+                return new XmlServiceClient(Constant.ServiceStackBaseHost);
+            }
+        }
+
+        [TestFixture]
+        public class CsvAsyncRestServiceClientTests : AsyncTaskTests
+        {
+            protected override IServiceClient CreateServiceClient()
+            {
+                return new CsvServiceClient(Constant.ServiceStackBaseHost);
             }
         }
     }

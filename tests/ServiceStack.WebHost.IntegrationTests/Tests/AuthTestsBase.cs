@@ -1,5 +1,4 @@
 using System;
-using System.Net;
 using NUnit.Framework;
 
 namespace ServiceStack.WebHost.IntegrationTests.Tests
@@ -14,6 +13,14 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
         private JsonServiceClient serviceClient;
         public JsonServiceClient ServiceClient => serviceClient ?? (serviceClient = new JsonServiceClient(Constant.ServiceStackBaseHost));
+
+        protected Register AdminRegister;
+
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
+        {
+            AdminRegister = CreateAdminUser();
+        }
 
         public Register CreateAdminUser()
         {
@@ -68,12 +75,6 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             });
 
             return client;
-        }
-
-        protected void AssertUnAuthorized(WebServiceException webEx)
-        {
-            Assert.That(webEx.StatusCode, Is.EqualTo((int)HttpStatusCode.Unauthorized));
-            Assert.That(webEx.StatusDescription, Is.EqualTo(HttpStatusCode.Unauthorized.ToString()));
         }
     }
 }

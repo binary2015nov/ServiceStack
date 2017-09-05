@@ -12,7 +12,6 @@ using ServiceStack.Host;
 using ServiceStack.Messaging;
 using ServiceStack.RabbitMq;
 using ServiceStack.Redis;
-using ServiceStack.Text;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {

@@ -26,7 +26,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
         public HttpWebResponse GetWebResponse(string uri, string acceptContentTypes)
         {
-            var webRequest = (HttpWebRequest)WebRequest.Create(uri);
+            var webRequest = WebRequest.CreateHttp(uri);
             webRequest.Accept = acceptContentTypes;
             return (HttpWebResponse)webRequest.GetResponse();
         }

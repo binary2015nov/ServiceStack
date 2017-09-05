@@ -25,8 +25,7 @@ namespace ServiceStack
         }
 
         public RequiresAnyRoleAttribute(params string[] roles)
-            : this(ApplyTo.All, roles)
-        { }
+            : this(ApplyTo.All, roles) { }
 
         public override void Execute(IRequest req, IResponse res, object requestDto)
         {

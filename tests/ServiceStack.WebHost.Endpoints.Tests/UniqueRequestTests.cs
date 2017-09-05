@@ -67,10 +67,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_handle_encoded_chars()
         {
-            var response = BaseUri.CombineWith("request/123%20456").GetStringFromUrl();
+            var response = BaseUri.AppendPath("request/123%20456").GetStringFromUrl();
             Assert.That(response, Is.EqualTo("123 456"));
-            response = BaseUri.CombineWith("request/123%7C456").GetStringFromUrl();
+            response = BaseUri.AppendPath("request/123%7C456").GetStringFromUrl();
             Assert.That(response, Is.EqualTo("123|456"));
+            response = BaseUri.AppendPath("request/123%2525456").GetStringFromUrl();
+            Assert.That(response, Is.EqualTo("123%25456"));
         }
 
         [Test]

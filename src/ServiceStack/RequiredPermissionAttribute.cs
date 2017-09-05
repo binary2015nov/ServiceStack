@@ -25,8 +25,7 @@ namespace ServiceStack
         }
 
         public RequiredPermissionAttribute(params string[] permissions)
-            : this(ApplyTo.All, permissions)
-        { }
+            : this(ApplyTo.All, permissions) { }
 
         public override void Execute(IRequest req, IResponse res, object requestDto)
         {
