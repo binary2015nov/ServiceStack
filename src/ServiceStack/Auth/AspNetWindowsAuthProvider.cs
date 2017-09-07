@@ -181,7 +181,7 @@ namespace ServiceStack.Auth
 
                     var response = authService.Post(new Authenticate
                     {
-                        provider = Name,
+                        Provider = Name,
                         UserName = user.GetUserName(),
                     });
                 }

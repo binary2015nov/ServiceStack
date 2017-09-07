@@ -9,6 +9,7 @@ using MarkdownSharp;
 using ServiceStack.Host;
 using ServiceStack.Markdown;
 using ServiceStack.Metadata;
+using ServiceStack.Serialization;
 using ServiceStack.Text;
 
 namespace ServiceStack
@@ -177,7 +178,8 @@ namespace ServiceStack
         public string SoapServiceName { get; set; }
         public XmlWriterSettings XmlWriterSettings { get; set; }
         public bool EnableAccessRestrictions { get; set; }
-        public bool UseBclJsonSerializers { get; set; }
+        public bool UseBclJsonSerializers { get { return JsonDataContractSerializer.Instance.UseBcl; } set { JsonDataContractSerializer.Instance.UseBcl = value; } }
+        
         public Dictionary<string, string> GlobalResponseHeaders { get; set; }
         public Feature EnableFeatures { get; set; }
         public bool ReturnsInnerException { get; set; }
@@ -223,8 +225,8 @@ namespace ServiceStack
 
         public bool UseHttpsLinks { get; set; }
 
-        public bool UseCamelCase { get; set; }
-        public bool EnableOptimizations { get; set; }
+        public bool UseCamelCase { get { return JsConfig.EmitCamelCaseNames; } set { JsConfig.EmitCamelCaseNames = value; } }
+        public bool EnableOptimizations { get { return MemoryStreamFactory.UseRecyclableMemoryStream; } set { MemoryStreamFactory.UseRecyclableMemoryStream = value; } }
 
         //Disables chunked encoding on Kestrel Server
         public bool DisableChunkedEncoding { get; set; }

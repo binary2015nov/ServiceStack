@@ -3,14 +3,8 @@ using NUnit.Framework;
 
 namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
-    public class AuthTestsBase
+    public abstract class AuthenticationTestsBase
     {
-        public const string RoleName1 = "Role1";
-        public const string RoleName2 = "Role2";
-
-        public const string Permission1 = "Permission1";
-        public const string Permission2 = "Permission2";
-
         private JsonServiceClient serviceClient;
         public JsonServiceClient ServiceClient => serviceClient ?? (serviceClient = new JsonServiceClient(Constant.ServiceStackBaseHost));
 
@@ -28,7 +22,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             {
                 UserName = "Admin",
                 DisplayName = "The Admin User",
-                Email = Constant.AdminEmail, //this email is automatically assigned as Admin in Web.Config
+                Email = Constant.AdminEmail,
                 FirstName = "Admin",
                 LastName = "User",
                 Password = Constant.AdminPassword,

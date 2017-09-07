@@ -1,4 +1,3 @@
-using Funq;
 using NUnit.Framework;
 using ServiceStack.WebHost.Endpoints.Tests.Support.Host;
 
@@ -33,17 +32,4 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 .Or.EqualTo("{\"uname\":\"user\",\"pwd\":\"pass\"}"));
 		}
 	}
-
-    public class TestConfigAppHostHttpListener : AppHostHttpListenerBase
-    {
-        public TestConfigAppHostHttpListener() : base("TestConfigAppHost Service", typeof(BclDto).GetAssembly())
-        {
-            Config.UseBclJsonSerializers = true;
-        }
-
-        public override void Configure(Container container)
-        {
-
-        }
-    }
 }

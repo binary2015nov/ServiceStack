@@ -235,7 +235,7 @@ namespace ServiceStack.Server.Tests.Auth
             var client = GetClient();
             client.Post(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = Username,
                 Password = Password,
             });

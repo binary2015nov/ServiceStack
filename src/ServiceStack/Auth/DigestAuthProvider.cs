@@ -176,7 +176,7 @@ namespace ServiceStack.Auth
                 {
                     var response = authService.Post(new Authenticate
                     {
-                        provider = Name,
+                        Provider = Name,
                         nonce = digestAuth["nonce"],
                         uri = digestAuth["uri"],
                         response = digestAuth["response"],

@@ -39,7 +39,7 @@ namespace ServiceStack
             if (!session.IsAuthenticated) return;
 
             var authenticateDto = dto as Authenticate;
-            if (authenticateDto != null && !AuthProviderCatagery.LogoutAction.EqualsIgnoreCase(authenticateDto.provider))
+            if (authenticateDto != null && !AuthProviderCatagery.LogoutAction.EqualsIgnoreCase(authenticateDto.Provider))
             {
                 var copy = SessionFeature.DefaultSessionFactory().PopulateWith(session);
 

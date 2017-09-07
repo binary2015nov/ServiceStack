@@ -181,7 +181,7 @@ namespace ServiceStack.Common.Tests.OAuth
             return credentialsAuth.Authenticate(service, oAuthUserSession,
                 new Authenticate
                 {
-                    provider = CredentialsAuthProvider.Name,
+                    Provider = CredentialsAuthProvider.Name,
                     UserName = RegisterDto.UserName,
                     Password = RegisterDto.Password,
                 });

@@ -63,7 +63,7 @@ namespace ServiceStack.Auth
             if (AuthProviders == null || AuthProviders.Length == 0)
                 throw new Exception("No auth providers have been registered in your app host.");
 
-            var provider = request.provider ?? AuthProviders[0].Provider;
+            var provider = request.Provider ?? AuthProviders[0].Provider;
             if (provider == AuthProviderCatagery.CredentialsAliasProvider)
                 provider = AuthProviderCatagery.CredentialsProvider;
 
@@ -74,7 +74,7 @@ namespace ServiceStack.Auth
             if (request.RememberMe)
                 Request.AddSessionOptions(SessionOptions.Permanent);
 
-            if (AuthProviderCatagery.LogoutAction.EqualsIgnoreCase(request.provider))
+            if (AuthProviderCatagery.LogoutAction.EqualsIgnoreCase(request.Provider))
                 return authProvider.Logout(this, request);
 
             var authWithRequest = authProvider as IAuthWithRequest;
@@ -98,7 +98,7 @@ namespace ServiceStack.Auth
                 // to refresh the current session reference.
                 session = this.GetSession();
 
-                if (request.provider == null && !session.IsAuthenticated)
+                if (request.Provider == null && !session.IsAuthenticated)
                     throw HttpError.Unauthorized(ErrorMessages.NotAuthenticated);
 
                 var referrerUrl = request.Continue
@@ -141,7 +141,7 @@ namespace ServiceStack.Auth
                     }
                 }
 
-                if (isHtml && request.provider != null)
+                if (isHtml && request.Provider != null)
                 {
                     if (alreadyAuthenticated)
                         return this.Redirect(referrerUrl.SetParam("s", "0"));
@@ -185,12 +185,12 @@ namespace ServiceStack.Auth
                 if (request.RememberMe)
                     Request.AddSessionOptions(SessionOptions.Permanent);
                 
-                var provider = request.provider ?? AuthProviders[0].Provider;
+                var provider = request.Provider ?? AuthProviders[0].Provider;
                 var authProvider = GetAuthProvider(provider);
                 if (authProvider == null)
                     throw HttpError.NotFound(ErrorMessages.UnknownAuthProviderFmt.Fmt(provider.SafeInput()));
 
-                if (request.provider == AuthProviderCatagery.LogoutAction)
+                if (request.Provider == AuthProviderCatagery.LogoutAction)
                     return authProvider.Logout(this, request) as AuthenticateResponse;
 
                 var result = Authenticate(request, provider, this.GetSession(), authProvider);
@@ -213,7 +213,7 @@ namespace ServiceStack.Auth
         /// </summary>
         private object Authenticate(Authenticate request, string provider, IAuthSession session, IAuthProvider authProvider)
         {
-            if (request.provider == null && request.UserName == null)
+            if (request.Provider == null && request.UserName == null)
                 return null; //Just return sessionInfo if no provider or username is given
 
             var authFeature = HostContext.GetPlugin<AuthFeature>();

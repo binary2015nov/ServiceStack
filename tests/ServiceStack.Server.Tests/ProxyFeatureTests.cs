@@ -305,7 +305,7 @@ namespace ServiceStack.Server.Tests
 
             var response = client.Post(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = "test",
                 Password = "test",
             });
@@ -324,7 +324,7 @@ namespace ServiceStack.Server.Tests
             {
                 var response = client.Post(new Authenticate
                 {
-                    provider = "credentials",
+                    Provider = "credentials",
                     UserName = "invalid",
                     Password = "password",
                 });

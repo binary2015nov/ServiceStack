@@ -25,14 +25,14 @@ namespace ServiceStack.WebHost.IntegrationTests
 {
     public class AppHost : AppHostBase
     {
-        protected bool StartMqHost = false;
+        private bool StartMqHost = false;
 
         public AppHost() : base("ServiceStack WebHost IntegrationTests", typeof(AppHost).Assembly)
         {
-            JsConfig.EmitCamelCaseNames = true;
             Config.AdminAuthSecret = Constant.AuthSecret;
             Config.ApiVersion = "2.0.0";
             Config.DebugMode = true;
+            Config.UseCamelCase = true;
             //Show StackTraces for easier debugging
             //var onlyEnableFeatures = Feature.All.Remove(Feature.Jsv | Feature.Soap);
             //Config.EnableFeatures = onlyEnableFeatures;       
@@ -43,7 +43,7 @@ namespace ServiceStack.WebHost.IntegrationTests
             //typeof(Authenticate).AddAttributes(new ExcludeAttribute(Feature.Metadata));
             foreach (var pi in typeof(Authenticate).GetPublicProperties())
             {
-                if (pi.Name != "provider" && pi.Name != "UserName" && pi.Name != "Password")
+                if (pi.Name != "Provider" && pi.Name != "UserName" && pi.Name != "Password")
                 {
                     pi.AddAttributes(new IgnoreDataMemberAttribute());
                 }

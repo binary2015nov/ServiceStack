@@ -8,8 +8,7 @@ using ServiceStack.Web;
 
 namespace ServiceStack.Host
 {
-    public class RestPath
-        : IRestPath
+    public class RestPath : IRestPath
     {
         private const string WildCard = "*";
         private const char WildCardChar = '*';
@@ -120,9 +119,7 @@ namespace ServiceStack.Host
             return new RestRoute(RequestType, Path, AllowedVerbs, 0);
         }
 
-        public RestPath(Type requestType, string path) : this(requestType, path, null) { }
-
-        public RestPath(Type requestType, string path, string verbs, string summary = null, string notes = null)
+        public RestPath(Type requestType, string path, string verbs = null, string summary = null, string notes = null)
         {
             this.RequestType = requestType;
             this.Summary = summary;

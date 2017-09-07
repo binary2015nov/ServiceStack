@@ -25,7 +25,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.IntegrationTests
 
             var request = new Authenticate
             {
-                provider = TwitterAuthProvider.Name,
+                Provider = TwitterAuthProvider.Name,
                 AccessToken = "2931572242-zmVKk5leFHJXJWRUpQqyEkdlRlNbDMjNlUcXViJ",
                 AccessTokenSecret = AccessTokens[TwitterAuthProvider.Name]
             };
@@ -46,7 +46,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.IntegrationTests
 
             var request = new Authenticate
             {
-                provider = FacebookAuthProvider.Name,
+                Provider = FacebookAuthProvider.Name,
                 AccessToken = AccessTokens[FacebookAuthProvider.Name],
             };
 
@@ -66,7 +66,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.IntegrationTests
 
             var request = new Authenticate
             {
-                provider = GithubAuthProvider.Name,
+                Provider = GithubAuthProvider.Name,
                 AccessToken = AccessTokens[GithubAuthProvider.Name],
             };
 
@@ -88,7 +88,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.IntegrationTests
 
             var request = new Authenticate
             {
-                provider = "GoogleOAuth",
+                Provider = "GoogleOAuth",
                 AccessToken = AccessTokens["GoogleOAuth"],
             };
 

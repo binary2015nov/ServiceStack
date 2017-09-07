@@ -104,7 +104,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
 
             var authResponse = encryptedClient.Send(new Authenticate
             {
-                provider = CredentialsAuthProvider.Name,
+                Provider = CredentialsAuthProvider.Name,
                 UserName = "test@gmail.com",
                 Password = "p@55word",
             });
@@ -133,7 +133,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
 
             var authResponse = encryptedClient.Send(new Authenticate
             {
-                provider = CredentialsAuthProvider.Name,
+                Provider = CredentialsAuthProvider.Name,
                 UserName = "test@gmail.com",
                 Password = "p@55word",
             });
@@ -167,7 +167,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
 
             var authResponse = encryptedClient.Send(new Authenticate
             {
-                provider = CredentialsAuthProvider.Name,
+                Provider = CredentialsAuthProvider.Name,
                 UserName = "test@gmail.com",
                 Password = "p@55word",
             });
@@ -184,7 +184,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
 
             var authResponse = encryptedClient.Send(new Authenticate
             {
-                provider = CredentialsAuthProvider.Name,
+                Provider = CredentialsAuthProvider.Name,
                 UserName = "test@gmail.com",
                 Password = "p@55word",
                 RememberMe = true,

@@ -1099,7 +1099,7 @@ namespace ServiceStack.Server.Tests.Auth
 
             client.Post(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = Username,
                 Password = Password,
             });
@@ -1189,7 +1189,7 @@ namespace ServiceStack.Server.Tests.Auth
             client = GetClient();
             client.Post(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = Username,
                 Password = Password,
             });
@@ -1221,7 +1221,7 @@ namespace ServiceStack.Server.Tests.Auth
             client = GetClient();
             client.Post(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = "user2",
                 Password = Password,
             });
@@ -1385,7 +1385,7 @@ namespace ServiceStack.Server.Tests.Auth
 
             client.Send(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = Username,
                 Password = Password,
             });
@@ -1423,7 +1423,7 @@ namespace ServiceStack.Server.Tests.Auth
 
             var authResponse = client.Send(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = Username,
                 Password = Password,
                 UseTokenCookie = true

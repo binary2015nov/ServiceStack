@@ -8,8 +8,14 @@ using ServiceStack.WebHost.IntegrationTests.Services;
 namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
     [TestFixture]
-    public class AssertValidAccessTests : AuthTestsBase
+    public class AssertValidAccessTests : AuthenticationTestsBase
     {
+        private const string RoleName1 = "Role1";
+        private const string RoleName2 = "Role2";
+
+        private const string Permission1 = "Permission1";
+        private const string Permission2 = "Permission2";
+
         [Test]
         public void Authentication_does_return_session_cookies()
         {
@@ -91,7 +97,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Cannot_Unassign_Roles_and_Permissions_when_unthenticate()
         {
-            var newUser = RegisterNewUser(autoLogin: true);
+            var newUser = RegisterNewUser(autoLogin: false);
 
             try
             {
@@ -265,10 +271,11 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         }
 
         [Test]
-        public void Can_access_Admin_service_with_AuthSecret()
+        public void Can_access_authenticate_service_with_AuthSecret()
         {            
-            Constant.ServiceStackBaseHost.AppendPath("requiresadmin")
-                .AddQueryParam("authsecret", Constant.AuthSecret).GetStringFromUrl();
+           var webRes = Constant.ServiceStackBaseHost.AppendPath("requiresadmin")
+                .AddQueryParam("authsecret", Constant.AuthSecret).GetWebResponse();
+            Assert.That(webRes.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
     }
 }

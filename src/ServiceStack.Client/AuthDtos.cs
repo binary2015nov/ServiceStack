@@ -11,7 +11,7 @@ namespace ServiceStack
     [DataContract]
     public class Authenticate : IPost, IReturn<AuthenticateResponse>, IMeta
     {
-        [DataMember(Order = 1)] public string provider { get; set; }
+        [DataMember(Order = 1)] public string Provider { get; set; }
         [DataMember(Order = 2)] public string State { get; set; }
         [DataMember(Order = 3)] public string oauth_token { get; set; }
         [DataMember(Order = 4)] public string oauth_verifier { get; set; }

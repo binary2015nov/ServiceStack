@@ -456,7 +456,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 var client = GetClient();
                 var authResponse = client.Send(new Authenticate
                 {
-                    provider = CredentialsAuthProvider.Name,
+                    Provider = CredentialsAuthProvider.Name,
                     UserName = "user",
                     Password = "p@55word",
                     RememberMe = true,
@@ -607,7 +607,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
                 var authResponse = client.Send(new Authenticate
                 {
-                    provider = CredentialsAuthProvider.Name,
+                    Provider = CredentialsAuthProvider.Name,
                     UserName = "user",
                     Password = "p@55word",
                     RememberMe = true,
@@ -632,7 +632,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
                 var authResponse = client.Send(new Authenticate
                 {
-                    provider = CredentialsAuthProvider.Name,
+                    Provider = CredentialsAuthProvider.Name,
                     UserName = "user",
                     Password = "p@55word",
                     RememberMe = true,
@@ -661,7 +661,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var authResponse = await client.SendAsync(
                 new Authenticate
                 {
-                    provider = CredentialsAuthProvider.Name,
+                    Provider = CredentialsAuthProvider.Name,
                     UserName = "user",
                     Password = "p@55word",
                     RememberMe = true,
@@ -697,7 +697,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 var authResponse = client.Send(
                     new Authenticate
                     {
-                        provider = CredentialsAuthProvider.Name,
+                        Provider = CredentialsAuthProvider.Name,
                         UserName = UserName, // Has Role
                         Password = Password,
                         RememberMe = true,
@@ -722,7 +722,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 var authResponse = client.Send(
                     new Authenticate
                     {
-                        provider = CredentialsAuthProvider.Name,
+                        Provider = CredentialsAuthProvider.Name,
                         UserName = "user2", // Does not have Role
                         Password = "p@55word2",
                         RememberMe = true,
@@ -837,7 +837,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
                 var authResponse = client.Send(new Authenticate
                 {
-                    provider = CredentialsAuthProvider.Name,
+                    Provider = CredentialsAuthProvider.Name,
                     UserName = "user",
                     Password = "p@55word",
                     RememberMe = true,
@@ -869,7 +869,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             {
                 var authResponse = client.Send(new Authenticate
                 {
-                    provider = CredentialsAuthProvider.Name,
+                    Provider = CredentialsAuthProvider.Name,
                     UserName = "user",
                     Password = "p@55word",
                     RememberMe = true,
@@ -894,7 +894,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             {
                 var authResponse = client.Send(new Authenticate
                 {
-                    provider = CredentialsAuthProvider.Name,
+                    Provider = CredentialsAuthProvider.Name,
                     UserName = "user",
                     Password = "p@55word",
                     RememberMe = true,
@@ -1076,7 +1076,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             {
                 client.Send(new Authenticate
                 {
-                    provider = CredentialsAuthProvider.Name,
+                    Provider = CredentialsAuthProvider.Name,
                     UserName = UserNameWithSessionRedirect,
                     Password = PasswordForSessionRedirect,
                     RememberMe = true,
@@ -1100,7 +1100,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             var authRequest = new Authenticate
             {
-                provider = CredentialsAuthProvider.Name,
+                Provider = CredentialsAuthProvider.Name,
                 UserName = UserName,
                 Password = Password,
                 RememberMe = true,
@@ -1119,7 +1119,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             var authRequest = new Authenticate
             {
-                provider = CredentialsAuthProvider.Name,
+                Provider = CredentialsAuthProvider.Name,
                 UserName = EmailBasedUsername,
                 Password = PasswordForEmailBasedAccount,
                 RememberMe = true,
@@ -1136,7 +1136,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             var authRequest = new Authenticate
             {
-                provider = CredentialsAuthProvider.Name,
+                Provider = CredentialsAuthProvider.Name,
                 UserName = EmailBasedUsername,
                 Password = PasswordForEmailBasedAccount,
                 RememberMe = true,
@@ -1306,7 +1306,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
                 var authResponse = client.Send(new Authenticate
                 {
-                    provider = CredentialsAuthProvider.Name,
+                    Provider = CredentialsAuthProvider.Name,
                     UserName = "user",
                     Password = "p@55word",
                     RememberMe = true,
@@ -1320,7 +1320,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
                 logoutResponse = client.Send(new Authenticate
                 {
-                    provider = AuthProviderCatagery.LogoutAction,
+                    Provider = AuthProviderCatagery.LogoutAction,
                 });
 
                 Assert.That(logoutResponse.ResponseStatus.ErrorCode, Is.Null);
@@ -1339,7 +1339,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 var client = GetClient();
                 var authRequest = new Authenticate
                 {
-                    provider = CredentialsAuthProvider.Name,
+                    Provider = CredentialsAuthProvider.Name,
                     UserName = UserName,
                     Password = Password,
                     RememberMe = true,
@@ -1363,7 +1363,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var client = GetClient();
             var authRequest = new Authenticate
             {
-                provider = CredentialsAuthProvider.Name,
+                Provider = CredentialsAuthProvider.Name,
                 UserName = UserName,
                 Password = Password,
                 RememberMe = true,
@@ -1390,7 +1390,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var client = GetClient();
             var authRequest = new Authenticate
             {
-                provider = CredentialsAuthProvider.Name,
+                Provider = CredentialsAuthProvider.Name,
                 UserName = UserName,
                 Password = Password,
                 RememberMe = true,
@@ -1410,7 +1410,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             {
                 client.Send(new Authenticate
                 {
-                    provider = CredentialsAuthProvider.Name,
+                    Provider = CredentialsAuthProvider.Name,
                     UserName = UserName,
                     Password = "some other password",
                     RememberMe = true,

@@ -264,7 +264,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
             var authClient = GetClient();
             var refreshToken = authClient.Send(new Authenticate
                 {
-                    provider = "credentials",
+                    Provider = "credentials",
                     UserName = Username,
                     Password = Password,
                 })
@@ -278,7 +278,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
             var authClient = GetClient();
             var authResponse = authClient.Send(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = Username,
                 Password = Password,
                 UseTokenCookie = true
@@ -299,7 +299,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
             var authClient = GetClient();
             var authResponse = authClient.Send(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = Username,
                 Password = Password,
                 RememberMe = true,
@@ -364,7 +364,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
             var authClient = GetClient();
             var refreshToken = authClient.Send(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = Username,
                 Password = Password,
             }).RefreshToken;
@@ -480,7 +480,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
 
             var response = client.Post(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = Username,
                 Password = Password,
                 RememberMe = true,
@@ -490,7 +490,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
 
             response = client.Post(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = Username,
                 Password = Password,
                 RememberMe = true,

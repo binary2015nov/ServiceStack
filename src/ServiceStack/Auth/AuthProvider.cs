@@ -320,8 +320,8 @@ namespace ServiceStack.Auth
 
         public virtual void OnFailedAuthentication(IAuthSession session, IRequest httpReq, IResponse httpRes)
         {
-            httpRes.StatusCode = (int)HttpStatusCode.Unauthorized;
-            httpRes.AddHeader(HttpHeaders.WwwAuthenticate, "{0} realm=\"{1}\"".Fmt(this.Provider, this.AuthRealm));
+            if (httpRes.StatusCode == (int)HttpStatusCode.OK)
+                httpRes.StatusCode = (int)HttpStatusCode.Unauthorized;
             httpRes.EndRequest();
         }
 
@@ -336,7 +336,6 @@ namespace ServiceStack.Auth
             }
 
             httpRes.StatusCode = (int)HttpStatusCode.Unauthorized;
-            httpRes.AddHeader(HttpHeaders.WwwAuthenticate, $"{authProvider.Provider} realm=\"{authProvider.AuthRealm}\"");
 
             httpRes.EndRequest();
         }

@@ -175,12 +175,12 @@ namespace ServiceStack
         /// <summary>
         /// Provide an exception handler for unhandled exceptions
         /// </summary>
-        List<HandleServiceExceptionDelegate> ServiceExceptionHandlers { get; }
+        List<ServiceExceptionHandler> ServiceExceptionHandlers { get; }
 
         /// <summary>
         /// Provide an exception handler for un-caught exceptions
         /// </summary>
-        List<HandleUncaughtExceptionDelegate> UncaughtExceptionHandlers { get; }
+        List<UncatchedExceptionHandler> UncaughtExceptionHandlers { get; }
 
         /// <summary>
         /// Provide callbacks to be fired after the AppHost has finished initializing
@@ -200,7 +200,7 @@ namespace ServiceStack
         /// <summary>
         /// Provide a catch-all handler that doesn't match any routes
         /// </summary>
-        List<HttpHandlerResolverDelegate> CatchAllHandlers { get; }
+        List<HttpHandlerResolver> CatchAllHandlers { get; }
 
         /// <summary>
         /// Use a fall-back Error Handler for handling global errors

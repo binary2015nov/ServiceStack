@@ -4,14 +4,14 @@ using ServiceStack.Web;
 
 namespace ServiceStack.Host
 {
-	public delegate IHttpHandler HttpHandlerResolverDelegate(string httpMethod, string pathInfo, string filePath);
+	public delegate IHttpHandler HttpHandlerResolver(string httpMethod, string pathInfo, string filePath);
 
 	public delegate bool StreamSerializerResolverDelegate(IRequest requestContext, object dto, IResponse httpRes);
 
-    public delegate void HandleUncaughtExceptionDelegate(
+    public delegate void UncatchedExceptionHandler(
         IRequest httpReq, IResponse httpRes, string operationName, Exception ex);
 
-    public delegate object HandleServiceExceptionDelegate(IRequest httpReq, object request, Exception ex);
+    public delegate object ServiceExceptionHandler(IRequest request, object requestDto, Exception ex);
 
     public delegate RestPath FallbackRestPathDelegate(string httpMethod, string pathInfo, string filePath);
 

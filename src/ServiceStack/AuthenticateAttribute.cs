@@ -14,9 +14,7 @@ namespace ServiceStack
     {
         /// <summary>
         /// Restrict authentication to a specific <see cref="IAuthProvider"/>.
-        /// For example, if this attribute should only permit access
-        /// if the user is authenticated with <see cref="BasicAuthProvider"/>,
-        /// you should set this property to <see cref="BasicAuthProvider.Name"/>.
+        /// For example, if this attribute should only permit access.
         /// </summary>
         public string Provider { get; set; }
 
@@ -56,11 +54,11 @@ namespace ServiceStack
             if (AuthenticateService.AuthProviders.Length == 0)
                 throw new InvalidOperationException(
                     "The AuthenticateService must be initialized by calling AuthenticateService.Init to use an authenticate attribute");
-  
-            var matchingOAuthConfigs = AuthenticateService.AuthProviders.Where(
-                x => Provider.IsNullOrEmpty()|| x.Provider == Provider).ToList();
 
-            if (matchingOAuthConfigs.Count == 0)
+            var matchingOAuthConfigs = AuthenticateService.AuthProviders.Where(
+                x => Provider.IsNullOrEmpty() || x.Provider == Provider);
+
+            if (matchingOAuthConfigs.Count() == 0)
             {
                 res.WriteError(req, requestDto, $"No Auth Provider found matching {this.Provider ?? "any"} provider");
                 res.EndRequest();
@@ -79,7 +77,7 @@ namespace ServiceStack
             {
                 if (this.DoHtmlRedirectIfConfigured(req, res, true)) return;
 
-                AuthProvider.HandleFailedAuth(matchingOAuthConfigs[0], session, req, res);
+                AuthProvider.HandleFailedAuth(matchingOAuthConfigs.First(), session, req, res);
             }
         }
 

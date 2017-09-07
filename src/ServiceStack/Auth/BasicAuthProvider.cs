@@ -6,13 +6,10 @@ namespace ServiceStack.Auth
 {
     public class BasicAuthProvider : CredentialsAuthProvider, IAuthWithRequest
     {
-        public new static string Name = AuthProviderCatagery.BasicProvider;
-        public new static string Realm = "/auth/" + AuthProviderCatagery.BasicProvider;
-
         public BasicAuthProvider()
         {
-            this.Provider = Name;
-            this.AuthRealm = Realm;
+            this.Provider = AuthProviderCatagery.BasicProvider;
+            this.AuthRealm = "/auth/" + AuthProviderCatagery.BasicProvider;
         }
 
         public BasicAuthProvider(IAppSettings appSettings)
@@ -31,24 +28,26 @@ namespace ServiceStack.Auth
 
         public void PreAuthenticate(IRequest req, IResponse res)
         {
-            res.AddHeader("WWW-Authenticate", $"Basic realm=\"{Realm}\"");
             //API Keys are sent in Basic Auth Username and Password is Empty
             var userPass = req.GetBasicAuthUserAndPassword();
             if (!string.IsNullOrEmpty(userPass?.Value))
             {
-                //Need to run SessionFeature filter since its not executed before this attribute (Priority -100)			
-                //SessionFeature.AddSessionIdToRequestFilter(req, res, null); //Required to get req.GetSessionId()
-
                 using (var authService = HostContext.ResolveService<AuthenticateService>(req))
                 {
                     var response = authService.Post(new Authenticate
                     {
-                        provider = Name,
+                        Provider = this.Provider,
                         UserName = userPass.Value.Key,
                         Password = userPass.Value.Value
                     });
                 }
             }
+        }
+
+        public override void OnFailedAuthentication(IAuthSession session, IRequest httpReq, IResponse httpRes)
+        {
+            httpRes.AddHeader(HttpHeaders.WwwAuthenticate, $"{Provider} realm=\"{Realm}\"");
+            base.OnFailedAuthentication(session, httpReq, httpRes);
         }
     }
 }

@@ -11,7 +11,6 @@ using ServiceStack.Configuration;
 using ServiceStack.Host;
 using ServiceStack.IO;
 using ServiceStack.Metadata;
-using ServiceStack.MiniProfiler;
 using ServiceStack.Web;
 
 namespace ServiceStack
@@ -71,7 +70,7 @@ namespace ServiceStack
             set => AppHost.TestMode = value;
         }
 
-        public static List<HttpHandlerResolverDelegate> CatchAllHandlers => AssertAppHost().CatchAllHandlers;
+        public static List<HttpHandlerResolver> CatchAllHandlers => AssertAppHost().CatchAllHandlers;
 
         public static List<Func<IHttpRequest, IHttpHandler>> RawHttpHandlers => AssertAppHost().RawHttpHandlers;
 

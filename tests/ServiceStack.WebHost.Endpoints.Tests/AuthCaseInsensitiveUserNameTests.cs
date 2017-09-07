@@ -65,7 +65,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             
             var response = client.Post(new Authenticate
             {
-                provider = CredentialsAuthProvider.Name,
+                Provider = CredentialsAuthProvider.Name,
                 UserName = "Exact",
                 Password = "test"
             });
@@ -90,7 +90,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             
             var response = client.Post(new Authenticate
             {
-                provider = CredentialsAuthProvider.Name,
+                Provider = CredentialsAuthProvider.Name,
                 UserName = "MythZ",
                 Password = "test"
             });
@@ -157,7 +157,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             
             var response = client.Post(new Authenticate
             {
-                provider = CredentialsAuthProvider.Name,
+                Provider = CredentialsAuthProvider.Name,
                 UserName = "Exact",
                 Password = "test"
             });
@@ -182,7 +182,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             
             var response = client.Post(new Authenticate
             {
-                provider = CredentialsAuthProvider.Name,
+                Provider = CredentialsAuthProvider.Name,
                 UserName = "MythZ",
                 Password = "test"
             });
@@ -252,7 +252,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             
             var response = client.Post(new Authenticate
             {
-                provider = CredentialsAuthProvider.Name,
+                Provider = CredentialsAuthProvider.Name,
                 UserName = "Exact",
                 Password = "test"
             });
@@ -279,7 +279,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             {
                 var response = client.Post(new Authenticate
                 {
-                    provider = CredentialsAuthProvider.Name,
+                    Provider = CredentialsAuthProvider.Name,
                     UserName = "MythZ",
                     Password = "test"
                 });

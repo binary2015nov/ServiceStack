@@ -1,5 +1,4 @@
 ﻿using System;
-using ServiceStack.Messaging;
 using ServiceStack.MiniProfiler;
 
 namespace ServiceStack.WebHost.IntegrationTests
@@ -8,8 +7,7 @@ namespace ServiceStack.WebHost.IntegrationTests
     {
         protected void Application_Start(object sender, EventArgs e)
         {
-            var appHost = new AppHost();
-            appHost.Init();
+            new AppHost().Init();
         }
 
         protected void Application_BeginRequest(object sender, EventArgs e)
@@ -21,10 +19,6 @@ namespace ServiceStack.WebHost.IntegrationTests
         protected void Application_EndRequest(object sender, EventArgs e)
         {
             Profiler.Stop();
-
-            var mqHost = HostContext.TryResolve<IMessageService>();
-            if (mqHost != null)
-                mqHost.Start();
         }
     }
 }

@@ -24,7 +24,6 @@ using ServiceStack.Metadata;
 using ServiceStack.MiniProfiler;
 using ServiceStack.NativeTypes;
 using ServiceStack.Redis;
-using ServiceStack.Serialization;
 using ServiceStack.Text;
 using ServiceStack.VirtualPath;
 using ServiceStack.Web;
@@ -49,7 +48,7 @@ namespace ServiceStack
 
         protected ServiceStackHost(string serviceName, params Assembly[] assembliesWithServices)
         {
-            CreateAt = DateTime.UtcNow;
+            CreateAt = DateTime.Now;
             ServiceName = serviceName;
             ServiceAssemblies = assembliesWithServices;
             Metadata = new ServiceMetadata();
@@ -74,8 +73,8 @@ namespace ServiceStack
             GatewayRequestFilters = new List<Action<IRequest, object>>();
             GatewayResponseFilters = new List<Action<IRequest, object>>();
             ViewEngines = new List<IViewEngine>();
-            ServiceExceptionHandlers = new List<HandleServiceExceptionDelegate>();
-            UncaughtExceptionHandlers = new List<HandleUncaughtExceptionDelegate>();
+            ServiceExceptionHandlers = new List<ServiceExceptionHandler>();
+            UncaughtExceptionHandlers = new List<UncatchedExceptionHandler>();
             AfterInitCallbacks = new List<Action<IAppHost>>();
             OnDisposeCallbacks = new List<Action<IAppHost>>();
             OnEndRequestCallbacks = new List<Action<IRequest>>();
@@ -83,7 +82,7 @@ namespace ServiceStack
             RawHttpHandlers = new List<Func<IHttpRequest, IHttpHandler>> {
                 ReturnRedirectHandler
             };
-            CatchAllHandlers = new List<HttpHandlerResolverDelegate>();
+            CatchAllHandlers = new List<HttpHandlerResolver>();
             CustomErrorHttpHandlers = new Dictionary<HttpStatusCode, IServiceStackHandler> {
                 { HttpStatusCode.Forbidden, new ForbiddenHttpHandler() },
                 { HttpStatusCode.NotFound, new NotFoundHttpHandler() },
@@ -109,11 +108,6 @@ namespace ServiceStack
             };
         }
 
-        /// <summary>
-        /// Collection of added plugins.
-        /// </summary>
-        public List<IPlugin> Plugins { get; private set; }
-
         protected virtual void OnBeforeInit() { }
 
         protected virtual void OnAfterInit() { }
@@ -136,7 +130,7 @@ namespace ServiceStack
         /// </summary>
         public virtual ServiceStackHost Init()
         {
-            InitAt = DateTime.UtcNow;
+            InitAt = DateTime.Now;
             HostContext.AppHost = this;
             if (WebHostPhysicalPath.IsNullOrEmpty())
                 WebHostPhysicalPath = GetWebRootPath();
@@ -146,18 +140,15 @@ namespace ServiceStack
             OnBeforeInit();
 
             Config.ServiceEndpointsMetadataConfig = ServiceEndpointsMetadataConfig.Create(Config.HandlerFactoryPath);
-            JsonDataContractSerializer.Instance.UseBcl = Config.UseBclJsonSerializers;
-            JsonDataContractSerializer.Instance.UseBcl = Config.UseBclJsonSerializers;
             AbstractVirtualFileBase.ScanSkipPaths = Config.ScanSkipPaths;
             ResourceVirtualDirectory.EmbeddedResourceTreatAsFiles = Config.EmbeddedResourceTreatAsFiles;
             Metadata.ApiVersion = Config.ApiVersion;
             Metadata.ServiceName = ServiceName;
 
             Container.Register<IHashProvider>(c => new SaltedHash()).ReusedWithin(ReuseScope.None);
-            if (Config.DebugMode)
-            {
+            if (Config.DebugMode)           
                 Plugins.Add(new RequestInfoFeature());
-            }
+            
             Service.DefaultResolver = this;
             ServiceController = ServiceController ?? CreateServiceController();
             try
@@ -199,7 +190,7 @@ namespace ServiceStack
                 OnStartupException(ex);
             }
             OnAfterInit();      
-            ReadyAt = DateTime.UtcNow;
+            ReadyAt = DateTime.Now;
             LogInitResult();
             return this;
         }
@@ -207,11 +198,16 @@ namespace ServiceStack
         public bool Ready => ReadyAt != DateTime.MinValue;
 
         /// <summary>
+        /// Collection of added plugins.
+        /// </summary>
+        public List<IPlugin> Plugins { get; private set; }
+
+        /// <summary>
         /// If app currently runs for unit tests. Used for overwritting AuthSession.
         /// </summary>
         public bool TestMode { get; set; }
 
-        public ServiceMetadata Metadata { get; set; }
+        public ServiceMetadata Metadata { get; private set; }
 
         public ServiceController ServiceController { get; set; }
 
@@ -311,14 +307,6 @@ namespace ServiceStack
 
             if (config.HandlerFactoryPath != null)
                 config.HandlerFactoryPath = config.HandlerFactoryPath.TrimStart('/');
-
-            if (config.UseCamelCase)
-                JsConfig.EmitCamelCaseNames = true;
-
-            if (config.EnableOptimizations)
-            {
-                MemoryStreamFactory.UseRecyclableMemoryStream = true;
-            }
 
             var specifiedContentType = config.DefaultContentType; //Before plugins loaded
 
@@ -436,19 +424,16 @@ namespace ServiceStack
 
         private void LogInitResult()
         {
-            var elapsed = DateTime.UtcNow - CreateAt;
-            var hasErrors = StartUpErrors.Any();
-
-            if (hasErrors)
+            var elapsed = DateTime.Now - CreateAt;
+            if (StartUpErrors.Any())
             {
+                Config.GlobalResponseHeaders["X-Startup-Errors"] = StartUpErrors.Count.ToString();
                 Logger.ErrorFormat(
                     "Initializing Application {0} took {1}ms. {2} error(s) detected: {3}",
                     ServiceName,
                     elapsed.TotalMilliseconds,
                     StartUpErrors.Count,
-                    StartUpErrors.ToJson());
-
-                Config.GlobalResponseHeaders["X-Startup-Errors"] = StartUpErrors.Count.ToString();
+                    StartUpErrors.Dump());
             }
             else
             {
@@ -514,7 +499,7 @@ namespace ServiceStack
 
         public IEnumerable<RestPath> RestPaths { get { return ServiceController?.RestPathMap.SelectMany(x => x.Value); } }
 
-        public Dictionary<Type, Func<IRequest, object>> RequestBinders => ServiceController.RequestTypeFactoryMap;
+        public Dictionary<Type, Func<IRequest, object>> RequestBinders => ServiceController?.RequestTypeFactoryMap;
 
         public IContentTypes ContentTypes { get; set; }
 
@@ -523,7 +508,7 @@ namespace ServiceStack
         /// They are called before each request is handled by a service, but after an HttpHandler is by the <see cref="HttpHandlerFactory"/> chosen.
         /// called in <see cref="ApplyPreRequestFilters"/>.
         /// </summary>
-        public List<Action<IRequest, IResponse>> PreRequestFilters { get; set; }
+        public List<Action<IRequest, IResponse>> PreRequestFilters { get; private set; }
 
         /// <summary>
         /// Collection of RequestConverters.
@@ -570,9 +555,9 @@ namespace ServiceStack
         /// </summary>
         public List<IViewEngine> ViewEngines { get; set; }
 
-        public List<HandleServiceExceptionDelegate> ServiceExceptionHandlers { get; set; }
+        public List<ServiceExceptionHandler> ServiceExceptionHandlers { get; set; }
 
-        public List<HandleUncaughtExceptionDelegate> UncaughtExceptionHandlers { get; set; }
+        public List<UncatchedExceptionHandler> UncaughtExceptionHandlers { get; set; }
 
         public List<Action<IAppHost>> AfterInitCallbacks { get; set; }
 
@@ -582,7 +567,7 @@ namespace ServiceStack
 
         public List<Func<IHttpRequest, IHttpHandler>> RawHttpHandlers { get; set; }
 
-        public List<HttpHandlerResolverDelegate> CatchAllHandlers { get; set; }
+        public List<HttpHandlerResolver> CatchAllHandlers { get; set; }
 
         public IServiceStackHandler GlobalHtmlErrorHttpHandler { get; set; }
 

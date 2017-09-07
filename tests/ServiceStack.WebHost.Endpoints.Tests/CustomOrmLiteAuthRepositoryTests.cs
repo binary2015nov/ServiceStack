@@ -197,7 +197,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             client.Post(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = "admin",
                 Password = "p@55w0rd",
                 RememberMe = true

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.13
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4EBD29DD-21A1-47B5-80DB-F9D58C91BED5}"
 EndProject
@@ -79,13 +79,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Signed", "Signed", "{C57AF9
 		..\NuGet.Signed\ServiceStack.Signed\servicestack.signed.nuspec = ..\NuGet.Signed\ServiceStack.Signed\servicestack.signed.nuspec
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Common.Tests", "..\tests\ServiceStack.Common.Tests\ServiceStack.Common.Tests.csproj", "{3FA9197A-462D-44CC-9AB3-61AF414D0B45}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.Common.Tests", "..\tests\ServiceStack.Common.Tests\ServiceStack.Common.Tests.csproj", "{3FA9197A-462D-44CC-9AB3-61AF414D0B45}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3170CB82-DFD4-4E65-8292-CEE38967D75F} = {3170CB82-DFD4-4E65-8292-CEE38967D75F}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.ServiceHost.Tests", "..\tests\ServiceStack.ServiceHost.Tests\ServiceStack.ServiceHost.Tests.csproj", "{94A33BC4-AC22-49A3-A38E-2ABFCD997ABA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.ServiceModel.Tests", "..\tests\ServiceStack.ServiceModel.Tests\ServiceStack.ServiceModel.Tests.csproj", "{A5646013-C243-453F-A2B6-3B6870A9637D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.ServiceModel.Tests", "..\tests\ServiceStack.ServiceModel.Tests\ServiceStack.ServiceModel.Tests.csproj", "{A5646013-C243-453F-A2B6-3B6870A9637D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.WebHost.Endpoints.Tests", "..\tests\ServiceStack.WebHost.Endpoints.Tests\ServiceStack.WebHost.Endpoints.Tests.csproj", "{55C5C6DA-1834-4BA8-8D2F-19C091B6FC81}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.WebHost.Endpoints.Tests", "..\tests\ServiceStack.WebHost.Endpoints.Tests\ServiceStack.WebHost.Endpoints.Tests.csproj", "{55C5C6DA-1834-4BA8-8D2F-19C091B6FC81}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3170CB82-DFD4-4E65-8292-CEE38967D75F} = {3170CB82-DFD4-4E65-8292-CEE38967D75F}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.WebHost.IntegrationTests", "..\tests\ServiceStack.WebHost.IntegrationTests\ServiceStack.WebHost.IntegrationTests.csproj", "{801771CD-2C19-463A-94F8-DF546825DF47}"
 EndProject
@@ -123,7 +129,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.Server", "Serv
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.Client", "ServiceStack.Client\ServiceStack.Client.csproj", "{C43F583F-ABDE-4DD4-BBE3-66322817A6AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Server.Tests", "..\tests\ServiceStack.Server.Tests\ServiceStack.Server.Tests.csproj", "{BB47EC88-D61D-4B67-9491-78C7155A7798}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.Server.Tests", "..\tests\ServiceStack.Server.Tests\ServiceStack.Server.Tests.csproj", "{BB47EC88-D61D-4B67-9491-78C7155A7798}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.Authentication.MongoDb", "ServiceStack.Authentication.MongoDb\ServiceStack.Authentication.MongoDb.csproj", "{16E42781-8872-4468-9B7A-9140778A4D5E}"
 EndProject
@@ -904,6 +910,15 @@ Global
 		{0428D353-CD67-481F-877A-676E3BBCF903} = {CBDE0575-D09B-4B4D-8C62-5E03E54F6BE8}
 		{CFD618DD-5DE8-42FE-8D83-CC5AB7A40FC1} = {4EBD29DD-21A1-47B5-80DB-F9D58C91BED5}
 		{E6E62C04-1CD3-4278-AF15-A51853681EAD} = {EB65E771-6C97-4D64-8E11-FD88AE48A41A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4788A68F-2C4B-4957-AC64-3284C2D2C302}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = ..\tests\RazorRockstars.Console\RazorRockstars.Console.csproj

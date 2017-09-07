@@ -17,7 +17,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         public void Can_download_webpage_html_page()
         {
             var html = (Constant.AbsoluteBaseUri + "webpage.html").GetHtmlFromUrl();
-            Assert.That(html.Contains("Default index ServiceStack.WebHost.IntegrationTests page"));
+            Assert.That(html.Contains("ServiceStack.WebHost.IntegrationTests Web Page"));
         }
 
         [Test]

@@ -1,3 +1,4 @@
+using Funq;
 using System.Runtime.Serialization;
 
 namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
@@ -34,4 +35,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 			};
 		}
 	}
+
+    public class TestConfigAppHostHttpListener : AppHostHttpListenerBase
+    {
+        public TestConfigAppHostHttpListener() : base("TestConfigAppHost Service", typeof(BclDto).GetAssembly())
+        {
+            Config.UseBclJsonSerializers = true;
+        }
+
+        public override void Configure(Container container) { }
+    }
 }

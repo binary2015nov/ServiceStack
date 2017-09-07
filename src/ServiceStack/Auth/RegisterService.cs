@@ -65,11 +65,11 @@ namespace ServiceStack.Auth
                 {
                     authResponse = authService.Post(
                         new Authenticate {
-                            provider = CredentialsAuthProvider.Name,
+                            Provider = CredentialsAuthProvider.Name,
                             UserName = request.UserName ?? request.Email,
                             Password = request.Password,
                             Continue = request.Continue
-                        });                   
+                        });
                 }
                 if (authResponse is Exception)
                     throw (Exception)authResponse;

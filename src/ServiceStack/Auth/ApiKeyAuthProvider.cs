@@ -305,7 +305,7 @@ namespace ServiceStack.Auth
             {
                 var response = authService.Post(new Authenticate
                 {
-                    provider = Name,
+                    Provider = Name,
                     UserName = "ApiKey",
                     Password = apiKey.Id,
                 });

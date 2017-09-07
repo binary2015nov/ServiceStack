@@ -1363,7 +1363,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             {
                 await client.AuthenticateAsync(new Authenticate
                 {
-                    provider = CustomCredentialsAuthProvider.Name,
+                    Provider = CustomCredentialsAuthProvider.Name,
                     UserName = "user",
                     Password = "pass",
                 });
@@ -1401,7 +1401,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
                 await client.AuthenticateAsync(new Authenticate
                 {
-                    provider = CustomCredentialsAuthProvider.Name,
+                    Provider = CustomCredentialsAuthProvider.Name,
                     UserName = "user",
                     Password = "pass",
                 });

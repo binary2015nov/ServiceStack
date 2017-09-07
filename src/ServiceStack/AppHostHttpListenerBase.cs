@@ -65,22 +65,12 @@ namespace ServiceStack
             var handler = HttpHandlerFactory.GetHandler(httpReq);
 
             var serviceStackHandler = handler as IServiceStackHandler;
-            if (serviceStackHandler != null)
-            {
-                //var restHandler = serviceStackHandler as RestHandler;
-                //if (restHandler != null)
-                //{
-                //    httpReq.OperationName = operationName = restHandler.RestPath.RequestType.GetOperationName();
-                //}
-
-                var task = serviceStackHandler.ProcessRequestAsync(httpReq, httpRes, operationName);
-                await HostContext.Async.ContinueWith(httpReq, task, x => httpRes.Close(), TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.AttachedToParent);
-                //Matches Exceptions handled in HttpListenerBase.InitTask()
-
-                return;
-            }
-
-            throw new NotImplementedException($"Cannot execute handler: {handler} at PathInfo: {httpReq.PathInfo}");
+            if (serviceStackHandler == null)
+                throw new NotImplementedException($"Cannot execute handler: {handler} at PathInfo: {httpReq.PathInfo}");
+          
+            var task = serviceStackHandler.ProcessRequestAsync(httpReq, httpRes, operationName);
+            await HostContext.Async.ContinueWith(httpReq, task, x => httpRes.Close(), TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.AttachedToParent);
+            //Matches Exceptions handled in HttpListenerBase.InitTask() 
         }
     }
 }
