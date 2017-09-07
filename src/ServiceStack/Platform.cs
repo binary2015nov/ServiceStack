@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using ServiceStack.Configuration;
+using ServiceStack.Text;
 using ServiceStack.Web;
 
 namespace ServiceStack
@@ -128,6 +129,13 @@ namespace ServiceStack
             }
 
             return -1;
+        }
+
+        public static void Reset()
+        {
+            JsConfig.Reset();
+            PlatformExtensions.ClearRuntimeAttributes(); //Clears Runtime Attributes
+            ReflectionExtensions.Reset();   
         }
     }
 }

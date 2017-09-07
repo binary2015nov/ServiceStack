@@ -1737,7 +1737,7 @@
             </summary>
             <param name="baseUriString">The base System.Uri, represented as a System.String.</param>
             <param name="uriComponents">An string array that contains the uri component elements.</param>
-            <param name="escape">true if uri component is escaped; otherwise, false.</param>
+            <param name="escape">true if escape the uri components; otherwise, false.</param>
             <returns>A string representation for a System.Uri instance.</returns>
         </member>
         <member name="M:ServiceStack.StringExtensions.FastToUtf8Bytes(System.String)">

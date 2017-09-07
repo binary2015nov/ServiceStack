@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.12
+VisualStudioVersion = 15.0.26823.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4EBD29DD-21A1-47B5-80DB-F9D58C91BED5}"
 EndProject
@@ -80,18 +80,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Signed", "Signed", "{C57AF9
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.Common.Tests", "..\tests\ServiceStack.Common.Tests\ServiceStack.Common.Tests.csproj", "{3FA9197A-462D-44CC-9AB3-61AF414D0B45}"
-	ProjectSection(ProjectDependencies) = postProject
-		{3170CB82-DFD4-4E65-8292-CEE38967D75F} = {3170CB82-DFD4-4E65-8292-CEE38967D75F}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.ServiceHost.Tests", "..\tests\ServiceStack.ServiceHost.Tests\ServiceStack.ServiceHost.Tests.csproj", "{94A33BC4-AC22-49A3-A38E-2ABFCD997ABA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.ServiceModel.Tests", "..\tests\ServiceStack.ServiceModel.Tests\ServiceStack.ServiceModel.Tests.csproj", "{A5646013-C243-453F-A2B6-3B6870A9637D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.WebHost.Endpoints.Tests", "..\tests\ServiceStack.WebHost.Endpoints.Tests\ServiceStack.WebHost.Endpoints.Tests.csproj", "{55C5C6DA-1834-4BA8-8D2F-19C091B6FC81}"
-	ProjectSection(ProjectDependencies) = postProject
-		{3170CB82-DFD4-4E65-8292-CEE38967D75F} = {3170CB82-DFD4-4E65-8292-CEE38967D75F}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.WebHost.IntegrationTests", "..\tests\ServiceStack.WebHost.IntegrationTests\ServiceStack.WebHost.IntegrationTests.csproj", "{801771CD-2C19-463A-94F8-DF546825DF47}"
 EndProject

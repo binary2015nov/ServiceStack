@@ -33,6 +33,7 @@ namespace ServiceStack.WebHost.IntegrationTests
             Config.ApiVersion = "2.0.0";
             Config.DebugMode = true;
             Config.UseCamelCase = true;
+            JsConfig.EmitCamelCaseNames = true;
             //Show StackTraces for easier debugging
             //var onlyEnableFeatures = Feature.All.Remove(Feature.Jsv | Feature.Soap);
             //Config.EnableFeatures = onlyEnableFeatures;       

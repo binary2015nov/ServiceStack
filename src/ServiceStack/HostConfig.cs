@@ -125,6 +125,7 @@ namespace ServiceStack
             };
             FallbackRestPath = null;
             UseHttpsLinks = false;
+            UseBclJsonSerializers = false;
 #if !NETSTANDARD1_6
             UseCamelCase = false;
             EnableOptimizations = false;

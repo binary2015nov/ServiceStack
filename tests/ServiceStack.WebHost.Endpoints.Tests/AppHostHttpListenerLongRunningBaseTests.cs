@@ -14,13 +14,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         ServiceStackHost appHost;
 
         [OneTimeSetUp]
-        public void TestFixtureStartUp()
+        public void TestFixtureSetUp()
         {
             appHost = new ExampleAppHostHttpListenerPool()
                 .Init()
                 .Start(Config.ListeningOn);
 
-            Console.WriteLine(@"ExampleAppHost Created at {0}, listening on {1}", DateTime.Now, Config.ListeningOn);
+            Console.WriteLine(@"ExampleAppHost Created at {0}, listening on {1}", appHost.CreateAt, Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -32,35 +32,35 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Root_path_redirects_to_metadata_page()
         {
-            var html = HttpUtils.GetStringFromUrl(Config.ListeningOn);
+            var html = Config.ListeningOn.GetStringFromUrl();
             Assert.That(html.Contains("The following operations are supported."));
         }
 
         [Test]
         public void Can_download_webpage_html_page()
         {
-            var html = HttpUtils.GetStringFromUrl((Config.ListeningOn + "webpage.html"));
-            Assert.That(html.Contains("Default index ServiceStack.WebHost.Endpoints.Tests page"));
+            var html = (Config.ListeningOn + "webpage.html").GetHtmlFromUrl();
+            Assert.That(html.Contains("ServiceStack.WebHost.Endpoints.Tests Web Page"));
         }
 
         [Test]
         public void Can_download_requestinfo_json()
         {
-            var html = HttpUtils.GetStringFromUrl((Config.ListeningOn + "?debug=requestinfo"));
+            var html = (Config.ListeningOn + "?debug=requestinfo").GetStringFromUrl();
             Assert.That(html.Contains("\"Host\":"));
         }
 
         [Test]
         public void Gets_404_on_non_existant_page()
         {
-            var webRes = HttpUtils.GetWebResponse((Config.ListeningOn + "nonexistant.html"));
+            var webRes = (Config.ListeningOn + "nonexistant.html").GetWebResponse();
             Assert.That(webRes.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         }
 
         [Test]
         public void Gets_403_on_page_with_non_whitelisted_extension()
         {
-            var webRes = HttpUtils.GetWebResponse((Config.ListeningOn + "webpage.forbidden"));
+            var webRes = (Config.ListeningOn + "webpage.forbidden").GetWebResponse();
             Assert.That(webRes.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
         }
 
@@ -77,7 +77,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_call_jsv_debug_on_GetFactorial_WebService()
         {
-            var contents = HttpUtils.GetStringFromUrl(Config.ListeningOn + "jsv/reply/GetFactorial?ForNumber=3&debug=true");
+            var contents = Config.ListeningOn.AppendPath("jsv/reply/GetFactorial?ForNumber=3&debug=true").GetStringFromUrl();
             Console.WriteLine("JSV DEBUG: " + contents);
 
             Assert.That(contents, Is.Not.Null);
@@ -90,7 +90,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             int errorCount = 0;
             try
             {
-                HttpUtils.GetStringFromUrl(missingUrl);
+                missingUrl.GetStringFromUrl();
             }
             catch (Exception ex)
             {
@@ -99,7 +99,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
             try
             {
-                HttpUtils.GetStringFromUrl(missingUrl);
+                missingUrl.GetStringFromUrl();
             }
             catch (Exception ex)
             {
@@ -141,7 +141,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var url = Config.ListeningOn + "gethttpresult?callback=cb";
             string response;
 
-            var webReq = (HttpWebRequest)WebRequest.Create(url);
+            var webReq = WebRequest.CreateHttp(url);
             webReq.Accept = "*/*";
             using (var webRes = webReq.GetResponse())
             {

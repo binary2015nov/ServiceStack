@@ -23,7 +23,7 @@ namespace ServiceStack
         /// <summary>
         /// The assemblies reflected to find api services provided in the AppHost constructor
         /// </summary>
-        List<Assembly> ServiceAssemblies { get; }
+        Assembly[] ServiceAssemblies { get; }
 
         /// <summary>
         /// The AppHost config

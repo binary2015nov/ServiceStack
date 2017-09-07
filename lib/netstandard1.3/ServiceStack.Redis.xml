@@ -1430,7 +1430,7 @@
             <param name="someBytes">byte array to deserialize</param>
             <returns></returns>
         </member>
-        <!-- 对于成员“M:ServiceStack.Redis.Support.Queue.Implementation.SerializingRedisClient.Deserialize(System.Byte[][])”忽略有格式错误的 XML 注释 -->
+        <!-- Badly formed XML comment ignored for member "M:ServiceStack.Redis.Support.Queue.Implementation.SerializingRedisClient.Deserialize(System.Byte[][])" -->
         <member name="P:ServiceStack.Redis.Support.Queue.ISequentialData`1.DequeueItems">
             <summary>
             

@@ -502,8 +502,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
     {
         public ExampleAppHostHttpListenerPool() : base("ServiceStack Examples", 500, typeof(GetFactorialService).GetAssembly())
         {
-            LogManager.LogFactory = new DebugLogFactory();
-
             //Signal advanced web browsers what HTTP Methods you accept
             Config.GlobalResponseHeaders = new Dictionary<string, string> {
                 { "Access-Control-Allow-Origin", "*" },

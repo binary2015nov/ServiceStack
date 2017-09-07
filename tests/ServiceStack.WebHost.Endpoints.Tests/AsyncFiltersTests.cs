@@ -216,7 +216,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OneTimeTearDown() => appHost.Dispose();
+        public void TestFixtureTearDown() => appHost.Dispose();
 
         [Test]
         public void Does_Execute_all_RequestFilters()

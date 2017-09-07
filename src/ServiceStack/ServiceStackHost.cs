@@ -241,74 +241,73 @@ namespace ServiceStack
         //After configure called
         public virtual void InitFinal()
         {
-            var config = Config;
-            if (config.EnableFeatures != Feature.All)
+            if (Config.EnableFeatures != Feature.All)
             {
-                if ((Feature.Xml & config.EnableFeatures) != Feature.Xml)
+                if ((Feature.Xml & Config.EnableFeatures) != Feature.Xml)
                 {
-                    config.IgnoreFormatsInMetadata.Add("xml");
+                    Config.IgnoreFormatsInMetadata.Add("xml");
                     Config.PreferredContentTypes.Remove(MimeTypes.Xml);
                 }
-                if ((Feature.Json & config.EnableFeatures) != Feature.Json)
+                if ((Feature.Json & Config.EnableFeatures) != Feature.Json)
                 {
-                    config.IgnoreFormatsInMetadata.Add("json");
+                    Config.IgnoreFormatsInMetadata.Add("json");
                     Config.PreferredContentTypes.Remove(MimeTypes.Json);
                 }
-                if ((Feature.Jsv & config.EnableFeatures) != Feature.Jsv)
+                if ((Feature.Jsv & Config.EnableFeatures) != Feature.Jsv)
                 {
-                    config.IgnoreFormatsInMetadata.Add("jsv");
+                    Config.IgnoreFormatsInMetadata.Add("jsv");
                     Config.PreferredContentTypes.Remove(MimeTypes.Jsv);
                 }
-                if ((Feature.Csv & config.EnableFeatures) != Feature.Csv)
+                if ((Feature.Csv & Config.EnableFeatures) != Feature.Csv)
                 {
-                    config.IgnoreFormatsInMetadata.Add("csv");
+                    Config.IgnoreFormatsInMetadata.Add("csv");
                     Config.PreferredContentTypes.Remove(MimeTypes.Csv);
                 }
-                if ((Feature.Html & config.EnableFeatures) != Feature.Html)
+                if ((Feature.Html & Config.EnableFeatures) != Feature.Html)
                 {
-                    config.IgnoreFormatsInMetadata.Add("html");
+                    Config.IgnoreFormatsInMetadata.Add("html");
                     Config.PreferredContentTypes.Remove(MimeTypes.Html);
                 }
-                if ((Feature.Soap11 & config.EnableFeatures) != Feature.Soap11)
-                    config.IgnoreFormatsInMetadata.Add("soap11");
-                if ((Feature.Soap12 & config.EnableFeatures) != Feature.Soap12)
-                    config.IgnoreFormatsInMetadata.Add("soap12");
+                if ((Feature.Soap11 & Config.EnableFeatures) != Feature.Soap11)
+                    Config.IgnoreFormatsInMetadata.Add("soap11");
+                if ((Feature.Soap12 & Config.EnableFeatures) != Feature.Soap12)
+                    Config.IgnoreFormatsInMetadata.Add("soap12");
             }
 
-            if ((Feature.Html & config.EnableFeatures) != Feature.Html)
+            if ((Feature.Html & Config.EnableFeatures) != Feature.Html)
                 Plugins.RemoveAll(x => x is HtmlFormat);
 
-            if ((Feature.Csv & config.EnableFeatures) != Feature.Csv)
+            if ((Feature.Csv & Config.EnableFeatures) != Feature.Csv)
                 Plugins.RemoveAll(x => x is CsvFormat);
 
-            if ((Feature.Markdown & config.EnableFeatures) != Feature.Markdown)
+            if ((Feature.Markdown & Config.EnableFeatures) != Feature.Markdown)
                 Plugins.RemoveAll(x => x is MarkdownFormat);
 
-            if ((Feature.PredefinedRoutes & config.EnableFeatures) != Feature.PredefinedRoutes)
+            if ((Feature.PredefinedRoutes & Config.EnableFeatures) != Feature.PredefinedRoutes)
                 Plugins.RemoveAll(x => x is PredefinedRoutesFeature);
 
-            if ((Feature.Metadata & config.EnableFeatures) != Feature.Metadata)
+            if ((Feature.Metadata & Config.EnableFeatures) != Feature.Metadata)
             {
                 Plugins.RemoveAll(x => x is MetadataFeature);
                 Plugins.RemoveAll(x => x is NativeTypesFeature);
             }
 
-            if ((Feature.RequestInfo & config.EnableFeatures) != Feature.RequestInfo)
+            if ((Feature.RequestInfo & Config.EnableFeatures) != Feature.RequestInfo)
                 Plugins.RemoveAll(x => x is RequestInfoFeature);
 
-            if ((Feature.Razor & config.EnableFeatures) != Feature.Razor)
+            if ((Feature.Razor & Config.EnableFeatures) != Feature.Razor)
                 Plugins.RemoveAll(x => x is IRazorPlugin);    //external
 
-            if ((Feature.ProtoBuf & config.EnableFeatures) != Feature.ProtoBuf)
+            if ((Feature.ProtoBuf & Config.EnableFeatures) != Feature.ProtoBuf)
                 Plugins.RemoveAll(x => x is IProtoBufPlugin); //external
 
-            if ((Feature.MsgPack & config.EnableFeatures) != Feature.MsgPack)
+            if ((Feature.MsgPack & Config.EnableFeatures) != Feature.MsgPack)
                 Plugins.RemoveAll(x => x is IMsgPackPlugin);  //external
 
-            if (config.HandlerFactoryPath != null)
-                config.HandlerFactoryPath = config.HandlerFactoryPath.TrimStart('/');
+            if (Config.HandlerFactoryPath != null)
+                Config.HandlerFactoryPath = Config.HandlerFactoryPath.TrimStart('/');
 
-            var specifiedContentType = config.DefaultContentType; //Before plugins loaded
+            var specifiedContentType = Config.DefaultContentType; //Before plugins loaded
 
             var plugins = Plugins.ToArray();
             delayLoadPlugin = true;
@@ -345,7 +344,7 @@ namespace ServiceStack
                 Container.Register<IAuthRepository>(c => c.Resolve<IUserAuthRepository>());
             }
 
-            if (config.LogUnobservedTaskExceptions)
+            if (Config.LogUnobservedTaskExceptions)
             {
                 TaskScheduler.UnobservedTaskException += (sender, args) =>
                 {
@@ -993,8 +992,8 @@ namespace ServiceStack
                     Container.Dispose();
                     Container = null;
                 }
-                JsConfig.Reset();
-                PlatformExtensions.ClearRuntimeAttributes(); //Clears Runtime Attributes
+
+                Platform.Reset();
                 if (HostContext.AppHost == this)
                     HostContext.AppHost = null;
             }

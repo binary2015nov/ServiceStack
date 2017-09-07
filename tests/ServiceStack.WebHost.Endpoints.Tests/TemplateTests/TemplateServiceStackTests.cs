@@ -9,7 +9,6 @@ using ServiceStack.IO;
 using ServiceStack.OrmLite;
 using ServiceStack.Templates;
 using ServiceStack.Testing;
-using ServiceStack.Text;
 
 namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
 {

@@ -2094,7 +2094,7 @@
             Matching Fields: "SomeField1, SomeField2"
             </param>
         </member>
-        <!-- 对于成员“M:ServiceStack.OrmLite.SqlExpression`1.Select(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})”忽略有格式错误的 XML 注释 -->
+        <!-- Badly formed XML comment ignored for member "M:ServiceStack.OrmLite.SqlExpression`1.Select(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})" -->
         <member name="M:ServiceStack.OrmLite.SqlExpression`1.Skip(System.Nullable{System.Int32})">
             <summary>
             Offset of the first row to return. The offset of the initial row is 0
@@ -2905,7 +2905,7 @@
             <para>db.Column&lt;string&gt;("SELECT LastName FROM Person WHERE Age = @age", new { age = 27 })</para>
             </summary>
         </member>
-        <!-- 对于成员“M:ServiceStack.OrmLite.OrmLiteReadApi.ColumnDistinct``1(System.Data.IDbConnection,ServiceStack.OrmLite.ISqlExpression)”忽略有格式错误的 XML 注释 -->
+        <!-- Badly formed XML comment ignored for member "M:ServiceStack.OrmLite.OrmLiteReadApi.ColumnDistinct``1(System.Data.IDbConnection,ServiceStack.OrmLite.ISqlExpression)" -->
         <member name="M:ServiceStack.OrmLite.OrmLiteReadApi.ColumnDistinct``1(System.Data.IDbConnection,System.String,System.Object)">
             <summary>
             Returns the distinct first column values in a HashSet using an SqlFormat query. E.g:
@@ -2918,7 +2918,7 @@
             <para>db.ColumnDistinct&lt;int&gt;("SELECT Age FROM Person WHERE Age &lt; @age", new[] { db.CreateParam("age",50) })</para>
             </summary>
         </member>
-        <!-- 对于成员“M:ServiceStack.OrmLite.OrmLiteReadApi.Lookup``2(System.Data.IDbConnection,ServiceStack.OrmLite.ISqlExpression)”忽略有格式错误的 XML 注释 -->
+        <!-- Badly formed XML comment ignored for member "M:ServiceStack.OrmLite.OrmLiteReadApi.Lookup``2(System.Data.IDbConnection,ServiceStack.OrmLite.ISqlExpression)" -->
         <member name="M:ServiceStack.OrmLite.OrmLiteReadApi.Lookup``2(System.Data.IDbConnection,System.String,System.Collections.Generic.IEnumerable{System.Data.IDbDataParameter})">
             <summary>
             Returns an Dictionary&lt;K, List&lt;V&gt;&gt; grouping made from the first two columns using an parameterized query. E.g:
@@ -2931,7 +2931,7 @@
             <para>db.Lookup&lt;int, string&gt;("SELECT Age, LastName FROM Person WHERE Age &lt; @age", new { age = 50 })</para>
             </summary>
         </member>
-        <!-- 对于成员“M:ServiceStack.OrmLite.OrmLiteReadApi.Dictionary``2(System.Data.IDbConnection,ServiceStack.OrmLite.ISqlExpression)”忽略有格式错误的 XML 注释 -->
+        <!-- Badly formed XML comment ignored for member "M:ServiceStack.OrmLite.OrmLiteReadApi.Dictionary``2(System.Data.IDbConnection,ServiceStack.OrmLite.ISqlExpression)" -->
         <member name="M:ServiceStack.OrmLite.OrmLiteReadApi.Dictionary``2(System.Data.IDbConnection,System.String,System.Object)">
             <summary>
             Returns a Dictionary from the first 2 columns: Column 1 (Keys), Column 2 (Values) using sql. E.g:
@@ -2999,7 +2999,7 @@
             <para>var cmd = db.SqlProc("GetRockstarsAged", new { age = 42 })</para>
             </summary>
         </member>
-        <!-- 对于成员“M:ServiceStack.OrmLite.OrmLiteReadApi.SqlColumn``1(System.Data.IDbConnection,ServiceStack.OrmLite.ISqlExpression)”忽略有格式错误的 XML 注释 -->
+        <!-- Badly formed XML comment ignored for member "M:ServiceStack.OrmLite.OrmLiteReadApi.SqlColumn``1(System.Data.IDbConnection,ServiceStack.OrmLite.ISqlExpression)" -->
         <member name="M:ServiceStack.OrmLite.OrmLiteReadApi.SqlColumn``1(System.Data.IDbConnection,System.String,System.Collections.Generic.IEnumerable{System.Data.IDbDataParameter})">
             <summary>
             Returns the first column in a List using a parameterized query. E.g:
@@ -3250,7 +3250,7 @@
             <para>db.Column&lt;string&gt;("SELECT LastName FROM Person WHERE Age = @age", new { age = 27 })</para>
             </summary>
         </member>
-        <!-- 对于成员“M:ServiceStack.OrmLite.OrmLiteReadApiAsync.ColumnDistinctAsync``1(System.Data.IDbConnection,ServiceStack.OrmLite.ISqlExpression,System.Threading.CancellationToken)”忽略有格式错误的 XML 注释 -->
+        <!-- Badly formed XML comment ignored for member "M:ServiceStack.OrmLite.OrmLiteReadApiAsync.ColumnDistinctAsync``1(System.Data.IDbConnection,ServiceStack.OrmLite.ISqlExpression,System.Threading.CancellationToken)" -->
         <member name="M:ServiceStack.OrmLite.OrmLiteReadApiAsync.ColumnDistinctAsync``1(System.Data.IDbConnection,System.String,System.Collections.Generic.IEnumerable{System.Data.IDbDataParameter},System.Threading.CancellationToken)">
             <summary>
             Returns the distinct first column values in a HashSet using an SqlFormat query. E.g:
@@ -3263,7 +3263,7 @@
             <para>db.ColumnDistinct&lt;int&gt;("SELECT Age FROM Person WHERE Age &lt; @age", new { age = 50 })</para>
             </summary>
         </member>
-        <!-- 对于成员“M:ServiceStack.OrmLite.OrmLiteReadApiAsync.LookupAsync``2(System.Data.IDbConnection,ServiceStack.OrmLite.ISqlExpression,System.Threading.CancellationToken)”忽略有格式错误的 XML 注释 -->
+        <!-- Badly formed XML comment ignored for member "M:ServiceStack.OrmLite.OrmLiteReadApiAsync.LookupAsync``2(System.Data.IDbConnection,ServiceStack.OrmLite.ISqlExpression,System.Threading.CancellationToken)" -->
         <member name="M:ServiceStack.OrmLite.OrmLiteReadApiAsync.LookupAsync``2(System.Data.IDbConnection,System.String,System.Collections.Generic.IEnumerable{System.Data.IDbDataParameter},System.Threading.CancellationToken)">
             <summary>
             Returns an Dictionary&lt;K, List&lt;V&gt;&gt; grouping made from the first two columns using an parameterized query. E.g:
@@ -3276,7 +3276,7 @@
             <para>db.Lookup&lt;int, string&gt;("SELECT Age, LastName FROM Person WHERE Age &lt; @age", new { age = 50 })</para>
             </summary>
         </member>
-        <!-- 对于成员“M:ServiceStack.OrmLite.OrmLiteReadApiAsync.DictionaryAsync``2(System.Data.IDbConnection,ServiceStack.OrmLite.ISqlExpression,System.Threading.CancellationToken)”忽略有格式错误的 XML 注释 -->
+        <!-- Badly formed XML comment ignored for member "M:ServiceStack.OrmLite.OrmLiteReadApiAsync.DictionaryAsync``2(System.Data.IDbConnection,ServiceStack.OrmLite.ISqlExpression,System.Threading.CancellationToken)" -->
         <member name="M:ServiceStack.OrmLite.OrmLiteReadApiAsync.DictionaryAsync``2(System.Data.IDbConnection,System.String,System.Collections.Generic.IEnumerable{System.Data.IDbDataParameter},System.Threading.CancellationToken)">
             <summary>
             Returns a Dictionary from the first 2 columns: Column 1 (Keys), Column 2 (Values) using sql. E.g:
@@ -3344,7 +3344,7 @@
             <para>db.SqlList&lt;Person&gt;("EXEC GetRockstarsAged @age", dbCmd => ...)</para>
             </summary>
         </member>
-        <!-- 对于成员“M:ServiceStack.OrmLite.OrmLiteReadApiAsync.SqlColumnAsync``1(System.Data.IDbConnection,ServiceStack.OrmLite.ISqlExpression,System.Threading.CancellationToken)”忽略有格式错误的 XML 注释 -->
+        <!-- Badly formed XML comment ignored for member "M:ServiceStack.OrmLite.OrmLiteReadApiAsync.SqlColumnAsync``1(System.Data.IDbConnection,ServiceStack.OrmLite.ISqlExpression,System.Threading.CancellationToken)" -->
         <member name="M:ServiceStack.OrmLite.OrmLiteReadApiAsync.SqlColumnAsync``1(System.Data.IDbConnection,System.String,System.Collections.Generic.IEnumerable{System.Data.IDbDataParameter},System.Threading.CancellationToken)">
             <summary>
             Returns the first column in a List using a parameterized query. E.g:

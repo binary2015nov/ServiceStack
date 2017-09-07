@@ -307,12 +307,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="packages.config" />
     <Content Include="static-root.txt" />
     <Content Include="App.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\DataSources\ServiceStack.ServiceInterface.ServiceModel.ResponseStatus.datasource" />
-    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="README.md" />
     <Content Include="sample.pdf" />
     <None Include="webpage.forbidden" />
