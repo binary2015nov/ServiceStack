@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using static System.String;
 #if SL5
 using ServiceStack.Text;
 #else
@@ -76,7 +75,7 @@ namespace ServiceStack
             var predefinedRoute = $"/{format}/oneway/{requestType.GetOperationName()}";
             var queryProperties = RestRoute.GetQueryProperties(requestDto.GetType());
             var queryString = RestRoute.GetQueryString(requestDto, queryProperties);
-            if (!IsNullOrEmpty(queryString))
+            if (!queryString.IsNullOrEmpty())
                 predefinedRoute += "?" + queryString;
 
             return predefinedRoute;
@@ -94,7 +93,7 @@ namespace ServiceStack
             var predefinedRoute = $"/{format}/reply/{requestType.GetOperationName()}";
             var queryProperties = RestRoute.GetQueryProperties(requestDto.GetType());
             var queryString = RestRoute.GetQueryString(requestDto, queryProperties);
-            if (!IsNullOrEmpty(queryString))
+            if (!queryString.IsNullOrEmpty())
                 predefinedRoute += "?" + queryString;
 
             return predefinedRoute;
@@ -203,8 +202,7 @@ namespace ServiceStack
             {
                 if (formatFallbackToPredefinedRoute == null)
                     throw new InvalidOperationException($"There are no rest routes mapped for '{requestType}' type. "
-                        + "(Note: The automatic route selection only works with [Route] attributes on the request DTO and "
-                        + "not with routes registered in the IAppHost!)");
+                        + "(Note: The automatic route selection only works with [Route] attributes on the request DTO)");
 
                 var predefinedRoute = $"/{formatFallbackToPredefinedRoute}/reply/{requestType.GetOperationName()}";
                 if (httpMethod == "GET" || httpMethod == "DELETE" || httpMethod == "OPTIONS" || httpMethod == "HEAD")
@@ -221,7 +219,7 @@ namespace ServiceStack
             var matchingRoutes = routesApplied.Where(x => x.Matches).ToList();
             if (matchingRoutes.Count == 0)
             {
-                var errors = Join(Empty, routesApplied.Select(x =>
+                var errors = string.Join(string.Empty, routesApplied.Select(x =>
                     $"\r\n\t{x.Route.Path}:\t{x.FailReason}").ToArray());
                 var errMsg = $"None of the given rest routes matches '{requestType.GetOperationName()}' request:{errors}";
 
@@ -234,7 +232,7 @@ namespace ServiceStack
                 matchingRoute = FindMostSpecificRoute(matchingRoutes);
                 if (matchingRoute == null)
                 {
-                    var errors = Join(Empty, matchingRoutes.Select(x => "\r\n\t" + x.Route.Path).ToArray());
+                    var errors = string.Join(string.Empty, matchingRoutes.Select(x => "\r\n\t" + x.Route.Path).ToArray());
                     var errMsg = $"Ambiguous matching routes found for '{requestType.Name}' request:{errors}";
                     throw new InvalidOperationException(errMsg);
                 }
@@ -248,7 +246,7 @@ namespace ServiceStack
             if (!httpMethod.HasRequestBody())
             {
                 var queryParams = matchingRoute.Route.FormatQueryParameters(requestDto);
-                if (!IsNullOrEmpty(queryParams))
+                if (!queryParams.IsNullOrEmpty())
                 {
                     url += "?" + queryParams;
                 }
@@ -331,11 +329,6 @@ namespace ServiceStack
                 : null;
         }
 
-        public static string AsHttps(this string absoluteUrl)
-        {
-            return IsNullOrEmpty(absoluteUrl) ? null : absoluteUrl.ReplaceFirst("http://", "https://");
-        }
-
         public static Dictionary<string, Type> GetQueryPropertyTypes(this Type requestType)
         {
             var map = RestRoute.GetQueryProperties(requestType);
@@ -390,7 +383,7 @@ namespace ServiceStack
 
         public RestRoute(Type type, string path, string verbs, int priority)
         {
-            this.HttpMethods = (verbs ?? Empty).Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            this.HttpMethods = (verbs ?? string.Empty).Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
             this.Type = type;
             this.Path = path;
             this.Priority = priority;
@@ -416,7 +409,7 @@ namespace ServiceStack
 
         public Type Type { get; private set; }
 
-        public bool IsValid => IsNullOrEmpty(this.ErrorMsg);
+        public bool IsValid => this.ErrorMsg.IsNullOrEmpty();
 
         public string Path { get; }
 
@@ -464,7 +457,7 @@ namespace ServiceStack
 
             if (unmatchedVariables.Any())
             {
-                var errMsg = "Could not match following variables: " + Join(",", unmatchedVariables.ToArray());
+                var errMsg = "Could not match following variables: " + string.Join(",", unmatchedVariables.ToArray());
                 return RouteResolutionResult.Error(this, errMsg);
             }
 
@@ -521,7 +514,7 @@ namespace ServiceStack
                     if (!propertyInfo.HasAttribute<DataMemberAttribute>()) continue;
 
                     var dataMember = propertyInfo.FirstAttribute<DataMemberAttribute>();
-                    if (!IsNullOrEmpty(dataMember.Name))
+                    if (!dataMember.Name.IsNullOrEmpty())
                     {
                         propertyName = dataMember.Name;
                     }
@@ -555,7 +548,7 @@ namespace ServiceStack
             var components = path.Split(PathSeparatorChars);
             foreach (var component in components)
             {
-                if (IsNullOrEmpty(component))
+                if (component.IsNullOrEmpty())
                 {
                     continue;
                 }
@@ -580,7 +573,7 @@ namespace ServiceStack
 
         private void AppendError(string msg)
         {
-            if (IsNullOrEmpty(this.ErrorMsg))
+            if (this.ErrorMsg.IsNullOrEmpty())
             {
                 this.ErrorMsg = msg;
             }
@@ -597,7 +590,7 @@ namespace ServiceStack
         public string Uri { get; private set; }
         public RestRoute Route { get; private set; }
 
-        public bool Matches => IsNullOrEmpty(this.FailReason);
+        public bool Matches => this.FailReason.IsNullOrEmpty();
 
         public static RouteResolutionResult Error(RestRoute route, string errorMsg)
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading;
@@ -8,14 +9,13 @@ using Funq;
 using NUnit.Framework;
 using ServiceStack.Auth;
 using ServiceStack.Caching;
-using ServiceStack.Common.Tests.ServiceClient.Web;
+using ServiceStack.Client;
 using ServiceStack.Data;
 using ServiceStack.OrmLite;
 using ServiceStack.Text;
 using ServiceStack.Web;
 using ServiceStack.WebHost.Endpoints.Tests.Support.Services;
 using ServiceStack.WebHost.IntegrationTests.Services;
-using System.Collections.Generic;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
@@ -241,9 +241,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         public override void Execute(IRequest req, IResponse res, object requestDto)
         {
-            //Need to run SessionFeature filter since its not executed before this attribute (Priority -100)
-            SessionFeature.AddSessionIdToRequestFilter(req, res, null); //Required to get req.GetSessionId()
-
             req.Items["TriedMyOwnAuthFirst"] = true; // let's simulate some sort of auth _before_ relaying to base class.
 
             base.Execute(req, res, requestDto);
@@ -402,9 +399,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             appHost.Dispose();
         }
 
-        public virtual void Configure(Container container)
-        {
-        }
+        public virtual void Configure(Container container) { }
 
         private static void FailOnAsyncError<T>(T response, Exception ex)
         {
@@ -961,7 +956,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var request = new Secured { Name = "test" };
             try
             {
-                client.Send<SecureResponse>(request);
+                client.Send<HttpWebResponse>(request);
             } catch (WebServiceException ex)
             {
 #if NETCORE
@@ -994,7 +989,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var request = new Secured { Name = "test" };
             try
             {
-                client.Send<SecureResponse>(request);
+                client.Send<HttpWebResponse>(request);
             } catch (WebServiceException ex)
             {
 #if NETCORE
@@ -1011,8 +1006,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var redirectUri = new Uri(redirectQueryString);
 
             // Should contain the url attempted to access before the redirect to the login page.
-            var securedPath = "/".CombineWith(VirtualDirectory).CombineWith("secured");
-            Assert.That(redirectUri.AbsolutePath, Is.EqualTo(securedPath).IgnoreCase);
+            //var securedPath = "/".CombineWith(VirtualDirectory).CombineWith("secured");
+            //Assert.That(redirectUri.AbsolutePath, Is.EqualTo(securedPath).IgnoreCase);
             // The url should also obey the WebHostUrl setting for the domain.
             var redirectSchemeAndHost = redirectUri.Scheme + "://" + redirectUri.Authority;
             var webHostUri = new Uri(WebHostUrl);
@@ -1038,7 +1033,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             // Perform a GET so that the Name DTO field is encoded as query string.
             try
             {
-                client.Get(request);
+                client.Get<string>(request);
             } catch (WebServiceException ex)
             {
 #if NETCORE
@@ -1074,7 +1069,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             try
             {
-                client.Send(new Authenticate
+                client.Send<HttpWebResponse>(new Authenticate
                 {
                     Provider = CredentialsAuthProvider.Name,
                     UserName = UserNameWithSessionRedirect,
@@ -1088,7 +1083,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 if (ex.StatusCode == (int)HttpStatusCode.NotFound)
                     return;
 #endif
-                throw;
+                throw ex;
             }
 
             Assert.That(lastResponseLocationHeader, Is.EqualTo(SessionRedirectUrl));
@@ -1298,7 +1293,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_logout_using_CredentailsAuth()
         {
-            Assert.That(AuthProviderCatagery.LogoutAction, Is.EqualTo("logout"));
+            Assert.That(AuthProviderCatageries.LogoutAction, Is.EqualTo("logout"));
 
             try
             {
@@ -1320,7 +1315,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
                 logoutResponse = client.Send(new Authenticate
                 {
-                    Provider = AuthProviderCatagery.LogoutAction,
+                    Provider = AuthProviderCatageries.LogoutAction,
                 });
 
                 Assert.That(logoutResponse.ResponseStatus.ErrorCode, Is.Null);

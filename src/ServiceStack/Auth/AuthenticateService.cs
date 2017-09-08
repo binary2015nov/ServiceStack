@@ -35,7 +35,7 @@ namespace ServiceStack.Auth
         {
             if (AuthProviders.Length == 0)
                 return null;
-            if (provider == AuthProviderCatagery.LogoutAction)
+            if (provider == AuthProviderCatageries.LogoutAction)
                 return AuthProviders[0];
 
             foreach (var authProvider in AuthProviders)
@@ -64,8 +64,8 @@ namespace ServiceStack.Auth
                 throw new Exception("No auth providers have been registered in your app host.");
 
             var provider = request.Provider ?? AuthProviders[0].Provider;
-            if (provider == AuthProviderCatagery.CredentialsAliasProvider)
-                provider = AuthProviderCatagery.CredentialsProvider;
+            if (provider == AuthProviderCatageries.CredentialsAliasProvider)
+                provider = AuthProviderCatageries.CredentialsProvider;
 
             var authProvider = GetAuthProvider(provider);
             if (authProvider == null)
@@ -74,7 +74,7 @@ namespace ServiceStack.Auth
             if (request.RememberMe)
                 Request.AddSessionOptions(SessionOptions.Permanent);
 
-            if (AuthProviderCatagery.LogoutAction.EqualsIgnoreCase(request.Provider))
+            if (AuthProviderCatageries.LogoutAction.EqualsIgnoreCase(request.Provider))
                 return authProvider.Logout(this, request);
 
             var authWithRequest = authProvider as IAuthWithRequest;
@@ -190,7 +190,7 @@ namespace ServiceStack.Auth
                 if (authProvider == null)
                     throw HttpError.NotFound(ErrorMessages.UnknownAuthProviderFmt.Fmt(provider.SafeInput()));
 
-                if (request.Provider == AuthProviderCatagery.LogoutAction)
+                if (request.Provider == AuthProviderCatageries.LogoutAction)
                     return authProvider.Logout(this, request) as AuthenticateResponse;
 
                 var result = Authenticate(request, provider, this.GetSession(), authProvider);

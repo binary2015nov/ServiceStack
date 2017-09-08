@@ -7,7 +7,6 @@ using ServiceStack.Logging;
 using ServiceStack.Messaging.Redis;
 using ServiceStack.Redis;
 using ServiceStack.Text;
-using RedisMessageQueueClient = ServiceStack.Messaging.RedisMessageQueueClient;
 
 namespace ServiceStack.Server.Tests.Messaging
 {
@@ -140,7 +139,7 @@ namespace ServiceStack.Server.Tests.Messaging
 
         }
 
-        [Test]
+        [Test, Ignore("Redis failover support")]
         public void Can_failover_at_runtime()
         {
             var failoverHost = "redis-failover:6379";
@@ -219,7 +218,7 @@ namespace ServiceStack.Server.Tests.Messaging
             public string Host { get; set; }
         }
 
-        [Test]
+        [Test, Ignore("Redis failover support")]
         public void Can_failover_MqServer_at_runtime()
         {
             const int iterations = 100;
@@ -301,7 +300,7 @@ namespace ServiceStack.Server.Tests.Messaging
                         {
                             try
                             {
-                                var redis = (RedisNativeClient)((RedisMessageQueueClient)client).ReadWriteClient;
+                                var redis = (RedisNativeClient)((ServiceStack.Messaging.RedisMessageQueueClient)client).ReadWriteClient;
 
                                 client.Publish(new Msg { Host = redis.Host + ":" + redis.Port });
                                 Interlocked.Increment(ref count);

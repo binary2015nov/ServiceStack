@@ -37,7 +37,7 @@ namespace ServiceStack
                 if (!taskType.IsGenericType() || taskType.FullName.Contains("VoidTaskResult"))
                     return null;
 
-                var fn = taskType.GetFastGetter("Result");
+                var fn = TypeProperties.Get(taskType).GetPublicGetter("Result");
                 return fn?.Invoke(task);
             }
             catch (TypeAccessException)

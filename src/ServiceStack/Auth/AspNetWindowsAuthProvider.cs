@@ -12,8 +12,8 @@ namespace ServiceStack.Auth
 {
     public class AspNetWindowsAuthProvider : AuthProvider, IAuthWithRequest
     {
-        public static string Name = AuthProviderCatagery.WindowsAuthProvider;
-        public static string Realm = "/auth/" + AuthProviderCatagery.WindowsAuthProvider;
+        public static string Name = AuthProviderCatageries.WindowsAuthProvider;
+        public static string Realm = "/auth/" + AuthProviderCatageries.WindowsAuthProvider;
 
         public AspNetWindowsAuthProvider(IAppHost appHost)
         {

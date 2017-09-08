@@ -496,7 +496,7 @@ namespace ServiceStack
 
         public ServiceRoutes Routes { get; set; }
 
-        public IEnumerable<RestPath> RestPaths { get { return ServiceController?.RestPathMap.SelectMany(x => x.Value); } }
+        public IEnumerable<RestPath> RestPaths => ServiceController?.RestPathMap.SelectMany(x => x.Value) ?? Routes.RestPaths;
 
         public Dictionary<Type, Func<IRequest, object>> RequestBinders => ServiceController?.RequestTypeFactoryMap;
 
@@ -859,9 +859,10 @@ namespace ServiceStack
             {
                 foreach (var atRestPath in atRestPaths)
                 {
-                    if (atRestPath == null) continue;
+                    if (atRestPath == null)
+                        continue;
 
-                    this.Routes.Add(reqAttr.RequestType, atRestPath, null);
+                    ServiceController.RegisterRestPath(new RestPath(reqAttr.RequestType, atRestPath));
                 }
             }
         }

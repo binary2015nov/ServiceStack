@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Funq;
 using ServiceStack.Auth;
 using ServiceStack.Configuration;
+using ServiceStack.Host.Handlers;
 using ServiceStack.Logging;
 using ServiceStack.Messaging;
 using ServiceStack.Serialization;

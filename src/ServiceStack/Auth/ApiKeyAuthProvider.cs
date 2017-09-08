@@ -54,8 +54,8 @@ namespace ServiceStack.Auth
     /// </summary>
     public class ApiKeyAuthProvider : AuthProvider, IAuthWithRequest, IAuthPlugin
     {
-        public const string Name = AuthProviderCatagery.ApiKeyProvider;
-        public const string Realm = "/auth/" + AuthProviderCatagery.ApiKeyProvider;
+        public const string Name = AuthProviderCatageries.ApiKeyProvider;
+        public const string Realm = "/auth/" + AuthProviderCatageries.ApiKeyProvider;
 
         public static string[] DefaultTypes = new[] { "secret" };
         public static string[] DefaultEnvironments = new[] { "live", "test" };
@@ -424,7 +424,7 @@ namespace ServiceStack.Auth
             {
                 return new GetApiKeysResponse
                 {
-                    Results = apiRepo.GetUserApiKeys(base.Request.GetSession().UserAuthId)
+                    Results = apiRepo.GetUserApiKeys(this.GetSession().UserAuthId)
                         .Where(x => x.Environment == env)
                         .Map(k => new UserApiKey {
                             Key = k.Id,
@@ -494,7 +494,7 @@ namespace ServiceStack
 
         internal static ApiKeyAuthProvider AssertValidApiKeyRequest(this IRequest req)
         {
-            var apiKeyAuth = (ApiKeyAuthProvider)AuthenticateService.GetAuthProvider(AuthProviderCatagery.ApiKeyProvider);
+            var apiKeyAuth = (ApiKeyAuthProvider)AuthenticateService.GetAuthProvider(AuthProviderCatageries.ApiKeyProvider);
             if (apiKeyAuth.RequireSecureConnection && !req.IsSecureConnection)
                 throw HttpError.Forbidden(ErrorMessages.ApiKeyRequiresSecureConnection);
 

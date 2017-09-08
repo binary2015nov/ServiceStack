@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ServiceStack.Host.Handlers;
 using ServiceStack.MiniProfiler;
 using ServiceStack.Web;
 
-namespace ServiceStack.Host
+namespace ServiceStack.Host.Handlers
 {
     public class RestHandler : ServiceStackHandlerBase
     {

@@ -6,8 +6,8 @@ using System.Linq;
 using System.Web;
 using NUnit.Framework;
 using ServiceStack.Host;
+using ServiceStack.Host.Handlers;
 using ServiceStack.Testing;
-using ServiceStack.Text;
 
 namespace ServiceStack.Common.Tests
 {

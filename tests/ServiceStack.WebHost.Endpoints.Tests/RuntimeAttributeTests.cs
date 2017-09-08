@@ -8,7 +8,7 @@ using NUnit.Framework;
 using ServiceStack.Api.Swagger;
 using ServiceStack.Auth;
 using ServiceStack.DataAnnotations;
-using ServiceStack.Host;
+using ServiceStack.Host.Handlers;
 using ServiceStack.Web;
 
 namespace ServiceStack.WebHost.Endpoints.Tests

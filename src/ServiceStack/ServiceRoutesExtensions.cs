@@ -59,9 +59,10 @@ namespace ServiceStack
             }
         }
 
-        private static void AddRoute(this IServiceRoutes routes, Type requestType, string allowedVerbs)
+        private static void AddRoute(this IServiceRoutes routes, Type requestType, string allowedVerbs, 
+            IEnumerable<RouteNamingConventionDelegate> routeNamingConventions = null)
         {
-            foreach (var strategy in HostContext.Config.RouteNamingConventions)
+            foreach (var strategy in routeNamingConventions ?? HostContext.AppHost?.Config.RouteNamingConventions ?? RouteNamingConvention.Default.ToList())
             {
                 strategy(routes, requestType, allowedVerbs);
             }

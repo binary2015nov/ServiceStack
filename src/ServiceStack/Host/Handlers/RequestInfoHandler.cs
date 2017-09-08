@@ -201,12 +201,7 @@ namespace ServiceStack.Host.Handlers
             var response = GetRequestInfo(httpReq);
             response.HandlerFactoryArgs = HttpHandlerFactory.LastHandlerArgs;
             response.DebugString = "";
-#if !NETSTANDARD1_6
-            if (HttpContext.Current != null)
-            {
-                response.DebugString += HttpContext.Current.Request.GetType().FullName
-                    + "|" + HttpContext.Current.Response.GetType().FullName;
-            }
+#if !NETSTANDARD1_6        
 
             if (HostContext.IsAspNetHost)
             {
@@ -215,10 +210,15 @@ namespace ServiceStack.Host.Handlers
                 response.Path = aspReq.Path;
                 response.UserHostAddress = aspReq.UserHostAddress;
                 response.ApplicationPath = aspReq.ApplicationPath;
+
                 response.ApplicationVirtualPath = System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath;
                 response.VirtualAbsolutePathRoot = VirtualPathUtility.ToAbsolute("/");
                 response.VirtualAppRelativePathRoot = VirtualPathUtility.ToAppRelative("/");
-
+                if (HttpContext.Current != null)
+                {
+                    response.DebugString += HttpContext.Current.Request.GetType().FullName
+                        + "|" + HttpContext.Current.Response.GetType().FullName;
+                }
                 if (!Env.IsMono)
                 {
                     var userIdentity = aspReq.LogonUserIdentity;

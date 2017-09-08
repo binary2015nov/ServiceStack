@@ -46,7 +46,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public void Can_download_webpage_html_page()
         {
             var html = (Config.ListeningOn + "webpage.html").GetStringFromUrl();
-            Assert.That(html.Contains("Default index ServiceStack.WebHost.Endpoints.Tests page"));
+            Assert.That(html.Contains("ServiceStack.WebHost.Endpoints.Tests Web Page"));
         }
 
         [Test]

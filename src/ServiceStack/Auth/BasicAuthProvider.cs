@@ -6,10 +6,13 @@ namespace ServiceStack.Auth
 {
     public class BasicAuthProvider : CredentialsAuthProvider, IAuthWithRequest
     {
+        public new static string Name = AuthProviderCatageries.BasicProvider;
+        public new static string Realm = "/auth/" + AuthProviderCatageries.BasicProvider;
+
         public BasicAuthProvider()
         {
-            this.Provider = AuthProviderCatagery.BasicProvider;
-            this.AuthRealm = "/auth/" + AuthProviderCatagery.BasicProvider;
+            this.Provider = Name;
+            this.AuthRealm = Realm;
         }
 
         public BasicAuthProvider(IAppSettings appSettings)

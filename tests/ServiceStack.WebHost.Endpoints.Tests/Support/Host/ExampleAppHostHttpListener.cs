@@ -5,7 +5,6 @@ using System.Net;
 using System.Runtime.Serialization;
 using System.Threading;
 using Funq;
-using ServiceStack.Configuration;
 using ServiceStack.Data;
 using ServiceStack.DataAnnotations;
 using ServiceStack.Logging;

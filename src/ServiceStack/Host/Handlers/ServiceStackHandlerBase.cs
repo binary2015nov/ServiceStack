@@ -130,8 +130,7 @@ namespace ServiceStack.Host.Handlers
                 return KeyValueDataContractDeserializer.Instance.Parse(httpReq.FormData, operationType);
             }
 
-            var request = CreateContentTypeRequest(httpReq, operationType, contentType);
-            return request;
+            return CreateContentTypeRequest(httpReq, operationType, contentType);
         }
 
         protected static object CreateContentTypeRequest(IRequest httpReq, Type requestType, string contentType)

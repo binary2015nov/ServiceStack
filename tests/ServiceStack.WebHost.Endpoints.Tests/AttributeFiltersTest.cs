@@ -4,7 +4,7 @@ using System.Linq;
 using Funq;
 using NUnit.Framework;
 using ServiceStack.Caching;
-using ServiceStack.Common.Tests.ServiceClient.Web;
+using ServiceStack.Client;
 using ServiceStack.Support.WebHost;
 using ServiceStack.Text;
 using ServiceStack.Web;
@@ -299,7 +299,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			//new Soap12ServiceClient(ListeningOn)
         };
 
-        [Test, TestCaseSource("ServiceClients")]
+        [Test, TestCaseSource(nameof(ServiceClients))]
         public void Request_and_Response_Filters_are_executed_using_ServiceClient(IServiceClient client)
         {
             var response = client.Send<AttributeFilteredResponse>(
@@ -318,7 +318,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             new JsonServiceClient(ListeningOn),
             new XmlServiceClient(ListeningOn),
-            new JsvServiceClient(ListeningOn)
+            new JsvServiceClient(ListeningOn),
+            new CsvServiceClient(ListeningOn),
         };
 
         [Test]
@@ -338,7 +339,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Request_and_Response_Filters_are_executed_using_RestClient(IRestClient client)
         {
             var response = client.Post<AttributeFilteredResponse>("attributefiltered", new AttributeFiltered() { RequestFilterExecuted = false });
@@ -350,7 +351,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             Assert.IsTrue(response.ResponseFilterDependencyIsResolved);
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Contextual_Request_and_Response_Filters_are_executed_using_RestClient(IRestClient client)
         {
             var response = client.Delete<AttributeFilteredResponse>("attributefiltered");
@@ -362,7 +363,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             Assert.IsTrue(response.ResponseFilterDependencyIsResolved);
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Multi_Contextual_Request_and_Response_Filters_are_executed_using_RestClient(IRestClient client)
         {
             var response = client.Put<AttributeFilteredResponse>("attributefiltered", new AttributeFiltered() { RequestFilterExecuted = false });

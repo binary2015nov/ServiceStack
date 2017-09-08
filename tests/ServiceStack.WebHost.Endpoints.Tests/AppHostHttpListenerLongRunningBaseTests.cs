@@ -9,9 +9,9 @@ using ServiceStack.WebHost.Endpoints.Tests.Support.Host;
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
     [TestFixture]
-    class AppHostHttpListenerLongRunningBaseTests
+    public class AppHostHttpListenerLongRunningBaseTests
     {
-        ServiceStackHost appHost;
+        private ServiceStackHost appHost;
 
         [OneTimeSetUp]
         public void TestFixtureSetUp()

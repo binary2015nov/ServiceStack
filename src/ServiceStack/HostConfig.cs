@@ -81,11 +81,7 @@ namespace ServiceStack
                 { "image/jpeg", TimeSpan.FromHours(1) },
             };
             AppendUtf8CharsetOnContentTypes = new HashSet<string> { MimeTypes.Json, };
-            RouteNamingConventions = new List<RouteNamingConventionDelegate> {
-                RouteNamingConvention.WithRequestDtoName,
-                RouteNamingConvention.WithMatchingAttributes,
-                RouteNamingConvention.WithMatchingPropertyNames
-            };
+            RouteNamingConventions = RouteNamingConvention.Default.ToList();
             MapExceptionToStatusCode = new Dictionary<Type, int>();
             OnlySendSessionCookiesSecurely = false;
             AllowSessionIdsInHttpParams = false;
@@ -197,7 +193,7 @@ namespace ServiceStack
 
         public Dictionary<string, TimeSpan> AddMaxAgeForStaticMimeTypes { get; set; }
 
-        public List<RouteNamingConventionDelegate> RouteNamingConventions { get; set; }
+        public List<RouteNamingConventionDelegate> RouteNamingConventions { get; private set; }
 
         public Dictionary<Type, int> MapExceptionToStatusCode { get; set; }
 

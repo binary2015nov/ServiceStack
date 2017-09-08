@@ -1,7 +1,5 @@
-﻿using System.Reflection;
-using Funq;
+﻿using Funq;
 using NUnit.Framework;
-using ServiceStack.Text;
 using ServiceStack.Web;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
@@ -11,15 +9,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         class AppHost : AppSelfHostBase
         {
-            public AppHost() : base(nameof(RedirectPathTests), typeof(RedirectPathTests).GetAssembly())
+            public AppHost() 
+                : base(nameof(RedirectPathTests), typeof(RedirectPathTests).GetAssembly())
             {
                 Config.DefaultRedirectPath = "~/does-resolve";
             }
 
-            public override void Configure(Container container)
-            {
-                
-            }
+            public override void Configure(Container container) { }
 
             public override string ResolveAbsoluteUrl(string virtualPath, IRequest httpReq)
             {
@@ -29,9 +25,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        private readonly ServiceStackHost appHost;
+        private ServiceStackHost appHost;
 
-        public RedirectPathTests()
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
             appHost = new AppHost()
                 .Init()
@@ -39,13 +36,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OneTimeTearDown() => appHost.Dispose();
+        public void TestFixtureTearDown() => appHost.Dispose();
 
         [Test]
         public void DefaultRedirectPath_RelativeUrl_does_resolve()
         {
             var html = Config.ListeningOn.GetStringFromUrl();
-            Assert.That(html, Does.Contain("Default index"));
+            Assert.That(html, Does.Contain("ServiceStack.WebHost.Endpoints.Tests Web Page"));
         }
     }
 }

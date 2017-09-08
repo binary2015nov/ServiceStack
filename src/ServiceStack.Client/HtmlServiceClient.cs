@@ -2,26 +2,21 @@
 using System.IO;
 using ServiceStack.Web;
 
-namespace ServiceStack.Common.Tests.ServiceClient.Web
+namespace ServiceStack.Client
 {
-    public class HtmlServiceClient: ServiceClientBase
+    public class HtmlServiceClient : ServiceClientBase
     {
-        public HtmlServiceClient()
-        {
-        }
+        public override string Format => "html";
+
+        public HtmlServiceClient() { }
 
         public HtmlServiceClient(string baseUri)
-            // Can't call SetBaseUri as that appends the format specific suffixes.
-            :base(baseUri, baseUri)
         {
+            SetBaseUri(baseUri);
         }
 
-        public override string Format
-        {
-            // Don't return a format as we are not using a ServiceStack format specific endpoint, but 
-            // rather the general purpose endpoint (just like a html <form> POST would use).
-            get { return null; }
-        }
+        public HtmlServiceClient(string syncReplyBaseUri, string asyncOneWayBaseUri)
+            : base(syncReplyBaseUri, asyncOneWayBaseUri) { }
 
         public override string Accept
         {
@@ -34,15 +29,15 @@ namespace ServiceStack.Common.Tests.ServiceClient.Web
             get { return MimeTypes.FormUrlEncoded; }
         }
 
-        public override void SerializeToStream(IRequest requestContext, object request, Stream stream)
+        public override void SerializeToStream(IRequest request, object requestDto, Stream stream)
         {
-            var queryString = QueryStringSerializer.SerializeToString(request);
+            var queryString = QueryStringSerializer.SerializeToString(requestDto);
             stream.Write(queryString);
         }
 
         public override T DeserializeFromStream<T>(Stream stream)
         {
-            return (T) DeserializeDtoFromHtml(typeof (T), stream);
+            return (T)DeserializeDtoFromHtml(typeof(T), stream);
         }
 
         public override StreamDeserializerDelegate StreamDeserializer
@@ -54,7 +49,8 @@ namespace ServiceStack.Common.Tests.ServiceClient.Web
         {
             // TODO: No tests currently use the response, but this could be something that will come in handy later.
             // It isn't trivial though, will have to parse the HTML content.
-            return Activator.CreateInstance(type);
+            //return Activator.CreateInstance(type);
+            throw new NotSupportedException($"The response content type is {MimeTypes.Html}, web browser dependency.");
         }
     }
 }

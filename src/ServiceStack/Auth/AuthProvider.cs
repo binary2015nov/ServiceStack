@@ -10,7 +10,7 @@ using ServiceStack.Web;
 
 namespace ServiceStack.Auth
 {
-    public static class AuthProviderCatagery
+    public static class AuthProviderCatageries
     {
         public const string BasicProvider = "basic";
         public const string ApiKeyProvider = "apikey";
@@ -322,6 +322,7 @@ namespace ServiceStack.Auth
         {
             if (httpRes.StatusCode == (int)HttpStatusCode.OK)
                 httpRes.StatusCode = (int)HttpStatusCode.Unauthorized;
+            httpRes.AddHeader(HttpHeaders.WwwAuthenticate, $"{this.Provider} realm=\"{this.AuthRealm}\"");
             httpRes.EndRequest();
         }
 
@@ -334,7 +335,7 @@ namespace ServiceStack.Auth
                 baseAuthProvider.OnFailedAuthentication(session, httpReq, httpRes);
                 return;
             }
-
+            httpRes.AddHeader(HttpHeaders.WwwAuthenticate, $"{authProvider.Provider} realm=\"{authProvider.AuthRealm}\"");
             httpRes.StatusCode = (int)HttpStatusCode.Unauthorized;
 
             httpRes.EndRequest();

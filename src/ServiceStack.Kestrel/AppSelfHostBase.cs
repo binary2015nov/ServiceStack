@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using ServiceStack.Host;
 using ServiceStack.Host.Handlers;
 using ServiceStack.Host.NetCore;
 using ServiceStack.Web;

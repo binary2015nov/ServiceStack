@@ -2,7 +2,6 @@
 
 namespace ServiceStack
 {
-
     /// <summary>
     /// Lets you Register new Services and the optional restPaths will be registered against 
     /// this default Request Type

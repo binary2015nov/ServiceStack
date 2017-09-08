@@ -1,18 +1,16 @@
 #if !LITE
 using System.IO;
 using System.Xml;
-using ServiceStack.Serialization;
 using ServiceStack.Text;
 using ServiceStack.Web;
 
 namespace ServiceStack
 {
-    public class XmlServiceClient
-        : ServiceClientBase
+    public class XmlServiceClient : ServiceClientBase
     {
         public override string Format => "xml";
 
-        public XmlServiceClient() {}
+        public XmlServiceClient() { }
 
         public XmlServiceClient(string baseUri) 
         {
@@ -20,21 +18,23 @@ namespace ServiceStack
         }
 
         public XmlServiceClient(string syncReplyBaseUri, string asyncOneWayBaseUri) 
-            : base(syncReplyBaseUri, asyncOneWayBaseUri) {}
+            : base(syncReplyBaseUri, asyncOneWayBaseUri) { }
 
         public override string ContentType => $"application/{Format}";
 
         public override void SerializeToStream(IRequest requestContext, object request, Stream stream)
         {
-            if (request == null) return;
-            DataContractSerializer.Instance.SerializeToStream(request, stream);
+            if (request == null)
+                return;
+
+            XmlSerializer.Serialize(request, stream);
         }
 
         public override T DeserializeFromStream<T>(Stream stream)
         {
             try
             {
-                return DataContractSerializer.Instance.DeserializeFromStream<T>(stream);
+                return XmlSerializer.Deserialize<T>(stream);
             }
             catch (XmlException ex)
             {

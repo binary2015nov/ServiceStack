@@ -750,7 +750,8 @@ namespace ServiceStack.Server.Tests.Auth
         {
             return new JsonServiceClient(ListeningOn)
             {
-                Credentials = new NetworkCredential(apiKey ?? ApiKey, ""),
+                RequestFilter = req => req.AddApiKeyAuth(apiKey ?? ApiKey)
+                //Credentials = new NetworkCredential(apiKey ?? ApiKey, ""),
             };
         }
 
@@ -902,7 +903,8 @@ namespace ServiceStack.Server.Tests.Auth
         {
             var client = new JsonServiceClient(ListeningOn)
             {
-                Credentials = new NetworkCredential("InvalidKey", ""),
+                RequestFilter = req => req.AddApiKeyAuth("InvalidKey"),
+                //Credentials = new NetworkCredential("InvalidKey", ""),
             };
 
             var request = new Secured { Name = "live" };

@@ -10,6 +10,12 @@ namespace ServiceStack.Host
 
     public static class RouteNamingConvention
     {
+        public static readonly RouteNamingConventionDelegate[] Default = {
+            RouteNamingConvention.WithRequestDtoName,
+            RouteNamingConvention.WithMatchingAttributes,
+            RouteNamingConvention.WithMatchingPropertyNames
+        };
+
         private const int AutoGenPriority = -1;
 
         public static readonly List<string> AttributeNamesToMatch = new[] {

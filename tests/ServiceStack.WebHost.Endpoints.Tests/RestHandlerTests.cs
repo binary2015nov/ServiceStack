@@ -5,6 +5,7 @@ using NUnit.Framework;
 using ServiceStack.Host;
 using ServiceStack.Web;
 using ServiceStack.WebHost.Endpoints.Tests.Support.Host;
+using ServiceStack.Host.Handlers;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
