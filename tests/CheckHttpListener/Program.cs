@@ -11,6 +11,7 @@ using ServiceStack.Auth;
 using ServiceStack.Data;
 using ServiceStack.OrmLite;
 using ServiceStack.Text;
+using ServiceStack.Web;
 
 namespace CheckHttpListener
 {
@@ -59,6 +60,9 @@ namespace CheckHttpListener
             });
         }
 
+        public override string ResolvePathInfo(IRequest request, string originalPathInfo, out bool isDirectory) =>
+            base.ResolvePathInfo(request, originalPathInfo.Replace("/testsite", "/TestSite"), out isDirectory);
+
 //        public override RouteAttribute[] GetRouteAttributes(Type requestType)
 //        {
 //            var routes = base.GetRouteAttributes(requestType);
@@ -86,9 +90,9 @@ namespace CheckHttpListener
         {
             var appHost = new AppSelfHost()
                 .Init()
-                .Start("http://127.0.0.1:2222/");
+                .Start("http://localhost/TestSite/");
 
-            Process.Start("http://127.0.0.1:2222/");
+            Process.Start("http://localhost/TestSite/");
             Console.ReadLine();
         }
     }
