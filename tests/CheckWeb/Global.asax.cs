@@ -368,11 +368,21 @@ namespace CheckWeb
     {
         public string PathInfo { get; set; }
     }
+
+    [Route("/return/text")]
+    public class ReturnText
+    {
+        public string Text { get; set; }
+    }
+
     public class MyServices : Service
     {
         //Return default.html for unmatched requests so routing is handled on client
         public object Any(IndexPage request) =>
             new HttpResult(VirtualFileSources.GetFile("default.html"));
+
+        [AddHeader(ContentType = MimeTypes.PlainText)]
+        public object Any(ReturnText request) => request.Text;
     }
 
     public class Global : System.Web.HttpApplication
