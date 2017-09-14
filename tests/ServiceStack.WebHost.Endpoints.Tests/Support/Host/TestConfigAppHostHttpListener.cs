@@ -14,14 +14,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 		public string Password { get; set; }
 	}
 
-	[DataContract]
-	public class BclDtoResponse
+    [DataContract]
+    public class BclDtoResponse
 	{
-		[DataMember(Name = "uname")]
-		public string UserName { get; set; }
+        [DataMember(Name = "uname")]
+        public string UserName { get; set; }
 
-		[DataMember(Name = "pwd")]
-		public string Password { get; set; }
+        [DataMember(Name = "pwd")]
+        public string Password { get; set; }
 	}
 
 	public class BclDtoService : Service

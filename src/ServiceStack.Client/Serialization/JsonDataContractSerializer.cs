@@ -7,7 +7,7 @@ namespace ServiceStack.Serialization
 {
     public partial class JsonDataContractSerializer : IStringSerializer
     {
-        public static JsonDataContractSerializer Instance = new JsonDataContractSerializer();
+        public static readonly JsonDataContractSerializer Instance = new JsonDataContractSerializer();
 
         public IStringSerializer TextSerializer { get; set; }
 

@@ -829,21 +829,6 @@
             Initializes a new instance of the <see cref="!:DebugLogger"/> class.
             </summary>
         </member>
-        <member name="M:ServiceStack.Logging.NullLogger.Log(System.Object,System.Exception)">
-            <summary>
-            Logs the specified message.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Logging.NullLogger.LogFormat(System.Object,System.Object[])">
-            <summary>
-            Logs the format.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Logging.NullLogger.Log(System.Object)">
-            <summary>
-            Logs the specified message.
-            </summary>
-        </member>
         <member name="T:ServiceStack.Logging.TestLogFactory">
             <summary>
             Creates a test Logger, that stores all log messages in a member list

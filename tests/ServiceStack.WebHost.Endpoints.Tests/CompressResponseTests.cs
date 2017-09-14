@@ -3,8 +3,6 @@ using System.Net;
 using Funq;
 using NUnit.Framework;
 using ServiceStack.IO;
-using ServiceStack.Text;
-using ServiceStack.VirtualPath;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
@@ -71,10 +69,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 Config.CompressFilesWithExtensions = new HashSet<string> { "html", "css" };
             }
 
-            public override void Configure(Container container)
-            {
-                
-            }
+            public override void Configure(Container container) { }
 
             public override List<IVirtualPathProvider> GetVirtualFileSources()
             {

@@ -10,8 +10,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 	[TestFixture]
 	public class WsdlMetadataTests : IService
 	{
-		//private static ILog log = LogManager.GetLogger(typeof(WsdlMetadataTests));
-
 		[Test]
 		public void Wsdl_state_is_correct()
 		{

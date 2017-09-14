@@ -9,7 +9,7 @@ namespace ServiceStack.VirtualPath
 {
     public abstract class AbstractVirtualFileBase : IVirtualFile
     {
-        public static List<string> ScanSkipPaths { get; set; } = new List<string>();
+        public static HashSet<string> ScanSkipPaths { get; set; } = new HashSet<string>();
 
         public IVirtualPathProvider VirtualPathProvider { get; set; }
 

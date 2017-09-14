@@ -44,10 +44,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public AppHostSmartPool() 
             : base("SmartPool Test", typeof(PerfServices).GetAssembly()) { }
 
-        public override void Configure(Container container)
-        {
-
-        }
+        public override void Configure(Container container) { }
     }
 
     [TestFixture]

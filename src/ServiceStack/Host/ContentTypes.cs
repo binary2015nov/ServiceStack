@@ -13,18 +13,18 @@ namespace ServiceStack.Host
     {
         private static readonly UTF8Encoding UTF8EncodingWithoutBom = new UTF8Encoding(false);
 
-        public static ContentTypes Default = new ContentTypes();
+        public static readonly ContentTypes Default = new ContentTypes();
 
-        public Dictionary<string, StreamSerializerDelegate> ContentTypeSerializers
+        public readonly Dictionary<string, StreamSerializerDelegate> ContentTypeSerializers
             = new Dictionary<string, StreamSerializerDelegate>();
 
-        public Dictionary<string, ResponseSerializerDelegate> ContentTypeResponseSerializers
-            = new Dictionary<string, ResponseSerializerDelegate>();
-
-        public Dictionary<string, StreamDeserializerDelegate> ContentTypeDeserializers
+        public readonly Dictionary<string, StreamDeserializerDelegate> ContentTypeDeserializers
             = new Dictionary<string, StreamDeserializerDelegate>();
 
-        public static HashSet<string> KnownFormats = new HashSet<string> {
+        public readonly Dictionary<string, ResponseSerializerDelegate> ContentTypeResponseSerializers
+            = new Dictionary<string, ResponseSerializerDelegate>();
+
+        public static readonly HashSet<string> KnownFormats = new HashSet<string> {
             "json",
             "xml",
             "jsv",
@@ -42,9 +42,9 @@ namespace ServiceStack.Host
 
         public void ClearCustomFilters()
         {
-            this.ContentTypeFormats = new Dictionary<string, string>();
-            this.ContentTypeSerializers = new Dictionary<string, StreamSerializerDelegate>();
-            this.ContentTypeDeserializers = new Dictionary<string, StreamDeserializerDelegate>();
+            this.ContentTypeFormats.Clear();
+            this.ContentTypeSerializers.Clear();
+            this.ContentTypeDeserializers.Clear();
         }
 
         public Dictionary<string, string> ContentTypeFormats { get; set; }

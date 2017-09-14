@@ -72,7 +72,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             new JsvServiceClient(Config.AbsoluteBaseUri)
         };
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void CorsMethodHasAccessControlHeaders(IRestClient client)
         {
             appHost.Config.GlobalResponseHeaders.Clear();

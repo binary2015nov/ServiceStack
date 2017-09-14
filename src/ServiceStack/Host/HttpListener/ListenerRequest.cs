@@ -284,9 +284,7 @@ namespace ServiceStack.Host.HttpListener
             return stream;
         }
 
-        static void EndSubStream(Stream stream)
-        {
-        }
+        static void EndSubStream(Stream stream) { }
 
         public static string GetHandlerPathIfAny(string listenerUrl)
         {

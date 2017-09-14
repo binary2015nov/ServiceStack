@@ -11,6 +11,7 @@ using ServiceStack.Markdown;
 using ServiceStack.Metadata;
 using ServiceStack.Serialization;
 using ServiceStack.Text;
+using ServiceStack.VirtualPath;
 
 namespace ServiceStack
 {
@@ -23,7 +24,6 @@ namespace ServiceStack
             WsdlServiceNamespace = DefaultWsdlNamespace;
             ApiVersion = "1.0";
             EmbeddedResourceSources = new HashSet<Assembly> { GetType().GetAssembly() };
-            EmbeddedResourceTreatAsFiles = new HashSet<string>();
             EnableAccessRestrictions = true;
             MetadataRedirectPath = null;
             DefaultContentType = null;
@@ -44,12 +44,10 @@ namespace ServiceStack
                 "default.aspx",
                 "default.ashx",
             };
+            IgnoreFormatsInMetadata = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             GlobalResponseHeaders = new Dictionary<string, string> {
                 { "Vary", "Accept" },
                 { "X-Powered-By", Env.ServerUserAgent },
-            };
-            IgnoreFormatsInMetadata = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
-
             };
             AllowFileExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
                 "js", "ts", "tsx", "jsx", "css", "htm", "html", "shtm", "txt", "xml", "rss", "csv", "pdf",
@@ -57,7 +55,7 @@ namespace ServiceStack
                 "avi", "divx", "m3u", "mov", "mp3", "mpeg", "mpg", "qt", "vob", "wav", "wma", "wmv",
                 "flv", "swf", "xap", "xaml", "ogg", "ogv", "mp4", "webm", "eot", "ttf", "woff", "woff2", "map"
             };
-            CompressFilesWithExtensions = new HashSet<string>();
+            CompressFilesWithExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             AllowFilePaths = new List<string> {
                 "jspm_packages/**/*.json"
             };
@@ -97,7 +95,7 @@ namespace ServiceStack
             RedirectToDefaultDocuments = false;
             RedirectDirectoriesToTrailingSlashes = true;
             StripApplicationVirtualPath = false;
-            ScanSkipPaths = new List<string> {
+            ScanSkipPaths = new HashSet<string> {
                 "obj/",
                 "bin/",
                 "node_modules/",
@@ -142,11 +140,11 @@ namespace ServiceStack
             set => metadataVisibility = value.ToAllowedFlagsSet();
         }
 
-        public HashSet<Assembly> EmbeddedResourceSources { get; set; }
-        public HashSet<string> EmbeddedResourceTreatAsFiles { get; set; }
+        public HashSet<Assembly> EmbeddedResourceSources { get; private set; }
+        public HashSet<string> EmbeddedResourceTreatAsFiles { get { return ResourceVirtualDirectory.EmbeddedResourceTreatAsFiles; } set { ResourceVirtualDirectory.EmbeddedResourceTreatAsFiles = value; } }
 
         public string DefaultContentType { get; set; }
-        public List<string> PreferredContentTypes { get; set; }
+        public List<string> PreferredContentTypes { get; private set; }
         public bool AllowJsonpRequests { get; set; }
         public bool AllowRouteContentTypeExtensions { get; set; }
         public bool DebugMode { get; set; }
@@ -159,9 +157,9 @@ namespace ServiceStack
 
         public HashSet<string> IgnoreFormatsInMetadata { get; set; }
 
-        public HashSet<string> AllowFileExtensions { get; set; }
+        public HashSet<string> AllowFileExtensions { get; private set; }
         public HashSet<string> CompressFilesWithExtensions { get; set; }
-        public long? CompressFilesLargerThanBytes { get; set; }
+        public long CompressFilesLargerThanBytes { get; set; }
         public List<string> AllowFilePaths { get; private set; }
 
         public List<string> ForbiddenPaths { get; private set; }
@@ -189,13 +187,13 @@ namespace ServiceStack
         public Dictionary<string, Type> MarkdownGlobalHelpers { get; set; }
         public Dictionary<string, string> HtmlReplaceTokens { get; set; }
 
-        public HashSet<string> AppendUtf8CharsetOnContentTypes { get; set; }
+        public HashSet<string> AppendUtf8CharsetOnContentTypes { get; private set; }
 
         public Dictionary<string, TimeSpan> AddMaxAgeForStaticMimeTypes { get; set; }
 
         public List<RouteNamingConventionDelegate> RouteNamingConventions { get; private set; }
 
-        public Dictionary<Type, int> MapExceptionToStatusCode { get; set; }
+        public Dictionary<Type, int> MapExceptionToStatusCode { get; private set; }
 
         public bool OnlySendSessionCookiesSecurely { get; set; }
         public bool AllowSessionIdsInHttpParams { get; set; }
@@ -216,14 +214,18 @@ namespace ServiceStack
         public bool RedirectDirectoriesToTrailingSlashes { get; set; }
 
         //Skip scanning common VS.NET extensions
-        public List<string> ScanSkipPaths { get; private set; }
+        public HashSet<string> ScanSkipPaths { get { return AbstractVirtualFileBase.ScanSkipPaths; } set { AbstractVirtualFileBase.ScanSkipPaths = value; } }
 
         public Dictionary<string, string> RedirectPaths { get; private set; }
 
         public bool UseHttpsLinks { get; set; }
 
         public bool UseCamelCase { get { return JsConfig.EmitCamelCaseNames; } set { JsConfig.EmitCamelCaseNames = value; } }
-        public bool EnableOptimizations { get { return MemoryStreamFactory.UseRecyclableMemoryStream; } set { MemoryStreamFactory.UseRecyclableMemoryStream = value; } }
+        public bool EnableOptimizations
+        {
+            get { return MemoryStreamFactory.UseRecyclableMemoryStream; }
+            set { MemoryStreamFactory.UseRecyclableMemoryStream = value; }
+        }
 
         //Disables chunked encoding on Kestrel Server
         public bool DisableChunkedEncoding { get; set; }

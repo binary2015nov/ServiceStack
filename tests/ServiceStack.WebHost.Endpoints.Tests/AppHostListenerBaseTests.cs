@@ -1,14 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
-using System.Net.Sockets;
-using System.Threading;
 using NUnit.Framework;
-#if !NETCORE_SUPPORT
-using ServiceStack.Host.HttpListener;
-#endif
 using ServiceStack.Logging;
+using ServiceStack.Host.Handlers;
 using ServiceStack.WebHost.Endpoints.Tests.Support.Host;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
@@ -45,15 +40,15 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_download_webpage_html_page()
         {
-            var html = (Config.ListeningOn + "webpage.html").GetStringFromUrl();
+            var html = (Config.ListeningOn + "webpage.html").GetHtmlFromUrl();
             Assert.That(html.Contains("ServiceStack.WebHost.Endpoints.Tests Web Page"));
         }
 
         [Test]
         public void Can_download_requestinfo_json()
         {
-            var html = (Config.ListeningOn + "?debug=requestinfo").GetStringFromUrl();
-            Assert.That(html.Contains("\"Host\":"));
+            var response = (Config.ListeningOn + "?debug=requestinfo").GetJsonFromUrl().To<RequestInfoResponse>();
+            Assert.IsNull(response.StartUpErrors);
         }
 
         [Test]
@@ -149,7 +144,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var url = Config.ListeningOn + "gethttpresult?callback=cb";
             string response;
 
-            var webReq = (HttpWebRequest)WebRequest.Create(url);
+            var webReq = WebRequest.CreateHttp(url);
             webReq.Accept = "*/*";
             using (var webRes = webReq.GetResponse())
             {
@@ -161,41 +156,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             Console.WriteLine(response);
             Assert.That(response, Does.StartWith("cb("));
             Assert.That(response, Does.EndWith(")"));
-        }
-
-        [Test, Ignore("Performance test")]
-        public void PerformanceTest()
-        {
-            const int clientCount = 500;
-            var threads = new List<Thread>(clientCount);
-#if !NETCORE
-            ThreadPool.SetMinThreads(500, 50);
-            ThreadPool.SetMaxThreads(1000, 50);
-#endif           
-
-            for (int i = 0; i < clientCount; i++)
-            {
-                threads.Add(new Thread(() => {
-                    var html = (Config.ListeningOn + "long_running").GetStringFromUrl();
-                }));
-            }
-
-            var sw = new Stopwatch();
-            sw.Start();
-            for (int i = 0; i < clientCount; i++)
-            {
-                threads[i].Start();
-            }
-
-
-            for (int i = 0; i < clientCount; i++)
-            {
-                threads[i].Join();
-            }
-
-            sw.Stop();
-
-            Console.WriteLine("Elapsed time for " + clientCount + " requests : " + sw.Elapsed);
         }
 
 #if !NETCORE_SUPPORT
@@ -214,44 +174,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             foreach (var entry in map)
             {
-                var handlerPath = ListenerRequest.GetHandlerPathIfAny(entry.Key);
+                var handlerPath = ServiceStack.Host.HttpListener.ListenerRequest.GetHandlerPathIfAny(entry.Key);
                 Assert.That(handlerPath, Is.EqualTo(entry.Value));
             }
         }
 #endif
 
-        [Test, Ignore("You have to manually check the test output if there where NullReferenceExceptions!")]
-        public void Rapid_Start_Stop_should_not_cause_exceptions()
-        {
-            var localAppHost = new ExampleAppHostHttpListener();
-
-            for (int i = 0; i < 100; i++)
-            {
-                localAppHost.Start(GetBaseAddressWithFreePort());
-#if !NETCORE_SUPPORT                
-                localAppHost.Stop();
-#endif
-            }
-        }
-
-        private static string GetBaseAddressWithFreePort()
-        {
-            TcpListener listener = new TcpListener(IPAddress.Loopback, 0);
-            listener.Start();
-            IPEndPoint endPoint = listener.LocalEndpoint as IPEndPoint;
-
-            if (endPoint != null)
-            {
-                string address = endPoint.Address.ToString();
-                int port = endPoint.Port;
-                Uri uri = new UriBuilder("http://", address, port).Uri;
-
-                listener.Stop();
-
-                return uri.ToString();
-            }
-
-            throw new InvalidOperationException("Can not find a port to start the WpcsServer!");
-        }
     }
 }

@@ -16,10 +16,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         public class AppHost : AppHostHttpListenerBase
         {
-            public AppHost()
-                : base("Echo AppHost", typeof(AppHost).GetAssembly())
-            {
-            }
+            public AppHost() : base("Echo AppHost", typeof(AppHost).GetAssembly()) { }
 
             public override void Configure(Container container) { }
 

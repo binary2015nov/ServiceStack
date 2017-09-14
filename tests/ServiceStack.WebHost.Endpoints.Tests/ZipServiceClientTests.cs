@@ -1,8 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Net;
-using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Funq;

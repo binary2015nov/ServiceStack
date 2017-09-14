@@ -13,7 +13,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		ExampleAppHostHttpListener appHost;
 
 		[OneTimeSetUp]
-		public void OnTestFixtureSetUp()
+		public void TestFixtureSetUp()
 		{
 			LogManager.LogFactory = new ConsoleLogFactory();
 
@@ -23,16 +23,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		}
 
 		[OneTimeTearDown]
-		public void OnTestFixtureTearDown()
+		public void TestFixtureTearDown()
 		{
-			Dispose();
-		}
-
-		public void Dispose()
-		{
-			if (appHost == null) return;
-			appHost.Dispose();
-		}
+            appHost.Dispose();
+        }
 
 		[Test]
 		public void Can_GET_single_Movie_using_RestClient_with_JSONP()

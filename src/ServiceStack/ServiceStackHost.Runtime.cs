@@ -745,7 +745,7 @@ namespace ServiceStack
         {
             return !string.IsNullOrEmpty(file.Extension) 
                 && Config.CompressFilesWithExtensions.Contains(file.Extension)
-                && (Config.CompressFilesLargerThanBytes == null || file.Length > Config.CompressFilesLargerThanBytes);
+                && (file.Length > Config.CompressFilesLargerThanBytes);
         }
     }
 

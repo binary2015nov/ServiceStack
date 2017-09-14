@@ -11,9 +11,9 @@ namespace ServiceStack.VirtualPath
 {
     public class ResourceVirtualDirectory : AbstractVirtualDirectoryBase
     {
-        public static HashSet<string> EmbeddedResourceTreatAsFiles { get; set; } = new HashSet<string>();
-
         private static ILog Log = LogManager.GetLogger(typeof(ResourceVirtualDirectory));
+
+        public static HashSet<string> EmbeddedResourceTreatAsFiles { get; set; } = new HashSet<string>();
 
         protected Assembly backingAssembly;
         public string rootNamespace { get; set; }

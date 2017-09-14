@@ -204,10 +204,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        private readonly ServiceStackHost appHost;
+        private ServiceStackHost appHost;
         private JsonServiceClient client;
 
-        public AsyncFiltersTests()
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
             appHost = new AppHost()
                 .Init()

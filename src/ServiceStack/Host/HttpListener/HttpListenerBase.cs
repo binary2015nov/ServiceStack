@@ -155,7 +155,7 @@ namespace ServiceStack.Host.HttpListener
             return new System.Net.HttpListener();
         }
 
-        private bool IsListening => this.IsStarted && this.Listener != null && this.Listener.IsListening;
+        public virtual bool IsListening => this.IsStarted && this.Listener != null && this.Listener.IsListening;
 
         // Loop here to begin processing of new requests.
         protected virtual void Listen(object state)

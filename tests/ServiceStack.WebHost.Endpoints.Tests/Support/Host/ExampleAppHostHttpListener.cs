@@ -533,9 +533,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
             container.Register<IDbConnectionFactory>(c =>
                 new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider));
 
-            var resetMovies = container.Resolve<ResetMoviesService>();
-            resetMovies.Post(null);
-
             //var movies = container.Resolve<IDbConnectionFactory>().Exec(x => x.Select<Movie>());
             //Console.WriteLine(movies.Dump());
 

@@ -15,7 +15,6 @@ namespace ServiceStack.Host
     {
         public ServiceMetadata()
         {
-            //this.restPaths = restPaths;
             this.RequestTypes = new HashSet<Type>();
             this.ServiceTypes = new HashSet<Type>();
             this.ResponseTypes = new HashSet<Type>();
@@ -32,7 +31,6 @@ namespace ServiceStack.Host
         public HashSet<Type> RequestTypes { get; protected set; }
         public HashSet<Type> ServiceTypes { get; protected set; }
         public HashSet<Type> ResponseTypes { get; protected set; }
-        //private readonly List<RestPath> restPaths;
 
         public IEnumerable<Operation> Operations => OperationsMap.Values;
 
@@ -555,7 +553,7 @@ namespace ServiceStack.Host
 
     public class Operation
     {
-        public string Name => RequestType.GetOperationName();
+        public string Name => RequestType?.GetOperationName();
 
         public Type RequestType { get; set; }
         public Type ServiceType { get; set; }

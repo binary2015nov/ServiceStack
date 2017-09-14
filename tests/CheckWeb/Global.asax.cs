@@ -38,7 +38,7 @@ namespace CheckWeb
             // Change ServiceStack configuration
             Config.DebugMode = true;
             //Config.UseHttpsLinks = true;
-            Config.AppendUtf8CharsetOnContentTypes = new HashSet<string> { MimeTypes.Html };
+            Config.AppendUtf8CharsetOnContentTypes.Add(MimeTypes.Html);
             Config.UseCamelCase = true;
             //Config.AllowJsConfig = false;
 

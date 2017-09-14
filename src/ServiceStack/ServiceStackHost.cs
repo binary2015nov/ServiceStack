@@ -34,7 +34,10 @@ namespace ServiceStack
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(ServiceStackHost));
 
-        public DateTime CreateAt { get; private set; }
+        /// <summary>
+        /// Gets the created time for current host.
+        /// </summary>
+        public readonly DateTime CreateAt = DateTime.Now;
 
         public HostConfig Config { get; private set; }
 
@@ -44,16 +47,13 @@ namespace ServiceStack
 
         public Assembly[] ServiceAssemblies { get; private set; }
 
-        public string WebHostPhysicalPath { get; set; }
-
         protected ServiceStackHost(string serviceName, params Assembly[] assembliesWithServices)
         {
-            CreateAt = DateTime.Now;
             ServiceName = serviceName;
             ServiceAssemblies = assembliesWithServices;
-            Metadata = new ServiceMetadata();
             Config = new HostConfig();
             AppSettings = new AppSettings();
+            Metadata = new ServiceMetadata();
             Container = new Container { DefaultOwner = Owner.External };
             ContentTypes = ServiceStack.Host.ContentTypes.Default;
             Routes = new ServiceRoutes();
@@ -121,6 +121,8 @@ namespace ServiceStack
 
         public DateTime InitAt { get; private set; }
 
+        public string WebHostPhysicalPath { get; set; }
+
         public DateTime ReadyAt { get; private set; }
 
         /// <summary>
@@ -140,8 +142,6 @@ namespace ServiceStack
             OnBeforeInit();
 
             Config.ServiceEndpointsMetadataConfig = ServiceEndpointsMetadataConfig.Create(Config.HandlerFactoryPath);
-            AbstractVirtualFileBase.ScanSkipPaths = Config.ScanSkipPaths;
-            ResourceVirtualDirectory.EmbeddedResourceTreatAsFiles = Config.EmbeddedResourceTreatAsFiles;
             Metadata.ApiVersion = Config.ApiVersion;
             Metadata.ServiceName = ServiceName;
 
@@ -492,7 +492,7 @@ namespace ServiceStack
         // Rare for a user to auto register all avaialable services in ServiceStack.dll
         // But happens when ILMerged, so exclude autoregistering SS services by default 
         // and let them register them manually
-        public HashSet<Type> ExcludeAutoRegisteringServiceTypes { get; set; }
+        public HashSet<Type> ExcludeAutoRegisteringServiceTypes { get; private set; }
 
         public ServiceRoutes Routes { get; set; }
 
@@ -564,13 +564,13 @@ namespace ServiceStack
 
         public List<Action<IRequest>> OnEndRequestCallbacks { get; set; }
 
-        public List<Func<IHttpRequest, IHttpHandler>> RawHttpHandlers { get; set; }
+        public List<Func<IHttpRequest, IHttpHandler>> RawHttpHandlers { get; private set; }
 
-        public List<HttpHandlerResolver> CatchAllHandlers { get; set; }
+        public List<HttpHandlerResolver> CatchAllHandlers { get; private set; }
 
         public IServiceStackHandler GlobalHtmlErrorHttpHandler { get; set; }
 
-        public Dictionary<HttpStatusCode, IServiceStackHandler> CustomErrorHttpHandlers { get; set; }
+        public Dictionary<HttpStatusCode, IServiceStackHandler> CustomErrorHttpHandlers { get; private set; }
 
         public List<ResponseStatus> StartUpErrors { get; set; }
 
@@ -648,7 +648,7 @@ namespace ServiceStack
             httpRes.WriteErrorToResponse(httpReq, httpReq.ResponseContentType, operationName, errorMessage, ex, statusCode);
         }
 
-        public virtual void OnStartupException(Exception ex)
+        protected virtual void OnStartupException(Exception ex)
         {
             if (Config.StrictMode)
                 throw ex;

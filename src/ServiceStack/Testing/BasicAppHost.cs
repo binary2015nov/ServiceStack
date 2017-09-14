@@ -19,8 +19,8 @@ namespace ServiceStack.Testing
 #endif
                    })
         {
-            this.ExcludeAutoRegisteringServiceTypes = new HashSet<Type>();
-            this.TestMode = true;
+            ExcludeAutoRegisteringServiceTypes.Clear();
+            TestMode = true;
             Plugins.Clear();
         }
 

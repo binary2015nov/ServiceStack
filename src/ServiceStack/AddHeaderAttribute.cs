@@ -10,13 +10,9 @@ namespace ServiceStack
         public string Name { get; set; }
         public string Value { get; set; }
 
-        public HttpStatusCode Status
-        {
-            get { return (HttpStatusCode)StatusCode.GetValueOrDefault(200); }
-            set { StatusCode = (int)value; }
-        }
+        public int StatusCode { get; set; } = 200;
+        public HttpStatusCode Status => (HttpStatusCode)StatusCode;
 
-        public int? StatusCode { get; set; }
         public string StatusDescription { get; set; }
 
         public AddHeaderAttribute() { }
@@ -29,16 +25,13 @@ namespace ServiceStack
 
         public AddHeaderAttribute(HttpStatusCode status, string statusDescription = null)
         {
-            Status = status;
+            StatusCode = (int)status;
             StatusDescription = statusDescription;
         }
 
         public override void Execute(IRequest req, IResponse res, object requestDto)
         {
-            if (StatusCode != null)
-            {
-                res.StatusCode = StatusCode.Value;
-            }
+            res.StatusCode = StatusCode;           
 
             if (StatusDescription != null)
             {

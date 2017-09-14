@@ -3,17 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Funq;
-using ServiceStack.Logging;
-using ServiceStack.Text;
 using ServiceStack.Web;
 
 namespace ServiceStack
 {
     public static class AppHostExtensions
     {
-        private static readonly ILog log = LogManager.GetLogger(typeof(AppHostExtensions));
-
-        public static void RegisterService<TService>(this IAppHost appHost, params string[] atRestPaths)
+        public static void RegisterService<TService>(this IAppHost appHost, params string[] atRestPaths) where TService : IService
         {
             appHost.RegisterService(typeof(TService), atRestPaths);
         }
@@ -35,35 +31,28 @@ namespace ServiceStack
 
                 foreach (var pluginType in pluginTypes)
                 {
-                    try
+                    var plugin = pluginType.CreateInstance() as IPlugin;
+                    if (plugin != null)
                     {
-                        var plugin = pluginType.CreateInstance() as IPlugin;
-                        if (plugin != null)
-                        {
-                            ssHost.LoadPlugin(plugin);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        log.Error("Error adding new Plugin " + pluginType.GetOperationName(), ex);
-                    }
+                        ssHost.LoadPlugin(plugin);
+                    } 
                 }
             }
         }
 
-        public static T GetPlugin<T>(this IAppHost appHost) where T : class, IPlugin
+        public static TPlugin GetPlugin<TPlugin>(this IAppHost appHost) where TPlugin : class, IPlugin
         {
-            return appHost.Plugins.FirstOrDefault(x => x is T) as T;
+            return appHost.Plugins.FirstOrDefault(x => x is TPlugin) as TPlugin;
         }
 
-        public static bool HasPlugin<T>(this IAppHost appHost) where T : class, IPlugin
+        public static bool HasPlugin<TPlugin>(this IAppHost appHost) where TPlugin : class, IPlugin
         {
-            return appHost.Plugins.FirstOrDefault(x => x is T) != null;
+            return appHost.Plugins.FirstOrDefault(x => x is TPlugin) != null;
         }
 
-        public static bool HasMultiplePlugins<T>(this IAppHost appHost) where T : class, IPlugin
+        public static bool HasMultiplePlugins<TPlugin>(this IAppHost appHost) where TPlugin : class, IPlugin
         {
-            return appHost.Plugins.Count(x => x is T) > 1;
+            return appHost.Plugins.Count(x => x is TPlugin) > 1;
         }
 
         /// <summary>
@@ -77,18 +66,6 @@ namespace ServiceStack
         {
             var hasContainer = appHost as IHasContainer;
             return hasContainer?.Container;
-        }
-
-        public static bool NotifyStartupException(this IAppHost appHost, Exception ex)
-        {
-            var ssHost = HostContext.AppHost;
-            if (ssHost == null) return false;
-
-            if (!ssHost.Ready)
-            {
-                ssHost.OnStartupException(ex);
-            }
-            return !ssHost.Ready;
         }
 
         public static string Localize(this string text, IRequest request)
@@ -110,9 +87,9 @@ namespace ServiceStack
             return appHost;
         }
 
-        public static List<IPlugin> AddIfNotExists<T>(this List<IPlugin> plugins, T plugin) where T : class, IPlugin
+        public static List<IPlugin> AddIfNotExists<TPlugin>(this List<IPlugin> plugins, TPlugin plugin) where TPlugin : class, IPlugin
         {
-            if (!plugins.Any(x => x is T))
+            if (!plugins.Any(x => x is TPlugin))
                 plugins.Add(plugin);
             
             return plugins;

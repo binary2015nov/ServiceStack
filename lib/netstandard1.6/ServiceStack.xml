@@ -4295,7 +4295,7 @@
             </summary>
             <param name="defaultFilePath"></param>
         </member>
-        <member name="M:ServiceStack.Host.RestHandler.CreateRequest(ServiceStack.Web.IRequest,System.String)">
+        <member name="M:ServiceStack.Host.Handlers.RestHandler.CreateRequest(ServiceStack.Web.IRequest,System.String)">
             <summary>
             Used in Unit tests
             </summary>

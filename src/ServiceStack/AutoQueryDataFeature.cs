@@ -15,7 +15,6 @@ using ServiceStack.DataAnnotations;
 using ServiceStack.MiniProfiler;
 using ServiceStack.Reflection;
 using ServiceStack.Web;
-using ServiceStack.Logging;
 using ServiceStack.Text;
 
 #if NETSTANDARD1_6
@@ -235,7 +234,7 @@ namespace ServiceStack
             appHost.Metadata.GetOperationAssemblies()
                 .Each(x => LoadFromAssemblies.Add(x));
 
-            ((ServiceStackHost)appHost).ServiceAssemblies.Each(x =>
+            appHost.ServiceAssemblies.Each(x =>
             {
                 if (!LoadFromAssemblies.Contains(x))
                     LoadFromAssemblies.Add(x);
