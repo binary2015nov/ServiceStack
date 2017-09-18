@@ -7,10 +7,63 @@ using ServiceStack.Web;
 
 namespace ServiceStack.Auth
 {
+    public class FullRegistrationValidator : RegistrationValidator
+    {
+        public FullRegistrationValidator() { RuleSet(ApplyTo.Post, () => RuleFor(x => x.DisplayName).NotEmpty()); }
+    }
+
+    public class RegistrationValidator : AbstractValidator<Register>
+    {
+        public RegistrationValidator()
+        {
+            RuleSet(
+                ApplyTo.Post,
+                () =>
+                {
+                    RuleFor(x => x.Password).NotEmpty();
+                    RuleFor(x => x.UserName).NotEmpty().When(x => x.Email.IsNullOrEmpty());
+                    RuleFor(x => x.Email).NotEmpty().EmailAddress().When(x => x.UserName.IsNullOrEmpty());
+                    RuleFor(x => x.UserName)
+                        .Must(x =>
+                        {
+                            var authRepo = HostContext.AppHost.GetAuthRepository(base.Request);
+                            using (authRepo as IDisposable)
+                            {
+                                return authRepo.GetUserAuthByUserName(x) == null;
+                            }
+                        })
+                        .WithErrorCode("AlreadyExists")
+                        .WithMessage(ErrorMessages.UsernameAlreadyExists)
+                        .When(x => !x.UserName.IsNullOrEmpty());
+                    RuleFor(x => x.Email)
+                        .Must(x =>
+                        {
+                            var authRepo = HostContext.AppHost.GetAuthRepository(base.Request);
+                            using (authRepo as IDisposable)
+                            {
+                                return x.IsNullOrEmpty() || authRepo.GetUserAuthByUserName(x) == null;
+                            }
+                        })
+                        .WithErrorCode("AlreadyExists")
+                        .WithMessage(ErrorMessages.EmailAlreadyExists)
+                        .When(x => !x.Email.IsNullOrEmpty());
+                });
+            RuleSet(
+                ApplyTo.Put,
+                () =>
+                {
+                    RuleFor(x => x.UserName).NotEmpty();
+                    RuleFor(x => x.Email).NotEmpty();
+                });
+        }
+    }
+
     [DefaultRequest(typeof(Register))]
     public class RegisterService : Service
     {
         public static ValidateFn ValidateFn { get; set; }
+
+        public static bool DisableUpdates { get; set; }
 
         public IValidator<Register> RegistrationValidator { get; set; }
 
@@ -36,9 +89,10 @@ namespace ServiceStack.Auth
             bool registerNewUser;
             IUserAuth user;
             var session = this.GetSession();
+            var newUserAuth = ConvertToUserAuth(request);
             using (AuthRepository as IDisposable)
             {
-                var existingUser = AuthRepository.GetUserAuth(session, null);
+                var existingUser = session.IsAuthenticated ? AuthRepository.GetUserAuth(session, null) : null;
                 registerNewUser = existingUser == null;
                 if (!HostContext.HasPlugin<ValidationFeature>() && RegistrationValidator != null)
                 {
@@ -47,7 +101,8 @@ namespace ServiceStack.Auth
 
                     RegistrationValidator.ValidateAndThrow(request, registerNewUser ? ApplyTo.Post : ApplyTo.Put);
                 }
-                var newUserAuth = ConvertToUserAuth(request);
+                if (!registerNewUser && DisableUpdates)
+                    throw new NotSupportedException(ErrorMessages.RegisterUpdatesDisabled);
 
                 user = registerNewUser
                     ? AuthRepository.CreateUserAuth(newUserAuth, request.Password)
@@ -117,56 +172,5 @@ namespace ServiceStack.Auth
             to.PrimaryEmail = request.Email;
             return to;
         }
-    }
-
-    public class RegistrationValidator : AbstractValidator<Register>
-    {
-        public RegistrationValidator()
-        {
-            RuleSet(
-                ApplyTo.Post,
-                () =>
-                {
-                    RuleFor(x => x.Password).NotEmpty();
-                    RuleFor(x => x.UserName).NotEmpty().When(x => x.Email.IsNullOrEmpty());
-                    RuleFor(x => x.Email).NotEmpty().EmailAddress().When(x => x.UserName.IsNullOrEmpty());
-                    RuleFor(x => x.UserName)
-                        .Must(x =>
-                        {
-                            var authRepo = HostContext.AppHost.GetAuthRepository(base.Request);
-                            using (authRepo as IDisposable)
-                            {
-                                return authRepo.GetUserAuthByUserName(x) == null;
-                            }
-                        })
-                        .WithErrorCode("AlreadyExists")
-                        .WithMessage(ErrorMessages.UsernameAlreadyExists)
-                        .When(x => !x.UserName.IsNullOrEmpty());
-                    RuleFor(x => x.Email)
-                        .Must(x =>
-                        {
-                            var authRepo = HostContext.AppHost.GetAuthRepository(base.Request);
-                            using (authRepo as IDisposable)
-                            {
-                                return x.IsNullOrEmpty() || authRepo.GetUserAuthByUserName(x) == null;
-                            }
-                        })
-                        .WithErrorCode("AlreadyExists")
-                        .WithMessage(ErrorMessages.EmailAlreadyExists)
-                        .When(x => !x.Email.IsNullOrEmpty());
-                });
-            RuleSet(
-                ApplyTo.Put,
-                () =>
-                {
-                    RuleFor(x => x.UserName).NotEmpty();
-                    RuleFor(x => x.Email).NotEmpty();
-                });
-        }
-    }
-
-    public class FullRegistrationValidator : RegistrationValidator
-    {
-        public FullRegistrationValidator() { RuleSet(ApplyTo.Post, () => RuleFor(x => x.DisplayName).NotEmpty()); }
     }
 }

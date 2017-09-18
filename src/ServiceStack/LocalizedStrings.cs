@@ -69,11 +69,11 @@
         public const string InvalidPermission = "Invalid Permission";
 
         //Register
-        public static string UserNotExists = "User does not exist";
-        public static string AuthRepositoryNotExists = "No IAuthRepository registered or failed to resolve. Check your IoC registrations.";
-        public static string UsernameAlreadyExists = "Username already exists";
-        public static string EmailAlreadyExists = "Email already exists";
-        public static string RegisterUpdatesDisabled = "Updating User Info is not allowed";
+        public const string UserNotExists = "User does not exist";
+        public const string AuthRepositoryNotExists = "No IAuthRepository registered or failed to resolve. Check your IoC registrations.";
+        public const string UsernameAlreadyExists = "Username already exists";
+        public const string EmailAlreadyExists = "Email already exists";
+        public const string RegisterUpdatesDisabled = "Updating User Info is not allowed";
 
         //AuthRepo
         public const string UserAlreadyExistsTemplate1 = "User '{0}' already exists";
