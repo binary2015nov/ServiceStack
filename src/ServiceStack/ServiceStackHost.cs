@@ -25,7 +25,6 @@ using ServiceStack.MiniProfiler;
 using ServiceStack.NativeTypes;
 using ServiceStack.Redis;
 using ServiceStack.Text;
-using ServiceStack.VirtualPath;
 using ServiceStack.Web;
 
 namespace ServiceStack

@@ -14,19 +14,19 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 		public string Password { get; set; }
 	}
 
-    [DataContract]
-    public class BclDtoResponse
+	[DataContract]
+	public class BclDtoResponse
 	{
-        [DataMember(Name = "uname")]
-        public string UserName { get; set; }
+		[DataMember(Name = "uname")]
+		public string UserName { get; set; }
 
-        [DataMember(Name = "pwd")]
-        public string Password { get; set; }
+		[DataMember(Name = "pwd")]
+		public string Password { get; set; }
 	}
 
 	public class BclDtoService : Service
 	{
-	    public object Any(BclDto request)
+		public object Any(BclDto request)
 		{
 			return new BclDtoResponse
 			{
@@ -35,14 +35,4 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 			};
 		}
 	}
-
-    public class TestConfigAppHostHttpListener : AppHostHttpListenerBase
-    {
-        public TestConfigAppHostHttpListener() : base("TestConfigAppHost Service", typeof(BclDto).GetAssembly())
-        {
-            Config.UseBclJsonSerializers = true;
-        }
-
-        public override void Configure(Container container) { }
-    }
 }

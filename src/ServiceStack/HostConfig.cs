@@ -44,11 +44,11 @@ namespace ServiceStack
                 "default.aspx",
                 "default.ashx",
             };
-            IgnoreFormatsInMetadata = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             GlobalResponseHeaders = new Dictionary<string, string> {
                 { "Vary", "Accept" },
                 { "X-Powered-By", Env.ServerUserAgent },
             };
+            IgnoreFormatsInMetadata = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             AllowFileExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
                 "js", "ts", "tsx", "jsx", "css", "htm", "html", "shtm", "txt", "xml", "rss", "csv", "pdf",
                 "jpg", "jpeg", "gif", "png", "bmp", "ico", "tif", "tiff", "svg",
@@ -152,7 +152,7 @@ namespace ServiceStack
         public string DebugAspNetHostEnvironment { get; set; }
         public string DebugHttpListenerHostEnvironment { get; set; }
         public List<string> DefaultDocuments { get; private set; }
-
+        public bool IgnoreWarningsOnAllProperties { get; set; }
         public List<string> IgnoreWarningsOnPropertyNames { get; private set; }
 
         public HashSet<string> IgnoreFormatsInMetadata { get; set; }
@@ -221,11 +221,7 @@ namespace ServiceStack
         public bool UseHttpsLinks { get; set; }
 
         public bool UseCamelCase { get { return JsConfig.EmitCamelCaseNames; } set { JsConfig.EmitCamelCaseNames = value; } }
-        public bool EnableOptimizations
-        {
-            get { return MemoryStreamFactory.UseRecyclableMemoryStream; }
-            set { MemoryStreamFactory.UseRecyclableMemoryStream = value; }
-        }
+        public bool EnableOptimizations { get { return MemoryStreamFactory.UseRecyclableMemoryStream; } set { MemoryStreamFactory.UseRecyclableMemoryStream = value; } }
 
         //Disables chunked encoding on Kestrel Server
         public bool DisableChunkedEncoding { get; set; }
@@ -235,7 +231,6 @@ namespace ServiceStack
         public FallbackRestPathDelegate FallbackRestPath { get; set; }
 
         private HashSet<string> razorNamespaces;
-        public HashSet<string> RazorNamespaces => razorNamespaces 
-            ?? (razorNamespaces = Platform.Instance.GetRazorNamespaces());
+        public HashSet<string> RazorNamespaces => razorNamespaces ?? (razorNamespaces = Platform.Instance.GetRazorNamespaces());
     }
 }

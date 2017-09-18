@@ -1,27 +1,38 @@
+using Funq;
 using NUnit.Framework;
 using ServiceStack.WebHost.Endpoints.Tests.Support.Host;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
+	public class TestConfigAppHostHttpListener : AppHostHttpListenerBase
+	{
+		public TestConfigAppHostHttpListener() : base("TestConfigAppHost Service", typeof(BclDtoService).GetAssembly())
+		{
+			Config.UseBclJsonSerializers = true;
+		}
+
+		public override void Configure(Container container) { }
+	}
+
 	[TestFixture]
 	public class AppHostConfigTests
 	{
-		ServiceStackHost appHost;
+		private ServiceStackHost appHost;
 
 		[OneTimeSetUp]
-        public void TestFixtureSetUp()
+		public void TestFixtureSetUp()
 		{
 			appHost = new TestConfigAppHostHttpListener()
-			    .Init()
-			    .Start(Config.ListeningOn);
+				.Init()
+				.Start(Config.ListeningOn);
 		}
 
 		[OneTimeTearDown]
 		public void TestFixtureTearDown()
 		{
-            appHost.Dispose();
-        }
-        
+			appHost.Dispose();
+		}
+		
 		[Test]
 		public void Actually_uses_the_BclJsonSerializers()
 		{
@@ -29,7 +40,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
 			json.Print();
 			Assert.That(json, Is.EqualTo("{\"pwd\":\"pass\",\"uname\":\"user\"}")
-                .Or.EqualTo("{\"uname\":\"user\",\"pwd\":\"pass\"}"));
+				.Or.EqualTo("{\"uname\":\"user\",\"pwd\":\"pass\"}"));
 		}
 	}
 }

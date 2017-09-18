@@ -83,6 +83,8 @@ namespace ServiceStack.Auth
                         UserName = typedAuthResponse.UserName,
                         ReferrerUrl = typedAuthResponse.ReferrerUrl,
                         UserId = user.Id.ToString(CultureInfo.InvariantCulture),
+                        BearerToken = typedAuthResponse.BearerToken,
+                        RefreshToken = typedAuthResponse.RefreshToken,
                     };
                 }
             }
