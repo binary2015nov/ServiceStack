@@ -17,6 +17,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public ResponseStatus ResponseStatus { get; set; }
     }
 
+    [TestFixture]
     public class JsonServiceClientResolverTests : ServiceClientResolverTestsBase
     {
         protected override IServiceClient CreateClient(string baseUrl, UrlResolverDelegate urlResolver = null,
@@ -32,6 +33,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
+    [TestFixture]
     public class JsonHttpClientResolverTests : ServiceClientResolverTestsBase
     {
         protected override IServiceClient CreateClient(string baseUrl, UrlResolverDelegate urlResolver = null,

@@ -125,7 +125,7 @@ namespace ServiceStack.Host
 
         public List<MethodInfo> GetImplementedActions(Type serviceType, Type requestType)
         {
-            if (!typeof(IService).IsAssignableFrom(serviceType))
+            if (!Service.IsServiceType(serviceType))
                 throw new NotSupportedException("All Services must implement IService");
 
             return Service.GetActions(serviceType)
@@ -171,22 +171,28 @@ namespace ServiceStack.Host
             return operation?.ResponseType;
         }
 
-        public List<Type> GetAllOperationTypes()
+        public HashSet<Type> GetAllOperationTypes()
         {
-            var allTypes = new List<Type>(RequestTypes);
+            var allTypes = new HashSet<Type>(RequestTypes);
             foreach (var responseType in ResponseTypes)
             {
-                allTypes.AddIfNotExists(responseType);
+                allTypes.Add(responseType);
             }
             return allTypes;
         }
 
-        public List<Type> GetAllSoapOperationTypes()
+        public HashSet<Type> GetAllSoapOperationTypes()
         {
             var operationTypes = GetAllOperationTypes();
-            var soapTypes = HostContext.AppHost.ExportSoapOperationTypes(operationTypes);
-            return soapTypes;
+            return operationTypes.Where(x => !x.IsGenericTypeDefinition() &&
+                  !x.AllAttributes<ExcludeAttribute>().Any(attr => attr.Feature.Has(Feature.Soap))).ToHashSet();
         }
+
+        public bool IsExportSoapType(Type type)
+        {
+            return GetAllSoapOperationTypes().Any(x => x.Equals(type));
+        }
+
 
         public List<string> GetAllOperationNames()
         {

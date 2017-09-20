@@ -81,7 +81,7 @@ namespace ServiceStack
         /// <summary>
         /// Register custom ContentType serializers
         /// </summary>
-        IContentTypes ContentTypes { get; }
+        ContentTypes ContentTypes { get; }
 
         /// <summary>
         /// Add Request Filters, to be applied before the dto is deserialized

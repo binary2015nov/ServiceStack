@@ -1,14 +1,8 @@
 using System;
 using System.Runtime.Serialization;
-using Funq;
 using NUnit.Framework;
-using ServiceStack.Host;
 using ServiceStack.Logging;
-using ServiceStack.Serialization;
 using ServiceStack.Testing;
-using ServiceStack.Text;
-using ServiceStack.Web;
-using DataContractSerializer = ServiceStack.Serialization.DataContractSerializer;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
@@ -38,18 +32,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 	{
 		private static readonly ILog Log = LogManager.GetLogger(typeof(CompressionTests));
 
-		[OneTimeSetUp]
-		public void Init()
-		{
-			LogManager.LogFactory = null;
-		}
-
 		[Test]
 		public void Can_compress_and_decompress_SimpleDto()
 		{
 			var simpleDto = new TestCompress(1, "name");
 
-			var simpleDtoXml = DataContractSerializer.Instance.SerializeToString(simpleDto);
+			var simpleDtoXml = ServiceStack.Serialization.DataContractSerializer.Instance.SerializeToString(simpleDto);
 
 			var simpleDtoZip = simpleDtoXml.Deflate();
 
@@ -59,7 +47,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
 			Assert.That(deserializedSimpleDtoXml, Is.Not.Empty);
 
-			var deserializedSimpleDto = DataContractSerializer.Instance.DeserializeFromString<TestCompress>(
+			var deserializedSimpleDto = ServiceStack.Serialization.DataContractSerializer.Instance.DeserializeFromString<TestCompress>(
 				deserializedSimpleDtoXml);
 
 			Assert.That(deserializedSimpleDto, Is.Not.Null);
@@ -72,43 +60,43 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		[Test]
 		public void Test_response_with_CompressedResult()
 		{
-            using (new BasicAppHost(typeof(CompressionTests).GetAssembly()).Init())
-		    {
-                var mockResponse = new MockHttpResponse();
+			using (new BasicAppHost(typeof(CompressionTests).GetAssembly()).Init())
+			{
+				var mockResponse = new MockHttpResponse();
 
-                var simpleDto = new TestCompress(1, "name");
+				var simpleDto = new TestCompress(1, "name");
 
-                var simpleDtoXml = DataContractSerializer.Instance.SerializeToString(simpleDto);
+				var simpleDtoXml = ServiceStack.Serialization.DataContractSerializer.Instance.SerializeToString(simpleDto);
 
-                const string expectedXml = "<TestCompress xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://schemas.ddnglobal.com/types/\"><Id>1</Id><Name>name</Name></TestCompress>";
-                const string expectedXmlNetCore = "<TestCompress xmlns=\"http://schemas.ddnglobal.com/types/\" xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\"><Id>1</Id><Name>name</Name></TestCompress>";
+				const string expectedXml = "<TestCompress xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://schemas.ddnglobal.com/types/\"><Id>1</Id><Name>name</Name></TestCompress>";
+				const string expectedXmlNetCore = "<TestCompress xmlns=\"http://schemas.ddnglobal.com/types/\" xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\"><Id>1</Id><Name>name</Name></TestCompress>";
 
-                Assert.That(simpleDtoXml, Is.EqualTo(expectedXml).Or.EqualTo(expectedXmlNetCore));
+				Assert.That(simpleDtoXml, Is.EqualTo(expectedXml).Or.EqualTo(expectedXmlNetCore));
 
-                var simpleDtoZip = simpleDtoXml.Deflate();
+				var simpleDtoZip = simpleDtoXml.Deflate();
 
-                Assert.That(simpleDtoZip.Length, Is.GreaterThan(0));
+				Assert.That(simpleDtoZip.Length, Is.GreaterThan(0));
 
-                var compressedResult = new CompressedResult(simpleDtoZip);
+				var compressedResult = new CompressedResult(simpleDtoZip);
 
-                var reponseWasAutoHandled = mockResponse.WriteToResponse(
-                    compressedResult, CompressionTypes.Deflate);
+				var reponseWasAutoHandled = mockResponse.WriteToResponse(
+					compressedResult, CompressionTypes.Deflate);
 
-                Assert.That(reponseWasAutoHandled.Result, Is.True);
+				Assert.That(reponseWasAutoHandled.Result, Is.True);
 
-                //var bytesToWriteToResponseStream = new byte[simpleDtoZip.Length - 4];
-                //Array.Copy(simpleDtoZip, CompressedResult.Adler32ChecksumLength, bytesToWriteToResponseStream, 0, bytesToWriteToResponseStream.Length);
+				//var bytesToWriteToResponseStream = new byte[simpleDtoZip.Length - 4];
+				//Array.Copy(simpleDtoZip, CompressedResult.Adler32ChecksumLength, bytesToWriteToResponseStream, 0, bytesToWriteToResponseStream.Length);
 
-                var bytesToWriteToResponseStream = simpleDtoZip;
+				var bytesToWriteToResponseStream = simpleDtoZip;
 
-                var writtenBytes = mockResponse.ReadAsBytes();
-                Assert.That(writtenBytes, Is.EqualTo(bytesToWriteToResponseStream));
-                Assert.That(mockResponse.ContentType, Is.EqualTo(MimeTypes.Xml));
-                Assert.That(mockResponse.Headers[HttpHeaders.ContentEncoding], Is.EqualTo(CompressionTypes.Deflate));
+				var writtenBytes = mockResponse.ReadAsBytes();
+				Assert.That(writtenBytes, Is.EqualTo(bytesToWriteToResponseStream));
+				Assert.That(mockResponse.ContentType, Is.EqualTo(MimeTypes.Xml));
+				Assert.That(mockResponse.Headers[HttpHeaders.ContentEncoding], Is.EqualTo(CompressionTypes.Deflate));
 
-                Log.Debug("Content-length: " + writtenBytes.Length);
-                Log.Debug(BitConverter.ToString(writtenBytes));
-            }
+				Console.WriteLine("Content-length: " + writtenBytes.Length);
+				Console.WriteLine(BitConverter.ToString(writtenBytes));
+			}
 		}
 
 		[Test]
@@ -116,7 +104,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		{
 			var simpleDto = new TestCompress(1, "name");
 
-			var simpleDtoXml = DataContractSerializer.Instance.SerializeToString(simpleDto);
+			var simpleDtoXml = ServiceStack.Serialization.DataContractSerializer.Instance.SerializeToString(simpleDto);
 
 			var simpleDtoZip = simpleDtoXml.GZip();
 
@@ -126,7 +114,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
 			Assert.That(deserializedSimpleDtoXml, Is.Not.Empty);
 
-			var deserializedSimpleDto = DataContractSerializer.Instance.DeserializeFromString<TestCompress>(
+			var deserializedSimpleDto = ServiceStack.Serialization.DataContractSerializer.Instance.DeserializeFromString<TestCompress>(
 				deserializedSimpleDtoXml);
 
 			Assert.That(deserializedSimpleDto, Is.Not.Null);

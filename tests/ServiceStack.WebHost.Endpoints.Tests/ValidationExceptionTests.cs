@@ -94,7 +94,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 .Start(Config.ListeningOn);
         }
 
-        [OneTimeTearDown] public void OneTimeTearDown() => appHost.Dispose();
+        [OneTimeTearDown] public void TestFixtureTearDown() => appHost.Dispose();
 
         protected virtual JsonServiceClient GetClient() => new JsonServiceClient(Config.ListeningOn);
 

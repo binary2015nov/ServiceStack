@@ -8,20 +8,19 @@ namespace ServiceStack.Logging
     /// 
     /// Made public so its testable
     /// </summary>
-    public class TestLogger : ILog {
+    public class TestLogger : ILog
+    {
         /// <summary>
         /// Initializes a new instance of the <see cref="TestLogger"/> class.
         /// </summary>
-        /// <param name="type">The type.</param>
-        public TestLogger(string type) {
-        }
+        /// <param name="name">The type.</param>
+        public TestLogger(string name) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestLogger"/> class.
         /// </summary>
         /// <param name="type">The type.</param>
-        public TestLogger(Type type) {
-        }
+        public TestLogger(Type type) { }
 
         public enum Levels {
             DEBUG,

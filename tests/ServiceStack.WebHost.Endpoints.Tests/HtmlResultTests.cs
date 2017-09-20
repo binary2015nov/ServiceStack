@@ -1,15 +1,13 @@
 using NUnit.Framework;
 using ServiceStack.Common.Tests;
 using ServiceStack.Testing;
-using ServiceStack.Text;
-using ServiceStack.Web;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
 	[TestFixture]
 	public class HtmlResultMetadataTests : TestBase
 	{
-		protected override void Configure(Funq.Container container) {}
+		protected override void Configure(Funq.Container container) { }
 
 		public static class Html
 		{
@@ -19,8 +17,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 					"<html><head><meta http-equiv=\"refresh\" content=\"0;url={0}\"></head></html>",
 					url);
 
-                return new HttpResult(html, MimeTypes.Html)
-                {
+				return new HttpResult(html, MimeTypes.Html)
+				{
 					Headers = { { "Location", url } },
 				};
 			}
@@ -29,7 +27,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		[Test]
 		public void Test_response_with_html_result()
 		{
-            var mockResponse = new MockHttpResponse();
+			var mockResponse = new MockHttpResponse();
 
 			const string url = "http://www.servicestack.net";
 			var htmlResult = Html.RedirectTo(url);

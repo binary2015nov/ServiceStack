@@ -8,8 +8,7 @@ using ServiceStack.Web;
 
 namespace ServiceStack
 {
-    public class CompressedResult
-        : IStreamWriterAsync, IHttpResult
+    public class CompressedResult : IStreamWriterAsync, IHttpResult
     {
         public const int Adler32ChecksumLength = 4;
 
@@ -63,13 +62,9 @@ namespace ServiceStack
             }
         }
 
-        public CompressedResult(byte[] contents)
-            : this(contents, CompressionTypes.Deflate)
-        { }
+        public CompressedResult(byte[] contents) : this(contents, CompressionTypes.Deflate) { }
 
-        public CompressedResult(byte[] contents, string compressionType)
-            : this(contents, compressionType, DefaultContentType)
-        { }
+        public CompressedResult(byte[] contents, string compressionType) : this(contents, compressionType, DefaultContentType) { }
 
         public CompressedResult(byte[] contents, string compressionType, string contentMimeType)
         {

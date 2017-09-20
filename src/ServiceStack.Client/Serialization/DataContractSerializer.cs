@@ -37,14 +37,14 @@ XmlDictionaryReaderQuotas quotas = null
 #endif
         }
 
-        public string Parse<XmlDto>(XmlDto from, bool indentXml)
+        public string Parse<XmlDto>(XmlDto xmlDto, bool indentXml)
         {
             try
             {
-                if (Equals(@from, default(XmlDto))) return null;
+                if (Equals(xmlDto, default(XmlDto))) return null;
                 using (var ms = MemoryStreamFactory.GetStream())
                 {
-                    var serializer = new System.Runtime.Serialization.DataContractSerializer(from.GetType());
+                    var serializer = new System.Runtime.Serialization.DataContractSerializer(xmlDto.GetType());
 #if !(SL5 || __IOS__ || XBOX || ANDROID || PCL || NETSTANDARD1_1 || NETSTANDARD1_6)
                     var xw = new XmlTextWriter(ms, Encoding); 
                     if (indentXml)
@@ -52,10 +52,10 @@ XmlDictionaryReaderQuotas quotas = null
                         xw.Formatting = Formatting.Indented;	
                     }
 
-                    serializer.WriteObject(xw, from);
+                    serializer.WriteObject(xw, xmlDto);
                     xw.Flush();
 #else
-                    serializer.WriteObject(ms, from);
+                    serializer.WriteObject(ms, xmlDto);
 #endif
 
                     ms.Seek(0, SeekOrigin.Begin);
@@ -65,7 +65,7 @@ XmlDictionaryReaderQuotas quotas = null
             }
             catch (Exception ex)
             {
-                throw new SerializationException($"Error serializing object of type {@from.GetType().FullName}", ex);
+                throw new SerializationException($"Error serializing object of type {xmlDto.GetType().FullName}", ex);
             }
         }
 
@@ -74,6 +74,10 @@ XmlDictionaryReaderQuotas quotas = null
             return Parse(from, false);
         }
 
+        public string Parse(Type type)
+        {
+            return Parse(AutoMappingUtils.PopulateWith(type.CreateInstance()), true);
+        }
 
         public void SerializeToStream(object obj, Stream stream)
         {

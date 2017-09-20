@@ -43,7 +43,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         private ServiceStackHost appHost;
 
         [OneTimeSetUp]
-        public void OnTestFixtureSetup()
+        public void TestFixtureSetup()
         {
             appHost = new BasicAppHost(typeof(DtoService).GetAssembly())
             {
@@ -60,7 +60,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
+        public void TestFixtureTearDown()
         {
             appHost.Dispose();
         }

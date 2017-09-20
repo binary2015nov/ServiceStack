@@ -1,16 +1,28 @@
 using System.IO;
 using NUnit.Framework;
+using Funq;
 using ServiceStack.Common.Tests;
-using ServiceStack.Host;
 using ServiceStack.Testing;
 using ServiceStack.Text;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
     [TestFixture]
-    public class HttpResultTests : TestBase
+    public class HttpResultTests
     {
-        protected override void Configure(Funq.Container container) { }
+        private ServiceStackHost appHost;
+
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
+        {
+            appHost = new BasicAppHost().Init();
+        }
+        
+        [OneTimeTearDown]
+        public void TestFixtureTearDown()
+        {
+            appHost.Dispose();
+        }
 
         [Test]
         public void Can_send_ResponseText_test_with_Custom_Header()
@@ -23,7 +35,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             {
                 Headers =
                 {
-                    {"X-Custom","Header"}
+                    { "X-Custom", "Header" }
                 }
             };
 

@@ -43,7 +43,7 @@ namespace ServiceStack.AuthWeb.Tests
     public class AppHost : AppHostBase
 #endif
     {
-        public static ILog Log = LogManager.GetLogger(typeof(AppHost));
+        public static readonly ILog Logger = LogManager.GetLogger(typeof(AppHost));
 
         public AppHost() : base("Test Auth", typeof(AppHost).Assembly)
         {
@@ -275,19 +275,19 @@ namespace ServiceStack.AuthWeb.Tests
             }
             catch (MultipleMatchesException mmex)
             {
-                Log.Error("Multiple windows user info for '{0}'".Fmt(userSession.UserAuthName), mmex);
+                Logger.Error("Multiple windows user info for '{0}'".Fmt(userSession.UserAuthName), mmex);
             }
             catch (Exception ex)
             {
-                Log.Error("Could not retrieve windows user info for '{0}'".Fmt(tokens.DisplayName), ex);
+                Logger.Error("Could not retrieve windows user info for '{0}'".Fmt(tokens.DisplayName), ex);
             }
 #endif
         }
 
-        public override List<Type> ExportSoapOperationTypes(List<Type> operationTypes)
+        public override HashSet<Type> ExportSoapOperationTypes()
         {
             //return base.ExportSoapOperationTypes(operationTypes);
-            return new List<Type> { typeof(Authenticate) };
+            return new HashSet<Type> { typeof(Authenticate) };
         }
     }
 

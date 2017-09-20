@@ -1,4 +1,3 @@
-#if !NETFX_CORE
 using System;
 
 namespace ServiceStack.Logging
@@ -22,10 +21,9 @@ namespace ServiceStack.Logging
             return new ConsoleLogger(type) { IsDebugEnabled = debugEnabled };
         }
 
-        public ILog GetLogger(string typeName)
+        public ILog GetLogger(string name)
         {
-            return new ConsoleLogger(typeName) { IsDebugEnabled = debugEnabled };
+            return new ConsoleLogger(name) { IsDebugEnabled = debugEnabled };
         }
     }
 }
-#endif

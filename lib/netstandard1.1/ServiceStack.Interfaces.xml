@@ -845,7 +845,7 @@
             <summary>
             Initializes a new instance of the <see cref="T:ServiceStack.Logging.TestLogger"/> class.
             </summary>
-            <param name="type">The type.</param>
+            <param name="name">The type.</param>
         </member>
         <member name="M:ServiceStack.Logging.TestLogger.#ctor(System.Type)">
             <summary>

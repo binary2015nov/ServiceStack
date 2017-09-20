@@ -9,8 +9,7 @@ namespace ServiceStack.Metadata
 
         protected override string CreateMessage(Type dtoType)
         {
-            var requestObj = AutoMappingUtils.PopulateWith(dtoType.CreateInstance());
-            return DataContractSerializer.Instance.Parse(requestObj, true);
+            return DataContractSerializer.Instance.Parse(dtoType);
         }
     }
 }

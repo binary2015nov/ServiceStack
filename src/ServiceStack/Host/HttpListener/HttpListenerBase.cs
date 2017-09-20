@@ -25,7 +25,7 @@ namespace ServiceStack.Host.HttpListener
     /// </summary>
     public abstract class HttpListenerBase : ServiceStackHost
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(HttpListenerBase));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(HttpListenerBase));
 
         private const int RequestThreadAbortedException = 995;
 
@@ -92,18 +92,18 @@ namespace ServiceStack.Host.HttpListener
         /// <summary>
         /// Starts the Web Service
         /// </summary>
-        /// <param name="urlBase">
+        /// <param name="baseUrl">
         /// A Uri that acts as the base that the server is listening on.
         /// Format should be: http://127.0.0.1:8080/ or http://127.0.0.1:8080/somevirtual/
         /// Note: the trailing slash is required! For more info see the
         /// HttpListener.Prefixes property on MSDN.
         /// </param>
-        protected void Start(string urlBase, WaitCallback listenCallback)
+        protected void Start(string baseUrl, WaitCallback listenCallback)
         {
-            Start(new[] {urlBase}, listenCallback);
+            Start(new[] {baseUrl}, listenCallback);
         }
 
-        protected void Start(IEnumerable<string> urlBases, WaitCallback listenCallback)
+        protected void Start(IEnumerable<string> baseUrls, WaitCallback listenCallback)
         {
             // *** Already running - just leave it in place
             if (this.IsStarted)
@@ -112,7 +112,7 @@ namespace ServiceStack.Host.HttpListener
             if (this.Listener == null)
                 Listener = CreateHttpListener();
 
-            foreach (var urlBase in urlBases)
+            foreach (var urlBase in baseUrls)
             {
                 if (Config.HandlerFactoryPath == null)
                     Config.HandlerFactoryPath = ListenerRequest.GetHandlerPathIfAny(urlBase);
@@ -129,7 +129,7 @@ namespace ServiceStack.Host.HttpListener
             {
                 if (Config.AllowAclUrlReservation && ex.ErrorCode == 5 && registeredReservedUrl == null)
                 {
-                    foreach (var urlBase in urlBases)
+                    foreach (var urlBase in baseUrls)
                     {
                         registeredReservedUrl = AddUrlReservationToAcl(urlBase);
                         if (registeredReservedUrl == null)
@@ -139,7 +139,7 @@ namespace ServiceStack.Host.HttpListener
                     if (registeredReservedUrl != null)
                     {
                         Listener = null;
-                        Start(urlBases, listenCallback);
+                        Start(baseUrls, listenCallback);
                         return;
                     }
                 }
@@ -171,7 +171,7 @@ namespace ServiceStack.Host.HttpListener
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("Listen()", ex);
+                    Logger.Error("Listen()", ex);
                     return;
                 }
                 if (Listener == null) return;
@@ -190,7 +190,7 @@ namespace ServiceStack.Host.HttpListener
             {
                 if (!IsListening)
                 {
-                    Log.DebugFormat("Ignoring ListenerCallback() as HttpListener is no longer listening");
+                    Logger.DebugFormat("Ignoring ListenerCallback() as HttpListener is no longer listening");
                     return;
                 }
                 // The EndGetContext() method, as with all Begin/End asynchronous methods in the .NET Framework,
@@ -204,7 +204,7 @@ namespace ServiceStack.Host.HttpListener
                 // method, and again, that is just the way most Begin/End asynchronous
                 // methods of the .NET Framework work.
                 var errMsg = ex + ": " + IsListening;
-                Log.Warn(errMsg, ex);
+                Logger.Warn(errMsg, ex);
                 return;
             }
             finally
@@ -217,7 +217,7 @@ namespace ServiceStack.Host.HttpListener
             }
 
             if (Config.DebugMode)
-                Log.DebugFormat("{0} Request : {1}", context.Request.UserHostAddress, context.Request.RawUrl);
+                Logger.DebugFormat("{0} Request : {1}", context.Request.UserHostAddress, context.Request.RawUrl);
 
             //System.Diagnostics.Debug.WriteLine("Start: " + requestNumber + " at " + DateTime.UtcNow);
             //var request = context.Request;
@@ -255,7 +255,7 @@ namespace ServiceStack.Host.HttpListener
             {
                 ex = ex.UnwrapIfSingleException();
                 var httpReq = CreateHttpRequest(context);
-                Log.Error("Error this.ProcessRequest(context): [{0}]: {1}".Fmt(ex.GetType().GetOperationName(), ex.Message), ex);
+                Logger.Error("Error this.ProcessRequest(context): [{0}]: {1}".Fmt(ex.GetType().GetOperationName(), ex.Message), ex);
 
                 WriteUnhandledErrorResponse(httpReq, ex);
             }
@@ -263,7 +263,7 @@ namespace ServiceStack.Host.HttpListener
             {
                 var error = "Error this.ProcessRequest(context)(Exception while writing error to the response): [{0}]: {1}\n{2}"
                             .Fmt(errorEx.GetType().GetOperationName(), errorEx.Message, ex);
-                Log.Error(error, errorEx);
+                Logger.Error(error, errorEx);
                 context.Response.Close();
             }
         }
@@ -344,7 +344,7 @@ namespace ServiceStack.Host.HttpListener
             {
                 if (ex.ErrorCode != RequestThreadAbortedException) throw;
 
-                Log.Error($"Swallowing HttpListenerException({RequestThreadAbortedException}) Thread exit or aborted request", ex);
+                Logger.Error($"Swallowing HttpListenerException({RequestThreadAbortedException}) Thread exit or aborted request", ex);
             }
             this.IsStarted = false;
             this.Listener = null;

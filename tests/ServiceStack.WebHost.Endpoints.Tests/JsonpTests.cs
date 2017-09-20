@@ -25,20 +25,20 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		[OneTimeTearDown]
 		public void TestFixtureTearDown()
 		{
-            appHost.Dispose();
-        }
+			appHost.Dispose();
+		}
 
 		[Test]
 		public void Can_GET_single_Movie_using_RestClient_with_JSONP()
 		{
-            var url = ListeningOn + "all-movies/1?callback=cb";
+			var url = ListeningOn + "all-movies/1?callback=cb";
 			string response;
 
 			var webReq = (HttpWebRequest)WebRequest.Create(url);
 			webReq.Accept = "*/*";
 			using (var webRes = webReq.GetResponse())
 			{
-                Assert.That(webRes.ContentType, Does.StartWith(MimeTypes.JavaScript));
+				Assert.That(webRes.ContentType, Does.StartWith(MimeTypes.JavaScript));
 				response = webRes.ReadToEnd();
 			}
 

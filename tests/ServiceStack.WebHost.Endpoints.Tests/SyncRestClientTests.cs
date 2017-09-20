@@ -24,7 +24,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeSetUp]
-        public void OnTestFixtureSetUp()
+        public void TestFixtureSetUp()
         {
             LogManager.LogFactory = new ConsoleLogFactory();
 
@@ -34,7 +34,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
+        public void TestFixtureTearDown()
         {
             Dispose();
         }
@@ -244,10 +244,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     [TestFixture]
     public class JsonSyncRestHttpClientTests : SyncRestClientTests
     {
-        public JsonSyncRestHttpClientTests()
-            : base(8090)
-        {
-        }
+        public JsonSyncRestHttpClientTests() : base(8090) { }
 
         protected override IRestClient CreateRestClient()
         {
@@ -273,10 +270,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     [TestFixture]
     public class JsvSyncRestClientTests : SyncRestClientTests
     {
-        public JsvSyncRestClientTests()
-            : base(8093)
-        {
-        }
+        public JsvSyncRestClientTests() : base(8093) { }
 
         protected override IRestClient CreateRestClient()
         {
@@ -287,10 +281,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     [TestFixture]
     public class XmlSyncRestClientTests : SyncRestClientTests
     {
-        public XmlSyncRestClientTests()
-            : base(8094)
-        {
-        }
+        public XmlSyncRestClientTests() : base(8094) { }
 
         protected override IRestClient CreateRestClient()
         {

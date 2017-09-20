@@ -20,7 +20,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		}
 
 		[OneTimeSetUp]
-		public void OnTestFixtureStartUp()
+		public void TestFixtureSetUp()
 		{
 			appHost = new ExampleAppHostHttpListener();
 			LogManager.LogFactory = new TestLogFactory();
@@ -32,7 +32,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		}
 
 		[OneTimeTearDown]
-		public void OnTestFixtureTearDown()
+		public void TestFixtureTearDown()
 		{
 			appHost.Dispose();
 		}
@@ -65,7 +65,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
 		public class TimedService : Service
 		{
-            public object Any(Timed request)
+			public object Any(Timed request)
 			{
 				Thread.Sleep(request.Milliseconds);
 				return true;

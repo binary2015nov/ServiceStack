@@ -31,9 +31,9 @@ namespace ServiceStack.Logging
         /// <summary>
         /// Gets the logger.
         /// </summary>
-        public static ILog GetLogger(string typeName)
+        public static ILog GetLogger(string name)
         {
-            return LogFactory.GetLogger(typeName);
+            return LogFactory.GetLogger(name);
         }
     }
 }

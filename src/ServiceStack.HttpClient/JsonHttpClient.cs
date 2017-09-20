@@ -22,7 +22,7 @@ namespace ServiceStack
 {
     public class JsonHttpClient : IServiceClient, IJsonServiceClient, IHasCookieContainer, IServiceClientMeta
     {
-        public static ILog log = LogManager.GetLogger(typeof(JsonHttpClient));
+        private readonly static ILog Logger = LogManager.GetLogger(typeof(JsonHttpClient));
 
         public static Func<HttpMessageHandler> GlobalHttpMessageHandlerFactory { get; set; }
         public HttpMessageHandler HttpMessageHandler { get; set; }
@@ -464,7 +464,6 @@ namespace ServiceStack
             GlobalResponseFilter?.Invoke(httpRes);
         }
 
-
         private void ThrowIfError<TResponse>(Task task, HttpResponseMessage httpRes, object request, string requestUri, object response)
         {
             DisposeCancelToken();
@@ -533,10 +532,10 @@ namespace ServiceStack
         public static WebServiceException ToWebServiceException(
             HttpResponseMessage httpRes, object response, Func<Stream, object> parseDtoFn)
         {
-            if (log.IsDebugEnabled)
+            if (Logger.IsDebugEnabled)
             {
-                log.DebugFormat("Status Code : {0}", httpRes.StatusCode);
-                log.DebugFormat("Status Description : {0}", httpRes.ReasonPhrase);
+                Logger.DebugFormat("Status Code : {0}", httpRes.StatusCode);
+                Logger.DebugFormat("Status Description : {0}", httpRes.ReasonPhrase);
             }
 
             var serviceEx = new WebServiceException(httpRes.ReasonPhrase)

@@ -38,6 +38,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public class Echo : IReturn<Echo>
         {
             public string Param { get; set; }
+
             public string PathInfoParam { get; set; }
         }
 
@@ -53,8 +54,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             public RequestInfoResponse Any(RequestInfo request)
             {
-                var requestInfo = RequestInfoHandler.GetRequestInfo(base.Request);
-                return requestInfo;
+                return RequestInfoHandler.GetRequestInfo(base.Request);
             }
 
             public object Any(CustomHtml request)

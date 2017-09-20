@@ -532,7 +532,7 @@ namespace ServiceStack.Host
                     var elType = requestType.GetElementType();
                     if (requestExecMap.TryGetValue(elType, out handlerFn))
                     {
-                        return CreateAutoBatchServiceExec(handlerFn);
+                        return requestExecMap[requestType] = CreateAutoBatchServiceExec(handlerFn);
                     }
                 }
 
@@ -546,7 +546,7 @@ namespace ServiceStack.Host
         {
             return (req, dtos) => 
             {
-                var dtosList = ((IEnumerable) dtos).Map(x => x);
+                var dtosList = ((IEnumerable)dtos).Map(x => x);
                 if (dtosList.Count == 0)
                     return TypeConstants.EmptyObjectArray;
 

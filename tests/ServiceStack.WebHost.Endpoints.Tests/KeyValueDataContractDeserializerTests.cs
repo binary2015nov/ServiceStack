@@ -15,20 +15,20 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		{
 			var request = RequestOfAllTypes.Create(1);
 			var map = new Dictionary<string, string> {
-                {"Byte",request.Byte.ToString()},
-                {"Char",request.Char.ToString()},
-                {"DateTime",request.DateTime.ToShortestXsdDateTimeString()},
-                {"Decimal",request.Decimal.ToString()},
-                {"Double",request.Double.ToString()},
-                {"Float",request.Float.ToString()},
-                {"Guid",request.Guid.ToString()},
-                {"Int",request.Int.ToString()},
-                {"Long",request.Long.ToString()},
-                {"Short",request.Short.ToString()},
-                {"String",request.String},
-                {"TimeSpan",request.TimeSpan.ToString()},
-                {"UInt",request.UInt.ToString()},
-                {"ULong",request.ULong.ToString()},
+				{"Byte",request.Byte.ToString()},
+				{"Char",request.Char.ToString()},
+				{"DateTime",request.DateTime.ToShortestXsdDateTimeString()},
+				{"Decimal",request.Decimal.ToString()},
+				{"Double",request.Double.ToString()},
+				{"Float",request.Float.ToString()},
+				{"Guid",request.Guid.ToString()},
+				{"Int",request.Int.ToString()},
+				{"Long",request.Long.ToString()},
+				{"Short",request.Short.ToString()},
+				{"String",request.String},
+				{"TimeSpan",request.TimeSpan.ToString()},
+				{"UInt",request.UInt.ToString()},
+				{"ULong",request.ULong.ToString()},
 			};
 
 			var toRequest = KeyValueDataContractDeserializer.Instance.Parse(map, typeof(RequestOfAllTypes));
@@ -41,13 +41,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		{
 			var request = RequestOfAllTypes.Create(1);
 			var map = new Dictionary<string, string> {
-                {"Byte",request.Byte.ToString()},
-                {"DateTime",request.DateTime.ToShortestXsdDateTimeString()},
-                {"Double",request.Double.ToString()},
-                {"Guid",request.Guid.ToString()},
-                {"Long",request.Long.ToString()},
-                {"String",request.String},
-                {"UInt",request.UInt.ToString()},
+				{"Byte",request.Byte.ToString()},
+				{"DateTime",request.DateTime.ToShortestXsdDateTimeString()},
+				{"Double",request.Double.ToString()},
+				{"Guid",request.Guid.ToString()},
+				{"Long",request.Long.ToString()},
+				{"String",request.String},
+				{"UInt",request.UInt.ToString()},
 			};
 
 			var toRequest = (RequestOfAllTypes)KeyValueDataContractDeserializer.Instance
@@ -67,14 +67,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		{
 			var request = RequestOfComplexTypes.Create(1);
 			var map = new Dictionary<string, string> {
-                {"IntArray",request.IntArray.Join()},
-                {"IntList",request.IntList.Join()},
-                {"IntMap",request.IntMap.Join()},
-                {"StringArray",request.StringArray.Join()},
-                {"StringList",request.StringList.Join()},
-                {"StringMap",request.StringMap.Join()},
-                {"StringIntMap",request.StringIntMap.Join()},
-                {"RequestOfAllTypes",TypeSerializer.SerializeToString(request.RequestOfAllTypes)},
+				{"IntArray",request.IntArray.Join()},
+				{"IntList",request.IntList.Join()},
+				{"IntMap",request.IntMap.Join()},
+				{"StringArray",request.StringArray.Join()},
+				{"StringList",request.StringList.Join()},
+				{"StringMap",request.StringMap.Join()},
+				{"StringIntMap",request.StringIntMap.Join()},
+				{"RequestOfAllTypes",TypeSerializer.SerializeToString(request.RequestOfAllTypes)},
 			};
 
 			var toRequest = KeyValueDataContractDeserializer.Instance.Parse(map, typeof(RequestOfComplexTypes));

@@ -11,10 +11,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     [TestFixture]
     public class AppHostListenerBaseTests
     {
-        ServiceStackHost appHost;
+        private ServiceStackHost appHost;
 
         [OneTimeSetUp]
-        public void TestFixtureStartUp()
+        public void TestFixtureSetUp()
         {
             LogManager.LogFactory = new ConsoleLogFactory();
             appHost = new ExampleAppHostHttpListener()

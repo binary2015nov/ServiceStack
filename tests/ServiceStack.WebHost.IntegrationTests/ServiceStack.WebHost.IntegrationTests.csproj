@@ -271,6 +271,7 @@
     <Compile Include="Tests\UniqueRequestTests.cs" />
     <Compile Include="Tests\VirtualPathTests.cs" />
     <Compile Include="Tests\WebServicesTests.cs" />
+    <Compile Include="Tests\ZipServiceClientTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\ServiceStack.Api.Swagger\ServiceStack.Api.Swagger.csproj">
@@ -288,6 +289,10 @@
     <ProjectReference Include="..\..\src\ServiceStack.Common\ServiceStack.Common.csproj">
       <Project>{982416DB-C143-4028-A0C3-CF41892D18D3}</Project>
       <Name>ServiceStack.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\ServiceStack.HttpClient\ServiceStack.HttpClient.csproj">
+      <Project>{c05de4a1-84c5-481b-8bd4-c837a1303b01}</Project>
+      <Name>ServiceStack.HttpClient</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\ServiceStack.ProtoBuf\ServiceStack.ProtoBuf.csproj">
       <Project>{ef36a253-c53f-4bf3-b0ec-4d29211fa67d}</Project>

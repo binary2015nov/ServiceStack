@@ -43,53 +43,53 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 		}
 	}
 
-    public class TestProgress : IReturn<List<Movie>> { }
-    public class TestProgressString : IReturn<string> { }
-    public class TestProgressBytes : IReturn<byte[]> { }
+	public class TestProgress : IReturn<List<Movie>> { }
+	public class TestProgressString : IReturn<string> { }
+	public class TestProgressBytes : IReturn<byte[]> { }
 
-    public class TestProgressBytesHttpResult : IReturn<byte[]> { }
-    public class TestProgressBinaryFile : IReturn<byte[]> { }
-    public class TestProgressTextFile : IReturn<string> { }
+	public class TestProgressBytesHttpResult : IReturn<byte[]> { }
+	public class TestProgressBinaryFile : IReturn<byte[]> { }
+	public class TestProgressTextFile : IReturn<string> { }
 
-    public class DownloadProgressService : Service
-    {
-        public object Any(TestProgress request)
-        {
-            return ResetMoviesService.Top5Movies;
-        }
+	public class DownloadProgressService : Service
+	{
+		public object Any(TestProgress request)
+		{
+			return ResetMoviesService.Top5Movies;
+		}
 
-        public string Any(TestProgressString request)
-        {
-            return ResetMoviesService.Top5Movies.ToJson();
-        }
+		public string Any(TestProgressString request)
+		{
+			return ResetMoviesService.Top5Movies.ToJson();
+		}
 
-        public object Any(TestProgressBytes request)
-        {
-            return ResetMoviesService.Top5Movies.ToJson().ToUtf8Bytes();
-        }
+		public object Any(TestProgressBytes request)
+		{
+			return ResetMoviesService.Top5Movies.ToJson().ToUtf8Bytes();
+		}
 
-        public object Any(TestProgressBytesHttpResult request)
-        {
-            return new HttpResult(ResetMoviesService.Top5Movies.ToJson().ToUtf8Bytes(), "application/octet-stream");
-        }
+		public object Any(TestProgressBytesHttpResult request)
+		{
+			return new HttpResult(ResetMoviesService.Top5Movies.ToJson().ToUtf8Bytes(), "application/octet-stream");
+		}
 
-        public object Any(TestProgressBinaryFile request)
-        {
-            var path = Path.GetTempFileName();
-            File.WriteAllBytes(path, ResetMoviesService.Top5Movies.ToJson().ToUtf8Bytes());
-            return new HttpResult(new FileInfo(path), "application/octet-stream");
-        }
+		public object Any(TestProgressBinaryFile request)
+		{
+			var path = Path.GetTempFileName();
+			File.WriteAllBytes(path, ResetMoviesService.Top5Movies.ToJson().ToUtf8Bytes());
+			return new HttpResult(new FileInfo(path), "application/octet-stream");
+		}
 
-        public object Any(TestProgressTextFile request)
-        {
-            var path = Path.GetTempFileName();
-            File.WriteAllText(path, ResetMoviesService.Top5Movies.ToJson());
-            return new HttpResult(new FileInfo(path), "application/json");
-        }
-    }
+		public object Any(TestProgressTextFile request)
+		{
+			var path = Path.GetTempFileName();
+			File.WriteAllText(path, ResetMoviesService.Top5Movies.ToJson());
+			return new HttpResult(new FileInfo(path), "application/json");
+		}
+	}
 
 
-    [Route("/all-movies", "POST,PUT")]
+	[Route("/all-movies", "POST,PUT")]
 	[Route("/all-movies/{Id}")]
 	[DataContract]
 	public class Movie
@@ -99,29 +99,29 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 			this.Genres = new List<string>();
 		}
 
-        [DataMember(Order = 1)]
+		[DataMember(Order = 1)]
 		[AutoIncrement]
 		public int Id { get; set; }
 
-        [DataMember(Order = 2)]
+		[DataMember(Order = 2)]
 		public string ImdbId { get; set; }
 
-        [DataMember(Order = 3)]
+		[DataMember(Order = 3)]
 		public string Title { get; set; }
 
-        [DataMember(Order = 4)]
+		[DataMember(Order = 4)]
 		public decimal Rating { get; set; }
 
-        [DataMember(Order = 5)]
+		[DataMember(Order = 5)]
 		public string Director { get; set; }
 
-        [DataMember(Order = 6)]
+		[DataMember(Order = 6)]
 		public DateTime ReleaseDate { get; set; }
 
-        [DataMember(Order = 7)]
+		[DataMember(Order = 7)]
 		public string TagLine { get; set; }
 
-        [DataMember(Order = 8)]
+		[DataMember(Order = 8)]
 		public List<string> Genres { get; set; }
 
 		#region AutoGen ReSharper code, only required by tests
@@ -161,7 +161,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 	}
 
 
-    public class MovieService : Service
+	public class MovieService : Service
 	{
 		public IDbConnectionFactory DbFactory { get; set; }
 
@@ -170,12 +170,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 		/// </summary>
 		public object Get(Movie movie)
 		{
-		    using (var db = DbFactory.Open())
-		    {
-		        return new MovieResponse {
-		            Movie = db.SingleById<Movie>(movie.Id)
-		        };
-		    }
+			using (var db = DbFactory.Open())
+			{
+				return new MovieResponse {
+					Movie = db.SingleById<Movie>(movie.Id)
+				};
+			}
 		}
 
 		/// <summary>
@@ -183,23 +183,23 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 		/// </summary>
 		public object Post(Movie movie)
 		{
-		    using (var db = DbFactory.Open())
-		    {
-                db.Save(movie);
+			using (var db = DbFactory.Open())
+			{
+				db.Save(movie);
 
-                var newMovie = new MovieResponse
-                {
-                    Movie = db.SingleById<Movie>(movie.Id)
-                };
+				var newMovie = new MovieResponse
+				{
+					Movie = db.SingleById<Movie>(movie.Id)
+				};
 
-                return new HttpResult(newMovie)
-                {
-                    StatusCode = HttpStatusCode.Created,
-                    Headers = {
-					    { HttpHeaders.Location, this.Request.AbsoluteUri.WithTrailingSlash() + movie.Id }
-				    }
-                };
-            }
+				return new HttpResult(newMovie)
+				{
+					StatusCode = HttpStatusCode.Created,
+					Headers = {
+						{ HttpHeaders.Location, this.Request.AbsoluteUri.WithTrailingSlash() + movie.Id }
+					}
+				};
+			}
 		}
 
 		/// <summary>
@@ -207,11 +207,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 		/// </summary>
 		public object Put(Movie movie)
 		{
-		    using (var db = DbFactory.Open())
-		    {
-		        db.Save(movie);
-		        return new MovieResponse();
-		    }
+			using (var db = DbFactory.Open())
+			{
+				db.Save(movie);
+				return new MovieResponse();
+			}
 		}
 
 		/// <summary>
@@ -219,18 +219,18 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 		/// </summary>
 		public object Delete(Movie request)
 		{
-		    using (var db = DbFactory.Open())
-		    {
-		        db.DeleteById<Movie>(request.Id);
-		        return new MovieResponse();
-		    }
+			using (var db = DbFactory.Open())
+			{
+				db.DeleteById<Movie>(request.Id);
+				return new MovieResponse();
+			}
 		}
 	}
 
 
 	[DataContract]
-    [Route("/all-movies", "GET")]
-    [Route("/all-movies/genres/{Genre}")]
+	[Route("/all-movies", "GET")]
+	[Route("/all-movies/genres/{Genre}")]
 	public class Movies
 	{
 		[DataMember]
@@ -252,7 +252,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 		public List<Movie> Movies { get; set; }
 	}
 
-    public class MoviesService : Service
+	public class MoviesService : Service
 	{
 		/// <summary>
 		/// GET /movies 
@@ -286,7 +286,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 		public List<Movie> Movies { get; set; }
 	}
 
-    public class MoviesZipService : Service
+	public class MoviesZipService : Service
 	{
 		public IDbConnectionFactory DbFactory { get; set; }
 
@@ -297,17 +297,17 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 
 		public object Post(MoviesZip request)
 		{
-		    using (var db = DbFactory.Open())
-		    {
-                var response = new MoviesZipResponse
-                {
-                    Movies = request.Genre.IsNullOrEmpty()
-                        ? db.Select<Movie>()
-                        : db.Select<Movie>("Genres LIKE {0}", "%" + request.Genre + "%")
-                };
+			using (var db = DbFactory.Open())
+			{
+				var response = new MoviesZipResponse
+				{
+					Movies = request.Genre.IsNullOrEmpty()
+						? db.Select<Movie>()
+						: db.Select<Movie>("Genres LIKE {0}", "%" + request.Genre + "%")
+				};
 
-                return Request.ToOptimizedResult(response);
-            }
+				return Request.ToOptimizedResult(response);
+			}
 		}
 	}
 
@@ -342,9 +342,9 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 
 		public object Post(ResetMovies request)
 		{
-            const bool overwriteTable = true;
-            Db.CreateTable<Movie>(overwriteTable);
-            Db.SaveAll(Top5Movies);
+			const bool overwriteTable = true;
+			Db.CreateTable<Movie>(overwriteTable);
+			Db.SaveAll(Top5Movies);
 
 			return new ResetMoviesResponse();
 		}
@@ -370,90 +370,90 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 	}
 
 
-    [Route("/inbox/{Id}/responses", "GET, PUT, OPTIONS")]
-    public class InboxPostResponseRequest
-    {
-        public int Id { get; set; }
-        public List<PageElementResponseDTO> Responses { get; set; }
-    }
+	[Route("/inbox/{Id}/responses", "GET, PUT, OPTIONS")]
+	public class InboxPostResponseRequest
+	{
+		public int Id { get; set; }
+		public List<PageElementResponseDTO> Responses { get; set; }
+	}
 
-    public class InboxPostResponseRequestResponse
-    {
-        public int Id { get; set; }
-        public List<PageElementResponseDTO> Responses { get; set; }
-    }
+	public class InboxPostResponseRequestResponse
+	{
+		public int Id { get; set; }
+		public List<PageElementResponseDTO> Responses { get; set; }
+	}
 
-    public class PageElementResponseDTO
-    {
-        public int PageElementId { get; set; }
-        public string PageElementType { get; set; }
-        public string PageElementResponse { get; set; }
-    }
+	public class PageElementResponseDTO
+	{
+		public int PageElementId { get; set; }
+		public string PageElementType { get; set; }
+		public string PageElementResponse { get; set; }
+	}
 
-    public class InboxPostResponseRequestService : Service
-    {
-        public object Any(InboxPostResponseRequest request)
-        {
-            if (request.Responses == null || request.Responses.Count == 0)
-            {
-                throw new ArgumentNullException("Responses");
-            }
-            return new InboxPostResponseRequestResponse {
-                Id = request.Id,
-                Responses = request.Responses
-            };
-        }
-    }
+	public class InboxPostResponseRequestService : Service
+	{
+		public object Any(InboxPostResponseRequest request)
+		{
+			if (request.Responses == null || request.Responses.Count == 0)
+			{
+				throw new ArgumentNullException("Responses");
+			}
+			return new InboxPostResponseRequestResponse {
+				Id = request.Id,
+				Responses = request.Responses
+			};
+		}
+	}
 
-    [Route("/inbox/{Id}/responses", "GET, PUT, OPTIONS")]
-    public class InboxPost
-    {
-        public bool Throw { get; set; }
-        public int Id { get; set; }
-    }
+	[Route("/inbox/{Id}/responses", "GET, PUT, OPTIONS")]
+	public class InboxPost
+	{
+		public bool Throw { get; set; }
+		public int Id { get; set; }
+	}
 
-    public class InboxPostService : Service
-    {
-        public object Any(InboxPost request)
-        {
-            if (request.Throw)
-                throw new ArgumentNullException("Throw");
-            
-            return null;
-        }
-    }
+	public class InboxPostService : Service
+	{
+		public object Any(InboxPost request)
+		{
+			if (request.Throw)
+				throw new ArgumentNullException("Throw");
+			
+			return null;
+		}
+	}
 
-    [DataContract]
-    [Route("/long_running")]
-    public class LongRunning { }
+	[DataContract]
+	[Route("/long_running")]
+	public class LongRunning { }
 
-    public class LongRunningService : Service
-    {
-        public object Any(LongRunning request)
-        {
-            Thread.Sleep(5000);
+	public class LongRunningService : Service
+	{
+		public object Any(LongRunning request)
+		{
+			Thread.Sleep(5000);
 
-            return "LongRunning done.";
-        }
-    }
+			return "LongRunning done.";
+		}
+	}
 
-    public class ExampleAppHostHttpListener : AppHostHttpListenerBase
+	public class ExampleAppHostHttpListener : AppHostHttpListenerBase
 	{
 		public ExampleAppHostHttpListener() : base("ServiceStack Examples", typeof(GetFactorialService).GetAssembly())
 		{
 			LogManager.LogFactory = new DebugLogFactory();
 
-            //Signal advanced web browsers what HTTP Methods you accept
-            Config.GlobalResponseHeaders = new Dictionary<string, string> {
-                { "Access-Control-Allow-Origin", "*" },
-                { "Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS" },
-            };
-            Config.WsdlServiceNamespace = "http://www.servicestack.net/types";
-            Config.DebugMode = true;
-            Config.PreferredContentTypes.Add(MimeTypes.ProtoBuf);
-        }
+			//Signal advanced web browsers what HTTP Methods you accept
+			Config.GlobalResponseHeaders = new Dictionary<string, string> {
+				{ "Access-Control-Allow-Origin", "*" },
+				{ "Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS" },
+			};
+			Config.WsdlServiceNamespace = "http://www.servicestack.net/types";
+			Config.DebugMode = true;
+			Config.PreferredContentTypes.Add(MimeTypes.ProtoBuf);
+		}
 
-        public Action<Container> ConfigureFilter { get; set; }
+		public Action<Container> ConfigureFilter { get; set; }
 
 		public override void Configure(Container container)
 		{
@@ -466,7 +466,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 				.Add<Movie>("/custom-movies", "POST,PUT")
 				.Add<Movie>("/custom-movies/{Id}")
 				.Add<GetFactorial>("/fact/{ForNumber}")
-                .Add<MoviesZip>("/all-movies.zip")
+				.Add<MoviesZip>("/all-movies.zip")
 				.Add<GetHttpResult>("/gethttpresult")
 			;
 
@@ -486,68 +486,68 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 				ConfigureFilter(container);
 			}
 
-            Plugins.Add(new ProtoBufFormat());
-            Plugins.Add(new RequestInfoFeature());
+			Plugins.Add(new ProtoBufFormat());
+			Plugins.Add(new RequestInfoFeature());
 		}
 
-	    protected override void OnAfterInit()
-	    {
-	        var resetMovies = Container.Resolve<ResetMoviesService>();
-	        resetMovies.Post(null);
-        }
+		protected override void OnAfterInit()
+		{
+			var resetMovies = Container.Resolve<ResetMoviesService>();
+			resetMovies.Post(null);
+		}
 	}
 
-    public class ExampleAppHostHttpListenerPool : AppHostHttpListenerPoolBase
-    {
-        public ExampleAppHostHttpListenerPool() : base("ServiceStack Examples", 500, typeof(GetFactorialService).GetAssembly())
-        {
-            //Signal advanced web browsers what HTTP Methods you accept
-            Config.GlobalResponseHeaders = new Dictionary<string, string> {
-                { "Access-Control-Allow-Origin", "*" },
-                { "Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS" },
-            };
-            Config.WsdlServiceNamespace = "http://www.servicestack.net/types";
-            Config.DebugMode = true;
-        }
+	public class ExampleAppHostHttpListenerPool : AppHostHttpListenerPoolBase
+	{
+		public ExampleAppHostHttpListenerPool() : base("ServiceStack Examples", 500, typeof(GetFactorialService).GetAssembly())
+		{
+			//Signal advanced web browsers what HTTP Methods you accept
+			Config.GlobalResponseHeaders = new Dictionary<string, string> {
+				{ "Access-Control-Allow-Origin", "*" },
+				{ "Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS" },
+			};
+			Config.WsdlServiceNamespace = "http://www.servicestack.net/types";
+			Config.DebugMode = true;
+		}
 
-        public Action<Container> ConfigureFilter { get; set; }
+		public Action<Container> ConfigureFilter { get; set; }
 
-        public override void Configure(Container container)
-        {
-            this.RegisterRequestBinder<CustomRequestBinder>(
-                httpReq => new CustomRequestBinder { IsFromBinder = true });
+		public override void Configure(Container container)
+		{
+			this.RegisterRequestBinder<CustomRequestBinder>(
+				httpReq => new CustomRequestBinder { IsFromBinder = true });
 
-            Routes
-                .Add<Movies>("/custom-movies", "GET")
-                .Add<Movies>("/custom-movies/genres/{Genre}")
-                .Add<Movie>("/custom-movies", "POST,PUT")
-                .Add<Movie>("/custom-movies/{Id}")
-                .Add<GetFactorial>("/fact/{ForNumber}")
-                .Add<MoviesZip>("/all-movies.zip")
-                .Add<GetHttpResult>("/gethttpresult")
-            ;
+			Routes
+				.Add<Movies>("/custom-movies", "GET")
+				.Add<Movies>("/custom-movies/genres/{Genre}")
+				.Add<Movie>("/custom-movies", "POST,PUT")
+				.Add<Movie>("/custom-movies/{Id}")
+				.Add<GetFactorial>("/fact/{ForNumber}")
+				.Add<MoviesZip>("/all-movies.zip")
+				.Add<GetHttpResult>("/gethttpresult")
+			;
 
-            container.Register(c => new ExampleConfig(AppSettings));
-            //var appConfig = container.Resolve<ExampleConfig>();
+			container.Register(c => new ExampleConfig(AppSettings));
+			//var appConfig = container.Resolve<ExampleConfig>();
 
-            container.Register<IDbConnectionFactory>(c =>
-                new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider));
+			container.Register<IDbConnectionFactory>(c =>
+				new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider));
 
-            //var movies = container.Resolve<IDbConnectionFactory>().Exec(x => x.Select<Movie>());
-            //Console.WriteLine(movies.Dump());
+			//var movies = container.Resolve<IDbConnectionFactory>().Exec(x => x.Select<Movie>());
+			//Console.WriteLine(movies.Dump());
 
-            if (ConfigureFilter != null)
-            {
-                ConfigureFilter(container);
-            }
+			if (ConfigureFilter != null)
+			{
+				ConfigureFilter(container);
+			}
 
-            Plugins.Add(new RequestInfoFeature());
-        }
+			Plugins.Add(new RequestInfoFeature());
+		}
 
-        protected override void OnAfterInit()
-        {
-            var resetMovies = Container.Resolve<ResetMoviesService>();
-            resetMovies.Post(null);
-        }
-    }
+		protected override void OnAfterInit()
+		{
+			var resetMovies = Container.Resolve<ResetMoviesService>();
+			resetMovies.Post(null);
+		}
+	}
 }

@@ -25,9 +25,9 @@ namespace ServiceStack.Logging
             return new StringBuilderLog(type, sb) { IsDebugEnabled = debugEnabled };
         }
 
-        public ILog GetLogger(string typeName)
+        public ILog GetLogger(string name)
         {
-            return new StringBuilderLog(typeName, sb) { IsDebugEnabled = debugEnabled };
+            return new StringBuilderLog(name, sb) { IsDebugEnabled = debugEnabled };
         }
 
         public string GetLogs()

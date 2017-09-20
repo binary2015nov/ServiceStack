@@ -5,11 +5,10 @@ using NUnit.Framework;
 using ServiceStack.IO;
 using ServiceStack.Testing;
 using ServiceStack.Text;
-using ServiceStack.VirtualPath;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
-    public class FileSystemVirtualPathProviderTests : VirtualPathProviderTests
+    public class FileSystemVirtualPathProviderTests : VirtualPathProviderTestsBase
     {
         private static string RootDir = "~/App_Data/files".MapProjectPath();
 
@@ -27,7 +26,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
-    public class InMemoryVirtualPathProviderTests : VirtualPathProviderTests
+    public class InMemoryVirtualPathProviderTests : VirtualPathProviderTestsBase
     {
         public override IVirtualPathProvider GetPathProvider()
         {
@@ -37,7 +36,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
 
     [TestFixture]
-    public abstract class VirtualPathProviderTests
+    public abstract class VirtualPathProviderTestsBase
     {
         public abstract IVirtualPathProvider GetPathProvider();
 

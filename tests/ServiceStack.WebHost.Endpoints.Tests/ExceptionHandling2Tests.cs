@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using NUnit.Framework;
 using ProtoBuf;
-using ServiceStack.Text;
 using ServiceStack.ProtoBuf;
 #if !NETCORE_SUPPORT
 using ServiceStack.ServiceModel;
@@ -132,10 +131,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
     public class AppHost : AppHostHttpListenerBase
     {
-        public AppHost()
-            : base("Test ErrorHandling", typeof(ReqstarsService).GetAssembly())
-        {
-        }
+        public AppHost() : base("Test ErrorHandling", typeof(ReqstarsService).GetAssembly()) { }
 
         public override void Configure(Funq.Container container)
         {
@@ -146,8 +142,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     [TestFixture]
     public class ExceptionHandling2Tests
     {
-        private static string testUri = Config.ListeningOn;
-
         AppHost appHost;
 
         [OneTimeSetUp]
@@ -175,11 +169,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         static IRestClient[] ServiceClients =
         {
-            new JsonServiceClient(testUri),
-            new JsonHttpClient(testUri),
-            new XmlServiceClient(testUri),
-            new JsvServiceClient(testUri),
-            new ProtoBufServiceClient(testUri)
+            new JsonServiceClient(Config.ListeningOn),
+            new JsonHttpClient(Config.ListeningOn),
+            new XmlServiceClient(Config.ListeningOn),
+            new JsvServiceClient(Config.ListeningOn),
+            new ProtoBufServiceClient(Config.ListeningOn)
         };
 
 

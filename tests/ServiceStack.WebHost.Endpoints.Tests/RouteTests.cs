@@ -32,7 +32,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public void Can_download_original_route()
         {
             var response = Config.AbsoluteBaseUri.CombineWith("/custom/foo")
-                .GetStringFromUrl(responseFilter: httpRes =>
+                .GetStringFromUrl(responseFilter: httpRes => 
                 {
                     httpRes.ContentType.Print();
                     Assert.That(httpRes.ContentType.MatchesContentType(MimeTypes.Html));
@@ -340,9 +340,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         public ModifiedRouteAppHost() : base(typeof(BufferedRequestTests).Name, typeof(CustomRouteService).GetAssembly()) { }
 
-        public override void Configure(Container container)
-        {
-        }
+        public override void Configure(Container container) { }
 
         public override RouteAttribute[] GetRouteAttributes(System.Type requestType)
         {

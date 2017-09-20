@@ -632,22 +632,11 @@ namespace ServiceStack
             return typesConfig;
         }
 
-        public virtual List<Type> ExportSoapOperationTypes(List<Type> operationTypes)
+        public virtual HashSet<Type> ExportSoapOperationTypes()
         {
-            var types = operationTypes
-                .Where(x => !x.AllAttributes<ExcludeAttribute>()
-                            .Any(attr => attr.Feature.Has(Feature.Soap)))
-                .Where(x => !x.IsGenericTypeDefinition())
-                .ToList();
-            return types;
+            return Metadata.GetAllSoapOperationTypes();
         }
 
-        public virtual bool ExportSoapType(Type type)
-        {
-            return !type.IsGenericTypeDefinition() &&
-                   !type.AllAttributes<ExcludeAttribute>()
-                        .Any(attr => attr.Feature.Has(Feature.Soap));
-        }
 
         /// <summary>
         /// Gets IDbConnection Checks if DbInfo is seat in RequestContext.

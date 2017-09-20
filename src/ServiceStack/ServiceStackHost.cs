@@ -499,7 +499,7 @@ namespace ServiceStack
 
         public Dictionary<Type, Func<IRequest, object>> RequestBinders => ServiceController?.RequestTypeFactoryMap;
 
-        public IContentTypes ContentTypes { get; set; }
+        public ContentTypes ContentTypes { get; set; }
 
         /// <summary>
         /// Collection of PreRequest filters.

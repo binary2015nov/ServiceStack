@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using ServiceStack.Host;
 using ServiceStack.Host.Handlers;
 using ServiceStack.Host.HttpListener;
-using ServiceStack.Text;
 
 namespace ServiceStack
 {
@@ -27,27 +26,15 @@ namespace ServiceStack
             return Environment.ProcessorCount * ThreadsPerProcessor;
         }
 
-        public string HandlerPath { get; set; }
+        public string HandlerPath { get { return Config.HandlerFactoryPath; } set { Config.HandlerFactoryPath = value; } }
 
         protected AppHostHttpListenerBase(string serviceName, params Assembly[] assembliesWithServices)
-            : base(serviceName, assembliesWithServices)
-        { }
+            : base(serviceName, assembliesWithServices) { }
 
         protected AppHostHttpListenerBase(string serviceName, string handlerPath, params Assembly[] assembliesWithServices)
             : base(serviceName, assembliesWithServices)
         {
             HandlerPath = handlerPath;
-        }
-
-        protected override void OnBeforeInit()
-        {
-            Config.HandlerFactoryPath = string.IsNullOrEmpty(HandlerPath)
-                ? null
-                : HandlerPath;
-
-            Config.MetadataRedirectPath = string.IsNullOrEmpty(HandlerPath)
-                ? "metadata"
-                : PathUtils.CombinePaths(HandlerPath, "metadata");
         }
 
         protected override async Task ProcessRequestAsync(HttpListenerContext context)

@@ -33,7 +33,7 @@ namespace ServiceStack
     /// </summary>
     public abstract class ServiceClientBase : IServiceClient, IMessageProducer, IHasCookieContainer, IServiceClientMeta
     {
-        private static readonly ILog log = LogManager.GetLogger(typeof(ServiceClientBase));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(ServiceClientBase));
 
         private AuthenticationInfo authInfo = null;
 
@@ -495,12 +495,12 @@ namespace ServiceStack
             return ToAbsoluteUrl(relativeOrAbsoluteUrl);
         }
 
-        internal void AsyncSerializeToStream(IRequest requestContext, object request, Stream stream)
+        internal void AsyncSerializeToStream(IRequest request, object requestDto, Stream stream)
         {
-            SerializeRequestToStream(request, stream);
+            SerializeRequestToStream(requestDto, stream);
         }
 
-        public abstract void SerializeToStream(IRequest requestContext, object request, Stream stream);
+        public abstract void SerializeToStream(IRequest request, object requestDto, Stream stream);
 
         public abstract T DeserializeFromStream<T>(Stream stream);
 
@@ -548,38 +548,38 @@ namespace ServiceStack
             }
         }
 
-        public virtual TResponse Send<TResponse>(object request)
+        public virtual TResponse Send<TResponse>(object requestDto)
         {
             if (typeof(TResponse) == typeof(object))
-                return (TResponse)this.Send(this.GetResponseType(request), request);
+                return (TResponse)this.Send(this.GetResponseType(requestDto), requestDto);
 
-            if (request is IVerb)
+            if (requestDto is IVerb)
             {
-                if (request is IGet)
-                    return Get<TResponse>(request);
-                if (request is IPost)
-                    return Post<TResponse>(request);
-                if (request is IPut)
-                    return Put<TResponse>(request);
-                if (request is IDelete)
-                    return Delete<TResponse>(request);
-                if (request is IPatch)
-                    return Patch<TResponse>(request);
+                if (requestDto is IGet)
+                    return Get<TResponse>(requestDto);
+                if (requestDto is IPost)
+                    return Post<TResponse>(requestDto);
+                if (requestDto is IPut)
+                    return Put<TResponse>(requestDto);
+                if (requestDto is IDelete)
+                    return Delete<TResponse>(requestDto);
+                if (requestDto is IPatch)
+                    return Patch<TResponse>(requestDto);
             }
 
             var httpMethod = HttpMethod ?? DefaultHttpMethod;
             var requestUri = ResolveUrl(httpMethod, UrlResolver == null
-                ? this.SyncReplyBaseUri.WithTrailingSlash() + request.GetType().Name
-                : Format + "/reply/" + request.GetType().Name);
+                ? this.SyncReplyBaseUri.WithTrailingSlash() + requestDto.GetType().Name
+                : Format + "/reply/" + requestDto.GetType().Name);
 
             if (ResultsFilter != null)
             {
-                var response = ResultsFilter(typeof(TResponse), httpMethod, requestUri, request);
+                var response = ResultsFilter(typeof(TResponse), httpMethod, requestUri, requestDto);
                 if (response is TResponse)
                     return (TResponse)response;
             }
 
-            var client = SendRequest(httpMethod, requestUri, request);
+            var client = SendRequest(httpMethod, requestUri, requestDto);
 
             try
             {
@@ -587,7 +587,7 @@ namespace ServiceStack
                 ApplyWebResponseFilters(webResponse);
 
                 var response = GetResponse<TResponse>(webResponse);
-                ResultsFilterResponse?.Invoke(webResponse, response, httpMethod, requestUri, request);
+                ResultsFilterResponse?.Invoke(webResponse, response, httpMethod, requestUri, requestDto);
 
                 DisposeIfRequired<TResponse>(webResponse);
 
@@ -598,9 +598,9 @@ namespace ServiceStack
                 TResponse response;
 
                 if (!HandleResponseException(ex,
-                    request,
+                    requestDto,
                     requestUri,
-                    () => SendRequest(HttpMethods.Post, requestUri, request),
+                    () => SendRequest(HttpMethods.Post, requestUri, requestDto),
                     c => PclExport.Instance.GetResponse(c),
                     out response))
                 {
@@ -779,11 +779,11 @@ namespace ServiceStack
             )
             {
                 var errorResponse = (HttpWebResponse)webEx.Response;
-                log.Error(webEx);
-                if (log.IsDebugEnabled)
+                Logger.Error(webEx);
+                if (Logger.IsDebugEnabled)
                 {
-                    log.DebugFormat("Status Code : {0}", errorResponse.StatusCode);
-                    log.DebugFormat("Status Description : {0}", errorResponse.StatusDescription);
+                    Logger.DebugFormat("Status Code : {0}", errorResponse.StatusCode);
+                    Logger.DebugFormat("Status Description : {0}", errorResponse.StatusDescription);
                 }
 
                 var serviceEx = new WebServiceException(errorResponse.StatusDescription)
@@ -886,7 +886,7 @@ namespace ServiceStack
                 }
 #endif
                 SerializeToStream(null, request, requestStream);
-
+                requestStream.Flush();
                 if (!keepOpen)
                 {
                     requestStream.Close();
@@ -900,8 +900,8 @@ namespace ServiceStack
                 throw new ArgumentNullException(nameof(httpMethod));
 
             this.PopulateRequestMetadata(request);
-
-            if (!httpMethod.HasRequestBody() && request != null)
+            var hasRequestBody = httpMethod.HasRequestBody();
+            if (!hasRequestBody && request != null)
             {
                 var queryString = QueryStringSerializer.SerializeToString(request);
                 if (!string.IsNullOrEmpty(queryString))
@@ -923,18 +923,15 @@ namespace ServiceStack
 #endif
 
 #if NET45 || NET40
-
                 client.UserAgent = UserAgent;
                 client.AllowAutoRedirect = AllowAutoRedirect;
                 if (Timeout.HasValue) 
                     client.Timeout = (int)(((TimeSpan)Timeout).TotalMilliseconds);
+
                 if (ReadWriteTimeout.HasValue)
                 client.ReadWriteTimeout = (int)(((TimeSpan)ReadWriteTimeout).TotalMilliseconds);
-
 #else
-
                 client.Headers[HttpRequestHeader.UserAgent] = userAgent;
-
 #endif
 
                 if (this.authInfo != null && !this.UserName.IsNullOrEmpty())
@@ -953,10 +950,10 @@ namespace ServiceStack
 
                 ApplyWebRequestFilters(client);
 
-                if (httpMethod.HasRequestBody())
+                if (hasRequestBody)
                 {
                     client.ContentType = ContentType;
-
+                    
                     if (RequestCompressionType != null)
                         client.Headers[HttpHeaders.ContentEncoding] = RequestCompressionType;
 
@@ -1292,18 +1289,18 @@ namespace ServiceStack
             asyncClient.CancelAsync();
         }
 
-        public virtual TResponse Send<TResponse>(string httpMethod, string relativeOrAbsoluteUrl, object request)
+        public virtual TResponse Send<TResponse>(string httpMethod, string relativeOrAbsoluteUrl, object requestDto)
         {
             var requestUri = ToAbsoluteUrl(relativeOrAbsoluteUrl);
 
             if (ResultsFilter != null)
             {
-                var response = ResultsFilter(typeof(TResponse), httpMethod, requestUri, request);
+                var response = ResultsFilter(typeof(TResponse), httpMethod, requestUri, requestDto);
                 if (response is TResponse)
                     return (TResponse)response;
             }
 
-            var client = SendRequest(httpMethod, requestUri, request);
+            var client = SendRequest(httpMethod, requestUri, requestDto);
 
             try
             {
@@ -1311,7 +1308,7 @@ namespace ServiceStack
                 ApplyWebResponseFilters(webResponse);
 
                 var response = GetResponse<TResponse>(webResponse);
-                ResultsFilterResponse?.Invoke(webResponse, response, httpMethod, requestUri, request);
+                ResultsFilterResponse?.Invoke(webResponse, response, httpMethod, requestUri, requestDto);
 
                 DisposeIfRequired<TResponse>(webResponse);
 
@@ -1323,9 +1320,9 @@ namespace ServiceStack
 
                 if (!HandleResponseException(
                     ex,
-                    request,
+                    requestDto,
                     requestUri,
-                    () => SendRequest(httpMethod, requestUri, request),
+                    () => SendRequest(httpMethod, requestUri, requestDto),
                     c => PclExport.Instance.GetResponse(c),
                     out response))
                 {

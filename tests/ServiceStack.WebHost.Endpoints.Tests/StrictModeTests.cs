@@ -22,10 +22,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 Config.StrictMode = true;
             }
 
-            public override void Configure(Container container)
-            {
-
-            }
+            public override void Configure(Container container) { }
         }
 
         private readonly ServiceStackHost appHost;
@@ -38,7 +35,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OneTimeTearDown() => appHost.Dispose();
+        public void TestFixtureTearDown() => appHost.Dispose();
 
         [Test]
         public void Returning_ValueTime_throws_StrictModeException()

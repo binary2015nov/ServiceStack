@@ -22,7 +22,7 @@ namespace ServiceStack.Metadata
 
             if (!AssertAccess(httpReq, httpRes, httpReq.QueryString["op"])) return;
 
-            var operationTypes = HostContext.Metadata.GetAllSoapOperationTypes();
+            var operationTypes = HostContext.AppHost.ExportSoapOperationTypes();
 
             if (httpReq.QueryString["xsd"] != null)
             {

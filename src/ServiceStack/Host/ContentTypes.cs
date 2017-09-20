@@ -11,7 +11,7 @@ namespace ServiceStack.Host
 {
     public class ContentTypes : IContentTypes
     {
-        private static readonly UTF8Encoding UTF8EncodingWithoutBom = new UTF8Encoding(false);
+        private static readonly Encoding UTF8EncodingWithoutBom = new UTF8Encoding(false);
 
         public static readonly ContentTypes Default = new ContentTypes();
 

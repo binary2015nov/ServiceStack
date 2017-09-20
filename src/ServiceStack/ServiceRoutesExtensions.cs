@@ -19,8 +19,7 @@ namespace ServiceStack
         /// </param>
         /// <returns>The same <see cref="IServiceRoutes"/> instance;
         ///		never <see langword="null"/>.</returns>
-        public static IServiceRoutes AddFromAssembly(this IServiceRoutes routes,
-                                                     params Assembly[] assembliesWithServices)
+        public static IServiceRoutes AddFromAssembly(this IServiceRoutes routes, params Assembly[] assembliesWithServices)
         {
             foreach (Assembly assembly in assembliesWithServices)
             {

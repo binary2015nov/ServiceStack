@@ -40,8 +40,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     [TestFixture]
     public class CorsFeatureServiceTest
     {
-        public class CorsFeatureAppHostHttpListener
-            : AppHostHttpListenerBase
+        public class CorsFeatureAppHostHttpListener : AppHostHttpListenerBase
         {
             public CorsFeatureAppHostHttpListener()
                 : base("Cors Feature Tests", typeof(CorsFeatureService).GetAssembly()) { }

@@ -3,7 +3,6 @@ using System.IO;
 using System.Text;
 using NUnit.Framework;
 using ServiceStack.ProtoBuf;
-using ServiceStack.Text;
 using ServiceStack.WebHost.IntegrationTests.Services;
 
 namespace ServiceStack.WebHost.IntegrationTests.Tests

@@ -21,15 +21,12 @@ namespace ServiceStack
 
         public override string ContentType => $"application/{Format}";
 
-        public override void SerializeToStream(IRequest requestContext, object request, Stream stream) => 
-            JsonDataContractSerializer.Instance.SerializeToStream(request, stream);
+        public override void SerializeToStream(IRequest request, object requestDto, Stream stream) => 
+            JsonDataContractSerializer.Instance.SerializeToStream(requestDto, stream);
 
         public override T DeserializeFromStream<T>(Stream stream) => 
             JsonDataContractSerializer.Instance.DeserializeFromStream<T>(stream);
 
         public override StreamDeserializerDelegate StreamDeserializer => JsonSerializer.DeserializeFromStream;
-
-        internal static JsonObject ParseObject(string json) => 
-            JsonObject.Parse(json);
     }
 }

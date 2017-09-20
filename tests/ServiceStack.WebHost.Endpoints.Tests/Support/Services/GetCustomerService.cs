@@ -4,8 +4,7 @@ using ServiceStack.WebHost.Endpoints.Tests.Support.Types;
 
 namespace ServiceStack.WebHost.Endpoints.Tests.Support.Services
 {
-    public class GetCustomerService
-        : TestServiceBase<GetCustomer>
+    public class GetCustomerService : TestServiceBase<GetCustomer>
     {
         protected override object Run(GetCustomer request)
         {

@@ -15,8 +15,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public class AuthDigestAppHost : AuthAppHost
         {
             public AuthDigestAppHost(string webHostUrl, Action<Container> configureFn = null)
-                : base(webHostUrl, configureFn)
-            { }
+                : base(webHostUrl, configureFn) { }
 
             public override IAuthProvider[] GetAuthProviders()
             {

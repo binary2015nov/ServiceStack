@@ -16,7 +16,6 @@ namespace ServiceStack
     
     public class TemplateInfoFilters : TemplateFilter
     {
-
         public string envVariable(string variable) => Environment.GetEnvironmentVariable(variable);
         public string envExpandVariables(string name) => Environment.ExpandEnvironmentVariables(name);
         public string envStackTrace() => Environment.StackTrace;
@@ -76,7 +75,7 @@ namespace ServiceStack
         public List<string> metaAllDtoNames() => HostContext.Metadata.GetOperationDtos().Map(x => x.Name);
         public IEnumerable<Operation> metaAllOperations() => HostContext.Metadata.Operations;
         public List<string> metaAllOperationNames() => HostContext.Metadata.GetAllOperationNames();
-        public List<Type> metaAllOperationTypes() => HostContext.Metadata.GetAllOperationTypes();
+        public HashSet<Type> metaAllOperationTypes() => HostContext.Metadata.GetAllOperationTypes();
         public Operation metaOperation(string name) => HostContext.Metadata.GetOperation(HostContext.Metadata.GetOperationType(name));
 
         public List<IPlugin> plugins() => HostContext.AppHost.Plugins;

@@ -19,7 +19,7 @@ namespace ServiceStack
 {
     public static class HttpResponseExtensionsInternal
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(HttpResponseExtensionsInternal));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(HttpResponseExtensionsInternal));
 
         [Obsolete("Use WriteToOutputStreamAsync")]
         public static bool WriteToOutputStream(IResponse response, object result, byte[] bodyPrefix, byte[] bodySuffix)
@@ -83,7 +83,7 @@ namespace ServiceStack
             return false;
         }
 
-        public static Task<bool> WriteToResponse(this IResponse httpRes, object result, string contentType, CancellationToken token=default(CancellationToken))
+        public static Task<bool> WriteToResponse(this IResponse httpRes, object result, string contentType, CancellationToken token = default(CancellationToken))
         {
             var serializer = HostContext.ContentTypes.GetResponseSerializer(contentType);
             return httpRes.WriteToResponse(result, serializer, new BasicRequest { ContentType = contentType }, token);
@@ -217,8 +217,8 @@ namespace ServiceStack
                                 continue;
                             }
 
-                            if (Log.IsDebugEnabled)
-                                Log.Debug($"Setting Custom HTTP Header: {responseHeaders.Key}: {responseHeaders.Value}");
+                            if (Logger.IsDebugEnabled)
+                                Logger.Debug($"Setting Custom HTTP Header: {responseHeaders.Key}: {responseHeaders.Value}");
 
                             if (Env.IsMono && responseHeaders.Key.EqualsIgnoreCase(HttpHeaders.ContentType))
                             {
@@ -352,7 +352,7 @@ namespace ServiceStack
             catch (Exception writeErrorEx)
             {
                 //Exception in writing to response should not hide the original exception
-                Log.Info("Failed to write error to response: {0}", writeErrorEx);
+                Logger.Info("Failed to write error to response: {0}", writeErrorEx);
                 return originalEx.AsTaskException<bool>();
             }
             return TypeConstants.TrueTask;

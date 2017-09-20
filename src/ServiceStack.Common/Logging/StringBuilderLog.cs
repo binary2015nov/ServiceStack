@@ -7,7 +7,7 @@ namespace ServiceStack.Logging
     {
         private readonly StringBuilder logs;
 
-        public StringBuilderLog(string type, StringBuilder logs)
+        public StringBuilderLog(string name, StringBuilder logs)
         {
             this.logs = logs;
         }

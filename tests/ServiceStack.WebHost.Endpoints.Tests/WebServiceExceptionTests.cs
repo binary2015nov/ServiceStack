@@ -1,9 +1,6 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using NUnit.Framework;
-#if !NETCORE_SUPPORT
-using ServiceStack.ServiceModel;
-#endif
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
@@ -15,9 +12,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 	}
 
 	[DataContract]
-	public class NoStatusResponse
-	{
-	}
+	public class NoStatusResponse { }
 
 	[TestFixture]
 	public class WebServiceExceptionTests
@@ -56,21 +51,21 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			Assert.That(webEx.ServerStackTrace, Is.Null);
 		}
 
-	    [Test]
-	    public void Can_Retrieve_Errors_From_ResponseBody_If_ResponseDto_Does_Not_Contain_ResponseStatus()
-	    {
-	        var webEx = new WebServiceException
-	            {
-	                ResponseDto = new List<string> {"123"},
-	                ResponseBody = "{\"ResponseStatus\":" +
-	                               "{\"ErrorCode\":\"UnauthorizedAccessException\"," +
-	                               "\"Message\":\"Error Message\"," +
-	                               "\"StackTrace\":\"Some Stack Trace\",\"Errors\":[]}}"
-	            };
-	        Assert.That(webEx.ErrorCode, Is.EqualTo("UnauthorizedAccessException"));
-            Assert.That(webEx.ErrorMessage, Is.EqualTo("Error Message"));
-            Assert.That(webEx.ServerStackTrace, Is.EqualTo("Some Stack Trace"));
-	    }
+		[Test]
+		public void Can_Retrieve_Errors_From_ResponseBody_If_ResponseDto_Does_Not_Contain_ResponseStatus()
+		{
+			var webEx = new WebServiceException
+				{
+					ResponseDto = new List<string> {"123"},
+					ResponseBody = "{\"ResponseStatus\":" +
+								   "{\"ErrorCode\":\"UnauthorizedAccessException\"," +
+								   "\"Message\":\"Error Message\"," +
+								   "\"StackTrace\":\"Some Stack Trace\",\"Errors\":[]}}"
+				};
+			Assert.That(webEx.ErrorCode, Is.EqualTo("UnauthorizedAccessException"));
+			Assert.That(webEx.ErrorMessage, Is.EqualTo("Error Message"));
+			Assert.That(webEx.ServerStackTrace, Is.EqualTo("Some Stack Trace"));
+		}
 	}
 
 }

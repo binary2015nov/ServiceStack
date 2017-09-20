@@ -15,6 +15,6 @@ namespace ServiceStack.Logging
         /// <summary>
         /// Gets the logger.
         /// </summary>
-        ILog GetLogger(string typeName);
+        ILog GetLogger(string name);
     }
 }

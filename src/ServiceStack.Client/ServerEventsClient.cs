@@ -664,7 +664,7 @@ namespace ServiceStack
 
         private void ProcessOnConnectMessage(ServerEventMessage e)
         {
-            var msg = JsonServiceClient.ParseObject(e.Json);
+            var msg = JsonObject.Parse(e.Json);
             ConnectionInfo = new ServerEventConnect
             {
                 HeartbeatIntervalMs = DefaultHeartbeatMs,
@@ -686,21 +686,21 @@ namespace ServiceStack
 
         private void ProcessOnJoinMessage(ServerEventMessage e)
         {
-            var msg = new ServerEventJoin().Populate(e, JsonServiceClient.ParseObject(e.Json));
+            var msg = new ServerEventJoin().Populate(e, JsonObject.Parse(e.Json));
             OnJoinReceived(msg);
             OnCommandReceived(msg);
         }
 
         private void ProcessOnLeaveMessage(ServerEventMessage e)
         {
-            var msg = new ServerEventLeave().Populate(e, JsonServiceClient.ParseObject(e.Json));
+            var msg = new ServerEventLeave().Populate(e, JsonObject.Parse(e.Json));
             OnLeaveReceived(msg);
             OnCommandReceived(msg);
         }
 
         private void ProcessOnUpdateMessage(ServerEventMessage e)
         {
-            var msg = new ServerEventUpdate().Populate(e, JsonServiceClient.ParseObject(e.Json));
+            var msg = new ServerEventUpdate().Populate(e, JsonObject.Parse(e.Json));
             OnUpdateReceived(msg);
             OnCommandReceived(msg);
         }
@@ -711,7 +711,7 @@ namespace ServiceStack
             if (log.IsDebugEnabled)
                 log.Debug("[SSE-CLIENT] LastPulseAt: " + DateTime.UtcNow.TimeOfDay);
 
-            var msg = JsonServiceClient.ParseObject(e.Json);
+            var msg = JsonObject.Parse(e.Json);
             var heartbeatMsg = new ServerEventHeartbeat().Populate(e, msg);
 
             OnHeartbeatReceived(heartbeatMsg);

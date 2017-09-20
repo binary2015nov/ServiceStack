@@ -3,86 +3,84 @@ using NUnit.Framework;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
-    /*
-     * Leave commented out - this pollutes and causes many failures in other tests
-     */
+    [TestFixture]
+    public class SharedDtoTests
+    {
+        [Route("/shareddto")]
+        public class RequestDto : IReturn<ResponseDto> { }
 
-    //[Explicit("This isn't supported at the moment.")]
-    //public class SharedDtoTests
-    //{
-    //    [Route("/shareddto")]
-    //    public class RequestDto : IReturn<ResponseDto> { }
-    //    public class ResponseDto
-    //    {
-    //        public string ServiceName { get; set; }
-    //    }
+        public class ResponseDto
+        {
+            public string ServiceName { get; set; }
+        }
 
-    //    public class Service1 : IService
-    //    {
-    //        public object Get(RequestDto req)
-    //        {
-    //            return new ResponseDto { ServiceName = GetType().Name };
-    //        }
-    //    }
+        public class Service1 : IService
+        {
+            public object Get(RequestDto req)
+            {
+                return new ResponseDto { ServiceName = GetType().Name };
+            }
+        }
 
-    //    public class Service2 : IService
-    //    {
-    //        public object Post(RequestDto req)
-    //        {
-    //            return new ResponseDto { ServiceName = GetType().Name };
-    //        }
-    //    }
+        public class Service2 : IService
+        {
+            public object Post(RequestDto req)
+            {
+                return new ResponseDto { ServiceName = GetType().Name };
+            }
+        }
 
-    //    private const string ListeningOn = "http://localhost:8080/";
+        class SharedDtoAppHost : AppHostHttpListenerBase
+        {
 
-    //    public class AppHost
-    //        : AppHostHttpListenerBase
-    //    {
+            public SharedDtoAppHost() : base("Shared dto tests", typeof(Service1).GetAssembly()) { }
 
-    //        public AppHost()
-    //            : base("Shared dto tests", typeof(Service1).GetAssembly()) { }
+            public override void Configure(Container container) { }
+        }
 
-    //        public override void Configure(Container container)
-    //        {
-    //        }
-    //    }
+        private ServiceStackHost AppHost;
 
-    //    AppHost AppHost;
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
+        {
+            AppHost = new SharedDtoAppHost();
+            AppHost.Init();
+            AppHost.Start(Config.ListeningOn);
+        }
 
-    //    [OneTimeSetUp]
-    //    public void OnTestFixtureSetUp()
-    //    {
-    //        AppHost = new AppHost();
-    //        AppHost.Init();
-    //        AppHost.Start(ListeningOn);
-    //    }
+        [OneTimeTearDown]
+        public void TestFixtureTearDown()
+        {
+            AppHost.Dispose();
+        }
 
-    //    [OneTimeTearDown]
-    //    public void OnTestFixtureTearDown()
-    //    {
-    //        AppHost.Dispose();
-    //        EndpointHost.ExceptionHandler = null;
-    //    }
+        protected static IRestClient[] RestClients =
+        {
+            new JsonServiceClient(Config.ListeningOn),
+            new XmlServiceClient(Config.ListeningOn),
+            new JsvServiceClient(Config.ListeningOn)
+        };
 
-    //    protected static IRestClient[] RestClients = 
-    //    {
-    //        new JsonServiceClient(ListeningOn),
-    //        new XmlServiceClient(ListeningOn),
-    //        new JsvServiceClient(ListeningOn)
-    //    };
+        [Test, TestCaseSource(nameof(RestClients))]
+        public void Can_call_service1(IRestClient client)
+        {
+            var response = client.Get(new RequestDto());
+            Assert.That(response.ServiceName, Is.EqualTo(typeof(Service1).Name));
+        }
 
-    //    [Test, TestCaseSource("RestClients")]
-    //    public void Can_call_service1(IRestClient client)
-    //    {
-    //        var response = client.Get(new RequestDto());
-    //        Assert.That(response.ServiceName, Is.EqualTo(typeof(Service1).Name));
-    //    }
-
-    //    [Test, TestCaseSource("RestClients")]
-    //    public void Can_call_service2(IRestClient client)
-    //    {
-    //        var response = client.Post(new RequestDto());
-    //        Assert.That(response.ServiceName, Is.EqualTo(typeof(Service2).Name));
-    //    }
-    //}
+        [Test, TestCaseSource(nameof(RestClients))]
+        public void Can_call_service2(IRestClient client)
+        {
+            try
+            {
+                var response = client.Post(new RequestDto());
+            }
+            catch (WebServiceException ex)
+            {
+                Assert.That(ex.StatusCode, Is.EqualTo(405));
+                Assert.That(ex.Message, Is.EqualTo("Could not find method named {1}({0}) or Any({0}) on Service {2}"
+                    .Fmt(typeof(RequestDto).GetOperationName(), "Post", typeof(Service1).GetOperationName())));
+            }
+        }
+    }
 }

@@ -157,8 +157,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
-    public abstract class ServiceClientTests
-        : ServiceClientTestBase
+    public abstract class ServiceClientTests : ServiceClientTestBase
     {
         /// <summary>
         /// These tests require admin privillages

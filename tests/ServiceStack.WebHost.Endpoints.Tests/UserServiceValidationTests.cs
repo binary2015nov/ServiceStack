@@ -63,12 +63,9 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         private static string ListeningOn = Config.ListeningOn;
 
-        public class UserAppHostHttpListener
-            : AppHostHttpListenerBase
+        public class UserAppHostHttpListener : AppHostHttpListenerBase
         {
-
-            public UserAppHostHttpListener()
-                : base("Validation Tests", typeof(UserValidationService).GetAssembly()) { }
+            public UserAppHostHttpListener() : base("Validation Tests", typeof(UserValidationService).GetAssembly()) { }
 
             public override void Configure(Container container)
             {

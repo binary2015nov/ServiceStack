@@ -1,35 +1,25 @@
 #if !LITE
 using System;
 using System.IO;
-using System.Runtime.Serialization;
 using ServiceStack.Text;
 
 namespace ServiceStack.Serialization
 {
     public partial class DataContractSerializer
     {
-        public object DeserializeFromString(string xml, Type type)
+        public object DeserializeFromString(string xmlString, Type type)
         {
-            try
-            {
-                return XmlSerializer.Deserialize(xml, type);
-            }
-            catch (Exception ex)
-            {
-                throw new SerializationException("DeserializeDataContract: Error converting type: " + ex.Message, ex);
-            }
+            return XmlSerializer.Deserialize(xmlString, type);   
         }
 
-        public T DeserializeFromString<T>(string xml)
+        public T DeserializeFromString<T>(string xmlString)
         {
-            var type = typeof(T);
-            return (T)DeserializeFromString(xml, type);
+            return XmlSerializer.Deserialize<T>(xmlString);
         }
 
         public T DeserializeFromStream<T>(Stream stream)
         {
-            var serializer = new System.Runtime.Serialization.DataContractSerializer(typeof(T));
-            return (T)serializer.ReadObject(stream);
+            return XmlSerializer.Deserialize<T>(stream);
         }
     }
 }

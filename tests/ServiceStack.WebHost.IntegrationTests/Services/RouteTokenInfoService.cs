@@ -51,7 +51,7 @@ namespace DeliveryService.Model.Operations
 
 	public class RouteTokenInfoService : Service
 	{
-        public object Any(RouteTokenInfo request)
+		public object Any(RouteTokenInfo request)
 		{
 			throw new NotImplementedException();
 		}

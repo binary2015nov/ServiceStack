@@ -1,16 +1,12 @@
-﻿using System.Reflection;
-using System;
+﻿using System;
 using System.Collections.Generic;
+#if !SL5
+using System.Collections.Concurrent;
+#endif
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-#if SL5
 using ServiceStack.Text;
-#else
-using System.Collections.Concurrent;
-using ServiceStack.Text;
-
-#endif
 
 namespace ServiceStack
 {
@@ -145,7 +141,7 @@ namespace ServiceStack
 
         public static string GetFullyQualifiedName(this Type type)
         {
-            var sb = StringBuilderCache.Allocate().Append(type.Name);
+            var sb = new StringBuilder(type.Name);
             if (type.IsGenericType())
             {
                 var genericMarker = type.Name.IndexOf('`');
@@ -163,7 +159,7 @@ namespace ServiceStack
                 }
                 sb.Append(">");
             }
-            return StringBuilderCache.Retrieve(sb);
+            return sb.ToString();
         }
 
         public static string ExpandTypeName(this Type type)
@@ -178,7 +174,7 @@ namespace ServiceStack
         {
             var nameOnly = type.Name.LeftPart('`');
 
-            var sb = StringBuilderCache.Allocate();
+            var sb = new StringBuilder();
             foreach (var arg in type.GetTypeGenericArguments())
             {
                 if (sb.Length > 0)
@@ -187,7 +183,7 @@ namespace ServiceStack
                 sb.Append(arg.ExpandTypeName());
             }
 
-            var fullName = $"{nameOnly}<{StringBuilderCache.Retrieve(sb)}>";
+            var fullName = $"{nameOnly}<{sb.ToString()}>";
             return fullName;
         }
 
@@ -253,20 +249,6 @@ namespace ServiceStack
             }
 
             return urlFilter == null ? url : urlFilter.ToUrl(url);
-        }
-
-        public static bool HasRequestBody(this string httpMethod)
-        {
-            switch (httpMethod)
-            {
-                case HttpMethods.Get:
-                case HttpMethods.Delete:
-                case HttpMethods.Head:
-                case HttpMethods.Options:
-                    return false;
-            }
-
-            return true;
         }
 
         private static List<RestRoute> GetRoutesForType(Type requestType)

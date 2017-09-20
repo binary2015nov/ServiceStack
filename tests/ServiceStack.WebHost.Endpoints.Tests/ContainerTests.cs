@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using ServiceStack.Text;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
@@ -39,29 +38,17 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         protected abstract IContainer CreateContainer();
 
-        public class Foo : IFoo
-        {
-        }
+        public class Foo : IFoo { }
 
-        public class Foo2 : IFoo
-        {
-        }
+        public class Foo2 : IFoo { }
 
-        public interface IFoo
-        {
-        }
+        public interface IFoo { }
 
-        public class Bar : IBar
-        {
-        }
+        public class Bar : IBar { }
 
-        public class Bar2 : IBar
-        {
-        }
+        public class Bar2 : IBar { }
 
-        public interface IBar
-        {
-        }
+        public interface IBar { }
         
         public class Test
         {

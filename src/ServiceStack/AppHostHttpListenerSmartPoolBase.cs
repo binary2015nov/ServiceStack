@@ -10,8 +10,7 @@ using ServiceStack.Logging;
 
 namespace ServiceStack
 {
-    public abstract class AppHostHttpListenerSmartPoolBase
-        : AppHostHttpListenerBase
+    public abstract class AppHostHttpListenerSmartPoolBase : AppHostHttpListenerBase
     {
         private readonly ILog log = LogManager.GetLogger(typeof(AppHostHttpListenerSmartPoolBase));
         private readonly AutoResetEvent listenForNextRequest = new AutoResetEvent(false);

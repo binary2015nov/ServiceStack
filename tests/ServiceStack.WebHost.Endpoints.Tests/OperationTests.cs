@@ -4,131 +4,128 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Web.UI;
-using Funq;
 using NUnit.Framework;
-using ServiceStack.Common.Tests;
+using Funq;
 using ServiceStack.Metadata;
 using ServiceStack.Testing;
 using ServiceStack.WebHost.Endpoints.Tests.Support.Operations;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
-    public class OperationTestsAppHost : AppHostHttpListenerBase
-    {
-        public OperationTestsAppHost() : base(typeof(GetCustomer).Name, typeof(GetCustomer).GetAssembly()) { }
-        public override void Configure(Container container) { }
-    }
+	public class OperationTestsAppHost : AppHostHttpListenerBase
+	{
+		public OperationTestsAppHost() : base(typeof(GetCustomer).Name, typeof(GetCustomer).GetAssembly()) { }
+		public override void Configure(Container container) { }
+	}
 
 	[TestFixture]
 	public class OperationTests : IService
 	{
-        private OperationTestsAppHost appHost;
-	    private OperationControl operationControl;
+		private OperationTestsAppHost appHost;
+		private OperationControl operationControl;
 
-        [OneTimeSetUp]
-        public void OnTestFixtureSetUp()
-        {
-            appHost = new OperationTestsAppHost();
-            appHost.Init();
+		[OneTimeSetUp]
+		public void TestFixtureSetUp()
+		{
+			appHost = new OperationTestsAppHost();
+			appHost.Init();
 #if NETCORE
-            appHost.Start(Config.ListeningOn);
+			appHost.Start(Config.ListeningOn);
 #endif
 
-            var dummyServiceType = GetType();
-            appHost.Metadata.Add(dummyServiceType, typeof(GetCustomer), typeof(GetCustomerResponse));
-            appHost.Metadata.Add(dummyServiceType, typeof(GetCustomers), typeof(GetCustomersResponse));
-            appHost.Metadata.Add(dummyServiceType, typeof(StoreCustomer), null);
+			var dummyServiceType = GetType();
+			appHost.Metadata.Add(dummyServiceType, typeof(GetCustomer), typeof(GetCustomerResponse));
+			appHost.Metadata.Add(dummyServiceType, typeof(GetCustomers), typeof(GetCustomersResponse));
+			appHost.Metadata.Add(dummyServiceType, typeof(StoreCustomer), null);
 
-            operationControl = new OperationControl
-            {
-                HttpRequest = new MockHttpRequest {PathInfo = "", RawUrl = "http://localhost:4444/metadata"},
-                MetadataConfig = ServiceEndpointsMetadataConfig.Create(""),
-                Format = Format.Json,
-                HostName = "localhost",
-                RequestMessage = "(string)",
-                ResponseMessage = "(HttpWebResponse)",
-                Title = "Metadata page",
-                OperationName = "operationname",
-                MetadataHtml = "<p>Operation</p>"
-            };
-        }
+			operationControl = new OperationControl
+			{
+				HttpRequest = new MockHttpRequest {PathInfo = "", RawUrl = "http://localhost:4444/metadata"},
+				MetadataConfig = ServiceEndpointsMetadataConfig.Create(""),
+				Format = Format.Json,
+				HostName = "localhost",
+				RequestMessage = "(string)",
+				ResponseMessage = "(HttpWebResponse)",
+				Title = "Metadata page",
+				OperationName = "operationname",
+				MetadataHtml = "<p>Operation</p>"
+			};
+		}
 
-        [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
-        {
-            appHost.Dispose();
-        }
+		[OneTimeTearDown]
+		public void TestFixtureTearDown()
+		{
+			appHost.Dispose();
+		}
 
-        [TearDown]
-        public void OnTearDown()
-        {
-            if (appHost?.Config?.WebHostUrl != null)
-                appHost.Config.WebHostUrl = null;
-        }
+		[TearDown]
+		public void OnTearDown()
+		{
+			if (appHost?.Config?.WebHostUrl != null)
+				appHost.Config.WebHostUrl = null;
+		}
 
-        [Test]
-        public void OperationControl_render_creates_link_back_to_main_page_using_WebHostUrl_when_set()
-        {
-            appHost.Config.WebHostUrl = "https://host.example.com/_api";
+		[Test]
+		public void OperationControl_render_creates_link_back_to_main_page_using_WebHostUrl_when_set()
+		{
+			appHost.Config.WebHostUrl = "https://host.example.com/_api";
 
-            var stringWriter = new StringWriter();
-            operationControl.Render(new HtmlTextWriter(stringWriter));
+			var stringWriter = new StringWriter();
+			operationControl.Render(new HtmlTextWriter(stringWriter));
 
-            string html = stringWriter.ToString();
-            Assert.IsTrue(html.Contains("<a href=\"https://host.example.com/_api/metadata\">&lt;back to all web services</a>"));
-        }
+			string html = stringWriter.ToString();
+			Assert.IsTrue(html.Contains("<a href=\"https://host.example.com/_api/metadata\">&lt;back to all web services</a>"));
+		}
 
-        [Test]
-        public void OperationControl_render_creates_link_back_to_main_page_using_relative_uri_when_WebHostUrl_not_set()
-        {
-            var stringWriter = new StringWriter();
-            operationControl.Render(new HtmlTextWriter(stringWriter));
+		[Test]
+		public void OperationControl_render_creates_link_back_to_main_page_using_relative_uri_when_WebHostUrl_not_set()
+		{
+			var stringWriter = new StringWriter();
+			operationControl.Render(new HtmlTextWriter(stringWriter));
 
-            string html = stringWriter.ToString();
-            Assert.That(html, Does.Contain("<a href=\"http://localhost/metadata\">&lt;back to all web services</a>"));
-        }
+			string html = stringWriter.ToString();
+			Assert.That(html, Does.Contain("<a href=\"http://localhost/metadata\">&lt;back to all web services</a>"));
+		}
 
-        [Test]
-        public void When_culture_is_turkish_operations_containing_capital_I_are_still_visible()
-        {
-            appHost.Metadata.Add(GetType(), typeof(HelloImage), null);
+		[Test]
+		public void When_culture_is_turkish_operations_containing_capital_I_are_still_visible()
+		{
+			appHost.Metadata.Add(GetType(), typeof(HelloImage), null);
 
-            using (new CultureSwitch("tr-TR"))
-            {
-                Assert.IsTrue(appHost.Metadata.IsVisible(operationControl.HttpRequest, Format.Json, "HelloImage"));
-            }
-        }
+			using (new CultureSwitch("tr-TR"))
+			{
+				Assert.IsTrue(appHost.Metadata.IsVisible(operationControl.HttpRequest, Format.Json, "HelloImage"));
+			}
+		}
 	}
 
-    [DataContract]
-    public class HelloImage
-    {
-    }
+	[DataContract]
+	public class HelloImage { }
 
-    public class CultureSwitch : IDisposable
-    {
-        private readonly CultureInfo _currentCulture;
+	public class CultureSwitch : IDisposable
+	{
+		private readonly CultureInfo _currentCulture;
 
-        public CultureSwitch(string culture)
-        {
+		public CultureSwitch(string culture)
+		{
 #if NETCORE
-            _currentCulture = CultureInfo.CurrentCulture;
-            CultureInfo.CurrentCulture = new CultureInfo(culture);
+			_currentCulture = CultureInfo.CurrentCulture;
+			CultureInfo.CurrentCulture = new CultureInfo(culture);
 #else
-            var currentThread = Thread.CurrentThread;
-            _currentCulture = currentThread.CurrentCulture;
-            var switchCulture = CultureInfo.GetCultureInfo(culture);
-            currentThread.CurrentCulture = switchCulture;
+			var currentThread = Thread.CurrentThread;
+			_currentCulture = currentThread.CurrentCulture;
+			var switchCulture = CultureInfo.GetCultureInfo(culture);
+			currentThread.CurrentCulture = switchCulture;
 #endif
-        }
+		}
 
-        public void Dispose()
-        {
+		public void Dispose()
+		{
 #if NETCORE
-            CultureInfo.CurrentCulture = _currentCulture;
+			CultureInfo.CurrentCulture = _currentCulture;
 #else
-            Thread.CurrentThread.CurrentCulture = _currentCulture;
+			Thread.CurrentThread.CurrentCulture = _currentCulture;
 #endif
-        }
-    }
+		}
+	}
 }

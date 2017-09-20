@@ -1,7 +1,6 @@
 namespace ServiceStack.WebHost.Endpoints.Tests.Support.Services
 {
-    public abstract class TestServiceBase<TRequest>
-        : IService
+    public abstract class TestServiceBase<TRequest> : IService
     {
         protected abstract object Run(TRequest request);
 

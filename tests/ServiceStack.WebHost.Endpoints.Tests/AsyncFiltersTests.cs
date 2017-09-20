@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Funq;
 using NUnit.Framework;
+using Funq;
 using ServiceStack.FluentValidation;
 using ServiceStack.Text;
 using ServiceStack.Validation;
@@ -143,13 +143,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
+    [TestFixture]
     public class AsyncFiltersTests
     {
         class AppHost : AppSelfHostBase
         {
-            public AppHost() : base(nameof(AsyncFiltersTests), typeof(TestAsyncFilterService).GetAssembly()) { }
-
             public static int CancelledAt = -1;
+
+            public AppHost() : base(nameof(AsyncFiltersTests), typeof(TestAsyncFilterService).GetAssembly()) { }
 
             public override void Configure(Container container)
             {
@@ -483,8 +484,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
             catch (WebServiceException ex)
             {
-                ex.ResponseStatus.PrintDump();
                 var status = ex.ResponseStatus;
+                status.PrintDump();
 
                 Assert.That(status.ErrorCode, Is.EqualTo("NotEmpty"));
                 Assert.That(status.Message, Is.EqualTo("'Name' should not be empty."));

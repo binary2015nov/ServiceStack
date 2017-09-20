@@ -5,7 +5,6 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using ServiceStack.Host;
 using ServiceStack.Web;
 
 namespace ServiceStack.Testing
@@ -84,7 +83,8 @@ namespace ServiceStack.Testing
 
         public string ReadAsString()
         {
-            if (!IsClosed) this.OutputStream.Seek(0, SeekOrigin.Begin);
+            if (!IsClosed)
+                this.OutputStream.Seek(0, SeekOrigin.Begin);
             var bytes = ((MemoryStream)OutputStream).ToArray();
             return bytes.FromUtf8Bytes();
         }

@@ -17,7 +17,7 @@ namespace ServiceStack.Web
 
     public delegate string TextSerializerDelegate(object dto);
 
-    public delegate void StreamSerializerDelegate(IRequest requestContext, object dto, Stream outputStream);
+    public delegate void StreamSerializerDelegate(IRequest request, object dto, Stream outputStream);
 
-    public delegate void ResponseSerializerDelegate(IRequest requestContext, object dto, IResponse httpRes);
+    public delegate void ResponseSerializerDelegate(IRequest request, object dto, IResponse response);
 }

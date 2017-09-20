@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using Funq;
 using NUnit.Framework;
-using ServiceStack.Host;
-using ServiceStack.WebHost.Endpoints;
 
 namespace ServiceStack.WebHost.IntegrationTests.Services
 {
@@ -41,11 +39,11 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 		}
 	}
 
-    [Route("/todolist")]
+	[Route("/todolist")]
 	public class TodoList : List<Todo>
 	{
-		public TodoList() {}
-		public TodoList(IEnumerable<Todo> collection) : base(collection) {}
+		public TodoList() { }
+		public TodoList(IEnumerable<Todo> collection) : base(collection) { }
 	}
 
 	public class TodoListResponse
@@ -55,7 +53,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 		public ResponseStatus ResponseStatus { get; set; }
 	}
 
-    [DefaultRequest(typeof(TodoList))]
+	[DefaultRequest(typeof(TodoList))]
 	public class TodoListService : Service
 	{
 		public object Get(TodoList request)
@@ -84,13 +82,11 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 	{
 		private const string ListeningOn = "http://localhost:8082/";
 
-		public class TodoListAppHostHttpListener
-			: AppHostHttpListenerBase
+		public class TodoListAppHostHttpListener : AppHostHttpListenerBase
 		{
-			public TodoListAppHostHttpListener()
-				: base("TodoList Tests", typeof(TodoList).GetAssembly()) { }
+			public TodoListAppHostHttpListener() : base("TodoList Tests", typeof(TodoList).GetAssembly()) { }
 
-			public override void Configure(Container container) {}
+			public override void Configure(Container container) { }
 		}
 
 		TodoListAppHostHttpListener appHost;
@@ -102,7 +98,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 		};
 
 		[OneTimeSetUp]
-		public void OnTestFixtureSetUp()
+		public void TestFixtureSetUp()
 		{
 			appHost = new TodoListAppHostHttpListener();
 			appHost.Init();
@@ -110,7 +106,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 		}
 
 		[OneTimeTearDown]
-		public void OnTestFixtureTearDown()
+		public void TestFixtureTearDown()
 		{
 			appHost.Dispose();
 		}
@@ -127,7 +123,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 		public void Can_Post_TodoList()
 		{
 			var serviceClient = new JsonServiceClient(ListeningOn);
-            var response = serviceClient.Post<TodoListResponse>("/todolist", new TodoList(Todos));
+			var response = serviceClient.Post<TodoListResponse>("/todolist", new TodoList(Todos));
 			Assert.That(response.Results, Is.EquivalentTo(Todos));
 		}
 

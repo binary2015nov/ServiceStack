@@ -17,24 +17,19 @@ namespace ServiceStack
 {
     public class HttpResult : IHttpResult, IStreamWriterAsync, IPartialWriterAsync, IDisposable
     {
-        public HttpResult()
-            : this((object)null, null) { }
+        public HttpResult() : this((object)null, null) { }
 
-        public HttpResult(object response)
-            : this(response, null) { }
+        public HttpResult(object response) : this(response, null) { }
 
-        public HttpResult(object response, string contentType)
-            : this(response, contentType, HttpStatusCode.OK) { }
+        public HttpResult(object response, string contentType) : this(response, contentType, HttpStatusCode.OK) { }
 
-        public HttpResult(HttpStatusCode statusCode, string statusDescription)
-            : this()
+        public HttpResult(HttpStatusCode statusCode, string statusDescription) : this()
         {
             StatusCode = statusCode;
             StatusDescription = statusDescription;
         }
 
-        public HttpResult(object response, HttpStatusCode statusCode)
-            : this(response, null, statusCode) { }
+        public HttpResult(object response, HttpStatusCode statusCode) : this(response, null, statusCode) { }
 
         public HttpResult(object response, string contentType, HttpStatusCode statusCode)
         {
@@ -48,8 +43,7 @@ namespace ServiceStack
         }
 
         public HttpResult(FileInfo fileResponse, bool asAttachment)
-            : this(fileResponse, MimeTypes.GetMimeType(fileResponse.Name), asAttachment)
-        { }
+            : this(fileResponse, MimeTypes.GetMimeType(fileResponse.Name), asAttachment) { }
 
         public HttpResult(FileInfo fileResponse, string contentType = null, bool asAttachment = false)
             : this(null, contentType ?? MimeTypes.GetMimeType(fileResponse.Name), HttpStatusCode.OK)
@@ -74,8 +68,7 @@ namespace ServiceStack
         }
 
         public HttpResult(IVirtualFile fileResponse, bool asAttachment)
-            : this(fileResponse, MimeTypes.GetMimeType(fileResponse.Name), asAttachment)
-        { }
+            : this(fileResponse, MimeTypes.GetMimeType(fileResponse.Name), asAttachment) { }
 
         public HttpResult(IVirtualFile fileResponse, string contentType = null, bool asAttachment = false)
             : this(null, contentType ?? MimeTypes.GetMimeType(fileResponse.Name), HttpStatusCode.OK)
@@ -97,22 +90,19 @@ namespace ServiceStack
             };
         }
 
-        public HttpResult(Stream responseStream, string contentType)
-            : this(null, contentType, HttpStatusCode.OK)
+        public HttpResult(Stream responseStream, string contentType) : this(null, contentType, HttpStatusCode.OK)
         {
             this.AllowsPartialResponse = true;
             this.ResponseStream = responseStream;
         }
 
-        public HttpResult(string responseText, string contentType)
-            : this(null, contentType, HttpStatusCode.OK)
+        public HttpResult(string responseText, string contentType) : this(null, contentType, HttpStatusCode.OK)
         {
             this.AllowsPartialResponse = true;
             this.ResponseText = responseText;
         }
 
-        public HttpResult(byte[] responseBytes, string contentType)
-            : this(null, contentType, HttpStatusCode.OK)
+        public HttpResult(byte[] responseBytes, string contentType) : this(null, contentType, HttpStatusCode.OK)
         {
             this.AllowsPartialResponse = true;
             this.ResponseStream = MemoryStreamFactory.GetStream(responseBytes);

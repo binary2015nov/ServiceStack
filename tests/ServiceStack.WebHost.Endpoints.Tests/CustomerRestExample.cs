@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using Funq;
 using NUnit.Framework;
+using Funq;
 using ServiceStack;
 using ServiceStack.Data;
 using ServiceStack.DataAnnotations;
@@ -10,8 +10,7 @@ namespace NewApi.Customers
 {
     public class AppHost : AppSelfHostBase
     {
-        public AppHost() 
-            : base("Customer REST Example", typeof(CustomerService).GetAssembly()) { }
+        public AppHost() : base("Customer REST Example", typeof(CustomerService).GetAssembly()) { }
 
         public override void Configure(Container container)
         {

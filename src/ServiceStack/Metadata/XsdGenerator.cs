@@ -2,6 +2,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using ServiceStack.DataAnnotations;
 using ServiceStack.Host;
 using ServiceStack.Logging;
 
@@ -9,7 +11,7 @@ namespace ServiceStack.Metadata
 {
     public class XsdGenerator
     {
-        private readonly ILog log = LogManager.GetLogger(typeof(XsdGenerator));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(XsdGenerator));
 
         public bool OptimizeForFlash { get; set; }
         public ICollection<Type> OperationTypes { get; set; }
@@ -35,10 +37,11 @@ namespace ServiceStack.Metadata
                         var baseTypeWithSameName = XsdMetadata.GetBaseTypeWithTheSameName(type);
                         if (uniqueTypeNames.Contains(baseTypeWithSameName.GetOperationName()))
                         {
-                            log.WarnFormat("Skipping duplicate type with existing name '{0}'", baseTypeWithSameName.GetOperationName());
+                            Logger.WarnFormat("Skipping duplicate type with existing name '{0}'", baseTypeWithSameName.GetOperationName());
                         }
 
-                        if (HostContext.AppHost.ExportSoapType(baseTypeWithSameName))
+                        if (!baseTypeWithSameName.IsGenericTypeDefinition() && !baseTypeWithSameName.AllAttributes<ExcludeAttribute>().
+                            Any(attr => attr.Feature.Has(Feature.Soap)))
                         {
                             uniqueTypes.Add(baseTypeWithSameName);
                         }

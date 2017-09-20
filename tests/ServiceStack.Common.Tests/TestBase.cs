@@ -28,8 +28,6 @@ namespace ServiceStack.Common.Tests
 
         protected TestBase(string serviceClientBaseUri, params Assembly[] serviceAssemblies)
         {
-            LogManager.LogFactory = new ConsoleLogFactory();
-
             if (serviceAssemblies.Length == 0)
                 serviceAssemblies = new[] { GetType().GetAssembly() };
 

@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using Funq;
 using NUnit.Framework;
+using Funq;
 using ServiceStack.Data;
 using ServiceStack.OrmLite;
 using ServiceStack.Redis;
-using ServiceStack.Text;
 using ServiceStack.Web;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
@@ -16,15 +14,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     public class ReplyAllAppHost : AppSelfHostBase
     {
         public ReplyAllAppHost()
-            : base(typeof(ReplyAllTests).Name, typeof(ReplyAllService).GetAssembly())
-        { }
+            : base(typeof(ReplyAllTests).Name, typeof(ReplyAllService).GetAssembly()) { }
 
         public override void Configure(Container container)
         {
-            GlobalRequestFilters.Add((rew, res, dto) =>
+            GlobalRequestFilters.Add((req, res, dto) =>
                 ReplyAllRequestAttribute.AssertSingleDto(dto));
 
-            GlobalResponseFilters.Add((rew, res, dto) =>
+            GlobalResponseFilters.Add((req, res, dto) =>
                 ReplyAllResponseAttribute.AssertSingleDto(dto));
 
             container.Register<IDbConnectionFactory>(c =>

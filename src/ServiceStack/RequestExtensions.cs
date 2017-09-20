@@ -1,6 +1,8 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Runtime.CompilerServices;
 using ServiceStack.Auth;
 using ServiceStack.Caching;
 using ServiceStack.Configuration;
@@ -80,6 +82,8 @@ namespace ServiceStack
             return null;
         }
 
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetContentEncoding(this IRequest request)
         {
             return request.Headers.Get(HttpHeaders.ContentEncoding);
@@ -96,6 +100,8 @@ namespace ServiceStack
             return stream;
         }
 
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetHeader(this IRequest request, string headerName)
         {
             return request.Headers.Get(headerName);
