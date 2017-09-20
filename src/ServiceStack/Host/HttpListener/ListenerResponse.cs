@@ -17,7 +17,7 @@ namespace ServiceStack.Host.HttpListener
 {
     public class ListenerResponse : IHttpResponse
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ListenerResponse));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(ListenerResponse));
 
         private readonly HttpListenerResponse response;
 
@@ -103,17 +103,9 @@ namespace ServiceStack.Host.HttpListener
 
         public void Write(string text)
         {
-            try
-            {
-                var bOutput = System.Text.Encoding.UTF8.GetBytes(text);
-                response.ContentLength64 += bOutput.Length; // required to avoid ProtocolViolation
-                OutputStream.Write(bOutput, 0, bOutput.Length);
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Could not WriteTextToResponse: " + ex.Message, ex);
-                throw;
-            }
+            var bOutput = System.Text.Encoding.UTF8.GetBytes(text);
+            response.ContentLength64 += bOutput.Length; // required to avoid ProtocolViolation
+            OutputStream.Write(bOutput, 0, bOutput.Length);
         }
 
         public void Close()
@@ -130,7 +122,7 @@ namespace ServiceStack.Host.HttpListener
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("Error closing HttpListener output stream", ex);
+                    Logger.Error("Error closing HttpListener output stream", ex);
                 }
             }
         }

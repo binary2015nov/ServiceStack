@@ -43,8 +43,6 @@ namespace ServiceStack.AuthWeb.Tests
     public class AppHost : AppHostBase
 #endif
     {
-        public static readonly ILog Logger = LogManager.GetLogger(typeof(AppHost));
-
         public AppHost() : base("Test Auth", typeof(AppHost).Assembly)
         {
             Config.AddRedirectParamsToQueryString = true;
@@ -275,11 +273,11 @@ namespace ServiceStack.AuthWeb.Tests
             }
             catch (MultipleMatchesException mmex)
             {
-                Logger.Error("Multiple windows user info for '{0}'".Fmt(userSession.UserAuthName), mmex);
+                Console.WriteLine("Multiple windows user info for '{0}'".Fmt(userSession.UserAuthName), mmex);
             }
             catch (Exception ex)
             {
-                Logger.Error("Could not retrieve windows user info for '{0}'".Fmt(tokens.DisplayName), ex);
+                Console.WriteLine("Could not retrieve windows user info for '{0}'".Fmt(tokens.DisplayName), ex);
             }
 #endif
         }

@@ -7,10 +7,11 @@ namespace ServiceStack.Caching.Azure
 {
     public class AzureCacheClient : AdapterBase, ICacheClient
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(AzureCacheClient));
+
         private DataCacheFactory CacheFactory { get; set; }
         private DataCache DataCache { get; set; }
         public bool FlushOnDispose { get; set; }
-        protected override ILog Log { get { return LogManager.GetLogger(GetType()); } }
 
         public AzureCacheClient(string cacheName = null)
         {
@@ -128,7 +129,7 @@ namespace ServiceStack.Caching.Azure
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(string.Format("Error trying to remove {0} from azure cache", key), ex);
+                    Logger.Error(string.Format("Error trying to remove {0} from azure cache", key), ex);
                 }
             }
         }

@@ -44,7 +44,7 @@ namespace ServiceStack.FluentValidation.Validators
 		public abstract IEnumerable<ValidationFailure> Validate(PropertyValidatorContext context);
 
 		public virtual async Task<IEnumerable<ValidationFailure>> ValidateAsync(PropertyValidatorContext context, CancellationToken cancellation) {
-			return Validate(context);
+            return await Task<IEnumerable<ValidationFailure>>.Run(() => Validate(context));
 		}
 
 		public virtual ICollection<Func<object, object, object>> CustomMessageFormatArguments {

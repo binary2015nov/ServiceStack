@@ -19,7 +19,7 @@ namespace ServiceStack.Razor.Managers
     /// </summary>
     public class RazorPageResolver : ServiceStackHandlerBase, IViewEngine
     {
-        public static ILog Log = LogManager.GetLogger(typeof(RazorPageResolver));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(RazorPageResolver));
 
         public const string ViewKey = "View";
         public const string LayoutKey = "Template";
@@ -242,8 +242,8 @@ namespace ServiceStack.Razor.Managers
                     for (var i = 0; i < errors.Count; i++)
                     {
                         var error = errors[i];
-                        Log.Debug("{0} Line: {1}:{2}:".Fmt(error.FileName, error.Line, error.Column));
-                        Log.Debug("{0}: {1}".Fmt(error.ErrorNumber, error.ErrorText));
+                        Logger.Debug("{0} Line: {1}:{2}:".Fmt(error.FileName, error.Line, error.Column));
+                        Logger.Debug("{0}: {1}".Fmt(error.ErrorNumber, error.ErrorText));
                     }
                 } 
                 throw pageCompileEx;

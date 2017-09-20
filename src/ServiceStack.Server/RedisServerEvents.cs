@@ -11,7 +11,7 @@ namespace ServiceStack
 {
     public class RedisServerEvents : IServerEvents
     {
-        private static ILog Log = LogManager.GetLogger(typeof(RedisServerEvents));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(RedisServerEvents));
 
         private MemoryServerEvents local;
 
@@ -72,7 +72,7 @@ namespace ServiceStack
             this.RedisPubSub = redisPubSub;
             this.clientsManager = redisPubSub.ClientsManager;
             redisPubSub.OnInit = OnInit;
-            redisPubSub.OnError = ex => Log.Error("Exception in RedisServerEvents: " + ex.Message, ex);
+            redisPubSub.OnError = ex => Logger.Error("Exception in RedisServerEvents: " + ex.Message, ex);
             redisPubSub.OnMessage = HandleMessage;
 
             WaitBeforeNextRestart = TimeSpan.FromMilliseconds(2000);
@@ -583,7 +583,7 @@ namespace ServiceStack
             }
             catch (Exception ex)
             {
-                Log.Warn("Error trying to remove local.Subcriptions during Dispose()...", ex);
+                Logger.Warn("Error trying to remove local.Subcriptions during Dispose()...", ex);
             }
 
             if (RedisPubSub != null)

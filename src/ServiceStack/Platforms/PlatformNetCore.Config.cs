@@ -9,7 +9,7 @@ namespace ServiceStack
 {
     public partial class PlatformNetCore : Platform
     {
-        private static ILog log = LogManager.GetLogger(typeof(PlatformNetCore));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(PlatformNetCore));
         
         public static ServiceStackHost HostInstance { get; set; }
 
@@ -54,7 +54,7 @@ namespace ServiceStack
             }
             catch (Exception ex)
             {
-                log.Error("GetAppConfigPath(): ", ex);
+                Logger.Error("GetAppConfigPath(): ", ex);
                 return null;
             }
         }

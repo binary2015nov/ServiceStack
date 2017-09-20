@@ -23,9 +23,9 @@ namespace ServiceStack.Razor.Managers
     /// </summary>
     public class RazorViewManager
     {
-        const string DefaultLayoutFile = RazorPageResolver.DefaultLayoutName + ".cshtml";
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(RazorViewManager));
 
-        public static ILog Log = LogManager.GetLogger(typeof(RazorViewManager));
+        const string DefaultLayoutFile = RazorPageResolver.DefaultLayoutName + ".cshtml";
 
         public Dictionary<string, RazorPage> Pages = new Dictionary<string, RazorPage>(StringComparer.OrdinalIgnoreCase);
         protected Dictionary<string, string> ViewNamesMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -332,11 +332,11 @@ namespace ServiceStack.Razor.Managers
                     EnsureCompiled(page);
 
                     if (page.CompileException != null)
-                        Log.ErrorFormat("Precompilation of Razor page '{0}' failed: {1}", page.File.Name, page.CompileException.Message);
+                        Logger.ErrorFormat("Precompilation of Razor page '{0}' failed: {1}", page.File.Name, page.CompileException.Message);
                 }
                 catch (Exception ex)
                 {
-                    Log.ErrorFormat("Precompilation of Razor page '{0}' failed: {1}", page.File.Name, ex.Message);
+                    Logger.ErrorFormat("Precompilation of Razor page '{0}' failed: {1}", page.File.Name, ex.Message);
                 }
                 return page;
             }, default(CancellationToken), TaskCreationOptions.None, TaskScheduler.Default);
@@ -363,7 +363,7 @@ namespace ServiceStack.Razor.Managers
             if (page.IsValid) return;
             if (page.PageHost == null)
             {
-                Log.WarnFormat("Could not find virtualPath for compiled Razor page '{0}'.", page.VirtualPath);
+                Logger.WarnFormat("Could not find virtualPath for compiled Razor page '{0}'.", page.VirtualPath);
                 return;
             }
 
@@ -385,8 +385,8 @@ namespace ServiceStack.Razor.Managers
 
                     compileTimer.Stop();
 
-                    if (Log.IsDebugEnabled)
-                        Log.DebugFormat("Compiled Razor page '{0}' in {1}ms.", page.File.Name, compileTimer.ElapsedMilliseconds);
+                    if (Logger.IsDebugEnabled)
+                        Logger.DebugFormat("Compiled Razor page '{0}' in {1}ms.", page.File.Name, compileTimer.ElapsedMilliseconds);
                 }
                 catch (HttpCompileException ex)
                 {

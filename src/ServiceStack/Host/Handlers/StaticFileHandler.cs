@@ -43,7 +43,8 @@ namespace ServiceStack.Host.Handlers
 {
     public class StaticFileHandler : HttpAsyncTaskHandler
     {
-        private static readonly ILog log = LogManager.GetLogger(typeof(StaticFileHandler));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(StaticFileHandler));
+
         public static int DefaultBufferSize = 1024 * 1024;
 
         public static Action<IRequest, IResponse, IVirtualFile> ResponseFilter { get; set; }
@@ -138,7 +139,7 @@ namespace ServiceStack.Host.Handlers
                         if (file == null)
                         {
                             var msg = ErrorMessages.FileNotExistsFmt.Fmt(request.PathInfo.SafeInput());
-                            log.Warn($"{msg} in path: {originalFileName}");
+                            Logger.Warn($"{msg} in path: {originalFileName}");
                             response.StatusCode = 404;
                             response.StatusDescription = msg;
                             return;
@@ -273,7 +274,7 @@ namespace ServiceStack.Host.Handlers
 #endif
                 catch (Exception ex)
                 {
-                    log.ErrorFormat($"Static file {request.PathInfo} forbidden: {ex.Message}");
+                    Logger.ErrorFormat($"Static file {request.PathInfo} forbidden: {ex.Message}");
                     throw new HttpException(403, "Forbidden.");
                 }
             });
@@ -281,9 +282,9 @@ namespace ServiceStack.Host.Handlers
 
         static Dictionary<string, string> CreateFileIndex(string appFilePath)
         {
-            log.Debug("Building case-insensitive fileIndex for Mono at: "
-                      + appFilePath);
-
+            if (Logger.IsDebugEnabled)        
+                Logger.DebugFormat("Building case-insensitive fileIndex for Mono at: {0}", appFilePath);
+            
             var caseInsensitiveLookup = new Dictionary<string, string>();
             foreach (var file in GetFiles(appFilePath))
             {

@@ -20,7 +20,7 @@ namespace ServiceStack.Formats
 
 	public class MarkdownFormat : IViewEngine, IPlugin
 	{
-		private static readonly ILog Log = LogManager.GetLogger(typeof(MarkdownFormat));
+		private static readonly ILog Logger = LogManager.GetLogger(typeof(MarkdownFormat));
 
 		private const string ErrorPageNotFound = "Could not find Markdown page '{0}'";
 
@@ -424,7 +424,7 @@ namespace ServiceStack.Formats
 				}
 				catch (Exception ex)
 				{
-					Log.Error("AddTemplate(): " + ex.Message, ex);
+					Logger.Error("AddTemplate(): " + ex.Message, ex);
 				}
 			}
 		}
@@ -490,7 +490,7 @@ namespace ServiceStack.Formats
 			}
 			catch (Exception ex)
 			{
-				Log.Error("AddViewPage() page.Prepare(): " + ex.Message, ex);
+				Logger.Error("AddViewPage() page.Prepare(): " + ex.Message, ex);
 			}
 
 			try
@@ -506,7 +506,7 @@ namespace ServiceStack.Formats
 			}
 			catch (Exception ex)
 			{
-				Log.Error("Error compiling template " + page.Template + ": " + ex.Message, ex);
+				Logger.Error("Error compiling template " + page.Template + ": " + ex.Message, ex);
 			}
 		}
 
@@ -553,7 +553,7 @@ namespace ServiceStack.Formats
 			}
 			catch (Exception ex)
 			{
-				Log.Error("AddViewPage() template.Prepare(): " + ex.Message, ex);
+				Logger.Error("AddViewPage() template.Prepare(): " + ex.Message, ex);
 				return null;
 			}
 		}

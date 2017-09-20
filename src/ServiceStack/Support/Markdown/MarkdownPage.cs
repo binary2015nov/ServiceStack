@@ -15,7 +15,7 @@ namespace ServiceStack.Support.Markdown
 {
 	public class MarkdownPage : IExpirable, IViewPage
 	{
-	    private static readonly ILog Log = LogManager.GetLogger(typeof(MarkdownPage));
+		private static readonly ILog Logger = LogManager.GetLogger(typeof(MarkdownPage));
 
 		public const string ModelName = "Model";
 
@@ -51,7 +51,7 @@ namespace ServiceStack.Support.Markdown
 		public string Contents { get; set; }
 		public string HtmlContents { get; set; }
 		public string Template { get; set; }
-        public string DirectiveTemplate { get; set; }
+		public string DirectiveTemplate { get; set; }
 		public EvaluatorExecutionContext ExecutionContext { get; private set; }
 
 		public DateTime? LastModified { get; set; }
@@ -100,7 +100,7 @@ namespace ServiceStack.Support.Markdown
 		public TemplateBlock[] HtmlBlocks { get; set; }
 
 		private Exception initException;
-	    private TemplateBlock lastBlockProcessed;
+		private TemplateBlock lastBlockProcessed;
 		readonly object readWriteLock = new object();
 		private bool isBusy;
 		public void Reload(string contents, DateTime lastModified)
@@ -129,47 +129,48 @@ namespace ServiceStack.Support.Markdown
 			}
 		}
 
-        public bool IsCompiled { get; set; }
+		public bool IsCompiled { get; set; }
 
-	    public void Compile(bool force=false)
-	    {
-            if (this.IsCompiled && !force) return;
+		public void Compile(bool force=false)
+		{
+			if (this.IsCompiled && !force) return;
 
-	        var sw = Stopwatch.StartNew();
+			var sw = Stopwatch.StartNew();
 
-            try
-            {
-                if (!typeof(MarkdownViewBase).IsAssignableFromType(this.Markdown.MarkdownBaseType))
-                {
-                    throw new ConfigurationErrorsException(
-                        "Config.MarkdownBaseType must inherit from MarkdownViewBase");
-                }
+			try
+			{
+				if (!typeof(MarkdownViewBase).IsAssignableFromType(this.Markdown.MarkdownBaseType))
+				{
+					throw new ConfigurationErrorsException(
+						"Config.MarkdownBaseType must inherit from MarkdownViewBase");
+				}
 
-                if (this.Contents.IsNullOrEmpty()) return;
+				if (this.Contents.IsNullOrEmpty()) return;
 
-                var markdownStatements = new List<StatementExprBlock>();
+				var markdownStatements = new List<StatementExprBlock>();
 
-                var markdownContents = StatementExprBlock.Extract(this.Contents, markdownStatements);
+				var markdownContents = StatementExprBlock.Extract(this.Contents, markdownStatements);
 
-                this.MarkdownBlocks = markdownContents.CreateTemplateBlocks(markdownStatements).ToArray();
+				this.MarkdownBlocks = markdownContents.CreateTemplateBlocks(markdownStatements).ToArray();
 
-                var htmlStatements = new List<StatementExprBlock>();
-                var htmlContents = StatementExprBlock.Extract(this.Contents, htmlStatements);
+				var htmlStatements = new List<StatementExprBlock>();
+				var htmlContents = StatementExprBlock.Extract(this.Contents, htmlStatements);
 
-                this.HtmlContents = Markdown.Transform(htmlContents);
-                this.HtmlBlocks = this.HtmlContents.CreateTemplateBlocks(htmlStatements).ToArray();
+				this.HtmlContents = Markdown.Transform(htmlContents);
+				this.HtmlBlocks = this.HtmlContents.CreateTemplateBlocks(htmlStatements).ToArray();
 
-                SetTemplateDirectivePath();
+				SetTemplateDirectivePath();
 
-                this.IsCompiled = true;
-                Log.DebugFormat("Compiled {0} in {1}ms", this.FilePath, sw.ElapsedMilliseconds);
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Error compiling {0}".Fmt(this.FilePath), ex);
-                throw;
-            }
-        }
+				this.IsCompiled = true;
+				if (Logger.IsDebugEnabled)
+					Logger.DebugFormat("Compiled {0} in {1}ms", this.FilePath, sw.ElapsedMilliseconds);
+			}
+			catch (Exception ex)
+			{
+				Logger.Error("Error compiling {0}".Fmt(this.FilePath), ex);
+				throw;
+			}
+		}
 
 		private void SetTemplateDirectivePath()
 		{
@@ -207,32 +208,32 @@ namespace ServiceStack.Support.Markdown
 
 						foreach (var block in this.HtmlBlocks)
 						{
-						    lastBlockProcessed = block;
-                            block.DoFirstRun(initHtmlContext);
-                        }
+							lastBlockProcessed = block;
+							block.DoFirstRun(initHtmlContext);
+						}
 						foreach (var block in this.MarkdownBlocks)
 						{
-                            lastBlockProcessed = block;
-                            block.DoFirstRun(initMarkdownContext);
+							lastBlockProcessed = block;
+							block.DoFirstRun(initMarkdownContext);
 						}
 
 						this.evaluator = this.ExecutionContext.Build();
 
 						foreach (var block in this.HtmlBlocks)
 						{
-                            lastBlockProcessed = block;
-                            block.AfterFirstRun(evaluator);
+							lastBlockProcessed = block;
+							block.AfterFirstRun(evaluator);
 						}
 						foreach (var block in this.MarkdownBlocks)
 						{
-                            lastBlockProcessed = block;
-                            block.AfterFirstRun(evaluator);
-                        }
+							lastBlockProcessed = block;
+							block.AfterFirstRun(evaluator);
+						}
 
 						AddDependentPages(blocks);
 
-                        lastBlockProcessed = null;
-                        initException = null;
+						lastBlockProcessed = null;
+						initException = null;
 						hasCompletedFirstRun = true;
 					}
 					catch (Exception ex)
@@ -260,10 +261,10 @@ namespace ServiceStack.Support.Markdown
 			}
 
 #if NETSTANDARD1_6
-            textWriter.Write(pageContext.MarkdownPage.Contents);
-            return;
+			textWriter.Write(pageContext.MarkdownPage.Contents);
+			return;
 #else
-            MarkdownViewBase instance = null;
+			MarkdownViewBase instance = null;
 			if (this.evaluator != null)
 			{
 				instance = (MarkdownViewBase)this.evaluator.CreateInstance();
@@ -272,7 +273,7 @@ namespace ServiceStack.Support.Markdown
 				pageContext.ScopeArgs.TryGetValue(ModelName, out model);
 
 				instance.Init(Markdown.AppHost, this, pageContext.ScopeArgs, model, pageContext.RenderHtml);
-			    instance.ViewEngine = Markdown;
+				instance.ViewEngine = Markdown;
 			}
 
 			foreach (var block in blocks)

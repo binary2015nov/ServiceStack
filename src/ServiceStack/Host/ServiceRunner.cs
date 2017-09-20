@@ -11,7 +11,7 @@ namespace ServiceStack.Host
 {
     public class ServiceRunner<TRequest> : IServiceRunner<TRequest>
     {
-        protected static readonly ILog Log = LogManager.GetLogger(typeof(ServiceRunner<>));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(ServiceRunner<>));
 
         protected readonly IAppHost AppHost;
         protected readonly ActionContext ActionContext;
@@ -197,7 +197,7 @@ namespace ServiceStack.Host
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("Error while logging req: " + req.Dump(), ex);
+                    Logger.Error("Error while logging req: " + req.Dump(), ex);
                 }
             }
         }

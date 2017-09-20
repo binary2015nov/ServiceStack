@@ -66,7 +66,7 @@ namespace ServiceStack
 
     public partial class ServerEventsClient : IDisposable
     {
-        private static ILog log = LogManager.GetLogger(typeof(ServerEventsClient));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(ServerEventsClient));
 
         public static int BufferSize = 1024 * 64;
         static int DefaultHeartbeatMs = 10 * 1000;
@@ -171,8 +171,8 @@ namespace ServiceStack
 
         public ServerEventsClient Start()
         {
-            if (log.IsDebugEnabled)
-                log.DebugFormat("Start()");
+            if (Logger.IsDebugEnabled)
+                Logger.DebugFormat("Start()");
 
             if (Interlocked.CompareExchange(ref status, 0, 0) == WorkerStatus.Disposed)
                 throw new ObjectDisposedException(GetType().Name + " has been disposed");
@@ -209,8 +209,8 @@ namespace ServiceStack
                     messageTcs = new TaskCompletionSource<ServerEventMessage>();
 
                 LastPulseAt = DateTime.UtcNow;
-                if (log.IsDebugEnabled)
-                    log.Debug("[SSE-CLIENT] LastPulseAt: " + DateTime.UtcNow.TimeOfDay);
+                if (Logger.IsDebugEnabled)
+                    Logger.Debug("[SSE-CLIENT] LastPulseAt: " + DateTime.UtcNow.TimeOfDay);
 
                 if (Interlocked.CompareExchange(ref status, WorkerStatus.Started, WorkerStatus.Starting) != WorkerStatus.Starting)
                     return this;
@@ -250,8 +250,8 @@ namespace ServiceStack
         
         protected void OnConnectReceived()
         {
-            if (log.IsDebugEnabled)
-                log.DebugFormat("[SSE-CLIENT] OnConnectReceived: {0} on #{1} / {2} on ({3})",
+            if (Logger.IsDebugEnabled)
+                Logger.DebugFormat("[SSE-CLIENT] OnConnectReceived: {0} on #{1} / {2} on ({3})",
                     ConnectionInfo.EventId, ConnectionDisplayName, ConnectionInfo.Id, string.Join(", ", Channels));
 
             StartNewHeartbeat();
@@ -279,13 +279,13 @@ namespace ServiceStack
 
         protected void Heartbeat(object state)
         {
-            if (log.IsDebugEnabled)
-                log.Debug("[SSE-CLIENT] Prep for Heartbeat...");
+            if (Logger.IsDebugEnabled)
+                Logger.Debug("[SSE-CLIENT] Prep for Heartbeat...");
 
             if (cancel.IsCancellationRequested)
             {
-                if (log.IsDebugEnabled)
-                    log.Debug("[SSE-CLIENT] Heartbeat CancellationRequested");
+                if (Logger.IsDebugEnabled)
+                    Logger.Debug("[SSE-CLIENT] Heartbeat CancellationRequested");
 
                 return;
             }
@@ -309,21 +309,21 @@ namespace ServiceStack
 
                     HeartbeatRequestFilter?.Invoke(req);
 
-                    if (log.IsDebugEnabled)
-                        log.Debug("[SSE-CLIENT] Sending Heartbeat...");
+                    if (Logger.IsDebugEnabled)
+                        Logger.Debug("[SSE-CLIENT] Sending Heartbeat...");
                 })
                 .Success(t =>
                 {
                     if (cancel.IsCancellationRequested)
                     {
-                        if (log.IsDebugEnabled)
-                            log.Debug("[SSE-CLIENT] Heartbeat is cancelled.");
+                        if (Logger.IsDebugEnabled)
+                            Logger.Debug("[SSE-CLIENT] Heartbeat is cancelled.");
 
                         return;
                     }
 
-                    if (log.IsDebugEnabled)
-                        log.Debug("[SSE-CLIENT] Heartbeat sent to: " + ConnectionInfo.HeartbeatUrl);
+                    if (Logger.IsDebugEnabled)
+                        Logger.Debug("[SSE-CLIENT] Heartbeat sent to: " + ConnectionInfo.HeartbeatUrl);
 
                     StartNewHeartbeat();
                 })
@@ -331,14 +331,14 @@ namespace ServiceStack
                 {
                     if (cancel.IsCancellationRequested)
                     {
-                        if (log.IsDebugEnabled)
-                            log.Debug("[SSE-CLIENT] Heartbeat error. Heartbeat is cancelled.");
+                        if (Logger.IsDebugEnabled)
+                            Logger.Debug("[SSE-CLIENT] Heartbeat error. Heartbeat is cancelled.");
 
                         return;
                     }
 
-                    if (log.IsDebugEnabled)
-                        log.Debug("[SSE-CLIENT] Error from Heartbeat: " + ex.UnwrapIfSingleException().Message);
+                    if (Logger.IsDebugEnabled)
+                        Logger.Debug("[SSE-CLIENT] Error from Heartbeat: " + ex.UnwrapIfSingleException().Message);
                     OnExceptionReceived(ex);
                 });
         }
@@ -356,32 +356,32 @@ namespace ServiceStack
 
         protected void OnJoinReceived(ServerEventJoin e)
         {
-            if (log.IsDebugEnabled)
-                log.Debug($"[SSE-CLIENT] OnJoinReceived: ({e.GetType().Name}) #{e.EventId} on #{ConnectionDisplayName} ({string.Join(", ", Channels)})");
+            if (Logger.IsDebugEnabled)
+                Logger.Debug($"[SSE-CLIENT] OnJoinReceived: ({e.GetType().Name}) #{e.EventId} on #{ConnectionDisplayName} ({string.Join(", ", Channels)})");
 
             OnJoin?.Invoke(e);
         }
 
         protected void OnLeaveReceived(ServerEventLeave e)
         {
-            if (log.IsDebugEnabled)
-                log.Debug($"[SSE-CLIENT] OnLeaveReceived: ({e.GetType().Name}) #{e.EventId} on #{ConnectionDisplayName} ({string.Join(", ", Channels)})");
+            if (Logger.IsDebugEnabled)
+                Logger.Debug($"[SSE-CLIENT] OnLeaveReceived: ({e.GetType().Name}) #{e.EventId} on #{ConnectionDisplayName} ({string.Join(", ", Channels)})");
 
             OnLeave?.Invoke(e);
         }
 
         protected void OnUpdateReceived(ServerEventUpdate e)
         {
-            if (log.IsDebugEnabled)
-                log.Debug($"[SSE-CLIENT] OnUpdateReceived: ({e.GetType().Name}) #{e.EventId} on #{ConnectionDisplayName} ({string.Join(", ", Channels)})");
+            if (Logger.IsDebugEnabled)
+                Logger.Debug($"[SSE-CLIENT] OnUpdateReceived: ({e.GetType().Name}) #{e.EventId} on #{ConnectionDisplayName} ({string.Join(", ", Channels)})");
 
             OnUpdate?.Invoke(e);
         }
 
         protected void OnCommandReceived(ServerEventCommand e)
         {
-            if (log.IsDebugEnabled)
-                log.Debug($"[SSE-CLIENT] OnCommandReceived: ({e.GetType().Name}) #{e.EventId} on #{ConnectionDisplayName} ({string.Join(", ", Channels)})");
+            if (Logger.IsDebugEnabled)
+                Logger.Debug($"[SSE-CLIENT] OnCommandReceived: ({e.GetType().Name}) #{e.EventId} on #{ConnectionDisplayName} ({string.Join(", ", Channels)})");
 
             var hold = commandTcs;
             commandTcs = new TaskCompletionSource<ServerEventCommand>();
@@ -393,8 +393,8 @@ namespace ServiceStack
 
         protected void OnHeartbeatReceived(ServerEventHeartbeat e)
         {
-            if (log.IsDebugEnabled)
-                log.Debug($"[SSE-CLIENT] OnHeartbeatReceived: ({e.GetType().Name}) #{e.EventId} on #{ConnectionDisplayName} ({string.Join(", ", Channels)})");
+            if (Logger.IsDebugEnabled)
+                Logger.Debug($"[SSE-CLIENT] OnHeartbeatReceived: ({e.GetType().Name}) #{e.EventId} on #{ConnectionDisplayName} ({string.Join(", ", Channels)})");
 
             var hold = heartbeatTcs;
             heartbeatTcs = new TaskCompletionSource<ServerEventHeartbeat>();
@@ -406,8 +406,8 @@ namespace ServiceStack
 
         protected void OnMessageReceived(ServerEventMessage e)
         {
-            if (log.IsDebugEnabled)
-                log.Debug($"[SSE-CLIENT] OnMessageReceived: {e.EventId} on #{ConnectionDisplayName} ({string.Join(", ", Channels)})");
+            if (Logger.IsDebugEnabled)
+                Logger.Debug($"[SSE-CLIENT] OnMessageReceived: {e.EventId} on #{ConnectionDisplayName} ({string.Join(", ", Channels)})");
 
             var hold = messageTcs;
             messageTcs = new TaskCompletionSource<ServerEventMessage>();
@@ -423,7 +423,7 @@ namespace ServiceStack
             Interlocked.Increment(ref noOfContinuousErrors);
 
             ex = ex.UnwrapIfSingleException();
-            log.Error($"[SSE-CLIENT] OnExceptionReceived: {ex.Message} on #{ConnectionDisplayName}", ex);
+            Logger.Error($"[SSE-CLIENT] OnExceptionReceived: {ex.Message} on #{ConnectionDisplayName}", ex);
 
             OnException?.Invoke(ex);
 
@@ -465,7 +465,7 @@ namespace ServiceStack
             }
             catch (Exception ex)
             {
-                log.Error($"[SSE-CLIENT] Error whilst restarting: {ex.Message}", ex);
+                Logger.Error($"[SSE-CLIENT] Error whilst restarting: {ex.Message}", ex);
             }
         }
 
@@ -482,8 +482,8 @@ namespace ServiceStack
                 rand.Next((int)Math.Pow(continuousErrorsCount, 3), (int)Math.Pow(continuousErrorsCount + 1, 3) + 1),
                 MaxSleepMs);
 
-            if (log.IsDebugEnabled)
-                log.Debug($"Sleeping for {nextTry}ms after {continuousErrorsCount} continuous errors");
+            if (Logger.IsDebugEnabled)
+                Logger.Debug($"Sleeping for {nextTry}ms after {continuousErrorsCount} continuous errors");
 
             return PclExportClient.Instance.WaitAsync(nextTry);
         }
@@ -533,7 +533,7 @@ namespace ServiceStack
                                 }
                                 catch (Exception ex)
                                 {
-                                    log.Error($"Unhandled Exception processing {currentMsg.Selector}: {ex.Message}");
+                                    Logger.Error($"Unhandled Exception processing {currentMsg.Selector}: {ex.Message}");
                                     OnException?.Invoke(ex);
                                 }
                             }
@@ -561,8 +561,8 @@ namespace ServiceStack
                 }
                 else
                 {
-                    if (log.IsDebugEnabled)
-                        log.Debug($"Connection ended on {ConnectionDisplayName}");
+                    if (Logger.IsDebugEnabled)
+                        Logger.Debug($"Connection ended on {ConnectionDisplayName}");
 
                     Restart();
                 }
@@ -708,8 +708,8 @@ namespace ServiceStack
         private void ProcessOnHeartbeatMessage(ServerEventMessage e)
         {
             LastPulseAt = DateTime.UtcNow;
-            if (log.IsDebugEnabled)
-                log.Debug("[SSE-CLIENT] LastPulseAt: " + DateTime.UtcNow.TimeOfDay);
+            if (Logger.IsDebugEnabled)
+                Logger.Debug("[SSE-CLIENT] LastPulseAt: " + DateTime.UtcNow.TimeOfDay);
 
             var msg = JsonObject.Parse(e.Json);
             var heartbeatMsg = new ServerEventHeartbeat().Populate(e, msg);
@@ -725,8 +725,8 @@ namespace ServiceStack
 
         public virtual Task InternalStop()
         {
-            if (log.IsDebugEnabled)
-                log.Debug("Stop()");
+            if (Logger.IsDebugEnabled)
+                Logger.Debug("Stop()");
 
             cancel?.Cancel();
 
@@ -740,8 +740,8 @@ namespace ServiceStack
                         if (hold != null)
                             req.CookieContainer = hold.CookieContainer;
 
-                        if (log.IsDebugEnabled)
-                            log.Debug("[SSE-CLIENT] Unregistering...");
+                        if (Logger.IsDebugEnabled)
+                            Logger.Debug("[SSE-CLIENT] Unregistering...");
                     });
                 } catch (Exception) {}
             }
@@ -819,7 +819,7 @@ namespace ServiceStack
                         }
                         catch (Exception ex)
                         {
-                            log.Error($"Error whilst executing '{eventName}' handler", ex);
+                            Logger.Error($"Error whilst executing '{eventName}' handler", ex);
                         }
                     }
                 }
@@ -845,8 +845,8 @@ namespace ServiceStack
 
         public void Dispose()
         {
-            if (log.IsDebugEnabled)
-                log.Debug("Dispose()");
+            if (Logger.IsDebugEnabled)
+                Logger.Debug("Dispose()");
 
             Stop();
             Interlocked.Exchange(ref status, WorkerStatus.Disposed);

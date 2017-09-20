@@ -15,7 +15,7 @@ namespace ServiceStack
 #endif
     public class WebServiceException : Exception, IHasStatusCode, IHasStatusDescription, IResponseStatusConvertible
     {
-        public static ILog log = LogManager.GetLogger(typeof(WebServiceException));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(WebServiceException));
 
         public WebServiceException() { }
         public WebServiceException(string message) : base(message) { }

@@ -1,16 +1,12 @@
 using System;
 using NUnit.Framework;
 using ServiceStack.Model;
-using ServiceStack.Logging;
 using ServiceStack.Text;
 
 namespace ServiceStack.Common.Tests.Models
 {
-    public class ModelWithFieldsOfNullableTypes
-        : IHasIntId
+    public class ModelWithFieldsOfNullableTypes : IHasIntId
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ModelWithFieldsOfNullableTypes));
-
         public int Id { get; set; }
         public int? NId { get; set; }
 
@@ -83,7 +79,7 @@ namespace ServiceStack.Common.Tests.Models
             }
             catch (Exception ex)
             {
-                Log.Error("Trouble with DateTime precisions, trying Assert again with rounding to seconds", ex);
+                Console.WriteLine("Trouble with DateTime precisions, trying Assert again with rounding to seconds", ex);
                 Assert.That(actual.NDateTime.Value.ToUniversalTime().RoundToSecond(), Is.EqualTo(expected.NDateTime.Value.ToUniversalTime().RoundToSecond()));
             }
 
@@ -93,7 +89,7 @@ namespace ServiceStack.Common.Tests.Models
             }
             catch (Exception ex)
             {
-                Log.Error("Trouble with float precisions, trying Assert again with rounding to 10 decimals", ex);
+                Console.WriteLine("Trouble with float precisions, trying Assert again with rounding to 10 decimals", ex);
                 Assert.That(Math.Round(actual.NFloat.Value, 10), Is.EqualTo(Math.Round(actual.NFloat.Value, 10)));
             }
 
@@ -103,7 +99,7 @@ namespace ServiceStack.Common.Tests.Models
             }
             catch (Exception ex)
             {
-                Log.Error("Trouble with double precisions, trying Assert again with rounding to 10 decimals", ex);
+                Console.WriteLine("Trouble with double precisions, trying Assert again with rounding to 10 decimals", ex);
                 Assert.That(Math.Round(actual.NDouble.Value, 10), Is.EqualTo(Math.Round(actual.NDouble.Value, 10)));
             }
 

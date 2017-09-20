@@ -6,11 +6,14 @@ using DotNetOpenAuth.Messaging;
 using DotNetOpenAuth.OAuth2;
 using ServiceStack.Auth;
 using ServiceStack.Configuration;
+using ServiceStack.Logging;
 
 namespace ServiceStack.Authentication.OAuth2
 {
     public abstract class OAuth2Provider : AuthProvider
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(OAuth2Provider));
+
         protected OAuth2Provider(IAppSettings appSettings, string realm, string provider)
             : base(appSettings, realm, provider)
         {
@@ -126,7 +129,7 @@ namespace ServiceStack.Authentication.OAuth2
                 }
                 catch (ProtocolException ex)
                 {
-                    Log.Error("Failed to login to {0}".Fmt(this.Provider), ex);
+                    Logger.Error("Failed to login to {0}".Fmt(this.Provider), ex);
                     return authService.Redirect(FailedRedirectUrlFilter(this, session.ReferrerUrl.SetParam("f", "Unknown")));
                 }
             }
@@ -220,7 +223,7 @@ namespace ServiceStack.Authentication.OAuth2
             }
             catch (Exception ex)
             {
-                Log.Error("Could not retrieve Profile info for '{0}'".Fmt(tokens.DisplayName), ex);
+                Logger.Error("Could not retrieve Profile info for '{0}'".Fmt(tokens.DisplayName), ex);
             }
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using ServiceStack.Configuration;
+using ServiceStack.Logging;
 using ServiceStack.Text;
 using ServiceStack.Web;
 
@@ -17,6 +18,8 @@ namespace ServiceStack.Auth
     /// </summary>
     public class OdnoklassnikiAuthProvider : OAuthProvider
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(OdnoklassnikiAuthProvider));
+
         public const string Name = "odnoklassniki";
         public static string Realm = "http://www.odnoklassniki.ru/oauth/";
         public static string PreAuthUrl = "http://www.odnoklassniki.ru/oauth/authorize";
@@ -49,7 +52,7 @@ namespace ServiceStack.Auth
             bool hasError = !error.IsNullOrEmpty();
             if (hasError)
             {
-                Log.Error($"Odnoklassniki error callback. {httpRequest.QueryString}");
+                Logger.Error($"Odnoklassniki error callback. {httpRequest.QueryString}");
                 return authService.Redirect(FailedRedirectUrlFilter(this, session.ReferrerUrl.SetParam("f", error)));
             }
 
@@ -76,7 +79,7 @@ namespace ServiceStack.Auth
 
                 if (!accessTokenError.IsNullOrEmpty())
                 {
-                    Log.Error($"Odnoklassniki access_token error callback. {authInfo}");
+                    Logger.Error($"Odnoklassniki access_token error callback. {authInfo}");
                     return authService.Redirect(session.ReferrerUrl.SetParam("f", "AccessTokenFailed"));
                 }
                 tokens.AccessTokenSecret = authInfo.Get("access_token");
@@ -125,7 +128,7 @@ namespace ServiceStack.Auth
 
                 if (!obj.Get("error").IsNullOrEmpty())
                 {
-                    Log.Error($"Could not retrieve Odnoklassniki user info for '{tokens.DisplayName}', Response:{json}");
+                    Logger.Error($"Could not retrieve Odnoklassniki user info for '{tokens.DisplayName}', Response:{json}");
                     return;
                 }
 
@@ -149,7 +152,7 @@ namespace ServiceStack.Auth
             }
             catch (Exception ex)
             {
-                Log.Error($"Could not retrieve Odnoklassniki user info for '{tokens.DisplayName}'", ex);
+                Logger.Error($"Could not retrieve Odnoklassniki user info for '{tokens.DisplayName}'", ex);
             }
 
             LoadUserOAuthProvider(userSession, tokens);

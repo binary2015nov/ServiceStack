@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using ServiceStack.Configuration;
+using ServiceStack.Logging;
 using ServiceStack.Text;
 
 namespace ServiceStack.Auth
@@ -12,14 +13,13 @@ namespace ServiceStack.Auth
     /// </summary>
     public class GithubAuthProvider : OAuthProvider
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(GithubAuthProvider));
+
         public const string Name = "github";
         public static string Realm = "https://github.com/login/";
         public static string PreAuthUrl = "https://github.com/login/oauth/authorize";
 
-        static GithubAuthProvider() {}
-
-        public GithubAuthProvider(IAppSettings appSettings)
-            : base(appSettings, Realm, Name, "ClientId", "ClientSecret")
+        public GithubAuthProvider(IAppSettings appSettings) : base(appSettings, Realm, Name, "ClientId", "ClientSecret")
         {
             ClientId = appSettings.GetString("oauth.github.ClientId");
             ClientSecret = appSettings.GetString("oauth.github.ClientSecret");
@@ -69,7 +69,7 @@ namespace ServiceStack.Auth
             var hasError = !error.IsNullOrEmpty();
             if (hasError)
             {
-                Log.Error($"GitHub error callback. {httpRequest.QueryString}");
+                Logger.Error($"GitHub error callback. {httpRequest.QueryString}");
                 return authService.Redirect(FailedRedirectUrlFilter(this, session.ReferrerUrl.SetParam("f", error)));
             }
 
@@ -98,7 +98,7 @@ namespace ServiceStack.Auth
 
                 if (!accessTokenError.IsNullOrEmpty())
                 {
-                    Log.Error($"GitHub access_token error callback. {authInfo}");
+                    Logger.Error($"GitHub access_token error callback. {authInfo}");
                     return authService.Redirect(FailedRedirectUrlFilter(this, session.ReferrerUrl.SetParam("f", "AccessTokenFailed")));
                 }
 
@@ -166,7 +166,7 @@ namespace ServiceStack.Auth
             }
             catch (Exception ex)
             {
-                Log.Error($"Could not retrieve github user info for '{tokens.DisplayName}'", ex);
+                Logger.Error($"Could not retrieve github user info for '{tokens.DisplayName}'", ex);
             }
 
             LoadUserOAuthProvider(userSession, tokens);

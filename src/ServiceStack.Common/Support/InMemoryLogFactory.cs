@@ -11,10 +11,10 @@ namespace ServiceStack.Support
     /// Returns a thread-safe InMemoryLog which you can use while *TESTING*
     /// to provide a detailed analysis of your logs.
     /// </summary>
-    public class InMemoryLogFactory
-        : ILogFactory
+    public class InMemoryLogFactory : ILogFactory
     {
         private readonly bool debugEnabled;
+
         public InMemoryLogFactory(bool debugEnabled = false)
         {
             this.debugEnabled = debugEnabled;
@@ -25,14 +25,13 @@ namespace ServiceStack.Support
             return new InMemoryLog(type.Name) { IsDebugEnabled = debugEnabled };
         }
 
-        public ILog GetLogger(string typeName)
+        public ILog GetLogger(string name)
         {
-            return new InMemoryLog(typeName) { IsDebugEnabled = debugEnabled };
+            return new InMemoryLog(name) { IsDebugEnabled = debugEnabled };
         }
     }
 
-    public class InMemoryLog
-        : ILog
+    public class InMemoryLog : ILog
     {
         private readonly object syncLock = new object();
         public string LoggerName { get; private set; }

@@ -293,11 +293,11 @@ namespace ServiceStack.Common.Tests
             var task = tcs.Task;
             tcs.SetResult("foo");
 
-            var fn = task.GetType().GetFastGetter("Result");
+            var fn = TypeProperties.Get(task.GetType()).GetPublicGetter("Result");
             var value = fn(task);
             Assert.That(value, Is.EqualTo("foo"));
 
-            fn = task.GetType().GetFastGetter("Result");
+            fn = TypeProperties.Get(task.GetType()).GetPublicGetter("Result");
             value = fn(task);
             Assert.That(value, Is.EqualTo("foo"));
         }

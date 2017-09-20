@@ -66,7 +66,8 @@ namespace ServiceStack.Auth
     //
     public class OAuthAuthorizer
     {
-        private static ILog log = LogManager.GetLogger(typeof(OAuthAuthorizer)); 
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(OAuthAuthorizer));
+
         // Settable by the user
         public string xAuthUsername, xAuthPassword;
 
@@ -112,7 +113,7 @@ namespace ServiceStack.Auth
             var emptyHeaders = headers.Keys.Where(k => string.IsNullOrEmpty(headers[k])).ToArray();
             if (emptyHeaders.Length > 0)
             {
-                log.Warn("Empty Headers: " + string.Join(", ", emptyHeaders));
+                Logger.Warn("Empty Headers: " + string.Join(", ", emptyHeaders));
             }
                 
             var items = headers.Keys.OrderBy(k => k)                

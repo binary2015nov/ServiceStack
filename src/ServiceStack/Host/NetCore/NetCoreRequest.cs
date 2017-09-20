@@ -22,7 +22,7 @@ namespace ServiceStack.Host.NetCore
 {
     public class NetCoreRequest : IHttpRequest, IHasResolver, IHasVirtualFiles
     {
-        public static ILog log = LogManager.GetLogger(typeof(NetCoreRequest));
+        public static readonly ILog Logger = LogManager.GetLogger(typeof(NetCoreRequest));
 
         private IResolver resolver;
         public IResolver Resolver
@@ -140,7 +140,7 @@ namespace ServiceStack.Host.NetCore
                     }
                     catch (Exception ex)
                     {
-                        log.Warn("Error trying to create System.Net.Cookie: " + httpCookie.Key, ex);
+                        Logger.Warn("Error trying to create System.Net.Cookie: " + httpCookie.Key, ex);
                     }
 
                     if (cookie != null)

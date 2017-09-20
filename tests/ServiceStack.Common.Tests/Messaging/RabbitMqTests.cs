@@ -4,9 +4,11 @@ using System.IO;
 using System.Threading;
 using NUnit.Framework;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using ServiceStack.Messaging;
 using ServiceStack.RabbitMq;
+using ServiceStack.Text;
 
 namespace ServiceStack.Common.Tests.Messaging
 {
@@ -163,6 +165,7 @@ namespace ServiceStack.Common.Tests.Messaging
                     }
                     catch (OperationInterruptedException ex)
                     {
+                        ex.PrintDump();
                         // The consumer was removed, either through
                         // channel or connection closure, or through the
                         // action of IModel.BasicCancel().

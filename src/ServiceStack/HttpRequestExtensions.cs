@@ -25,6 +25,8 @@ namespace ServiceStack
 {
     public static class HttpRequestExtensions
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(HttpRequestExtensions));
+
         /// <summary>
         /// Gets string value from Items[name] then Cookies[name] if exists.
         /// Useful when *first* setting the users response cookie in the request filter.
@@ -342,8 +344,6 @@ namespace ServiceStack
                                         info
          * */
 
-        private static readonly ILog Log = LogManager.GetLogger(typeof(HttpRequestExtensions));
-
         public static readonly string WebHostDirectoryName = Path.GetFileName("~".MapHostAbsolutePath());
 
         public static string GetOperationNameFromLastPathInfo(string lastPathInfo)
@@ -430,7 +430,7 @@ namespace ServiceStack
             }
             catch (Exception ex)
             {
-                Log.ErrorFormat("Error trying to get 'Request.Url.Host'", ex);
+                Logger.ErrorFormat("Error trying to get 'Request.Url.Host'", ex);
 
                 return request.UserHostName;
             }

@@ -24,6 +24,7 @@ namespace ServiceStack
     public partial class AsyncServiceClient : IHasSessionId, IHasVersion
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(AsyncServiceClient));
+
         private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(60);
 
         //private HttpWebRequest webRequest = null;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using ServiceStack.Configuration;
+using ServiceStack.Logging;
 using ServiceStack.Text;
 using ServiceStack.Web;
 
@@ -13,14 +14,12 @@ namespace ServiceStack.Auth
     /// </summary>
     public class YandexAuthProvider : OAuthProvider
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(YandexAuthProvider));
+
         public const string Name = "yandex";
         public static string Realm = "https://oauth.yandex.ru/";
         public static string PreAuthUrl = "https://oauth.yandex.ru/authorize";
         public static string TokenUrl = "https://oauth.yandex.ru/token";
-
-        static YandexAuthProvider()
-        {
-        }
 
         public YandexAuthProvider(IAppSettings appSettings)
             : base(appSettings, Realm, Name, "AppId", "AppPassword")
@@ -47,7 +46,7 @@ namespace ServiceStack.Auth
             bool hasError = !error.IsNullOrEmpty();
             if (hasError)
             {
-                Log.Error($"Yandex error callback. {httpRequest.QueryString}");
+                Logger.Error($"Yandex error callback. {httpRequest.QueryString}");
                 return authService.Redirect(FailedRedirectUrlFilter(this, session.ReferrerUrl.SetParam("f", error)));
             }
 
@@ -73,7 +72,7 @@ namespace ServiceStack.Auth
 
                 if (!accessTokenError.IsNullOrEmpty())
                 {
-                    Log.Error($"Yandex access_token error callback. {authInfo}");
+                    Logger.Error($"Yandex access_token error callback. {authInfo}");
                     return authService.Redirect(session.ReferrerUrl.SetParam("f", "AccessTokenFailed"));
                 }
                 tokens.AccessTokenSecret = authInfo.Get("access_token");
@@ -114,7 +113,7 @@ namespace ServiceStack.Auth
             }
             catch (Exception ex)
             {
-                Log.Error($"Could not retrieve Yandex user info for '{tokens.DisplayName}'", ex);
+                Logger.Error($"Could not retrieve Yandex user info for '{tokens.DisplayName}'", ex);
             }
         }
 

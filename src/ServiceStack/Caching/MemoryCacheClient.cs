@@ -8,7 +8,7 @@ namespace ServiceStack.Caching
 {
     public class MemoryCacheClient : ICacheClientExtended, IRemoveByPattern
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(MemoryCacheClient));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(MemoryCacheClient));
 
         private ConcurrentDictionary<string, CacheEntry> memory;
         public bool FlushOnDispose { get; set; }
@@ -135,7 +135,7 @@ namespace ServiceStack.Caching
                 }
                 catch (Exception ex)
                 {
-                    Log.Error($"Error trying to remove {key} from the cache", ex);
+                    Logger.Error($"Error trying to remove {key} from the cache", ex);
                 }
             }
         }
@@ -347,7 +347,7 @@ namespace ServiceStack.Caching
             }
             catch (Exception ex)
             {
-                Log.Error($"Error trying to remove items from cache with this {pattern} pattern", ex);
+                Logger.Error($"Error trying to remove items from cache with this {pattern} pattern", ex);
             }
         }
 
@@ -386,7 +386,7 @@ namespace ServiceStack.Caching
             }
             catch (Exception ex)
             {
-                Log.Error($"Error trying to remove items from cache with this {pattern} pattern", ex);
+                Logger.Error($"Error trying to remove items from cache with this {pattern} pattern", ex);
             }
             return keys;
         }

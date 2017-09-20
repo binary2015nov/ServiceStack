@@ -35,7 +35,7 @@ namespace ServiceStack.Mvc
 {
     public class RazorFormat : IPlugin, Html.IViewEngine
     {
-        public static ILog log = LogManager.GetLogger(typeof(RazorFormat));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(RazorFormat));
 
         public IVirtualPathProvider VirtualFileSources { get; set; }
 
@@ -229,7 +229,7 @@ namespace ServiceStack.Mvc
                     }
                     catch (Exception ex)
                     {
-                        log.Warn("Error trying to dispose Razor View: " + ex.Message, ex);
+                        Logger.Warn("Error trying to dispose Razor View: " + ex.Message, ex);
                     }
                 }
             }

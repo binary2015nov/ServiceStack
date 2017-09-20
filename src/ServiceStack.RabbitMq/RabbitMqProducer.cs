@@ -9,7 +9,8 @@ namespace ServiceStack.RabbitMq
 {
     public class RabbitMqProducer : IMessageProducer, IOneWayClient
     {
-        public static ILog Log = LogManager.GetLogger(typeof(RabbitMqProducer));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(RabbitMqProducer));
+
         protected readonly RabbitMqMessageFactory msgFactory;
         public int RetryCount { get; set; }
         public Action OnPublishedCallback { get; set; }
@@ -200,7 +201,7 @@ namespace ServiceStack.RabbitMq
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("Error trying to dispose RabbitMqProducer model", ex);
+                    Logger.Error("Error trying to dispose RabbitMqProducer model", ex);
                 } 
                 channel = null;
             }
@@ -212,7 +213,7 @@ namespace ServiceStack.RabbitMq
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("Error trying to dispose RabbitMqProducer connection", ex);
+                    Logger.Error("Error trying to dispose RabbitMqProducer connection", ex);
                 }
                 connection = null;
             }

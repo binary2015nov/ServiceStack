@@ -23,7 +23,7 @@ namespace ServiceStack.Razor.Compilation
 {
     public class RazorPageHost : RazorEngineHost, IRazorHost
     {
-        private static ILog log = LogManager.GetLogger(typeof(RazorPageHost));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(RazorPageHost));
 
         private static readonly IEnumerable<string> _defaultImports = new[] {
             "System",
@@ -207,7 +207,7 @@ namespace ServiceStack.Razor.Compilation
             Type forceLoadOfRuntimeBinder = typeof(Microsoft.CSharp.RuntimeBinder.Binder);
             if (forceLoadOfRuntimeBinder == null)
             {
-                log.Warn("Force load of .NET 4.0+ RuntimeBinder in Microsoft.CSharp.dll");
+                Logger.Warn("Force load of .NET 4.0+ RuntimeBinder in Microsoft.CSharp.dll");
             }
 
             var razorResults = Generate();

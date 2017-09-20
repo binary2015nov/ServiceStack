@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ServiceStack.Configuration;
+using ServiceStack.Logging;
 using ServiceStack.Text;
 
 namespace ServiceStack.Auth
@@ -11,11 +12,12 @@ namespace ServiceStack.Auth
     /// </summary>
     public class TwitterAuthProvider : OAuthProvider
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(TwitterAuthProvider));
+
         public const string Name = "twitter";
         public static string Realm = "https://api.twitter.com/";
 
-        public TwitterAuthProvider(IAppSettings appSettings)
-            : base(appSettings, Realm, Name)
+        public TwitterAuthProvider(IAppSettings appSettings) : base(appSettings, Realm, Name)
         {
             this.AuthorizeUrl = appSettings.Get("oauth.twitter.AuthorizeUrl", Realm + "oauth/authenticate");
         }
@@ -147,7 +149,7 @@ namespace ServiceStack.Auth
             catch (Exception ex)
             {
                 if (userId != null)
-                    Log.Error($"Could not retrieve twitter user info for '{userId}'", ex);
+                    Logger.Error($"Could not retrieve twitter user info for '{userId}'", ex);
 
                 throw;
             }

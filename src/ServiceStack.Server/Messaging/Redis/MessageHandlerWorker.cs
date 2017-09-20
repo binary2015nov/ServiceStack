@@ -8,7 +8,7 @@ namespace ServiceStack.Messaging.Redis
 {
     internal class MessageHandlerWorker : IDisposable
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(MessageHandlerWorker));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageHandlerWorker));
 
         readonly object msgLock = new object();
 
@@ -90,7 +90,7 @@ namespace ServiceStack.Messaging.Redis
 
             if (Interlocked.CompareExchange(ref status, WorkerStatus.Starting, WorkerStatus.Stopped) == WorkerStatus.Stopped)
             {
-                Log.Debug("Starting MQ Handler Worker: {0}...".Fmt(QueueName));
+                Logger.Debug("Starting MQ Handler Worker: {0}...".Fmt(QueueName));
 
                 //Should only be 1 thread past this point
                 bgThread = new Thread(Run) {
@@ -142,7 +142,7 @@ namespace ServiceStack.Messaging.Redis
                 //Ignore handling rare, but expected exceptions from KillBgThreadIfExists()
                 if (ex is ThreadInterruptedException || ex is ThreadAbortException)
                 {
-                    Log.Warn("Received {0} in Worker: {1}".Fmt(ex.GetType().Name, QueueName));
+                    Logger.Warn("Received {0} in Worker: {1}".Fmt(ex.GetType().Name, QueueName));
                     return;
                 }
 #endif
@@ -167,7 +167,7 @@ namespace ServiceStack.Messaging.Redis
 
             if (Interlocked.CompareExchange(ref status, WorkerStatus.Stopping, WorkerStatus.Started) == WorkerStatus.Started)
             {
-                Log.Debug("Stopping MQ Handler Worker: {0}...".Fmt(QueueName));
+                Logger.Debug("Stopping MQ Handler Worker: {0}...".Fmt(QueueName));
                 Thread.Sleep(100);
                 lock (msgLock)
                 {
@@ -186,11 +186,11 @@ namespace ServiceStack.Messaging.Redis
                     if (!bgThread.Join(500))
                     {
                         //Ideally we shouldn't get here, but lets try our hardest to clean it up
-                        Log.Warn("Interrupting previous Background Worker: " + bgThread.Name);
+                        Logger.Warn("Interrupting previous Background Worker: " + bgThread.Name);
                         bgThread.Interrupt();
                         if (!bgThread.Join(TimeSpan.FromSeconds(3)))
                         {
-                            Log.Warn(bgThread.Name + " just wont die, so we're now aborting it...");
+                            Logger.Warn(bgThread.Name + " just wont die, so we're now aborting it...");
                             bgThread.Abort();
                         }
                     }
@@ -219,7 +219,7 @@ namespace ServiceStack.Messaging.Redis
             }
             catch (Exception ex)
             {
-                Log.Error("Error Disposing MessageHandlerWorker for: " + QueueName, ex);
+                Logger.Error("Error Disposing MessageHandlerWorker for: " + QueueName, ex);
             }
         }
 

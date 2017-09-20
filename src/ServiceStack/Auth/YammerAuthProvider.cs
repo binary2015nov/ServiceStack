@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using ServiceStack.Configuration;
+using ServiceStack.Logging;
 using ServiceStack.Text;
 
 namespace ServiceStack.Auth
@@ -36,6 +37,8 @@ namespace ServiceStack.Auth
     /// </remarks>
     public class YammerAuthProvider : OAuthProvider
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(YammerAuthProvider));
+
         /// <summary>
         /// The OAuth provider name / identifier.
         /// </summary>
@@ -47,8 +50,7 @@ namespace ServiceStack.Auth
         /// <param name="appSettings">
         /// The application settings (in web.config).
         /// </param>
-        public YammerAuthProvider(IAppSettings appSettings)
-            : base(appSettings, appSettings.GetString("oauth.yammer.Realm"), Name, "ClientId", "AppSecret")
+        public YammerAuthProvider(IAppSettings appSettings) : base(appSettings, appSettings.GetString("oauth.yammer.Realm"), Name, "ClientId", "AppSecret")
         {
             this.ClientId = appSettings.GetString("oauth.yammer.ClientId");
             this.ClientSecret = appSettings.GetString("oauth.yammer.ClientSecret");
@@ -212,7 +214,7 @@ namespace ServiceStack.Auth
             }
             catch (Exception ex)
             {
-                Log.Error($"Could not retrieve Yammer user info for '{tokens.DisplayName}'", ex);
+                Logger.Error($"Could not retrieve Yammer user info for '{tokens.DisplayName}'", ex);
             }
 
             this.LoadUserOAuthProvider(userSession, tokens);

@@ -29,7 +29,8 @@ namespace ServiceStack.Messaging.Redis
     /// </summary>
     public class RedisMqServer : IMessageService
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(RedisMqServer));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(RedisMqServer));
+
         public const int DefaultRetryCount = 1; //Will be a total of 2 attempts
 
         public int RetryCount { get; set; }
@@ -132,7 +133,7 @@ namespace ServiceStack.Messaging.Redis
             this.RetryCount = retryCount;
             //this.RequestTimeOut = requestTimeOut;
             this.MessageFactory = new RedisMessageFactory(clientsManager);
-            this.ErrorHandler = ex => Log.Error("Exception in Redis MQ Server: " + ex.Message, ex);
+            this.ErrorHandler = ex => Logger.Error("Exception in Redis MQ Server: " + ex.Message, ex);
             this.WaitBeforeNextRestart = TimeSpan.FromMilliseconds(2000);
         }
 
@@ -277,7 +278,7 @@ namespace ServiceStack.Messaging.Redis
 
         public void NotifyAll()
         {
-            Log.Debug("Notifying all worker threads to check for new messages...");
+            Logger.Debug("Notifying all worker threads to check for new messages...");
             foreach (var worker in workers)
             {
                 worker.NotifyNewMessage();
@@ -286,37 +287,37 @@ namespace ServiceStack.Messaging.Redis
 
         public void StartWorkerThreads()
         {
-            Log.Debug("Starting all Redis MQ Server worker threads...");
+            Logger.Debug("Starting all Redis MQ Server worker threads...");
             workers.Each(x => x.Start());
         }
 
         public void ForceRestartWorkerThreads()
         {
-            Log.Debug("ForceRestart all Redis MQ Server worker threads...");
+            Logger.Debug("ForceRestart all Redis MQ Server worker threads...");
             workers.Each(x => x.ForceRestart());
         }
 
         public void StopWorkerThreads()
         {
-            Log.Debug("Stopping all Redis MQ Server worker threads...");
+            Logger.Debug("Stopping all Redis MQ Server worker threads...");
             workers.Each(x => x.Stop());
         }
 
         void DisposeWorkerThreads()
         {
-            Log.Debug("Disposing all Redis MQ Server worker threads...");
+            Logger.Debug("Disposing all Redis MQ Server worker threads...");
             if (workers != null) workers.Each(x => x.Dispose());
         }
 
         void WorkerErrorHandler(MessageHandlerWorker source, Exception ex)
         {
-            Log.Error("Received exception in Worker: " + source.QueueName, ex);
+            Logger.Error("Received exception in Worker: " + source.QueueName, ex);
             for (int i = 0; i < workers.Length; i++)
             {
                 var worker = workers[i];
                 if (worker == source)
                 {
-                    Log.Debug("Starting new {0} Worker at index {1}...".Fmt(source.QueueName, i));
+                    Logger.Debug("Starting new {0} Worker at index {1}...".Fmt(source.QueueName, i));
                     workers[i] = source.Clone();
                     workers[i].Start();
                     worker.Dispose();
@@ -365,7 +366,7 @@ namespace ServiceStack.Messaging.Redis
             }
             catch (Exception ex)
             {
-                Log.Error("Error DisposeWorkerThreads(): ", ex);
+                Logger.Error("Error DisposeWorkerThreads(): ", ex);
             }
 
             RedisPubSub.Dispose();

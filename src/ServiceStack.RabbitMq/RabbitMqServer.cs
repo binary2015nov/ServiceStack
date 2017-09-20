@@ -12,7 +12,7 @@ namespace ServiceStack.RabbitMq
 {
     public class RabbitMqServer : IMessageService
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(RabbitMqServer));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(RabbitMqServer));
 
         public const int DefaultRetryCount = 1; //Will be a total of 2 attempts
 
@@ -145,7 +145,7 @@ namespace ServiceStack.RabbitMq
         private void Init(RabbitMqMessageFactory messageFactory)
         {
             this.messageFactory = messageFactory;
-            this.ErrorHandler = ex => Log.Error("Exception in Rabbit MQ Server: " + ex.Message, ex);
+            this.ErrorHandler = ex => Logger.Error("Exception in Rabbit MQ Server: " + ex.Message, ex);
             RetryCount = DefaultRetryCount;
             AutoReconnect = true;
         }
@@ -320,7 +320,7 @@ namespace ServiceStack.RabbitMq
 
                     if (workers == null || workers.Length == 0)
                     {
-                        Log.Warn("Cannot start a MQ Server with no Message Handlers registered, ignoring.");
+                        Logger.Warn("Cannot start a MQ Server with no Message Handlers registered, ignoring.");
                         Interlocked.CompareExchange(ref status, WorkerStatus.Stopped, WorkerStatus.Starting);
                         return;
                     }
@@ -338,11 +338,11 @@ namespace ServiceStack.RabbitMq
                             Name = "Rabbit MQ Server " + Interlocked.Increment(ref bgThreadCount)
                         };
                         bgThread.Start();
-                        Log.Debug("Started Background Thread: " + bgThread.Name);
+                        Logger.Debug("Started Background Thread: " + bgThread.Name);
                     }
                     else
                     {
-                        Log.Debug("Retrying RunLoop() on Thread: " + bgThread.Name);
+                        Logger.Debug("Retrying RunLoop() on Thread: " + bgThread.Name);
                         RunLoop();
                     }
                 }
@@ -369,13 +369,13 @@ namespace ServiceStack.RabbitMq
                     while (Interlocked.CompareExchange(ref status, 0, 0) == WorkerStatus.Started)
                     {
                         Monitor.Wait(msgLock);
-                        Log.Debug("msgLock received...");
+                        Logger.Debug("msgLock received...");
 
                         var op = Interlocked.CompareExchange(ref doOperation, WorkerOperation.NoOp, doOperation);
                         switch (op)
                         {
                             case WorkerOperation.Stop:
-                                Log.Debug("Stop Command Issued");
+                                Logger.Debug("Stop Command Issued");
 
                                 Interlocked.CompareExchange(ref status, WorkerStatus.Stopping, WorkerStatus.Started);
                                 try
@@ -389,7 +389,7 @@ namespace ServiceStack.RabbitMq
                                 return; //exits
 
                             case WorkerOperation.Restart:
-                                Log.Debug("Restart Command Issued");
+                                Logger.Debug("Restart Command Issued");
 
                                 Interlocked.CompareExchange(ref status, WorkerStatus.Stopping, WorkerStatus.Started);
                                 try
@@ -428,7 +428,7 @@ namespace ServiceStack.RabbitMq
                     Start();
                 }
             }
-            Log.Debug("Exiting RunLoop()...");
+            Logger.Debug("Exiting RunLoop()...");
         }
 
         public virtual void Stop()
@@ -470,8 +470,8 @@ namespace ServiceStack.RabbitMq
 
         public virtual void StartWorkerThreads()
         {
-            if (Log.IsDebugEnabled)
-                Log.Debug("Starting all Rabbit MQ Server worker threads...");
+            if (Logger.IsDebugEnabled)
+                Logger.Debug("Starting all Rabbit MQ Server worker threads...");
 
             foreach (var worker in workers)
             {
@@ -482,15 +482,15 @@ namespace ServiceStack.RabbitMq
                 catch (Exception ex)
                 {
                     ErrorHandler?.Invoke(ex);
-                    Log.Warn("Could not START Rabbit MQ worker thread: " + ex.Message);
+                    Logger.Warn("Could not START Rabbit MQ worker thread: " + ex.Message);
                 }
             }
         }
 
         public virtual void StopWorkerThreads()
         {
-            if (Log.IsDebugEnabled)
-                Log.Debug("Stopping all Rabbit MQ Server worker threads...");
+            if (Logger.IsDebugEnabled)
+                Logger.Debug("Stopping all Rabbit MQ Server worker threads...");
 
             foreach (var worker in workers)
             {
@@ -501,27 +501,27 @@ namespace ServiceStack.RabbitMq
                 catch (Exception ex)
                 {
                     ErrorHandler?.Invoke(ex);
-                    Log.Warn("Could not STOP Rabbit MQ worker thread: " + ex.Message);
+                    Logger.Warn("Could not STOP Rabbit MQ worker thread: " + ex.Message);
                 }
             }
         }
 
         void DisposeWorkerThreads()
         {
-            if (Log.IsDebugEnabled)
-                Log.Debug("Disposing all Rabbit MQ Server worker threads...");
+            if (Logger.IsDebugEnabled)
+                Logger.Debug("Disposing all Rabbit MQ Server worker threads...");
             workers?.Each(x => x.Dispose());
         }
 
         void WorkerErrorHandler(RabbitMqWorker source, Exception ex)
         {
-            Log.Error("Received exception in Worker: " + source.QueueName, ex);
+            Logger.Error("Received exception in Worker: " + source.QueueName, ex);
             for (int i = 0; i < workers.Length; i++)
             {
                 var worker = workers[i];
                 if (worker == source)
                 {
-                    Log.Debug("Starting new {0} Worker at index {1}...".Fmt(source.QueueName, i));
+                    Logger.Debug("Starting new {0} Worker at index {1}...".Fmt(source.QueueName, i));
                     workers[i] = source.Clone();
                     workers[i].Start();
                     worker.Dispose();
@@ -538,11 +538,11 @@ namespace ServiceStack.RabbitMq
                 if (!bgThread.Join(500))
                 {
                     //Ideally we shouldn't get here, but lets try our hardest to clean it up
-                    Log.Warn("Interrupting previous Background Thread: " + bgThread.Name);
+                    Logger.Warn("Interrupting previous Background Thread: " + bgThread.Name);
                     bgThread.Interrupt();
                     if (!bgThread.Join(TimeSpan.FromSeconds(3)))
                     {
-                        Log.Warn(bgThread.Name + " just wont die, so we're now aborting it...");
+                        Logger.Warn(bgThread.Name + " just wont die, so we're now aborting it...");
                         bgThread.Abort();
                     }
                 }
@@ -566,7 +566,7 @@ namespace ServiceStack.RabbitMq
             }
             catch (Exception ex)
             {
-                Log.Error("Error DisposeWorkerThreads(): ", ex);
+                Logger.Error("Error DisposeWorkerThreads(): ", ex);
             }
 
             try

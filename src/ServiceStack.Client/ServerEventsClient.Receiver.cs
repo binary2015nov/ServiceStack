@@ -15,15 +15,15 @@ namespace ServiceStack
 
     public class ServerEventReceiver : IReceiver
     {
-        public static ILog Log = LogManager.GetLogger(typeof(ServerEventReceiver));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(ServerEventReceiver));
 
         public ServerEventsClient Client { get; set; }
         public ServerEventMessage Request { get; set; }
 
         public virtual void NoSuchMethod(string selector, object message)
         {
-            if (Log.IsDebugEnabled)
-                Log.Debug($"NoSuchMethod defined for {selector}");
+            if (Logger.IsDebugEnabled)
+                Logger.Debug($"NoSuchMethod defined for {selector}");
         }
     }
 

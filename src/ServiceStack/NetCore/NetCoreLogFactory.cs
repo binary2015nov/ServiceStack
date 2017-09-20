@@ -22,9 +22,9 @@ namespace ServiceStack.NetCore
             return new NetCoreLog(loggerFactory.CreateLogger(type), debugEnabled);
         }
 
-        public ILog GetLogger(string typeName)
+        public ILog GetLogger(string name)
         {
-            return new NetCoreLog(loggerFactory.CreateLogger(typeName), debugEnabled);
+            return new NetCoreLog(loggerFactory.CreateLogger(name), debugEnabled);
         }
     }
 

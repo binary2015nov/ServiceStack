@@ -16,7 +16,7 @@ namespace ServiceStack.Serialization
     /// </summary>
     public class StringMapTypeDeserializer
     {
-        private static ILog Log = LogManager.GetLogger(typeof(StringMapTypeDeserializer));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(StringMapTypeDeserializer));
 
         internal class PropertySerializerEntry
         {
@@ -151,14 +151,14 @@ namespace ServiceStack.Serialization
                     var ignoredProperty = propertyName.ToLowerInvariant();
                     if (ignoredWarningsOnPropertyNames != null && !ignoredWarningsOnPropertyNames.Contains(ignoredProperty))
                     {
-                        Log.WarnFormat("Property '{0}' does not exist on type '{1}'", ignoredProperty, type.FullName);
+                        Logger.WarnFormat("Property '{0}' does not exist on type '{1}'", ignoredProperty, type.FullName);
                     }
                     return instance;
                 }
 
                 if (propertySerializerEntry.PropertySetFn == null)
                 {
-                    Log.WarnFormat("Could not set value of read-only property '{0}' on type '{1}'", propertyName,
+                    Logger.WarnFormat("Could not set value of read-only property '{0}' on type '{1}'", propertyName,
                                     type.FullName);
                     return instance;
                 }
@@ -172,7 +172,7 @@ namespace ServiceStack.Serialization
                 var value = propertySerializerEntry.PropertyParseStringFn(propertyTextValue);
                 if (value == null)
                 {
-                    Log.WarnFormat("Could not create instance on '{0}' for property '{1}' with text value '{2}'",
+                    Logger.WarnFormat("Could not create instance on '{0}' for property '{1}' with text value '{2}'",
                                     instance, propertyName, propertyTextValue);
                     return instance;
                 }

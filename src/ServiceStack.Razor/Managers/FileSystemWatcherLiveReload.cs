@@ -11,7 +11,7 @@ namespace ServiceStack.Razor.Managers
 
     public class FileSystemWatcherLiveReload : ILiveReload
     {
-        public static ILog Log = LogManager.GetLogger(typeof(FileSystemWatcherLiveReload));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(FileSystemWatcherLiveReload));
 
         /// <summary>
         /// The purpose of the FileSystemWatcher is to ensure razor pages are
@@ -48,7 +48,7 @@ namespace ServiceStack.Razor.Managers
         /// </summary>
         private void FileSystemWatcher_Error(object sender, ErrorEventArgs e)
         {
-            Log.WarnFormat("FileSystemWatcher Error: ", sender);
+            Logger.WarnFormat("FileSystemWatcher Error: ", sender);
         }
 
         protected virtual void FileSystemWatcher_Renamed(object sender, RenamedEventArgs e)
@@ -66,7 +66,7 @@ namespace ServiceStack.Razor.Managers
             }
             catch (Exception ex)
             {
-                Log.Warn("FileSystemWatcher_Renamed error: ", ex);
+                Logger.Warn("FileSystemWatcher_Renamed error: ", ex);
             }
         }
 
@@ -83,7 +83,7 @@ namespace ServiceStack.Razor.Managers
             }
             catch (Exception ex)
             {
-                Log.Warn("FileSystemWatcher_Deleted error: ", ex);
+                Logger.Warn("FileSystemWatcher_Deleted error: ", ex);
             }
         }
 
@@ -95,7 +95,7 @@ namespace ServiceStack.Razor.Managers
             }
             catch (Exception ex)
             {
-                Log.Warn("FileSystemWatcher_Created error: ", ex);
+                Logger.Warn("FileSystemWatcher_Created error: ", ex);
             }
         }
 
@@ -112,7 +112,7 @@ namespace ServiceStack.Razor.Managers
             }
             catch (Exception ex)
             {
-                Log.Warn("FileSystemWatcher_Changed error: ", ex);
+                Logger.Warn("FileSystemWatcher_Changed error: ", ex);
             }
         }
     }

@@ -7,14 +7,12 @@ namespace ServiceStack.Messaging
 {
     public class InMemoryTransientMessageFactory : IMessageFactory
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(InMemoryTransientMessageFactory));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(InMemoryTransientMessageFactory));
+
         private readonly InMemoryTransientMessageService  transientMessageService;
         internal MessageQueueClientFactory MqFactory { get; set; }
 
-        public InMemoryTransientMessageFactory()
-            : this(null)
-        {
-        }
+        public InMemoryTransientMessageFactory() : this(new InMemoryTransientMessageService()) { }
 
         public InMemoryTransientMessageFactory(InMemoryTransientMessageService transientMessageService)
         {

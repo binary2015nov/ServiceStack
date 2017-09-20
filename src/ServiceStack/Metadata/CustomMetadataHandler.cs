@@ -6,10 +6,9 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Metadata
 {
-    public class CustomMetadataHandler
-        : BaseMetadataHandler
+    public class CustomMetadataHandler : BaseMetadataHandler
     {
-        private static readonly new ILog Log = LogManager.GetLogger(typeof(CustomMetadataHandler));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(CustomMetadataHandler));
 
         public CustomMetadataHandler(string contentType, string format)
         {
@@ -36,7 +35,7 @@ namespace ServiceStack.Metadata
             catch (Exception ex)
             {
                 var error = $"Error serializing type '{dtoType.GetOperationName()}' with custom format '{this.ContentFormat}'";
-                Log.Error(error, ex);
+                Logger.Error(error, ex);
 
                 return $"{{Unable to show example output for type '{dtoType.GetOperationName()}' using the custom '{this.ContentFormat}' filter}}{ex.Message}";
             }

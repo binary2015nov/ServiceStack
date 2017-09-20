@@ -4,8 +4,6 @@ using System.Net;
 using Enyim.Caching;
 using Enyim.Caching.Configuration;
 using Enyim.Caching.Memcached;
-using ILog = ServiceStack.Logging.ILog;
-using LogManager = ServiceStack.Logging.LogManager;
 
 namespace ServiceStack.Caching.Memcached
 {
@@ -15,10 +13,9 @@ namespace ServiceStack.Caching.Memcached
     /// 
     /// Basically delegates all calls to Enyim.Caching.MemcachedClient with added diagnostics and logging.
     /// </summary>
-    public class MemcachedClientCache
-        : ICacheClient, IMemcachedClient
+    public class MemcachedClientCache : ICacheClient, IMemcachedClient
     {
-        protected ILog Log { get { return LogManager.GetLogger(GetType()); } }
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(MemcachedClientCache));
 
         private MemcachedClient _client;
 
@@ -303,7 +300,7 @@ namespace ServiceStack.Caching.Memcached
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(string.Format("Error trying to remove {0} from memcached", key), ex);
+                    Logger.Error(string.Format("Error trying to remove {0} from memcached", key), ex);
                 }
             }
         }
@@ -317,19 +314,19 @@ namespace ServiceStack.Caching.Memcached
         private T Execute<T>(Func<T> action)
         {
             DateTime before = DateTime.Now;
-            Log.DebugFormat("Executing action '{0}'", action.Method.Name);
+            Logger.DebugFormat("Executing action '{0}'", action.Method.Name);
 
             try
             {
                 T result = action();
                 TimeSpan timeTaken = DateTime.Now - before;
-                if (Log.IsDebugEnabled)
-                    Log.DebugFormat("Action '{0}' executed. Took {1} ms.", action.Method.Name, timeTaken.TotalMilliseconds);
+                if (Logger.IsDebugEnabled)
+                    Logger.DebugFormat("Action '{0}' executed. Took {1} ms.", action.Method.Name, timeTaken.TotalMilliseconds);
                 return result;
             }
             catch (Exception ex)
             {
-                Log.ErrorFormat("There was an error executing Action '{0}'. Message: {1}", action.Method.Name, ex.Message);
+                Logger.ErrorFormat("There was an error executing Action '{0}'. Message: {1}", action.Method.Name, ex.Message);
                 throw;
             }
         }
@@ -341,18 +338,18 @@ namespace ServiceStack.Caching.Memcached
         private void Execute(Action action)
         {
             DateTime before = DateTime.Now;
-            Log.DebugFormat("Executing action '{0}'", action.Method.Name);
+            Logger.DebugFormat("Executing action '{0}'", action.Method.Name);
 
             try
             {
                 action();
                 TimeSpan timeTaken = DateTime.Now - before;
-                if (Log.IsDebugEnabled)
-                    Log.DebugFormat("Action '{0}' executed. Took {1} ms.", action.Method.Name, timeTaken.TotalMilliseconds);
+                if (Logger.IsDebugEnabled)
+                    Logger.DebugFormat("Action '{0}' executed. Took {1} ms.", action.Method.Name, timeTaken.TotalMilliseconds);
             }
             catch (Exception ex)
             {
-                Log.ErrorFormat("There was an error executing Action '{0}'. Message: {1}", action.Method.Name, ex.Message);
+                Logger.ErrorFormat("There was an error executing Action '{0}'. Message: {1}", action.Method.Name, ex.Message);
                 throw;
             }
         }

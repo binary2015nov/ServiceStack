@@ -33,7 +33,7 @@ namespace ServiceStack.Support.Markdown
 
 	public class Evaluator
 	{
-	    private static ILog Log = LogManager.GetLogger(typeof (Evaluator));
+		private static readonly ILog Logger = LogManager.GetLogger(typeof(Evaluator));
 
 		const string StaticMethodName = "__tmp";
 #if !NETSTANDARD1_6
@@ -47,95 +47,92 @@ namespace ServiceStack.Support.Markdown
 		private Type[] GenericArgs { get; set; }
 		private IDictionary<string, Type> TypeProperties { get; set; }
 
-        public static readonly List<Assembly> Assemblies = new List<Assembly> {
-            typeof(string).GetAssembly(),       //"system.dll",
+		public static readonly List<Assembly> Assemblies = new List<Assembly> {
+			typeof(string).GetAssembly(),       //"system.dll",
 //			typeof(XmlDocument).GetAssembly(),  //"system.xml.dll",
-            typeof(System.Web.HtmlString).GetAssembly(), //"system.web.dll",
-            typeof(Expression).GetAssembly(),   //"system.core.dll",
-            typeof(AppHostBase).GetAssembly(),  //"ServiceStack.dll",
-            typeof(JsConfig).GetAssembly(),     //"ServiceStack.Text.dll",
-            typeof(IService).GetAssembly(),   //"ServiceStack.Interfaces.dll",
-            typeof(UrnId).GetAssembly(), //"ServiceStack.Common.dll"
-        };
+			typeof(System.Web.HtmlString).GetAssembly(), //"system.web.dll",
+			typeof(Expression).GetAssembly(),   //"system.core.dll",
+			typeof(AppHostBase).GetAssembly(),  //"ServiceStack.dll",
+			typeof(JsConfig).GetAssembly(),     //"ServiceStack.Text.dll",
+			typeof(IService).GetAssembly(),   //"ServiceStack.Interfaces.dll",
+			typeof(UrnId).GetAssembly(), //"ServiceStack.Common.dll"
+		};
 
-	    public static readonly List<string> AssemblyNames = new List<string> {
-	        "System",
-            "System.Text",
+		public static readonly List<string> AssemblyNames = new List<string> {
+			"System",
+			"System.Text",
 //            "System.Xml",
-            "System.Web",
-            "System.Collections",
-            "System.Collections.Generic",
-            "System.Linq",
-            "System.Linq.Expressions",
-            "ServiceStack.Html",
-            "ServiceStack.Markdown"                                                                     
-        };
+			"System.Web",
+			"System.Collections",
+			"System.Collections.Generic",
+			"System.Linq",
+			"System.Linq.Expressions",
+			"ServiceStack.Html",
+			"ServiceStack.Markdown"                                                                     
+		};
 
-        public static readonly Dictionary<string,string> NamespaceAssemblies = new Dictionary<string, string>();
+		public static readonly Dictionary<string,string> NamespaceAssemblies = new Dictionary<string, string>();
 
-        //Use NamespaceAssemblies if assemblyName is not also its namespace
-        public static void AddAssembly(string assemblyName)
-        {
-            if (NamespaceAssemblies.ContainsKey(assemblyName))
-                assemblyName = NamespaceAssemblies[assemblyName];
-
-            if (AssemblyNames.Contains(assemblyName)) return;
-            AssemblyNames.Add(assemblyName);
-
-            try {
-                var assembly = Assembly.Load(new AssemblyName(assemblyName));
-                if (!Assemblies.Contains(assembly))
-                    Assemblies.Add(assembly);
-            } catch (System.IO.FileNotFoundException) {
-                //Possibly the assembly name differs from the namespace name
-                try
-                {
-                    FindNamespaceInLoadedAssemblies(assemblyName);
-                }
-                catch (Exception ex) {
-                    Log.Error("Can't load assembly: " + assemblyName, ex);
-                }
-            } catch (Exception ex) {
-                Log.Error("Can't load assembly: " + assemblyName, ex);
-            }
-        }
-
-        private static void FindNamespaceInLoadedAssemblies(string assemblyNamespace)
-        {
-#if !NETSTANDARD1_6
-            var assemblies = from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                             from type in assembly.GetTypes()
-                             where type.Namespace == assemblyNamespace
-                             select type.Assembly;
-
-            foreach (var a in assemblies) {
-                if (!Assemblies.Contains(a))
-                    Assemblies.Add(a);
-            }
-#endif
-        }
-
-        public static Type FindType(string typeName)
-        {
-            if (typeName == null || typeName.Contains(".")) return null;
-            var type = Type.GetType(typeName);
-            if (type != null) return type;
-            
-            foreach (var assembly in Assemblies)
-            {
-                var searchType = assembly.GetName().Name + "." + typeName;
-                type = assembly.GetType(searchType);
-                if (type != null) 
-                    return type;
-            }
-
-            return null;
-        }
-
-		public Evaluator(IEnumerable<EvaluatorItem> items)
-			: this(items, null, null, null)
+		//Use NamespaceAssemblies if assemblyName is not also its namespace
+		public static void AddAssembly(string assemblyName)
 		{
+			if (NamespaceAssemblies.ContainsKey(assemblyName))
+				assemblyName = NamespaceAssemblies[assemblyName];
+
+			if (AssemblyNames.Contains(assemblyName)) return;
+			AssemblyNames.Add(assemblyName);
+
+			try {
+				var assembly = Assembly.Load(new AssemblyName(assemblyName));
+				if (!Assemblies.Contains(assembly))
+					Assemblies.Add(assembly);
+			} catch (System.IO.FileNotFoundException) {
+				//Possibly the assembly name differs from the namespace name
+				try
+				{
+					FindNamespaceInLoadedAssemblies(assemblyName);
+				}
+				catch (Exception ex) {
+					Logger.Error("Can't load assembly: " + assemblyName, ex);
+				}
+			} catch (Exception ex) {
+				Logger.Error("Can't load assembly: " + assemblyName, ex);
+			}
 		}
+
+		private static void FindNamespaceInLoadedAssemblies(string assemblyNamespace)
+		{
+#if !NETSTANDARD1_6
+			var assemblies = from assembly in AppDomain.CurrentDomain.GetAssemblies()
+							 from type in assembly.GetTypes()
+							 where type.Namespace == assemblyNamespace
+							 select type.Assembly;
+
+			foreach (var a in assemblies) {
+				if (!Assemblies.Contains(a))
+					Assemblies.Add(a);
+			}
+#endif
+		}
+
+		public static Type FindType(string typeName)
+		{
+			if (typeName == null || typeName.Contains(".")) return null;
+			var type = Type.GetType(typeName);
+			if (type != null) return type;
+			
+			foreach (var assembly in Assemblies)
+			{
+				var searchType = assembly.GetName().Name + "." + typeName;
+				type = assembly.GetType(searchType);
+				if (type != null) 
+					return type;
+			}
+
+			return null;
+		}
+
+		public Evaluator(IEnumerable<EvaluatorItem> items) : this(items, null, null, null) { }
 
 		public Evaluator(IEnumerable<EvaluatorItem> items,
 			Type baseType, Type[] genericArgs, IDictionary<string, Type> typeProperties)
@@ -155,7 +152,7 @@ namespace ServiceStack.Support.Markdown
 			EvaluatorItem[] items = 
 			{
 				new EvaluatorItem {
-	                ReturnType  = returnType, 
+					ReturnType  = returnType, 
 					Expression = expression, 
 					Name = name,
 					Params = exprParams ?? new Dictionary<string, Type>(),
@@ -179,7 +176,7 @@ namespace ServiceStack.Support.Markdown
 					//|| type.FullName == null
 					? null
 					: StringBuilderCache.Allocate()
-                        .Append(type.FullName.Replace('+', '.').LeftPart('`'));
+						.Append(type.FullName.Replace('+', '.').LeftPart('`'));
 
 				if (typeName == null) return null;
 
@@ -203,17 +200,17 @@ namespace ServiceStack.Support.Markdown
 
 				return StringBuilderCache.Retrieve(typeName);
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				//Console.WriteLine(ex);
+				Logger.Error("Get type name eror: " + ex.Message);
 				throw;
 			}
 		}
 
 		private static readonly bool IsVersion4AndUp = Type.GetType("System.Collections.Concurrent.Partitioner") != null;
-        
+		
 #if NETSTANDARD1_6
-		private void ConstructEvaluator(IEnumerable<EvaluatorItem> items) {}
+		private void ConstructEvaluator(IEnumerable<EvaluatorItem> items) { }
 #else
 		private static void AddAssembly(System.CodeDom.Compiler.CompilerParameters cp, string location)
 		{
@@ -226,9 +223,9 @@ namespace ServiceStack.Support.Markdown
 			cp.ReferencedAssemblies.Add(location);
 		}
 
-        private void ConstructEvaluator(IEnumerable<EvaluatorItem> items)
+		private void ConstructEvaluator(IEnumerable<EvaluatorItem> items)
 		{
-            var codeCompiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("CSharp");
+			var codeCompiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("CSharp");
 
 			var cp = new System.CodeDom.Compiler.CompilerParameters 
 			{
@@ -236,11 +233,11 @@ namespace ServiceStack.Support.Markdown
 				GenerateInMemory = true,
 			};
 			Assemblies.ForEach(x => AddAssembly(cp, x.Location));
-            
+			
 			var code = StringBuilderCache.Allocate();
 
-            AssemblyNames.ForEach(x => 
-                code.AppendFormat("using {0};\n", x));
+			AssemblyNames.ForEach(x => 
+				code.AppendFormat("using {0};\n", x));
 
 			code.Append(
 @"
@@ -316,7 +313,7 @@ namespace CSharpEval
 			{
 				if (!Env.IsMono)
 				{
-                    cp.ReferencedAssemblies.Add(Env.ReferenceAssembyPath + @"System.Core.dll");
+					cp.ReferencedAssemblies.Add(Env.ReferenceAssembyPath + @"System.Core.dll");
 				}
 			}
 
@@ -369,13 +366,13 @@ namespace CSharpEval
 			{
 				assemblies.Add(assembly);
 
-                if (assembly.IsDynamic()) continue;
+				if (assembly.IsDynamic()) continue;
 				AddAssembly(cp, assembly.Location);
 			}
 		}
 #endif
 
-        private void AddPropertiesToTypeIfAny(StringBuilder code)
+		private void AddPropertiesToTypeIfAny(StringBuilder code)
 		{
 			if (this.TypeProperties != null)
 			{

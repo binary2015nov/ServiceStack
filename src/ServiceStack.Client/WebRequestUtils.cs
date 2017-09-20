@@ -32,7 +32,7 @@ namespace ServiceStack
     // by adamfowleruk
     public class AuthenticationInfo
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(AuthenticationInfo));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(AuthenticationInfo));
 
         public string method { get; set; }
         public string realm { get; set; }

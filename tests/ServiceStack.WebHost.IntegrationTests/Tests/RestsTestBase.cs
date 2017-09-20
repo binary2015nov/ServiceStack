@@ -2,9 +2,9 @@ using System;
 using System.IO;
 using System.Net;
 using NUnit.Framework;
+using Funq;
 using ServiceStack.Common.Tests;
 using ServiceStack.Host;
-using ServiceStack.Logging;
 using ServiceStack.Text;
 using ServiceStack.Web;
 using ServiceStack.WebHost.IntegrationTests.Services;
@@ -13,13 +13,11 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
     public class RestsTestBase : TestBase
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(RestsTestBase));
-
         readonly HostConfig defaultConfig = new HostConfig();
 
         public RestsTestBase() : base(Constant.ServiceStackBaseHost, typeof(HelloService).Assembly) { }
 
-        protected override void Configure(Funq.Container container) { }
+        protected override void Configure(Container container) { }
 
         public HttpWebResponse GetWebResponse(string uri, string acceptContentTypes)
         {
@@ -66,9 +64,9 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
                 if (webEx.Status == WebExceptionStatus.ProtocolError)
                 {
                     var errorResponse = ((HttpWebResponse)webEx.Response);
-                    Log.Error(webEx);
-                    Log.DebugFormat("Status Code : {0}", errorResponse.StatusCode);
-                    Log.DebugFormat("Status Description : {0}", errorResponse.StatusDescription);
+                    Console.WriteLine(webEx);
+                    Console.WriteLine("Status Code : {0}", errorResponse.StatusCode);
+                    Console.WriteLine("Status Description : {0}", errorResponse.StatusDescription);
 
                     using (var stream = errorResponse.GetResponseStream())
                     {

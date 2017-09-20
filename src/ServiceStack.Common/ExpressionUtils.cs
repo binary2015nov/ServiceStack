@@ -9,7 +9,7 @@ namespace ServiceStack
 {
     public static class ExpressionUtils
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(ExpressionUtils));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(ExpressionUtils));
 
         public static PropertyInfo ToPropertyInfo(this Expression fieldExpr)
         {
@@ -124,7 +124,7 @@ namespace ServiceStack
                     }
                     catch (Exception ex)
                     {
-                        Log.Error("Error compiling expression in MemberBinding.GetValue()", ex);
+                        Logger.Error("Error compiling expression in MemberBinding.GetValue()", ex);
 
                         //Fallback to compile and execute
                         var member = Expression.Convert(assign.Expression, typeof(object));

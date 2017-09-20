@@ -3,6 +3,7 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using ServiceStack.Host;
 using ServiceStack.Host.Handlers;
 using ServiceStack.Html;
@@ -14,13 +15,12 @@ using ServiceStack.Web;
 
 namespace ServiceStack.Razor
 {
-    using System.Reflection;
-
     public class RazorFormat : IPlugin, IRazorPlugin, IRazorConfig
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(RazorFormat));
+
         public const string TemplatePlaceHolder = "@RenderBody()";
 
-        private static readonly ILog Log = LogManager.GetLogger(typeof(RazorFormat));
         public static RazorFormat Instance;
 
         public RazorFormat()
@@ -173,12 +173,12 @@ namespace ServiceStack.Razor
         {
             if (Instance != null)
             {
-                Log.Warn("RazorFormat plugin should only be initialized once");
+                Logger.Warn("RazorFormat plugin should only be initialized once");
 
                 if (ViewManager != null && PageResolver != null)
                     return this;
 
-                Log.Warn("Incomplete initialization, RazorFormat.Instance set but ViewManager/PageResolver is null");
+                Logger.Warn("Incomplete initialization, RazorFormat.Instance set but ViewManager/PageResolver is null");
             }
 
             Instance = this;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Web;
 using ServiceStack.Configuration;
+using ServiceStack.Logging;
 using ServiceStack.Text;
 
 namespace ServiceStack.Auth
@@ -13,6 +14,8 @@ namespace ServiceStack.Auth
     /// </summary>
     public class FacebookAuthProvider : OAuthProvider
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(FacebookAuthProvider));
+
         public const string Name = "facebook";
         public static string Realm = "https://graph.facebook.com/v2.8/";
         public static string PreAuthUrl = "https://www.facebook.com/dialog/oauth";
@@ -61,7 +64,7 @@ namespace ServiceStack.Auth
             var hasError = !error.IsNullOrEmpty();
             if (hasError)
             {
-                Log.Error($"Facebook error callback. {httpRequest.QueryString}");
+                Logger.Error($"Facebook error callback. {httpRequest.QueryString}");
                 return authService.Redirect(FailedRedirectUrlFilter(this, session.ReferrerUrl.SetParam("f", error)));
             }             
         
@@ -135,7 +138,7 @@ namespace ServiceStack.Auth
             }
             catch (Exception ex)
             {
-                Log.Error($"Could not retrieve facebook user info for '{tokens.DisplayName}'", ex);
+                Logger.Error($"Could not retrieve facebook user info for '{tokens.DisplayName}'", ex);
             }
 
             LoadUserOAuthProvider(userSession, tokens);

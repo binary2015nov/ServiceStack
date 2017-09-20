@@ -13,7 +13,7 @@ namespace ServiceStack
 {
     public class CsvRequestLogger : InMemoryRollingRequestLogger
     {
-        private static readonly ILog log = LogManager.GetLogger(typeof(CsvRequestLogger));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(CsvRequestLogger));
 
         readonly object semaphore = new object();
         private List<RequestLogEntry> logs = new List<RequestLogEntry>();
@@ -67,7 +67,7 @@ namespace ServiceStack
             }
             catch (Exception ex)
             {
-                log.Error($"Could not read last entry from '{log}'", ex);
+                Logger.Error($"Could not read last entry from '{Logger}'", ex);
             }
             return null;
         }
@@ -133,7 +133,7 @@ namespace ServiceStack
             }
             catch (Exception ex)
             {
-                log.Error(ex);
+                Logger.Error(ex);
             }
         }
 

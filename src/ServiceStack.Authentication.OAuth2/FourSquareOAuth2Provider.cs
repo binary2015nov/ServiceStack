@@ -5,6 +5,7 @@ using DotNetOpenAuth.Messaging;
 using DotNetOpenAuth.OAuth2;
 using ServiceStack.Auth;
 using ServiceStack.Configuration;
+using ServiceStack.Logging;
 using ServiceStack.Text;
 
 namespace ServiceStack.Authentication.OAuth2
@@ -15,6 +16,8 @@ namespace ServiceStack.Authentication.OAuth2
     /// </summary>
     public class FourSquareOAuth2Provider : OAuth2Provider
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(FourSquareOAuth2Provider));
+
         public const string Name = "FourSquare";
 
         public const string Realm = "https://foursquare.com/oauth2/authenticate";
@@ -105,7 +108,7 @@ namespace ServiceStack.Authentication.OAuth2
                 }
                 catch (ProtocolException ex)
                 {
-                    Log.Error("Failed to login to {0}".Fmt(this.Provider), ex);
+                    Logger.Error("Failed to login to {0}".Fmt(this.Provider), ex);
                     return authService.Redirect(session.ReferrerUrl.AddHashParam("f", "Unknown"));
                 }
             }

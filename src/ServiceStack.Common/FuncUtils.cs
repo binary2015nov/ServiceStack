@@ -5,7 +5,7 @@ namespace ServiceStack
 {
     public static class FuncUtils
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(FuncUtils));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(FuncUtils));
 
         /// <summary>
         /// Invokes the action provided and returns true if no excpetion was thrown.
@@ -22,7 +22,7 @@ namespace ServiceStack
             }
             catch (Exception ex)
             {
-                Log.Error(ex.Message, ex);
+                Logger.Error(ex.Message, ex);
             }
             return false;
         }
@@ -40,7 +40,7 @@ namespace ServiceStack
             }
             catch (Exception ex)
             {
-                Log.Error(ex.Message, ex);
+                Logger.Error(ex.Message, ex);
             }
             return default(T);
         }

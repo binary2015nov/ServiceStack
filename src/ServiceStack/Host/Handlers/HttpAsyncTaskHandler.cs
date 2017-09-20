@@ -13,7 +13,7 @@ namespace ServiceStack.Host.Handlers
 {
     public abstract class HttpAsyncTaskHandler : IHttpAsyncHandler, IServiceStackHandler
     {
-        protected static ILog Log = LogManager.GetLogger(typeof(HttpAsyncTaskHandler));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(HttpAsyncTaskHandler));
 
         public static RequestHandlerInfo LastRequestInfo { get; private set; }
 
@@ -69,7 +69,7 @@ namespace ServiceStack.Host.Handlers
 
         public virtual void ProcessRequest(IRequest httpReq, IResponse httpRes, string operationName)
         {
-            Log.Error($"HttpAsyncTaskHandler.ProcessRequest() that should never have been called, was just called from: {Environment.StackTrace}");
+            Logger.Error($"HttpAsyncTaskHandler.ProcessRequest() that should never have been called, was just called from: {Environment.StackTrace}");
             ProcessRequestAsync(httpReq, httpRes, operationName).Wait();
         }
 
@@ -184,7 +184,7 @@ namespace ServiceStack.Host.Handlers
             catch (Exception writeErrorEx)
             {
                 //Exception in writing to response should not hide the original exception
-                Log.Info("Failed to write error to response: {0}", writeErrorEx);
+                Logger.Info("Failed to write error to response: {0}", writeErrorEx);
                 //rethrow the original exception
                 return ex.AsTaskException();
             }

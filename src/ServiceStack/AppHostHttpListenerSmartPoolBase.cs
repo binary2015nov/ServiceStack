@@ -12,7 +12,8 @@ namespace ServiceStack
 {
     public abstract class AppHostHttpListenerSmartPoolBase : AppHostHttpListenerBase
     {
-        private readonly ILog log = LogManager.GetLogger(typeof(AppHostHttpListenerSmartPoolBase));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(AppHostHttpListenerSmartPoolBase));
+
         private readonly AutoResetEvent listenForNextRequest = new AutoResetEvent(false);
         private readonly SmartThreadPool threadPoolManager;
 
@@ -68,8 +69,6 @@ namespace ServiceStack
             }
         }
 
-        private bool IsListening => this.IsStarted && this.Listener != null && this.Listener.IsListening;
-
         // Loop here to begin processing of new requests.
         protected override void Listen(object state)
         {
@@ -84,7 +83,7 @@ namespace ServiceStack
                 }
                 catch (Exception ex)
                 {
-                    log.Error("Listen()", ex);
+                    Logger.Error("Listen()", ex);
                     return;
                 }
                 if (Listener == null) return;
@@ -104,7 +103,7 @@ namespace ServiceStack
             {
                 if (!isListening)
                 {
-                    log.DebugFormat("Ignoring ListenerCallback() as HttpListener is no longer listening");
+                    Logger.DebugFormat("Ignoring ListenerCallback() as HttpListener is no longer listening");
                     return;
                 }
                 // The EndGetContext() method, as with all Begin/End asynchronous methods in the .NET Framework,
@@ -118,7 +117,7 @@ namespace ServiceStack
                 // method, and again, that is just the way most Begin/End asynchronous
                 // methods of the .NET Framework work.
                 string errMsg = ex + ": " + isListening;
-                log.Warn(errMsg);
+                Logger.Warn(errMsg);
                 return;
             }
             finally
@@ -130,8 +129,8 @@ namespace ServiceStack
                 listenForNextRequest.Set();
             }
 
-            if (Config.DebugMode && log.IsDebugEnabled)
-                log.Debug($"{context.Request.UserHostAddress} Request : {context.Request.RawUrl}");
+            if (Config.DebugMode && Logger.IsDebugEnabled)
+                Logger.Debug($"{context.Request.UserHostAddress} Request : {context.Request.RawUrl}");
 
             OnBeginRequest(context);
 

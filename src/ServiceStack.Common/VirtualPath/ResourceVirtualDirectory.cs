@@ -11,7 +11,7 @@ namespace ServiceStack.VirtualPath
 {
     public class ResourceVirtualDirectory : AbstractVirtualDirectoryBase
     {
-        private static ILog Log = LogManager.GetLogger(typeof(ResourceVirtualDirectory));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(ResourceVirtualDirectory));
 
         public static HashSet<string> EmbeddedResourceTreatAsFiles { get; set; } = new HashSet<string>();
 
@@ -115,7 +115,7 @@ namespace ServiceStack.VirtualPath
                 var mrInfo = resourceNames.FirstOrDefault(x => backingAssembly.GetManifestResourceInfo(x) != null);
                 if (mrInfo == null)
                 {
-                    Log.Warn("Virtual file not found: " + fullResourceName);
+                    Logger.Warn("Virtual file not found: " + fullResourceName);
                     return null;
                 }
 
@@ -123,7 +123,7 @@ namespace ServiceStack.VirtualPath
             }
             catch (Exception ex)
             {
-                Log.Warn(ex.Message, ex);
+                Logger.Warn(ex.Message, ex);
                 return null;
             }
         }

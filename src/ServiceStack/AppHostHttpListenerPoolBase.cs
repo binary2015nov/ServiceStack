@@ -14,6 +14,8 @@ namespace ServiceStack
 {
     public abstract class AppHostHttpListenerPoolBase : AppHostHttpListenerBase
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(AppHostHttpListenerPoolBase));
+
         private class ThreadPoolManager : IDisposable
         {
             private readonly object syncRoot = new object();
@@ -68,25 +70,24 @@ namespace ServiceStack
 
         private readonly AutoResetEvent listenForNextRequest = new AutoResetEvent(false);
         private readonly ThreadPoolManager threadPoolManager;
-        private readonly ILog log = LogManager.GetLogger(typeof(HttpListenerBase));
 
         protected AppHostHttpListenerPoolBase(string serviceName, params Assembly[] assembliesWithServices)
-            : this(serviceName, CalculatePoolSize(), assembliesWithServices)
-        { }
+            : this(serviceName, CalculatePoolSize(), assembliesWithServices) { }
 
         protected AppHostHttpListenerPoolBase(string serviceName, int poolSize, params Assembly[] assembliesWithServices)
             : base(serviceName, assembliesWithServices)
-        { threadPoolManager = new ThreadPoolManager(poolSize); }
+        {
+            threadPoolManager = new ThreadPoolManager(poolSize);
+        }
 
         protected AppHostHttpListenerPoolBase(string serviceName, string handlerPath, params Assembly[] assembliesWithServices)
-            : this(serviceName, handlerPath, CalculatePoolSize(), assembliesWithServices)
-        { }
+            : this(serviceName, handlerPath, CalculatePoolSize(), assembliesWithServices) { }
 
         protected AppHostHttpListenerPoolBase(string serviceName, string handlerPath, int poolSize, params Assembly[] assembliesWithServices)
             : base(serviceName, handlerPath, assembliesWithServices)
-        { threadPoolManager = new ThreadPoolManager(poolSize); }
-
-        private bool IsListening => this.IsStarted && this.Listener != null && this.Listener.IsListening;
+        {
+            threadPoolManager = new ThreadPoolManager(poolSize);
+        }
 
         // Loop here to begin processing of new requests.
         protected override void Listen(object state)
@@ -102,7 +103,7 @@ namespace ServiceStack
                 }
                 catch (Exception ex)
                 {
-                    log.Error("Listen()", ex);
+                    Logger.Error("Listen()", ex);
                     return;
                 }
                 if (Listener == null) return;
@@ -122,7 +123,7 @@ namespace ServiceStack
             {
                 if (!isListening)
                 {
-                    log.DebugFormat("Ignoring ListenerCallback() as HttpListener is no longer listening");
+                    Logger.DebugFormat("Ignoring ListenerCallback() as HttpListener is no longer listening");
                     return;
                 }
                 // The EndGetContext() method, as with all Begin/End asynchronous methods in the .NET Framework,
@@ -136,7 +137,7 @@ namespace ServiceStack
                 // method, and again, that is just the way most Begin/End asynchronous
                 // methods of the .NET Framework work.
                 string errMsg = ex + ": " + isListening;
-                log.Warn(errMsg);
+                Logger.Warn(errMsg);
                 return;
             }
             finally
@@ -149,7 +150,7 @@ namespace ServiceStack
             }
 
             if (Config.DebugMode)
-                log.DebugFormat("{0} Request : {1}", context.Request.UserHostAddress, context.Request.RawUrl);
+                Logger.DebugFormat("{0} Request : {1}", context.Request.UserHostAddress, context.Request.RawUrl);
 
             OnBeginRequest(context);
 

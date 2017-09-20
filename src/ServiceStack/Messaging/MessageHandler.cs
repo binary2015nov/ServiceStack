@@ -9,10 +9,9 @@ namespace ServiceStack.Messaging
     /// Expects to be called in 1 thread. i.e. Non Thread-Safe.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class MessageHandler<T>
-        : IMessageHandler, IDisposable
+    public class MessageHandler<T> : IMessageHandler, IDisposable
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(MessageHandler<T>));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(MessageHandler<>));
 
         public const int DefaultRetryCount = 2; //Will be a total of 3 attempts
         private readonly IMessageService messageService;
@@ -85,9 +84,8 @@ namespace ServiceStack.Messaging
             }
             catch (Exception ex)
             {
-                Log.Error("Error serializing message from mq server: " + ex.Message, ex);
+                Logger.Error("Error serializing message from mq server: " + ex.Message, ex);
             }
-
             return msgsProcessed;
         }
 
@@ -100,7 +98,7 @@ namespace ServiceStack.Messaging
 
         private void DefaultInExceptionHandler(IMessageHandler mqHandler, IMessage<T> message, Exception ex)
         {
-            Log.Error("Message exception handler threw an error", ex);
+            Logger.Error("Message exception handler threw an error", ex);
 
             bool requeue = !(ex is UnRetryableMessagingException)
                 && message.RetryAttempts < retryCount;
@@ -219,7 +217,7 @@ namespace ServiceStack.Messaging
                         }
                         catch (Exception ex)
                         {
-                            Log.Error($"Could not send response to '{mqReplyTo}' with client '{replyClient.GetType().GetOperationName()}'", ex);
+                            Logger.Error($"Could not send response to '{mqReplyTo}' with client '{replyClient.GetType().GetOperationName()}'", ex);
 
                             // Leave as-is to work around a Mono 2.6.7 compiler bug
                             if (!responseType.IsUserType()) return;
@@ -246,7 +244,7 @@ namespace ServiceStack.Messaging
                 }
                 catch (Exception exHandlerEx)
                 {
-                    Log.Error("Message exception handler threw an error", exHandlerEx);
+                    Logger.Error("Message exception handler threw an error", exHandlerEx);
                 }
             }
             finally

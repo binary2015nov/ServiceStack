@@ -11,7 +11,7 @@ namespace ServiceStack
 {
     public class RedisErrorLoggerFeature : IPlugin
     {
-        public static ILog Log = LogManager.GetLogger(typeof(RedisErrorLoggerFeature));
+        public static readonly ILog Logger = LogManager.GetLogger(typeof(RedisErrorLoggerFeature));
 
         public IRedisClientsManager redisManager;
 
@@ -79,7 +79,7 @@ namespace ServiceStack
             }
             catch (Exception suppressRedisException)
             {
-                Log.Error("Could not append exception to redis service error logs", suppressRedisException);
+                Logger.Error("Could not append exception to redis service error logs", suppressRedisException);
             }
         }
 

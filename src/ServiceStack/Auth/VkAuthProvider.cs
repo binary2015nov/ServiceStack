@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using ServiceStack.Configuration;
+using ServiceStack.Logging;
 using ServiceStack.Text;
 using ServiceStack.Web;
 
@@ -11,13 +12,12 @@ namespace ServiceStack.Auth {
     ///   The Callback URL for your app should match the CallbackUrl provided.
     /// </summary>
     public class VkAuthProvider : OAuthProvider {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(VkAuthProvider));
+
         public const string Name = "vkcom";
         public static string Realm = "https://oauth.VK.ru/";
         public static string PreAuthUrl = "https://oauth.vk.com/authorize";
         public static string TokenUrl = "https://oauth.vk.com/access_token";
-
-        static VkAuthProvider() {
-        }
 
         public VkAuthProvider(IAppSettings appSettings)
             : base(appSettings, Realm, Name, "ApplicationId", "SecureKey") {
@@ -44,7 +44,7 @@ namespace ServiceStack.Auth {
 
                authInfo = json.ArrayObjects()[0].GetUnescaped("response").ArrayObjects()[0];
             } catch (Exception e) {
-                Log.Error($"VK get user info error: {e.Message}");
+                Logger.Error($"VK get user info error: {e.Message}");
             }
 
             return authInfo;
@@ -58,7 +58,7 @@ namespace ServiceStack.Auth {
                 var authInfo = GetUserInfo(request.AccessToken, request.AccessTokenSecret);
 
                 if(authInfo == null || !(authInfo.Get("error") ?? authInfo.Get("error_description")).IsNullOrEmpty()){
-                    Log.Error($"VK access_token error callback. {authInfo}");                    
+                    Logger.Error($"VK access_token error callback. {authInfo}");                    
                     return HttpError.Unauthorized("AccessToken is not for App: " + ApplicationId);
                 }
 
@@ -81,7 +81,7 @@ namespace ServiceStack.Auth {
 
             bool hasError = !error.IsNullOrEmpty();
             if (hasError) {
-                Log.Error($"VK error callback. {httpRequest.QueryString}");
+                Logger.Error($"VK error callback. {httpRequest.QueryString}");
                 return authService.Redirect(FailedRedirectUrlFilter(this, session.ReferrerUrl.SetParam("f", error)));
             }
 
@@ -106,8 +106,9 @@ namespace ServiceStack.Auth {
                 //VK does not throw exception, but returns error property in JSON response
                 string accessTokenError = authInfo.Get("error") ?? authInfo.Get("error_description");
 
-                if (!accessTokenError.IsNullOrEmpty()) {
-                    Log.Error($"VK access_token error callback. {authInfo}");
+                if (!accessTokenError.IsNullOrEmpty())
+                {
+                    Logger.Error($"VK access_token error callback. {authInfo}");
                     return authService.Redirect(session.ReferrerUrl.SetParam("f", "AccessTokenFailed"));
                 }
                 tokens.AccessTokenSecret = authInfo.Get("access_token");
@@ -181,7 +182,7 @@ namespace ServiceStack.Auth {
                     }
                 }
             } catch (Exception ex) {
-                Log.Error($"Could not retrieve VK user info for '{tokens.DisplayName}'", ex);
+                Logger.Error($"Could not retrieve VK user info for '{tokens.DisplayName}'", ex);
             }
 
             LoadUserOAuthProvider(userSession, tokens);

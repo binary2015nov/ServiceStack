@@ -10,9 +10,9 @@ namespace ServiceStack.RabbitMq
 {
     public class RabbitMqWorker : IDisposable
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(RabbitMqWorker));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(RabbitMqWorker));
 
-        readonly object msgLock = new object();
+        private readonly object msgLock = new object();
 
         private readonly RabbitMqMessageFactory mqFactory;
         private IMessageQueueClient mqClient;
@@ -99,7 +99,8 @@ namespace ServiceStack.RabbitMq
 
             if (Interlocked.CompareExchange(ref status, WorkerStatus.Starting, WorkerStatus.Stopped) == WorkerStatus.Stopped)
             {
-                Log.Debug("Starting MQ Handler Worker: {0}...".Fmt(QueueName));
+                if (Logger.IsDebugEnabled)
+                    Logger.Debug("Starting MQ Handler Worker: {0}...".Fmt(QueueName));
 
                 //Should only be 1 thread past this point
                 bgThread = new Thread(Run)
@@ -142,7 +143,7 @@ namespace ServiceStack.RabbitMq
                 //Ignore handling rare, but expected exceptions from KillBgThreadIfExists()
                 if (ex is ThreadInterruptedException || ex is ThreadAbortException)
                 {
-                    Log.Warn("Received {0} in Worker: {1}".Fmt(ex.GetType().Name, QueueName));
+                    Logger.Warn("Received {0} in Worker: {1}".Fmt(ex.GetType().Name, QueueName));
                     return;
                 }
 #endif
@@ -222,7 +223,8 @@ namespace ServiceStack.RabbitMq
                 catch (Exception ex)
                 {
                     var waitMs = Math.Min(retries++ * 100, 10000);
-                    Log.Debug("Retrying to Reconnect after {0}ms...".Fmt(waitMs), ex);
+                    if (Logger.IsDebugEnabled)
+                        Logger.Debug("Retrying to Reconnect after {0}ms...".Fmt(waitMs), ex);
                     Thread.Sleep(waitMs);
                 }
             }
@@ -277,7 +279,7 @@ namespace ServiceStack.RabbitMq
                 catch (Exception ex)
                 {
                     var waitMs = Math.Min(retries++ * 100, 10000);
-                    Log.Debug("Retrying to Reconnect Subscription after {0}ms...".Fmt(waitMs), ex);
+                    Logger.Debug("Retrying to Reconnect Subscription after {0}ms...".Fmt(waitMs), ex);
                     Thread.Sleep(waitMs);
                 }
             }
@@ -298,7 +300,7 @@ namespace ServiceStack.RabbitMq
 
             if (Interlocked.CompareExchange(ref status, WorkerStatus.Stopping, WorkerStatus.Started) == WorkerStatus.Started)
             {
-                Log.Debug("Stopping Rabbit MQ Handler Worker: {0}...".Fmt(QueueName));
+                Logger.Debug("Stopping Rabbit MQ Handler Worker: {0}...".Fmt(QueueName));
                 if (mqFactory.UsePolling)
                 {
                     Thread.Sleep(100);
@@ -330,11 +332,11 @@ namespace ServiceStack.RabbitMq
                     if (!bgThread.Join(500))
                     {
                         //Ideally we shouldn't get here, but lets try our hardest to clean it up
-                        Log.Warn("Interrupting previous Background Worker: " + bgThread.Name);
+                        Logger.Warn("Interrupting previous Background Worker: " + bgThread.Name);
                         bgThread.Interrupt();
                         if (!bgThread.Join(TimeSpan.FromSeconds(3)))
                         {
-                            Log.Warn(bgThread.Name + " just wont die, so we're now aborting it...");
+                            Logger.Warn(bgThread.Name + " just wont die, so we're now aborting it...");
                             bgThread.Abort();
                         }
                     }
@@ -363,7 +365,7 @@ namespace ServiceStack.RabbitMq
             }
             catch (Exception ex)
             {
-                Log.Error("Error Disposing MessageHandlerWorker for: " + QueueName, ex);
+                Logger.Error("Error Disposing MessageHandlerWorker for: " + QueueName, ex);
             }
         }
 

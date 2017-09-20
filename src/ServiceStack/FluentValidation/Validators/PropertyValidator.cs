@@ -22,8 +22,8 @@ namespace ServiceStack.FluentValidation.Validators
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Linq.Expressions;
-    using System.Threading;
-    using System.Threading.Tasks;
+	using System.Threading;
+	using System.Threading.Tasks;
 	using Resources;
 	using Results;
 
@@ -32,7 +32,6 @@ namespace ServiceStack.FluentValidation.Validators
 		private IStringSource errorSource;
 		private IStringSource originalErrorSource;
 		private IStringSource errorCodeSource;
-		private IStringSource originalErrorCodeSource;
 
 		public virtual bool IsAsync {
 			get { return false; }
@@ -51,7 +50,7 @@ namespace ServiceStack.FluentValidation.Validators
 		}
 
 		protected PropertyValidator(string errorMessage) {
-            originalErrorSource = errorSource = new StaticStringSource(errorMessage);
+			originalErrorSource = errorSource = new StaticStringSource(errorMessage);
 		}
 
 		protected PropertyValidator(Expression<Func<string>> errorMessageResourceSelector) {
@@ -86,13 +85,13 @@ namespace ServiceStack.FluentValidation.Validators
 			return
 				IsValidAsync(context, cancellation)
 				.Then(valid => {
-					    if (valid) {
-						    return Enumerable.Empty<ValidationFailure>();
-					    }
+						if (valid) {
+							return Enumerable.Empty<ValidationFailure>();
+						}
 
 						PrepareMessageFormatterForValidationError(context);
 						return new[] { CreateValidationError(context) }.AsEnumerable();
-				      },
+					  },
 					runSynchronously: true
 				);
 		}
@@ -100,7 +99,7 @@ namespace ServiceStack.FluentValidation.Validators
 		protected abstract bool IsValid(PropertyValidatorContext context);
 
 		protected virtual async Task<bool> IsValidAsync(PropertyValidatorContext context, CancellationToken cancellation) {
-			return IsValid(context);
+			return await Task.Run(() => IsValid(context));
 		}
 
 		/// <summary>

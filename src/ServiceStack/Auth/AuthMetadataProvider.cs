@@ -7,7 +7,7 @@ namespace ServiceStack.Auth
 {
     public class AuthMetadataProvider : IAuthMetadataProvider
     {
-        static readonly ILog Log = LogManager.GetLogger(typeof(AuthMetadataProvider));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(AuthMetadataProvider));
 
         public static string DefaultNoProfileImgUrl = "https://raw.githubusercontent.com/ServiceStack/Assets/master/img/apps/no-profile64.png";
 
@@ -53,7 +53,7 @@ namespace ServiceStack.Auth
             }
             catch (Exception ex)
             {
-                Log.Error("Error AddProfileUrl to: {0}>{1}".Fmt(tokens.Provider, tokens.UserName), ex);
+                Logger.Error("Error AddProfileUrl to: {0}>{1}".Fmt(tokens.Provider, tokens.UserName), ex);
             }
         }
 

@@ -10,7 +10,7 @@ namespace ServiceStack.VirtualPath
 {
     public class FileSystemVirtualDirectory : AbstractVirtualDirectoryBase
     {
-        private static ILog Log = LogManager.GetLogger(typeof(FileSystemVirtualDirectory));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(FileSystemVirtualDirectory));
 
         protected DirectoryInfo BackingDirInfo;
 
@@ -59,7 +59,7 @@ namespace ServiceStack.VirtualPath
             catch (Exception ex)
             {
                 //Possible exception from scanning symbolic links
-                Log.Warn($"Unable to GetFiles for {RealPath}", ex);
+                Logger.Warn($"Unable to GetFiles for {RealPath}", ex);
                 return TypeConstants<FileInfo>.EmptyArray;
             }
         }
@@ -73,7 +73,7 @@ namespace ServiceStack.VirtualPath
             catch (Exception ex)
             {
                 //Possible exception from scanning symbolic links
-                Log.Warn($"Unable to GetDirectories for {RealPath}", ex);
+                Logger.Warn($"Unable to GetDirectories for {RealPath}", ex);
                 return TypeConstants<DirectoryInfo>.EmptyArray;
             }
         }
@@ -99,7 +99,7 @@ namespace ServiceStack.VirtualPath
             catch (Exception ex)
             {
                 //Possible exception from scanning symbolic links
-                Log.Warn($"Unable to scan for {globPattern} in {RealPath}", ex);
+                Logger.Warn($"Unable to scan for {globPattern} in {RealPath}", ex);
                 return TypeConstants<IVirtualFile>.EmptyArray;
             }
         }

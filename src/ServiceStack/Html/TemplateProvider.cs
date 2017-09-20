@@ -11,9 +11,9 @@ namespace ServiceStack.Html
 {
     public class TemplateProvider
     {
-        public int? CompileInParallelWithNoOfThreads { get; set; }
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(TemplateProvider));
 
-        private static readonly ILog Log = LogManager.GetLogger(typeof(TemplateProvider));
+        public int? CompileInParallelWithNoOfThreads { get; set; }
 
         AutoResetEvent waiter = new AutoResetEvent(false);
 
@@ -76,7 +76,7 @@ namespace ServiceStack.Html
         {
             var compileInParallel = CompileInParallelWithNoOfThreads > 0;
 
-            Log.Info($"Starting to compile {compilePages.Count}/{priorityCompilePages.Count} pages, " +
+            Logger.Info($"Starting to compile {compilePages.Count}/{priorityCompilePages.Count} pages, " +
                      $"{(compileInParallel ? "In Parallel" : "Sequentially")}");
 
 #if !NETSTANDARD1_6
@@ -85,7 +85,7 @@ namespace ServiceStack.Html
                 var threadsToRun = Math.Min(CompileInParallelWithNoOfThreads.GetValueOrDefault(), compilePages.Count);
                 if (threadsToRun <= runningThreads) return;
 
-                Log.Info($"Starting {threadsToRun} threads..");
+                Logger.Info($"Starting {threadsToRun} threads..");
 
                 threadsToRun.Times(x => {
                     ThreadPool.QueueUserWorkItem(waitHandle => { try { CompileAllPages(); } catch { } });
@@ -117,7 +117,7 @@ namespace ServiceStack.Html
             finally
             {
                 Interlocked.Decrement(ref runningThreads);
-                Log.Info($"Compilation threads remaining {runningThreads}...");
+                Logger.Info($"Compilation threads remaining {runningThreads}...");
                 waiter.Set();
             }
         }

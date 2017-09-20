@@ -13,8 +13,6 @@ namespace ServiceStack
 {
     public static class ServiceExtensions
     {
-        public static ILog Log = LogManager.GetLogger(typeof(ServiceExtensions));
-
         public static IHttpResult Redirect(this IServiceBase service, string url)
         {
             return service.Redirect(url, "Moved Temporarily");

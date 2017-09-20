@@ -13,7 +13,8 @@ namespace ServiceStack
 {
     public static class HttpResponseExtensions
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(HttpResponseExtensions));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(HttpResponseExtensions));
+
         //public static bool IsXsp;
         //public static bool IsModMono;
         public static bool IsMonoFastCgi;
@@ -52,7 +53,7 @@ namespace ServiceStack
             }
             catch (Exception ex)
             {
-                Log.Error("Exception closing HttpResponse: " + ex.Message, ex);
+                Logger.Error("Exception closing HttpResponse: " + ex.Message, ex);
             }
         }
 
@@ -66,7 +67,7 @@ namespace ServiceStack
             }
             catch (Exception ex)
             {
-                Log.Error("Error in HttpListenerResponseWrapper: " + ex.Message, ex);
+                Logger.Error("Error in HttpListenerResponseWrapper: " + ex.Message, ex);
             }
         }
 #endif

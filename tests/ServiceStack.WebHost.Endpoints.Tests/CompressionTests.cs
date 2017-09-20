@@ -30,8 +30,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 	[TestFixture]
 	public class CompressionTests
 	{
-		private static readonly ILog Log = LogManager.GetLogger(typeof(CompressionTests));
-
 		[Test]
 		public void Can_compress_and_decompress_SimpleDto()
 		{

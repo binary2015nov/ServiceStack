@@ -8,6 +8,7 @@ using System.Net;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using ServiceStack.Logging;
 using ServiceStack.Serialization;
 using ServiceStack.Text;
 using ServiceStack.Web;
@@ -16,6 +17,8 @@ namespace ServiceStack.Host.Handlers
 {
     public abstract class ServiceStackHandlerBase : HttpAsyncTaskHandler
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(ServiceStackHandlerBase));
+
         internal static readonly Dictionary<byte[], byte[]> NetworkInterfaceIpv4Addresses = new Dictionary<byte[], byte[]>();
         internal static readonly byte[][] NetworkInterfaceIpv6Addresses = TypeConstants.EmptyByteArrayArray;
 
@@ -29,7 +32,7 @@ namespace ServiceStack.Host.Handlers
             }
             catch (Exception ex)
             {
-                Log.Warn("Failed to retrieve IP Addresses, some security restriction features may not work: " + ex.Message, ex);
+                Logger.Warn("Failed to retrieve IP Addresses, some security restriction features may not work: " + ex.Message, ex);
             }
         }
 
@@ -97,6 +100,7 @@ namespace ServiceStack.Host.Handlers
             }
             catch (Exception ex)
             {
+                Logger.Error("Handle response error: " + ex.Message);
                 throw;
             }
         }

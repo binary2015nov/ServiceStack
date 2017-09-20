@@ -22,7 +22,7 @@ namespace ServiceStack
 {
     public class JsonHttpClient : IServiceClient, IJsonServiceClient, IHasCookieContainer, IServiceClientMeta
     {
-        private readonly static ILog Logger = LogManager.GetLogger(typeof(JsonHttpClient));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(JsonHttpClient));
 
         public static Func<HttpMessageHandler> GlobalHttpMessageHandlerFactory { get; set; }
         public HttpMessageHandler HttpMessageHandler { get; set; }
