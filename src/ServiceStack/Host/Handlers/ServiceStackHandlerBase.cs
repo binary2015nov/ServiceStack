@@ -141,13 +141,12 @@ namespace ServiceStack.Host.Handlers
                         }
                     }
                 }
+                return requestType.CreateInstance(); //Return an empty DTO, even for empty requestDto bodies
             }
             catch (Exception ex)
-            {
-                var msg = $"Could not deserialize '{contentType}' requestDto using {requestType}'\nError: {ex}";
-                throw new SerializationException(msg, ex);
+            {  
+                throw new SerializationException($"Could not deserialize '{contentType}' requestDto using {requestType}'\nError: {ex}", ex);
             }
-            return requestType.CreateInstance(); //Return an empty DTO, even for empty requestDto bodies
         }
 
         protected static object GetCustomRequestFromBinder(IRequest httpReq, Type requestType)

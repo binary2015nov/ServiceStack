@@ -91,12 +91,12 @@ namespace ServiceStack
 
         public virtual async Task ProxyRequestAsync(IHttpRequest httpReq, string url)
         {
-            var webReq = (HttpWebRequest)WebRequest.Create(url);
+            var webReq = WebRequest.CreateHttp(url);
             webReq.Method = httpReq.Verb;
             webReq.ContentType = httpReq.ContentType;
             webReq.Accept = httpReq.Accept;
 
-#if NET45 ||NET40
+#if NET40 || NET45
             webReq.UserAgent = httpReq.UserAgent;
             webReq.Referer = httpReq.UrlReferrer?.ToString();
             webReq.ServicePoint.Expect100Continue = false;

@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using NUnit.Framework;
 using ServiceStack.WebHost.Endpoints.Tests.Support.Host;
 
@@ -7,16 +6,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     [TestFixture]
     public class NestedServiceTests
     {
-        protected static string ListeningOn = Config.ListeningOn;
-
-        ExampleAppHostHttpListener appHost;
+        private ExampleAppHostHttpListener appHost;
 
         [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
             appHost = new ExampleAppHostHttpListener();
             appHost.Init();
-            appHost.Start(ListeningOn);
+            appHost.Start(Config.ListeningOn);
         }
 
         [OneTimeTearDown]
@@ -28,7 +25,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_call_nested_service_with_ServiceClient()
         {
-            var client = new JsonServiceClient(ListeningOn);
+            var client = new JsonServiceClient(Config.ListeningOn);
 
             var reqRoot = new Root { Id = 1 };
             Assert.That(reqRoot.ToGetUrl(), Is.EqualTo("/root/1"));
@@ -51,7 +48,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public int Id { get; set; }
 
         [Route("/root.nested/{Id}")]
-        public class Nested : IReturn<Root.Nested>
+        public class Nested : IReturn<Nested>
         {
             public int Id { get; set; }
         }

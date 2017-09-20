@@ -31,7 +31,7 @@ namespace ServiceStack
             {
                 PclExportClient.Instance.SetCookieContainer(webRequest, client);
             }
-            if (client.DisableAutoCompression)          
+            if (client.DisableAutoCompression)
                 client.Headers.Remove(HttpRequestHeader.AcceptEncoding.ToString());
 
             return webRequest;

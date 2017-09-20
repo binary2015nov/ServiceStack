@@ -23,8 +23,9 @@ namespace ServiceStack
 
     public partial class AsyncServiceClient : IHasSessionId, IHasVersion
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(AsyncServiceClient));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(AsyncServiceClient));
         private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(60);
+
         //private HttpWebRequest webRequest = null;
         private AuthenticationInfo authInfo = null;
 
@@ -94,6 +95,8 @@ namespace ServiceStack
         public string BaseUri { get; set; }
         public bool DisableAutoCompression { get; set; }
 
+        public string RequestCompressionType { get; set; }
+
         public string UserName { get; set; }
 
         public string Password { get; set; }
@@ -147,7 +150,7 @@ namespace ServiceStack
             }
         }
 
-        public Task<TResponse> SendAsync<TResponse>(string httpMethod, string absoluteUrl, object request, CancellationToken token=default(CancellationToken))
+        public Task<TResponse> SendAsync<TResponse>(string httpMethod, string absoluteUrl, object request, CancellationToken token = default(CancellationToken))
         {
             var tcs = new TaskCompletionSource<TResponse>();
 
@@ -204,7 +207,7 @@ namespace ServiceStack
                 }
             }
 
-            var webRequest = this.CreateHttpWebRequest(requestUri);
+            var webRequest = this.CreateHttpWebRequest(requestUri);       
             var requestState = new AsyncState<TResponse>(BufferSize)
             {
                 HttpMethod = httpMethod,
@@ -241,7 +244,7 @@ namespace ServiceStack
 
             PclExportClient.Instance.AddHeader(client, Headers);
 
-#if NET45 || NET40
+#if NET40 || NET45
 
             client.UserAgent = UserAgent;
 
@@ -259,14 +262,20 @@ namespace ServiceStack
                 client.Credentials = this.Credentials;
             else if (this.AlwaysSendBasicAuthHeader)
                 client.AddBasicAuth(this.UserName, this.Password);
-
+            if (httpMethod.HasRequestBody())
+            {
+                client.ContentType = ContentType;        
+            }
             ApplyWebRequestFilters(client);
 
             try
             {
                 if (client.Method.HasRequestBody())
                 {
-                    client.ContentType = ContentType;
+                    client.ContentType = ContentType;     
+                    if (RequestCompressionType != null)
+                            client.Headers[HttpRequestHeader.ContentEncoding] = RequestCompressionType;
+                    
                     client.BeginGetRequestStream(RequestCallback<TResponse>, state);
                 }
                 else
@@ -530,7 +539,7 @@ namespace ServiceStack
                     }
                     catch (Exception ex)
                     {
-                        Log.Debug($"Error Reading Response Error: {ex.Message}", ex);
+                        Logger.Debug($"Error Reading Response Error: {ex.Message}", ex);
                         requestState.HandleError(default(T), ex);
                     }
                     finally
@@ -553,11 +562,11 @@ namespace ServiceStack
             if (PclExportClient.Instance.IsWebException(webEx))
             {
                 var errorResponse = (HttpWebResponse)webEx.Response;
-                Log.Error(webEx);
-                if (Log.IsDebugEnabled)
+                Logger.Error(webEx);
+                if (Logger.IsDebugEnabled)
                 {
-                    Log.Debug($"Status Code : {errorResponse.StatusCode}");
-                    Log.Debug($"Status Description : {errorResponse.StatusDescription}");
+                    Logger.Debug($"Status Code : {errorResponse.StatusCode}");
+                    Logger.Debug($"Status Description : {errorResponse.StatusDescription}");
                 }
 
                 var serviceEx = new WebServiceException(errorResponse.StatusDescription)
@@ -593,7 +602,7 @@ namespace ServiceStack
                 catch (Exception innerEx)
                 {
                     // Oh, well, we tried
-                    Log.Debug($"WebException Reading Response Error: {innerEx.Message}", innerEx);
+                    Logger.Debug($"WebException Reading Response Error: {innerEx.Message}", innerEx);
                     state.HandleError(default(TResponse), new WebServiceException(errorResponse.StatusDescription, innerEx) {
                         StatusCode = (int)errorResponse.StatusCode,
                         StatusDescription = errorResponse.StatusDescription,
@@ -608,11 +617,11 @@ namespace ServiceStack
             {
                 var customEx = WebRequestUtils.CreateCustomException(state.Url, authEx);
 
-                Log.Debug($"AuthenticationException: {customEx.Message}", customEx);
+                Logger.Debug($"AuthenticationException: {customEx.Message}", customEx);
                 state.HandleError(default(TResponse), authEx);
             }
 
-            Log.Debug($"Exception Reading Response Error: {exception.Message}", exception);
+            Logger.Debug($"Exception Reading Response Error: {exception.Message}", exception);
             state.HandleError(default(TResponse), exception);
 
             CancelAsyncFn = null;

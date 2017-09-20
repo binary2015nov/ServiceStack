@@ -107,8 +107,7 @@ namespace ServiceStack
             asyncClient.ShareCookiesWithBrowser = this.ShareCookiesWithBrowser = true;
         }
 
-        protected ServiceClientBase(string syncReplyBaseUri, string asyncOneWayBaseUri)
-            : this()
+        protected ServiceClientBase(string syncReplyBaseUri, string asyncOneWayBaseUri) : this()
         {
             this.SyncReplyBaseUri = syncReplyBaseUri;
             this.AsyncOneWayBaseUri = asyncOneWayBaseUri;
@@ -140,7 +139,16 @@ namespace ServiceStack
         }
         private bool disableAutoCompression;
 
-        public string RequestCompressionType { get; set; }
+        public string RequestCompressionType
+        {
+            get => requestCompressionType;
+            set
+            {
+                requestCompressionType = value;
+                asyncClient.RequestCompressionType = value;
+            }
+        }
+        private string requestCompressionType;
 
         /// <summary>
         /// The user name for basic authentication
@@ -886,7 +894,6 @@ namespace ServiceStack
                 }
 #endif
                 SerializeToStream(null, request, requestStream);
-                requestStream.Flush();
                 if (!keepOpen)
                 {
                     requestStream.Close();
@@ -917,7 +924,6 @@ namespace ServiceStack
                 client.Accept = Accept;
                 client.Method = httpMethod;
                 PclExportClient.Instance.AddHeader(client, Headers);
-
 #if !SL5
                 if (Proxy != null) client.Proxy = Proxy;
 #endif
@@ -953,7 +959,7 @@ namespace ServiceStack
                 if (hasRequestBody)
                 {
                     client.ContentType = ContentType;
-                    
+
                     if (RequestCompressionType != null)
                         client.Headers[HttpHeaders.ContentEncoding] = RequestCompressionType;
 

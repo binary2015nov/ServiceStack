@@ -441,8 +441,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 	{
 		public ExampleAppHostHttpListener() : base("ServiceStack Examples", typeof(GetFactorialService).GetAssembly())
 		{
-			LogManager.LogFactory = new DebugLogFactory();
-
 			//Signal advanced web browsers what HTTP Methods you accept
 			Config.GlobalResponseHeaders = new Dictionary<string, string> {
 				{ "Access-Control-Allow-Origin", "*" },
@@ -481,10 +479,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 			//var movies = container.Resolve<IDbConnectionFactory>().Exec(x => x.Select<Movie>());
 			//Console.WriteLine(movies.Dump());
 
-			if (ConfigureFilter != null)
-			{
-				ConfigureFilter(container);
-			}
+			ConfigureFilter?.Invoke(container);			
 
 			Plugins.Add(new ProtoBufFormat());
 			Plugins.Add(new RequestInfoFeature());

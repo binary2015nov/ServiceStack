@@ -13,14 +13,11 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
     public class RestsTestBase : TestBase
     {
-        private static ILog Log = LogManager.GetLogger(typeof(RestsTestBase));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(RestsTestBase));
 
         readonly HostConfig defaultConfig = new HostConfig();
 
-        public RestsTestBase() : base(Constant.ServiceStackBaseHost, typeof(HelloService).Assembly)
-        //: base("http://localhost:4000", typeof(HelloService).Assembly) //Uncomment to test on dev web server
-        {
-        }
+        public RestsTestBase() : base(Constant.ServiceStackBaseHost, typeof(HelloService).Assembly) { }
 
         protected override void Configure(Funq.Container container) { }
 
