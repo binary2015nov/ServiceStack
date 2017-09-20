@@ -19,7 +19,7 @@ namespace ServiceStack
 {
     public static class HttpResponseExtensionsInternal
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(HttpResponseExtensionsInternal));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(HttpResponseExtensionsInternal));
 
         [Obsolete("Use WriteToOutputStreamAsync")]
         public static bool WriteToOutputStream(IResponse response, object result, byte[] bodyPrefix, byte[] bodySuffix)
@@ -83,7 +83,7 @@ namespace ServiceStack
             return false;
         }
 
-        public static Task<bool> WriteToResponse(this IResponse httpRes, object result, string contentType, CancellationToken token = default(CancellationToken))
+        public static Task<bool> WriteToResponse(this IResponse httpRes, object result, string contentType, CancellationToken token=default(CancellationToken))
         {
             var serializer = HostContext.ContentTypes.GetResponseSerializer(contentType);
             return httpRes.WriteToResponse(result, serializer, new BasicRequest { ContentType = contentType }, token);
@@ -167,8 +167,7 @@ namespace ServiceStack
 
                         httpResult.PaddingLength = paddingLength;
 
-                        var httpError = httpResult as IHttpError;
-                        if (httpError != null)
+                        if (httpResult is IHttpError httpError)
                         {
                             response.Dto = httpError.CreateErrorResponse();
                             if (response.HandleCustomErrorHandler(request,
@@ -202,8 +201,7 @@ namespace ServiceStack
                     }
 
                     /* Mono Error: Exception: Method not found: 'System.Web.HttpResponse.get_Headers' */
-                    var responseOptions = result as IHasOptions;
-                    if (responseOptions != null)
+                    if (result is IHasOptions responseOptions)
                     {
                         //Reserving options with keys in the format 'xx.xxx' (No Http headers contain a '.' so its a safe restriction)
                         const string reservedOptions = ".";
@@ -217,17 +215,16 @@ namespace ServiceStack
                                 continue;
                             }
 
-                            if (Logger.IsDebugEnabled)
-                                Logger.Debug($"Setting Custom HTTP Header: {responseHeaders.Key}: {responseHeaders.Value}");
-
-                            if (Env.IsMono && responseHeaders.Key.EqualsIgnoreCase(HttpHeaders.ContentType))
+                            if (responseHeaders.Key.EqualsIgnoreCase(HttpHeaders.ContentType))
                             {
                                 response.ContentType = responseHeaders.Value;
+                                continue;
                             }
-                            else
-                            {
-                                response.AddHeader(responseHeaders.Key, responseHeaders.Value);
-                            }
+
+                            if (Log.IsDebugEnabled)
+                                Log.Debug($"Setting Custom HTTP Header: {responseHeaders.Key}: {responseHeaders.Value}");
+
+                            response.AddHeader(responseHeaders.Key, responseHeaders.Value);
                         }
                     }
 
@@ -352,7 +349,7 @@ namespace ServiceStack
             catch (Exception writeErrorEx)
             {
                 //Exception in writing to response should not hide the original exception
-                Logger.Info("Failed to write error to response: {0}", writeErrorEx);
+                Log.Info("Failed to write error to response: {0}", writeErrorEx);
                 return originalEx.AsTaskException<bool>();
             }
             return TypeConstants.TrueTask;
@@ -509,7 +506,7 @@ namespace ServiceStack
 
             // For some exception types, we'll need to extract additional information in debug mode
             // (for example, so people can fix errors in their pages).
-            if (HostContext.Config.DebugMode)
+            if (HostContext.DebugMode)
             {
 #if !NETSTANDARD1_6
                 var compileEx = ex as HttpCompileException;
@@ -530,7 +527,7 @@ namespace ServiceStack
                 {
                     ErrorCode = ex.ToErrorCode(),
                     Message = ex.Message,
-                    StackTrace = HostContext.Config.DebugMode ? ex.StackTrace : null,
+                    StackTrace = HostContext.DebugMode ? ex.StackTrace : null,
                     Errors = errors
                 }
             };
