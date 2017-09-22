@@ -133,7 +133,9 @@ namespace ServiceStack
             if (WebHostPhysicalPath.IsNullOrEmpty())
                 WebHostPhysicalPath = GetWebRootPath();
 
-            Config.EmbeddedResourceSources.Add(GetType().GetAssembly());
+            Assembly currentAssembly = GetType().GetAssembly();
+            Config.EmbeddedResourceSources.Add(currentAssembly);
+            Config.DebugMode = currentAssembly.IsDebugBuild();
             
             OnBeforeInit();
 
@@ -471,7 +473,7 @@ namespace ServiceStack
         /// <param name="urlBase">Url to listen to</param>
         public virtual ServiceStackHost Start(string urlBase)
         {
-            throw new NotImplementedException("Start(listeningAtUrlBase) is not supported by this AppHost");
+            throw new NotSupportedException($"The current method is not supported by this AppHost - {GetType().FullName}.");
         }
 
         // Rare for a user to auto register all avaialable services in ServiceStack.dll

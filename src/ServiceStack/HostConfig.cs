@@ -33,7 +33,6 @@ namespace ServiceStack
             AllowJsonpRequests = true;
             AllowRouteContentTypeExtensions = true;
             AllowNonHttpOnlyCookies = false;
-            DebugMode = GetType().GetAssembly().IsDebugBuild();
             DefaultDocuments = new List<string> {
                 "default.htm",
                 "default.html",

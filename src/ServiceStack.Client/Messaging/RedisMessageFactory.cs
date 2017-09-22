@@ -24,8 +24,6 @@ namespace ServiceStack.Messaging
             return new RedisMessageProducer(clientsManager);
         }
 
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
     }
 }
