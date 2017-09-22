@@ -1,4 +1,5 @@
 #if !NETCORE
+using System;
 using NUnit.Framework;
 using ServiceStack.Host;
 using ServiceStack.Metadata;
@@ -45,8 +46,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 					},
 					OptimizeForFlash = false,
 				}.ToString();
-
-				Assert.That(!xsd.StartsWith("<?"));
+				Console.WriteLine(xsd);
+				Assert.That(xsd.StartsWith("<xs:schema xmlns:tns=\"http://schemas.microsoft.com/2003/10/Serialization/\""));
 			}
 		}
 

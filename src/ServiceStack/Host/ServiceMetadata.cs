@@ -171,26 +171,28 @@ namespace ServiceStack.Host
             return operation?.ResponseType;
         }
 
+        private HashSet<Type> allOperationTypes;
         public HashSet<Type> GetAllOperationTypes()
         {
-            var allTypes = new HashSet<Type>(RequestTypes);
+            allOperationTypes = new HashSet<Type>(RequestTypes);
             foreach (var responseType in ResponseTypes)
             {
-                allTypes.Add(responseType);
+                allOperationTypes.Add(responseType);
             }
-            return allTypes;
+            return allOperationTypes;
         }
 
+        private HashSet<Type> allSoapOperationTypes;
         public HashSet<Type> GetAllSoapOperationTypes()
         {
-            var operationTypes = GetAllOperationTypes();
-            return operationTypes.Where(x => !x.IsGenericTypeDefinition() &&
+            var operationTypes = allOperationTypes ?? GetAllOperationTypes();
+            return allSoapOperationTypes = operationTypes.Where(x => !x.IsGenericTypeDefinition() &&
                   !x.AllAttributes<ExcludeAttribute>().Any(attr => attr.Feature.Has(Feature.Soap))).ToHashSet();
         }
 
         public bool IsExportSoapType(Type type)
         {
-            return GetAllSoapOperationTypes().Any(x => x.Equals(type));
+            return (allSoapOperationTypes ?? GetAllSoapOperationTypes()).Any(x => x.Equals(type));
         }
 
 

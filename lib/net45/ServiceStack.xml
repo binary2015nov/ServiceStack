@@ -4834,7 +4834,7 @@
             </summary>
             <returns>string value or null if it doesn't exist</returns>
         </member>
-        <member name="F:ServiceStack.HttpRequestExtensions.Log">
+        <member name="F:ServiceStack.HttpRequestExtensions.WebHostDirectoryName">
                      * 
                          Input: http://localhost:96/Cambia3/Temp/Test.aspx/path/info?q=item#fragment
             

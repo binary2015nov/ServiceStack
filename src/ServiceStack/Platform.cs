@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using ServiceStack.Configuration;
 using ServiceStack.Text;
@@ -129,6 +130,14 @@ namespace ServiceStack
             }
 
             return -1;
+        }
+
+        public static DateTime GetAssemblyLastModified(Assembly assembly)
+        {
+            if (assembly.Location == string.Empty)
+                throw new NotSupportedException("The current assembly is loaded from a byte array");
+
+            return new FileInfo(assembly.Location).LastWriteTime;           
         }
 
         public static void Reset()

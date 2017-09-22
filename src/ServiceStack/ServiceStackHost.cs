@@ -33,9 +33,6 @@ namespace ServiceStack
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(ServiceStackHost));
 
-        /// <summary>
-        /// Gets the created time for current host.
-        /// </summary>
         public readonly DateTime CreateAt = DateTime.Now;
 
         public HostConfig Config { get; private set; }
@@ -460,22 +457,11 @@ namespace ServiceStack
             };
 
             pathProviders.AddRange(Config.EmbeddedResourceSources.Distinct()
-                .Map(x => new ResourceVirtualFiles(x) { LastModified = GetAssemblyLastModified(x) } ));
+                .Map(x => new ResourceVirtualFiles(x) { LastModified = Platform.GetAssemblyLastModified(x) } ));
 
             if (AddVirtualFileSources.Count > 0)
                 pathProviders.AddRange(AddVirtualFileSources);
             return pathProviders;
-        }
-
-        private static DateTime GetAssemblyLastModified(Assembly asm)
-        {
-            try
-            {
-                if (asm.Location != null)
-                    return new FileInfo(asm.Location).LastWriteTime;
-            }
-            catch (Exception) { /* ignored */ }
-            return default(DateTime);
         }
 
         /// <summary>
@@ -493,7 +479,7 @@ namespace ServiceStack
         // and let them register them manually
         public HashSet<Type> ExcludeAutoRegisteringServiceTypes { get; private set; }
 
-        public ServiceRoutes Routes { get; set; }
+        public ServiceRoutes Routes { get; private set; }
 
         public IEnumerable<RestPath> RestPaths => ServiceController?.RestPathMap.SelectMany(x => x.Value) ?? Routes.RestPaths;
 
@@ -517,7 +503,7 @@ namespace ServiceStack
         /// 
         /// Note one converter could influence the input for the next converter!
         /// </summary>
-        public List<Func<IRequest, object, object>> RequestConverters { get; set; }
+        public List<Func<IRequest, object, object>> RequestConverters { get; private set; }
 
         /// <summary>
         /// Collection of ResponseConverters.
@@ -525,27 +511,27 @@ namespace ServiceStack
         /// 
         /// Called directly after response is handled, even before <see cref="ApplyResponseFilters"></see>!
         /// </summary>
-        public List<Func<IRequest, object, object>> ResponseConverters { get; set; }
+        public List<Func<IRequest, object, object>> ResponseConverters { get; private set; }
 
-        public List<Action<IRequest, IResponse, object>> GlobalRequestFilters { get; set; }
+        public List<Action<IRequest, IResponse, object>> GlobalRequestFilters { get; private set; }
 
-        public List<Func<IRequest, IResponse, object, Task>> GlobalRequestFiltersAsync { get; set; }
+        public List<Func<IRequest, IResponse, object, Task>> GlobalRequestFiltersAsync { get; private set; }
 
-        public Dictionary<Type, ITypedFilter> GlobalTypedRequestFilters { get; set; }
+        public Dictionary<Type, ITypedFilter> GlobalTypedRequestFilters { get; private set; }
 
-        public List<Action<IRequest, IResponse, object>> GlobalResponseFilters { get; set; }
+        public List<Action<IRequest, IResponse, object>> GlobalResponseFilters { get; private set; }
 
-        public Dictionary<Type, ITypedFilter> GlobalTypedResponseFilters { get; set; }
+        public Dictionary<Type, ITypedFilter> GlobalTypedResponseFilters { get; private set; }
 
-        public List<Action<IRequest, IResponse, object>> GlobalMessageRequestFilters { get; }
+        public List<Action<IRequest, IResponse, object>> GlobalMessageRequestFilters { get; private set; }
 
-        public List<Func<IRequest, IResponse, object, Task>> GlobalMessageRequestFiltersAsync { get; }
+        public List<Func<IRequest, IResponse, object, Task>> GlobalMessageRequestFiltersAsync { get; private set; }
 
-        public Dictionary<Type, ITypedFilter> GlobalTypedMessageRequestFilters { get; set; }
+        public Dictionary<Type, ITypedFilter> GlobalTypedMessageRequestFilters { get; private set; }
 
-        public List<Action<IRequest, IResponse, object>> GlobalMessageResponseFilters { get; }
+        public List<Action<IRequest, IResponse, object>> GlobalMessageResponseFilters { get; private set; }
 
-        public Dictionary<Type, ITypedFilter> GlobalTypedMessageResponseFilters { get; set; }
+        public Dictionary<Type, ITypedFilter> GlobalTypedMessageResponseFilters { get; private set; }
 
         /// <summary>
         /// Lists of view engines for this app.

@@ -14,7 +14,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var xmlResponse = handler.CreateResponse(typeof(DefaultConstructor));
             xmlResponse.Print();
             Assert.That(xmlResponse, Does.StartWith(
-                "<NoDefaultConstructor xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://schemas.servicestack.net/types\">"));
+                "<DefaultConstructor xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://schemas.servicestack.net/types\">"));
         }
 
         [Test]
