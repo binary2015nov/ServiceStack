@@ -1,12 +1,10 @@
-﻿#define NET45
-using System.Net;
+﻿using System.Net;
 using NUnit.Framework;
 using ServiceStack.Host.Handlers;
-using ServiceStack.Text;
 
 namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
-    public class RequestInfoServices : Service {}
+    public class RequestInfoServices : Service { }
     
     public partial class RequestInfoTests
     {        

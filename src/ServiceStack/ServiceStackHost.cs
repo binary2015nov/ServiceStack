@@ -47,7 +47,7 @@ namespace ServiceStack
         {
             ServiceName = serviceName;
             ServiceAssemblies = assembliesWithServices;
-            Config = new HostConfig();
+            Config = new HostConfig { DebugMode = GetType().GetAssembly().IsDebugBuild() };
             AppSettings = new AppSettings();
             Metadata = new ServiceMetadata();
             Container = new Container { DefaultOwner = Owner.External };
@@ -132,10 +132,6 @@ namespace ServiceStack
             HostContext.AppHost = this;
             if (WebHostPhysicalPath.IsNullOrEmpty())
                 WebHostPhysicalPath = GetWebRootPath();
-
-            Assembly currentAssembly = GetType().GetAssembly();
-            Config.EmbeddedResourceSources.Add(currentAssembly);
-            Config.DebugMode = currentAssembly.IsDebugBuild();
             
             OnBeforeInit();
 
@@ -458,7 +454,7 @@ namespace ServiceStack
                 new FileSystemVirtualFiles(WebHostPhysicalPath)
             };
 
-            pathProviders.AddRange(Config.EmbeddedResourceSources.Distinct()
+            pathProviders.AddRange(Config.EmbeddedResourceSources
                 .Map(x => new ResourceVirtualFiles(x) { LastModified = Platform.GetAssemblyLastModified(x) } ));
 
             if (AddVirtualFileSources.Count > 0)

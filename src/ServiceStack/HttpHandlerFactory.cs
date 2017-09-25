@@ -37,15 +37,14 @@ namespace ServiceStack
                 ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 : new HashSet<string>();
 
-            var isAspNetHost = HostContext.IsAspNetHost;
             WebHostPhysicalPath = appHost.VirtualFileSources.RootDirectory.RealPath;
-            HostAutoRedirectsDirs = isAspNetHost && !Env.IsMono;
+            HostAutoRedirectsDirs = HostContext.IsAspNetHost && !Env.IsMono;
 
             //Apache+mod_mono treats path="servicestack*" as path="*" so takes over root path, so we need to serve matching resources
             var hostedAtRootPath = AppHostConfig.HandlerFactoryPath.IsNullOrEmpty();
 
             //DefaultHttpHandler not supported in IntegratedPipeline mode
-            if (!Platform.IsIntegratedPipeline && isAspNetHost && !hostedAtRootPath && !Env.IsMono)
+            if (!Platform.IsIntegratedPipeline && HostContext.IsAspNetHost && !hostedAtRootPath && !Env.IsMono)
                 DefaultHttpHandler = new DefaultHttpHandler();
 
             var rootFiles = appHost.VirtualFileSources.GetRootFiles().ToList();

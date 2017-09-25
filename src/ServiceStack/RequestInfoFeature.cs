@@ -19,12 +19,14 @@ namespace ServiceStack
         {
             if (request.QueryString[Keywords.Debug] != Keywords.RequestInfo)
                 return null;
-            var session = request.GetSession();
-            if (HostContext.Config.DebugMode || HostContext.HasValidAuthSecret(request) ||
-                session != null && session.Roles.Contains("admin"))
-            {      
+
+            if (HostContext.Config.DebugMode || HostContext.HasValidAuthSecret(request))
                 return new RequestInfoHandler { Request = request };
-            }
+
+            var session = request.GetSession();     
+            if (session != null && session.Roles.Contains("admin"))         
+                return new RequestInfoHandler { Request = request };
+            
             return null;
         }
 

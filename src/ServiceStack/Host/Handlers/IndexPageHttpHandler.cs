@@ -14,7 +14,7 @@ namespace ServiceStack.Host.Handlers
             if (request.PathInfo == "/")
             {
                 var relativeUrl = defaultUrl.Substring(defaultUrl.IndexOf('/'));
-                var absoluteUrl = request.RawUrl.TrimEnd('/') + relativeUrl;
+                var absoluteUrl = request.GetBaseUrl() + relativeUrl;
                 response.StatusCode = (int)HttpStatusCode.Redirect;
                 response.AddHeader(HttpHeaders.Location, absoluteUrl);
             }
