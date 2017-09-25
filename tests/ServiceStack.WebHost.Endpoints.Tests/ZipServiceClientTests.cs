@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Funq;
 using NUnit.Framework;
+using Funq;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {

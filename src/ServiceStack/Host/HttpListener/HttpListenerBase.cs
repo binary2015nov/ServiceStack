@@ -40,8 +40,7 @@ namespace ServiceStack.Host.HttpListener
 
         public Action<HttpListenerContext> BeforeRequest { get; set; }
 
-        protected HttpListenerBase(string serviceName, params Assembly[] assembliesWithServices)
-            : base(serviceName, assembliesWithServices) { }
+        protected HttpListenerBase(string serviceName, params Assembly[] assembliesWithServices) : base(serviceName, assembliesWithServices) { }
 
         protected override void OnAfterInit()
         {

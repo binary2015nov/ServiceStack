@@ -3,16 +3,14 @@ using System;
 namespace ServiceStack.Logging
 {
     /// <summary>
-    /// Logging API for this library. You can inject your own implementation otherwise
-    /// will use the DebugLogFactory to write to System.Diagnostics.Debug
+    /// Provides access to log factories and loggers. This class cannot be inherited.
     /// </summary>
-    public class LogManager
+    public static class LogManager
     {
         private static ILogFactory logFactory;
 
         /// <summary>
-        /// Gets or sets the log factory.
-        /// Use this to override the factory that is used to create loggers
+        /// Gets or sets the log factory used to create loggers. The default value is <see cref="ServiceStack.Logging.NullLogFactory"/>.
         /// </summary>
         public static ILogFactory LogFactory
         {
@@ -20,17 +18,11 @@ namespace ServiceStack.Logging
             set { logFactory = value; }
         }
 
-        /// <summary>
-        /// Gets the logger.
-        /// </summary>
         public static ILog GetLogger(Type type)
         {
             return LogFactory.GetLogger(type);
         }
 
-        /// <summary>
-        /// Gets the logger.
-        /// </summary>
         public static ILog GetLogger(string name)
         {
             return LogFactory.GetLogger(name);

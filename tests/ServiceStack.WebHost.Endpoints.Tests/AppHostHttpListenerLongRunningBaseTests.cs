@@ -21,7 +21,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 .Init()
                 .Start(Config.ListeningOn);
 
-            Console.WriteLine(@"ExampleAppHost Created at {0}, listening on {1}", appHost.CreateAt, Config.ListeningOn);
+            Console.WriteLine(@"ExampleAppHost Created at {0}, listening on {1}", appHost.CreatedAt, Config.ListeningOn);
         }
 
         [OneTimeTearDown]

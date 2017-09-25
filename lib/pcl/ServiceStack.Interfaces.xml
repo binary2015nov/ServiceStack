@@ -786,24 +786,12 @@
         </member>
         <member name="T:ServiceStack.Logging.LogManager">
             <summary>
-            Logging API for this library. You can inject your own implementation otherwise
-            will use the DebugLogFactory to write to System.Diagnostics.Debug
+            Provides access to log factories and loggers. This class cannot be inherited.
             </summary>
         </member>
         <member name="P:ServiceStack.Logging.LogManager.LogFactory">
             <summary>
-            Gets or sets the log factory.
-            Use this to override the factory that is used to create loggers
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Logging.LogManager.GetLogger(System.Type)">
-            <summary>
-            Gets the logger.
-            </summary>
-        </member>
-        <member name="M:ServiceStack.Logging.LogManager.GetLogger(System.String)">
-            <summary>
-            Gets the logger.
+            Gets or sets the log factory used to create loggers. The default value is <see cref="T:ServiceStack.Logging.NullLogFactory"/>.
             </summary>
         </member>
         <member name="T:ServiceStack.Logging.NullLogFactory">

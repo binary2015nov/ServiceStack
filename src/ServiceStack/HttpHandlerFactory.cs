@@ -173,8 +173,6 @@ namespace ServiceStack
             return GetHandlerForPathInfo(httpReq, physicalPath) ?? NotFoundHttpHandler;
         }
 
-        // no handler registered 
-        // serve the file from the filesystem, restricting to a safelist of extensions
         public static bool ShouldAllow(string filePath)
         {
             if (filePath.IsNullOrEmpty() || filePath == "/")
@@ -266,8 +264,6 @@ namespace ServiceStack
             return null;
         }
 
-        public void ReleaseHandler(IHttpHandler handler)
-        {
-        }
+        public virtual void ReleaseHandler(IHttpHandler handler) { }
     }
 }

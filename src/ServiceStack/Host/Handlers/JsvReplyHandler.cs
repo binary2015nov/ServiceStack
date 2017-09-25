@@ -5,8 +5,7 @@ namespace ServiceStack.Host.Handlers
 {
     public class JsvOneWayHandler : GenericHandler
     {
-        public JsvOneWayHandler()
-            : base(MimeTypes.Jsv, RequestAttributes.OneWay | RequestAttributes.Jsv, Feature.Jsv) { }
+        public JsvOneWayHandler() : base(MimeTypes.Jsv, RequestAttributes.OneWay | RequestAttributes.Jsv, Feature.Jsv) { }
     }
 
     public class JsvReplyHandler : GenericHandler

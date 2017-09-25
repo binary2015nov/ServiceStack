@@ -33,7 +33,7 @@ namespace ServiceStack
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(ServiceStackHost));
 
-        public readonly DateTime CreateAt = DateTime.Now;
+        public readonly DateTime CreatedAt = DateTime.Now;
 
         public HostConfig Config { get; private set; }
 
@@ -115,8 +115,6 @@ namespace ServiceStack
         /// </summary>
         public Container Container { get; private set; }
 
-        public DateTime InitAt { get; private set; }
-
         public string WebHostPhysicalPath { get; set; }
 
         public DateTime ReadyAt { get; private set; }
@@ -128,7 +126,6 @@ namespace ServiceStack
         /// </summary>
         public virtual ServiceStackHost Init()
         {
-            InitAt = DateTime.Now;
             HostContext.AppHost = this;
             if (WebHostPhysicalPath.IsNullOrEmpty())
                 WebHostPhysicalPath = GetWebRootPath();
@@ -417,7 +414,7 @@ namespace ServiceStack
 
         private void LogInitResult()
         {
-            var elapsed = DateTime.Now - CreateAt;
+            var elapsed = DateTime.Now - CreatedAt;
             if (StartUpErrors.Any())
             {
                 Config.GlobalResponseHeaders["X-Startup-Errors"] = StartUpErrors.Count.ToString();

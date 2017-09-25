@@ -561,7 +561,7 @@ namespace ServiceStack
             }
         }
 
-        public virtual void OnLogError(Type type, string message, Exception innerEx=null)
+        public virtual void OnLogError(Type type, string message, Exception innerEx = null)
         {
             if (innerEx != null)
                 Logger.Error(message, innerEx);
