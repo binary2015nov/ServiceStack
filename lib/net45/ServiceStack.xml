@@ -7123,11 +7123,6 @@
              <returns>The same <see cref="T:ServiceStack.Web.IServiceRoutes"/> instance;
             		never <see langword="null"/>.</returns>
         </member>
-        <member name="F:ServiceStack.ServiceStackHost.CreateAt">
-            <summary>
-            Gets the created time for current host.
-            </summary>
-        </member>
         <member name="P:ServiceStack.ServiceStackHost.Container">
             <summary>
             The AppHost.Container. Note: it is not thread safe to register dependencies after AppStart.

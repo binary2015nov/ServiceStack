@@ -9,11 +9,11 @@ using ServiceStack.Web;
 
 namespace ServiceStack.WebHost.IntegrationTests.Services
 {
-    [Route("/movies/query", "GET")]
-    public class QueryMovies : QueryDb<Movie>
-    {
-        public string TitleContains { get; set; }
-    }
+	[Route("/movies/query", "GET")]
+	public class QueryMovies : QueryDb<Movie>
+	{
+		public string TitleContains { get; set; }
+	}
 
 	[Route("/movies", "POST,PUT,PATCH")]
 	[Route("/movies/{Id}")]
@@ -25,29 +25,29 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 			this.Genres = new List<string>();
 		}
 
-        [DataMember(Order = 1)]
+		[DataMember(Order = 1)]
 		[AutoIncrement]
 		public int Id { get; set; }
 
-        [DataMember(Order = 2)]
+		[DataMember(Order = 2)]
 		public string ImdbId { get; set; }
 
-        [DataMember(Order = 3)]
+		[DataMember(Order = 3)]
 		public string Title { get; set; }
 
-        [DataMember(Order = 4)]
+		[DataMember(Order = 4)]
 		public decimal Rating { get; set; }
 
-        [DataMember(Order = 5)]
+		[DataMember(Order = 5)]
 		public string Director { get; set; }
 
-        [DataMember(Order = 6)]
+		[DataMember(Order = 6)]
 		public DateTime ReleaseDate { get; set; }
 
-        [DataMember(Order = 7)]
+		[DataMember(Order = 7)]
 		public string TagLine { get; set; }
 
-        [DataMember(Order = 8)]
+		[DataMember(Order = 8)]
 		public List<string> Genres { get; set; }
 
 		#region AutoGen ReSharper code, only required by tests
@@ -103,7 +103,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 		/// </summary>
 		public object Post(Movie movie)
 		{
-            Db.Save(movie);
+			Db.Save(movie);
 
 			var newMovie = new MovieResponse {
 				Movie = Db.SingleById<Movie>(movie.Id)
@@ -121,7 +121,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 		/// </summary>
 		public object Put(Movie movie)
 		{
-		    Db.Update(movie);
+			Db.Update(movie);
 			return new MovieResponse();
 		}
 
@@ -139,12 +139,12 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 		/// </summary>
 		public object Patch(Movie movie)
 		{
-            var existingMovie = Db.SingleById<Movie>(movie.Id);
-            if (movie.Title != null)
-                existingMovie.Title = movie.Title;
-            Db.Save(existingMovie);
-            
-            return new MovieResponse();
+			var existingMovie = Db.SingleById<Movie>(movie.Id);
+			if (movie.Title != null)
+				existingMovie.Title = movie.Title;
+			Db.Save(existingMovie);
+			
+			return new MovieResponse();
 		}
 	}
 }

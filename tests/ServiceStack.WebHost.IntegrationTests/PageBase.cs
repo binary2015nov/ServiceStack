@@ -56,13 +56,7 @@ namespace ServiceStack.WebHost.IntegrationTests
         /// Dynamic Session Bag
         /// </summary>
         private ISession session;
-        public new ISession Session
-        {
-            get
-            {
-                return session ?? (session = SessionFactory.GetOrCreateSession());
-            }
-        }
+        public new ISession Session => session ?? (session = SessionFactory.GetOrCreateSession());
 
         public void ClearSession()
         {

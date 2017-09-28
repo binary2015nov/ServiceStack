@@ -20,7 +20,6 @@ namespace ServiceStack.AuthWeb.Tests
     public class UserProfile
     {
         public int Id { get; set; }
-
         public UserAuth UserAuth { get; set; }
         public AuthUserSession Session { get; set; }
         public List<UserAuthDetails> UserAuthDetails { get; set; }
@@ -33,7 +32,7 @@ namespace ServiceStack.AuthWeb.Tests
     }
 
     [Route("/lockallusers")]
-    public class LockAllUsers {}
+    public class LockAllUsers { }
     public class LockServices : Service
     {
         public object Any(LockAllUsers request)
