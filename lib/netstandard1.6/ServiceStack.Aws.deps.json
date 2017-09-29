@@ -25,7 +25,7 @@
           "ServiceStack.Common": "4.5.0.0",
           "ServiceStack": "4.5.0.0",
           "ServiceStack.Interfaces": "4.0.0.0",
-          "ServiceStack.Text": "1.0.41.0"
+          "ServiceStack.Text": "4.5.9.0"
         },
         "runtime": {
           "ServiceStack.Aws.dll": {}
@@ -1289,7 +1289,7 @@
           "ServiceStack.Interfaces.dll": {}
         }
       },
-      "ServiceStack.Text/1.0.41.0": {
+      "ServiceStack.Text/4.5.9.0": {
         "runtime": {
           "ServiceStack.Text.dll": {}
         }
@@ -2043,7 +2043,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "ServiceStack.Text/1.0.41.0": {
+    "ServiceStack.Text/4.5.9.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

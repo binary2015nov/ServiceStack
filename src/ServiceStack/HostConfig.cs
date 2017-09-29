@@ -22,7 +22,7 @@ namespace ServiceStack
         public HostConfig()
         {
             WsdlServiceNamespace = DefaultWsdlNamespace;
-            ApiVersion = "1.0";
+            ApiVersion = "1.0.0";
             EmbeddedResourceSources = new HashSet<Assembly> { GetType().GetAssembly() };
             EnableAccessRestrictions = true;
             MetadataRedirectPath = null;

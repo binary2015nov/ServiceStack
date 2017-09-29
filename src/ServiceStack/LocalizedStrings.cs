@@ -31,6 +31,8 @@
         public const string IRequest = "__irequest";
         public const string RequestDuration = "_requestDurationStopwatch";
         public const string Code = "code";
+        public const string View = "View";
+        public const string Template = "Template";
     }
 
     public static class LocalizedStrings

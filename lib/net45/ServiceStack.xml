@@ -6872,7 +6872,7 @@
             </summary>
             <returns>true if any dependencies were released</returns>
         </member>
-        <member name="M:ServiceStack.RequestExtensions.ToOptimizedResult``1(ServiceStack.Web.IRequest,``0)">
+        <member name="M:ServiceStack.RequestExtensions.ToOptimizedResult(ServiceStack.Web.IRequest,System.Object)">
             <summary>
             Returns the optimized result for the IRequestContext. 
             Does not use or store results in any cache.

@@ -9,8 +9,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Services
     [DataContract]
     public class InsecureDevEnvironmentRestrictionResponse { }
 
-    public class InsecureDevEnvironmentRestrictionService
-        : TestServiceBase<InSecureDevEnvironmentRestriction>
+    public class InsecureDevEnvironmentRestrictionService : TestServiceBase<InSecureDevEnvironmentRestriction>
     {
         protected override object Run(InSecureDevEnvironmentRestriction request)
         {

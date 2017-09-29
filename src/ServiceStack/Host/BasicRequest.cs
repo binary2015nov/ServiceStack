@@ -51,7 +51,7 @@ namespace ServiceStack.Host
 
         public BasicRequest(object requestDto, 
             RequestAttributes requestAttributes = RequestAttributes.LocalSubnet | RequestAttributes.MessageQueue)
-            : this(MessageFactory.Create(requestDto), requestAttributes) {}
+            : this(MessageFactory.Create(requestDto), requestAttributes) { }
 
         public BasicRequest(IMessage message = null,
             RequestAttributes requestAttributes = RequestAttributes.LocalSubnet | RequestAttributes.MessageQueue)

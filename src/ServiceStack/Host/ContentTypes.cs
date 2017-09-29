@@ -11,9 +11,9 @@ namespace ServiceStack.Host
 {
     public class ContentTypes : IContentTypes
     {
-        private static readonly UTF8Encoding UTF8EncodingWithoutBom = new UTF8Encoding(false);
+        private static readonly Encoding UTF8EncodingWithoutBom = new UTF8Encoding(false);
 
-        public static ContentTypes Instance = new ContentTypes();
+        public static readonly ContentTypes Default = new ContentTypes();
 
         public Dictionary<string, StreamSerializerDelegate> ContentTypeSerializers
             = new Dictionary<string, StreamSerializerDelegate>();
@@ -27,7 +27,7 @@ namespace ServiceStack.Host
         public Dictionary<string, StreamDeserializerDelegateAsync> ContentTypeDeserializersAsync
             = new Dictionary<string, StreamDeserializerDelegateAsync>();
 
-        public static HashSet<string> KnownFormats = new HashSet<string>
+        public static readonly HashSet<string> KnownFormats = new HashSet<string>
         {
             "json",
             "xml",
@@ -135,7 +135,7 @@ namespace ServiceStack.Host
             switch (contentTypeAttr)
             {
                 case RequestAttributes.Xml:
-                    return XmlSerializer.SerializeToString(response).ToUtf8Bytes();
+                    return XmlSerializer.Serialize(response).ToUtf8Bytes();
 
                 case RequestAttributes.Json:
                     return JsonDataContractSerializer.Instance.SerializeToString(response).ToUtf8Bytes();
@@ -189,7 +189,7 @@ namespace ServiceStack.Host
             switch (contentTypeAttr)
             {
                 case RequestAttributes.Xml:
-                    return XmlSerializer.SerializeToString(response);
+                    return XmlSerializer.Serialize(response);
 
                 case RequestAttributes.Json:
                     return JsonDataContractSerializer.Instance.SerializeToString(response);
@@ -249,7 +249,7 @@ namespace ServiceStack.Host
             switch (contentTypeAttr)
             {
                 case RequestAttributes.Xml:
-                    return (r, o, s) => XmlSerializer.SerializeToStream(o, s);
+                    return (r, o, s) => XmlSerializer.Serialize(o, s);
 
                 case RequestAttributes.Json:
                     return (r, o, s) => JsonDataContractSerializer.Instance.SerializeToStream(o, s);
@@ -275,7 +275,7 @@ namespace ServiceStack.Host
             switch (contentTypeAttr)
             {
                 case RequestAttributes.Xml:
-                    return XmlSerializer.DeserializeFromString(request, type);
+                    return XmlSerializer.Deserialize(request, type);
 
                 case RequestAttributes.Json:
                     return JsonDataContractSerializer.Instance.DeserializeFromString(request, type);
@@ -308,7 +308,7 @@ namespace ServiceStack.Host
             {
                 case RequestAttributes.Xml:
                 case RequestAttributes.Soap11: //"text/xml; charset=utf-8" also matches xml
-                    return XmlSerializer.DeserializeFromStream;
+                    return (t, s) => XmlSerializer.Deserialize(s, t);
 
                 case RequestAttributes.Json:
                     return JsonDataContractSerializer.Instance.DeserializeFromStream;
