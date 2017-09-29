@@ -222,13 +222,14 @@ namespace ServiceStack.Razor
 
         public void ProcessRazorPage(IRequest httpReq, RazorPage contentPage, object model, IResponse httpRes)
         {
-            PageResolver.ExecuteRazorPage(httpReq, httpRes, model, contentPage);
+            PageResolver.ExecuteRazorPage(httpReq, httpRes.OutputStream, model, contentPage);
         }
 
-        public void ProcessRequest(IRequest httpReq, IResponse httpRes, object dto)
+        public void ProcessRequest(IRequest httpReq, IResponse httpRes, object dto) //only used in tests
         {
-            PageResolver.ProcessRequest(httpReq, httpRes, dto);
+            PageResolver.ProcessRequestAsync(httpReq, dto, httpRes.OutputStream).Wait();
         }
+        
         public void ProcessContentPageRequest(IRequest httpReq, IResponse httpRes)
         {
             ((IServiceStackHandler)PageResolver).ProcessRequest(httpReq, httpRes, httpReq.OperationName);
@@ -259,8 +260,7 @@ namespace ServiceStack.Razor
             if (this.VirtualFileSources == null)
                 throw new ArgumentNullException("VirtualPathProvider");
 
-            var writableFileProvider = this.VirtualFileSources as IVirtualFiles;
-            if (writableFileProvider == null)
+            if (!(this.VirtualFileSources is IVirtualFiles writableFileProvider))
                 throw new InvalidOperationException("VirtualPathProvider is not IVirtualFiles");
 
             var tmpPath = "/__tmp/{0}.cshtml".Fmt(Guid.NewGuid().ToString("N"));
@@ -302,12 +302,12 @@ namespace ServiceStack.Razor
             var httpReq = new BasicRequest();
             if (layout != null)
             {
-                httpReq.Items[RazorPageResolver.LayoutKey] = layout;
+                httpReq.Items[Keywords.Template] = layout;
             }
 
-            razorView = PageResolver.ExecuteRazorPage(httpReq, httpReq.Response, model, razorPage);
-
             var ms = (MemoryStream)httpReq.Response.OutputStream;
+            razorView = PageResolver.ExecuteRazorPage(httpReq, ms, model, razorPage);
+
             return ms.ToArray().FromUtf8Bytes();
         }
     }
