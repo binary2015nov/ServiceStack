@@ -70,7 +70,7 @@ namespace Funq
         /// Registers a service instance with the container. This instance will have <see cref="Owner.External"/> and 
         /// <see cref="ReuseScope.Hierarchy"/> behavior.
         /// </summary>
-        /// <param name = "instance"> Service instance to use.</param>
+        /// <param name="instance">Service instance to use.</param>
         public void Register<TService>(TService instance)
         {
             Register(null, instance);
@@ -80,8 +80,8 @@ namespace Funq
         /// Registers a named service instance with the container. This instance
         /// will have <see cref="Owner.External"/> and <see cref="ReuseScope.Hierarchy"/> behavior.
         /// </summary >
-        /// <param name= "name"> Name of the service to register.</param>
-        /// <param name = "instance"> Service instance to use.</param>        
+        /// <param name="name">Name of the service to register.</param>
+        /// <param name="instance">Service instance to use.</param>        
         public void Register<TService>(string name, TService instance)
         {
             var entry = RegisterImpl<TService, Func<Container, TService>>(name, null);

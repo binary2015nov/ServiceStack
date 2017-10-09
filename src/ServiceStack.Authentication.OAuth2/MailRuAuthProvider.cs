@@ -16,8 +16,8 @@ namespace ServiceStack.Authentication.OAuth2
         public MailRuAuthProvider(IAppSettings appSettings)
             : base(appSettings, Realm, Name)
         {
-            Method = appSettings.GetString($"oauth.{Name}.Method");
-            Secure = appSettings.GetString($"oauth.{Name}.Secure");
+            Method = appSettings.Get($"oauth.{Name}.Method");
+            Secure = appSettings.Get($"oauth.{Name}.Secure");
 
             this.AuthorizeUrl = this.AuthorizeUrl ?? Realm;
             this.AccessTokenUrl = this.AccessTokenUrl ?? "https://connect.mail.ru/oauth/token";

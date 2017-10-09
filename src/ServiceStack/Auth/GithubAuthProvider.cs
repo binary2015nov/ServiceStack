@@ -21,8 +21,8 @@ namespace ServiceStack.Auth
 
         public GithubAuthProvider(IAppSettings appSettings) : base(appSettings, Realm, Name, "ClientId", "ClientSecret")
         {
-            ClientId = appSettings.GetString("oauth.github.ClientId");
-            ClientSecret = appSettings.GetString("oauth.github.ClientSecret");
+            ClientId = appSettings.Get("oauth.github.ClientId");
+            ClientSecret = appSettings.Get("oauth.github.ClientSecret");
             Scopes = appSettings.Get("oauth.github.Scopes", new[] { "user" });
         }
 

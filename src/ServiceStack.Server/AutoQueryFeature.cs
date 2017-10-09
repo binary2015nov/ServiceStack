@@ -176,7 +176,7 @@ namespace ServiceStack
             appHost.Metadata.GetOperationAssemblies()
                 .Each(x => LoadFromAssemblies.Add(x));
 
-            ((ServiceStackHost)appHost).ServiceAssemblies.Each(x => {
+            appHost.ServiceAssemblies.Each(x => {
                 if (!LoadFromAssemblies.Contains(x))
                     LoadFromAssemblies.Add(x);
             });

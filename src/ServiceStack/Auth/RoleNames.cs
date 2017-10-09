@@ -1,4 +1,4 @@
-﻿namespace ServiceStack.Configuration
+﻿namespace ServiceStack.Auth
 {
     public static class RoleNames
     {

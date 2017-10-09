@@ -126,7 +126,7 @@ namespace ServiceStack
             if (unitTest)
                 return;
 
-            if (HostContext.StrictMode)
+            if (appHost.Config.StrictMode)
             {
                 var sessionInstance = sessionFactory();
                 if (TypeSerializer.HasCircularReferences(sessionInstance))

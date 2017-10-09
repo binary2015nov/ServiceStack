@@ -21,6 +21,9 @@
     <EmbeddedResource Include="Templates\*.*;js\*.*;MiniProfiler\UI\*.*" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="Configuration\ISettings.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\ServiceStack.Client\ServiceStack.Client.csproj" />
     <ProjectReference Include="..\ServiceStack.Common\ServiceStack.Common.csproj" />
   </ItemGroup>

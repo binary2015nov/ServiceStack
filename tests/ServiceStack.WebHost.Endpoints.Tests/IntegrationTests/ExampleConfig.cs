@@ -13,7 +13,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.IntegrationTests
 
 		public ExampleConfig(IAppSettings appConfig)
 		{
-			ConnectionString = appConfig.GetString("ConnectionString");
+			ConnectionString = appConfig.Get("ConnectionString");
 			DefaultFibonacciLimit = appConfig.Get("DefaultFibonacciLimit", 10);
 		}
 

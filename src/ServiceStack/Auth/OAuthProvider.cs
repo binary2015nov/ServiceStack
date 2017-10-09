@@ -16,12 +16,12 @@ namespace ServiceStack.Auth
             this.AuthRealm = appSettings.Get("OAuthRealm", authRealm);
 
             this.Provider = oAuthProvider;
-            this.RedirectUrl = appSettings.GetString($"oauth.{oAuthProvider}.RedirectUrl")
-                ?? FallbackConfig(appSettings.GetString("oauth.RedirectUrl"));
-            this.CallbackUrl = appSettings.GetString($"oauth.{oAuthProvider}.CallbackUrl")
-                ?? FallbackConfig(appSettings.GetString("oauth.CallbackUrl"));
-            this.ConsumerKey = appSettings.GetString($"oauth.{oAuthProvider}.{consumerKeyName}");
-            this.ConsumerSecret = appSettings.GetString($"oauth.{oAuthProvider}.{consumerSecretName}");
+            this.RedirectUrl = appSettings.Get($"oauth.{oAuthProvider}.RedirectUrl")
+                ?? FallbackConfig(appSettings.Get("oauth.RedirectUrl"));
+            this.CallbackUrl = appSettings.Get($"oauth.{oAuthProvider}.CallbackUrl")
+                ?? FallbackConfig(appSettings.Get("oauth.CallbackUrl"));
+            this.ConsumerKey = appSettings.Get($"oauth.{oAuthProvider}.{consumerKeyName}");
+            this.ConsumerSecret = appSettings.Get($"oauth.{oAuthProvider}.{consumerSecretName}");
 
             this.RequestTokenUrl = appSettings.Get($"oauth.{oAuthProvider}.RequestTokenUrl", authRealm + "oauth/request_token");
             this.AuthorizeUrl = appSettings.Get($"oauth.{oAuthProvider}.AuthorizeUrl", authRealm + "oauth/authorize");

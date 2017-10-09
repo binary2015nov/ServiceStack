@@ -21,10 +21,10 @@ namespace ServiceStack.Auth {
 
         public VkAuthProvider(IAppSettings appSettings)
             : base(appSettings, Realm, Name, "ApplicationId", "SecureKey") {
-            ApplicationId = appSettings.GetString("oauth.vkcom.ApplicationId");
-            SecureKey = appSettings.GetString("oauth.vkcom.SecureKey");
-            Scope = appSettings.GetString("oauth.vkcom.Scope");
-            ApiVersion = appSettings.GetString("oauth.vkcom.ApiVersion");
+            ApplicationId = appSettings.Get("oauth.vkcom.ApplicationId");
+            SecureKey = appSettings.Get("oauth.vkcom.SecureKey");
+            Scope = appSettings.Get("oauth.vkcom.Scope");
+            ApiVersion = appSettings.Get("oauth.vkcom.ApiVersion");
 
             AccessTokenUrl = TokenUrl;
         }

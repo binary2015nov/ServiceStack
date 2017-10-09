@@ -35,7 +35,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
         public IAppSettings AppSettings { get; set; }
 
         public string render(string key, string content) => $@"
-<h2>{AppSettings.GetString(key)}</h2>
+<h2>{AppSettings.Get(key)}</h2>
 <p>
     {content}
 </p>

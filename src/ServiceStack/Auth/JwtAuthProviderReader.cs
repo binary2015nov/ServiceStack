@@ -233,55 +233,55 @@ namespace ServiceStack.Auth
                 RequireHashAlgorithm = appSettings.Get("jwt.RequireHashAlgorithm", RequireHashAlgorithm);
                 EncryptPayload = appSettings.Get("jwt.EncryptPayload", EncryptPayload);
 
-                Issuer = appSettings.GetString("jwt.Issuer");
-                Audience = appSettings.GetString("jwt.Audience");
-                KeyId = appSettings.GetString("jwt.KeyId");
+                Issuer = appSettings.Get("jwt.Issuer");
+                Audience = appSettings.Get("jwt.Audience");
+                KeyId = appSettings.Get("jwt.KeyId");
 
-                var hashAlg = appSettings.GetString("jwt.HashAlgorithm");
+                var hashAlg = appSettings.Get("jwt.HashAlgorithm");
                 if (!string.IsNullOrEmpty(hashAlg))
                     HashAlgorithm = hashAlg;
 
-                var privateKeyXml = appSettings.GetString("jwt.PrivateKeyXml");
+                var privateKeyXml = appSettings.Get("jwt.PrivateKeyXml");
                 if (privateKeyXml != null)
                     PrivateKeyXml = privateKeyXml;
 
-                var publicKeyXml = appSettings.GetString("jwt.PublicKeyXml");
+                var publicKeyXml = appSettings.Get("jwt.PublicKeyXml");
                 if (publicKeyXml != null)
                     PublicKeyXml = publicKeyXml;
 
-                var base64 = appSettings.GetString("jwt.AuthKeyBase64");
+                var base64 = appSettings.Get("jwt.AuthKeyBase64");
                 if (base64 != null)
                     AuthKeyBase64 = base64;
 
-                var dateStr = appSettings.GetString("jwt.InvalidateTokensIssuedBefore");
+                var dateStr = appSettings.Get("jwt.InvalidateTokensIssuedBefore");
                 if (!string.IsNullOrEmpty(dateStr))
                     InvalidateTokensIssuedBefore = dateStr.FromJsv<DateTime>();
 
                 ExpireTokensIn = appSettings.Get("jwt.ExpireTokensIn", ExpireTokensIn);
                 ExpireRefreshTokensIn = appSettings.Get("jwt.ExpireRefreshTokensIn", ExpireRefreshTokensIn);
 
-                var intStr = appSettings.GetString("jwt.ExpireTokensInDays");
+                var intStr = appSettings.Get("jwt.ExpireTokensInDays");
                 if (intStr != null)
                     ExpireTokensInDays = int.Parse(intStr);
 
                 string base64Key;
 
                 var i = 1;
-                while ((base64Key = appSettings.GetString("jwt.PrivateKeyXml." + i++)) != null)
+                while ((base64Key = appSettings.Get("jwt.PrivateKeyXml." + i++)) != null)
                 {
                     var publicKey = base64Key.ToPublicRSAParameters();
                     FallbackPublicKeys.Add(publicKey);
                 }
 
                 i = 1;
-                while ((base64Key = appSettings.GetString("jwt.PublicKeyXml." + i++)) != null)
+                while ((base64Key = appSettings.Get("jwt.PublicKeyXml." + i++)) != null)
                 {
                     var publicKey = base64Key.ToPublicRSAParameters();
                     FallbackPublicKeys.Add(publicKey);
                 }
 
                 i = 1;
-                while ((base64Key = appSettings.GetString("jwt.AuthKeyBase64." + i++)) != null)
+                while ((base64Key = appSettings.Get("jwt.AuthKeyBase64." + i++)) != null)
                 {
                     var authKey = Convert.FromBase64String(base64Key);
                     FallbackAuthKeys.Add(authKey);

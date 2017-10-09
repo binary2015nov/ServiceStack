@@ -14,7 +14,7 @@ namespace ServiceStack
 
         public Dictionary<string, string> GetAll() => settings;
 
-        public List<string> GetAllKeys() => settings.Keys.ToList();
+        public IEnumerable<string> GetAllKeys() => settings.Keys;
 
         public bool Exists(string key) => settings.ContainsKey(key);
 
@@ -28,19 +28,19 @@ namespace ServiceStack
             settings[key] = textValue;
         }
 
-        public string GetString(string key) => settings.TryGetValue(key, out string value)
+        public string Get(string key) => settings.TryGetValue(key, out string value)
             ? value
             : null;
 
-        public IList<string> GetList(string key) => GetString(key).FromJsv<List<string>>();
+        public IList<string> GetList(string key) => Get(key).FromJsv<List<string>>();
 
-        public IDictionary<string, string> GetDictionary(string key) => GetString(key).FromJsv<Dictionary<string, string>>();
+        public IDictionary<string, string> GetDictionary(string key) => Get(key).FromJsv<Dictionary<string, string>>();
 
-        public T Get<T>(string key) => GetString(key).FromJsv<T>();
+        public T Get<T>(string key) => Get(key).FromJsv<T>();
 
         public T Get<T>(string key, T defaultValue)
         {
-            var value = GetString(key);
+            var value = Get(key);
             return value != null ? value.FromJsv<T>() : defaultValue;
         }
     }

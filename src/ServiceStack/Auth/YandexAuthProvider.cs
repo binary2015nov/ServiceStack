@@ -24,8 +24,8 @@ namespace ServiceStack.Auth
         public YandexAuthProvider(IAppSettings appSettings)
             : base(appSettings, Realm, Name, "AppId", "AppPassword")
         {
-            ApplicationId = appSettings.GetString("oauth.Yandex.AppId");
-            ApplicationPassword = appSettings.GetString("oauth.Yandex.AppPassword");
+            ApplicationId = appSettings.Get("oauth.Yandex.AppId");
+            ApplicationPassword = appSettings.Get("oauth.Yandex.AppPassword");
             AccessTokenUrl = TokenUrl;
         }
 

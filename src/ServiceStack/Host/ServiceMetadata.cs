@@ -240,7 +240,7 @@ namespace ServiceStack.Host
 
         public bool IsVisible(IRequest httpReq, Operation operation)
         {
-            if (HostContext.Config != null && !HostContext.Config.EnableAccessRestrictions)
+            if (!HostContext.Config.EnableAccessRestrictions)
                 return true;
 
             if (operation.RequestType.ExcludesFeature(Feature.Metadata))
@@ -256,7 +256,7 @@ namespace ServiceStack.Host
 
         public bool IsVisible(IRequest httpReq, Type requestType)
         {
-            if (HostContext.Config != null && !HostContext.Config.EnableAccessRestrictions)
+            if (!HostContext.Config.EnableAccessRestrictions)
                 return true;
 
             var operation = HostContext.Metadata.GetOperation(requestType);
@@ -265,7 +265,7 @@ namespace ServiceStack.Host
 
         public bool IsVisible(IRequest httpReq, Format format, string operationName)
         {
-            if (HostContext.Config != null && !HostContext.Config.EnableAccessRestrictions)
+            if (!HostContext.Config.EnableAccessRestrictions)
                 return true;
 
             Operation operation;
@@ -293,7 +293,7 @@ namespace ServiceStack.Host
 
         public bool CanAccess(RequestAttributes reqAttrs, Format format, string operationName)
         {
-            if (HostContext.Config != null && !HostContext.Config.EnableAccessRestrictions)
+            if (!HostContext.Config.EnableAccessRestrictions)
                 return true;
 
             Operation operation;
@@ -314,7 +314,7 @@ namespace ServiceStack.Host
 
         public bool CanAccess(Format format, string operationName)
         {
-            if (HostContext.Config != null && !HostContext.Config.EnableAccessRestrictions)
+            if (!HostContext.Config.EnableAccessRestrictions)
                 return true;
 
             Operation operation;
@@ -561,8 +561,6 @@ namespace ServiceStack.Host
 
     public class Operation
     {
-        public string Name => RequestType?.GetOperationName();
-
         public Type RequestType { get; set; }
         public Type ServiceType { get; set; }
         public Type ResponseType { get; set; }
@@ -577,6 +575,8 @@ namespace ServiceStack.Host
         public List<string> RequiresAnyRole { get; set; }
         public List<string> RequiredPermissions { get; set; }
         public List<string> RequiresAnyPermission { get; set; }
+
+        public string Name => RequestType?.GetOperationName();
     }
 
     public class OperationDto

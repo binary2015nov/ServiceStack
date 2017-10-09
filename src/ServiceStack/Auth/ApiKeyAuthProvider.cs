@@ -142,23 +142,23 @@ namespace ServiceStack.Auth
                 InitSchema = appSettings.Get("apikey.InitSchema", true);
                 RequireSecureConnection = appSettings.Get("apikey.RequireSecureConnection", true);
 
-                var env = appSettings.GetString("apikey.Environments");
+                var env = appSettings.Get("apikey.Environments");
                 if (env != null)
                     Environments = env.Split(ConfigUtils.ItemSeperator);
 
-                var type = appSettings.GetString("apikey.KeyTypes");
+                var type = appSettings.Get("apikey.KeyTypes");
                 if (type != null)
                     KeyTypes = type.Split(ConfigUtils.ItemSeperator);
 
-                var keySize = appSettings.GetString("apikey.KeySizeBytes");
+                var keySize = appSettings.Get("apikey.KeySizeBytes");
                 if (keySize != null)
                     KeySizeBytes = int.Parse(keySize);
 
-                var timespan = appSettings.GetString("apikey.ExpireKeysAfter");
+                var timespan = appSettings.Get("apikey.ExpireKeysAfter");
                 if (timespan != null)
                     ExpireKeysAfter = timespan.FromJsv<TimeSpan>();
 
-                timespan = appSettings.GetString("apikey.SessionCacheDuration");
+                timespan = appSettings.Get("apikey.SessionCacheDuration");
                 if (timespan != null)
                     SessionCacheDuration = timespan.FromJsv<TimeSpan>();
             }

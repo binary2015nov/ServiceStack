@@ -26,11 +26,11 @@ namespace ServiceStack
             ApplyTo = applyTo;
         }
 
-        public void ResponseFilter(IRequest req, IResponse res, object response)
+        public void ResponseFilter(IRequest req, IResponse res, object responseDto)
         {
             ApplyTo httpMethod = req.HttpMethodAsApplyTo();
             if (ApplyTo.Has(httpMethod))
-                this.Execute(req, res, response);
+                this.Execute(req, res, responseDto);
         }
 
         /// <summary>

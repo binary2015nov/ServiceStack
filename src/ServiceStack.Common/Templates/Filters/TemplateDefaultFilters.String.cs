@@ -27,7 +27,7 @@ namespace ServiceStack.Templates
             return rawStr;
         }
 
-        public string appSetting(string name) => Context.AppSettings.GetString(name);
+        public string appSetting(string name) => Context.AppSettings.Get(name);
 
         public string indent() => Context.Args[TemplateConstants.DefaultIndent] as string;
         public string indents(int count) => repeat(Context.Args[TemplateConstants.DefaultIndent] as string, count);

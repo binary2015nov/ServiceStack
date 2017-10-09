@@ -5,53 +5,46 @@ using System.Linq;
 namespace ServiceStack.Configuration
 {
     /// <summary>
-    /// More familiar name for the new crowd.
+    /// Provides access to the System.Configuration.AppSettingsSection data for the current application's default configuration.
     /// </summary>
     public class AppSettings : AppSettingsBase
     {
-        private class ConfigurationManagerWrapper : ISettings
+        private class ConfigurationManagerWrapper : ISettingsReader
         {
+#if NETSTANDARD1_6
+            private Dictionary<string, string> appSettings;
+            public Dictionary<string, string> AppSettings { get { return appSettings ?? (appSettings = ConfigUtils.GetAppSettingsMap()); } }
+#endif
+
             public string Get(string key)
             {
 #if !NETSTANDARD1_6
                 return ConfigurationManager.AppSettings[key];
 #else
-                var appSettings = ConfigUtils.GetAppSettingsMap();
                 string value;
-                return appSettings.TryGetValue(key, out value)
+                return AppSettings.TryGetValue(key, out value)
                     ? value
                     : null;
 #endif
             }
 
-            public List<string> GetAllKeys()
+            public IEnumerable<string> GetAllKeys()
             {
 #if !NETSTANDARD1_6
-                return new List<string>(ConfigurationManager.AppSettings.AllKeys);
+                return ConfigurationManager.AppSettings.AllKeys;
 #else
-                var appSettings = ConfigUtils.GetAppSettingsMap();
-                return appSettings.Keys.ToList();
+                return AppSettings.Keys;
 #endif
             }
         }
 
         /// <summary>
-        /// The tier lets you specify a retrieving a setting with the tier prefix first before falling back to the original key. 
-        /// E.g a tier of 'Live' looks for 'Live.{Key}' or if not found falls back to '{Key}'.
+        /// Initializes a new instance of the ServiceStack.Configuration.AppSettings class.
         /// </summary>
+        /// <param name="tier">The tier used to retrieve a setting. The default value is null.</param>
         public AppSettings(string tier = null) : base(new ConfigurationManagerWrapper())
         {
             Tier = tier;
-        }
-
-        /// <summary>
-        /// Returns string if exists, otherwise null
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public override string GetString(string name) //Keeping backwards compatible
-        {
-            return base.GetNullableString(name); 
         }
     }
 }

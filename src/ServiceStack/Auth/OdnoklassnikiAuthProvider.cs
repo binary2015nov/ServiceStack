@@ -30,9 +30,9 @@ namespace ServiceStack.Auth
         public OdnoklassnikiAuthProvider(IAppSettings appSettings)
             : base(appSettings, Realm, Name, "ApplicationId", "SecretKey")
         {
-            ApplicationId = appSettings.GetString("oauth.Odnoklassniki.ApplicationId");
-            PublicKey = appSettings.GetString("oauth.Odnoklassniki.PublicKey");
-            SecretKey = appSettings.GetString("oauth.Odnoklassniki.SecretKey");
+            ApplicationId = appSettings.Get("oauth.Odnoklassniki.ApplicationId");
+            PublicKey = appSettings.Get("oauth.Odnoklassniki.PublicKey");
+            SecretKey = appSettings.Get("oauth.Odnoklassniki.SecretKey");
 
             AccessTokenUrl = TokenUrl;
         }

@@ -119,7 +119,7 @@ namespace ServiceStack.Common.Tests
         public void GetString_returns_null_On_Nonexistent_Key()
         {
             var appSettings = GetAppSettings();
-            var value = appSettings.GetString("GarbageKey");
+            var value = appSettings.Get("GarbageKey");
             Assert.IsNull(value);
         }
 
@@ -152,21 +152,6 @@ namespace ServiceStack.Common.Tests
     [TestFixture]
     public class DictionarySettingsTest : AppSettingsTest
     {
-        [Test]
-        public void GetRequiredString_Throws_Exception_On_Nonexistent_Key()
-        {
-            var appSettings = GetAppSettings();
-            try
-            {
-                appSettings.GetRequiredString("GarbageKey");
-                Assert.Fail("GetString did not throw a ConfigurationErrorsException");
-            }
-            catch (ConfigurationErrorsException ex)
-            {
-                Assert.That(ex.Message.Contains("GarbageKey"));
-            }
-        }
-
         [Test]
         public void Does_work_with_ParseKeyValueText()
         {
@@ -248,7 +233,7 @@ ObjectKey {SomeSetting:Test,SomeOtherSetting:12,FinalSetting:Final}";
         public void GetNullable_String_Returns_Null()
         {
             var appSettings = GetAppSettings();
-            var value = appSettings.GetNullableString("NullableKey");
+            var value = appSettings.Get("NullableKey");
 
             Assert.That(value, Is.Null);
         }
@@ -257,7 +242,7 @@ ObjectKey {SomeSetting:Test,SomeOtherSetting:12,FinalSetting:Final}";
         public void GetString_Returns_Value()
         {
             var appSettings = GetAppSettings();
-            var value = appSettings.GetString("RealKey");
+            var value = appSettings.Get("RealKey");
 
             Assert.That(value, Is.EqualTo("This is a real value"));
         }
@@ -409,7 +394,6 @@ ObjectKey {SomeSetting:Test,SomeOtherSetting:12,FinalSetting:Final}";
         {
             var appSettings = GetAppSettings();
             var allKeys = appSettings.GetAllKeys();
-            allKeys.Remove("servicestack:license");
 
             Assert.That(allKeys, Is.EquivalentTo(GetConfigDictionary().Keys));
         }

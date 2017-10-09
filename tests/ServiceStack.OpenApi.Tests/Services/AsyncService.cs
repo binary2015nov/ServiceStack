@@ -23,7 +23,7 @@ namespace ServiceStack.OpenApi.Tests.Services
     {
         public async Task<InfoUpdateResponseDto> Update(UpdateInfoReq query)
         {
-            return new InfoUpdateResponseDto {Result = "Hello"};
+            return new InfoUpdateResponseDto { Result = "Hello" };
         }
     }
 }

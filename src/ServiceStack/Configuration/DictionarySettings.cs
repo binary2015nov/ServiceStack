@@ -3,13 +3,13 @@ using System.Linq;
 
 namespace ServiceStack.Configuration
 {
-    public class DictionarySettings : AppSettingsBase, ISettings
+    public class DictionarySettings : AppSettingsBase
     {
         private readonly DictionaryWrapper instance;
 
         class DictionaryWrapper : ISettingsWriter
         {
-            internal readonly Dictionary<string, string> Map;
+            public readonly Dictionary<string, string> Map;
 
             public DictionaryWrapper(Dictionary<string, string> map = null)
             {
@@ -22,7 +22,7 @@ namespace ServiceStack.Configuration
                 return Map.TryGetValue(key, out value) ? value : null;
             }
 
-            public List<string> GetAllKeys()
+            public IEnumerable<string> GetAllKeys()
             {
                 return Map.Keys.ToList();
             }
@@ -37,10 +37,9 @@ namespace ServiceStack.Configuration
             }
         }
 
-        public DictionarySettings(Dictionary<string, string> map=null)
-            : base(new DictionaryWrapper(map))
+        public DictionarySettings(Dictionary<string, string> map = null) : base(new DictionaryWrapper(map))
         {
-            instance = (DictionaryWrapper)settings;
+            instance = (DictionaryWrapper)SettingsReader;
         }
 
         public override Dictionary<string, string> GetAll()

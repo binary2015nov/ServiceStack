@@ -76,7 +76,7 @@ namespace ServiceStack
         public static void RegisterLicenseFromAppSettings(IAppSettings appSettings)
         {
             //Automatically register license key stored in <appSettings/>
-            var licenceKeyText = appSettings.GetString(NetStandardPclExport.AppSettingsKey);
+            var licenceKeyText = appSettings.Get(NetStandardPclExport.AppSettingsKey);
             if (!string.IsNullOrEmpty(licenceKeyText))
             {
                 LicenseUtils.RegisterLicense(licenceKeyText);

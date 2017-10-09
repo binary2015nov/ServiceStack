@@ -5,8 +5,7 @@ using System;
 
 namespace ServiceStack.Messaging.Redis
 {
-	public class RedisTransientMessageService
-		: TransientMessageServiceBase
+	public class RedisTransientMessageService : TransientMessageServiceBase
 	{
 		private readonly RedisTransientMessageFactory messageFactory;
 

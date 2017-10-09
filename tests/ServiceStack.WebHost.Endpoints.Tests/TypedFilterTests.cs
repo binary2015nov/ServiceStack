@@ -1,14 +1,17 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using ServiceStack.Host;
+using ServiceStack.Text;
 using ServiceStack.Testing;
 using ServiceStack.Web;
+using System.Linq;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
     [TestFixture]
     public class TypedFilterTests
     {
-        private class Dto : IReturn<Dto>
+        public class Dto : IReturn<Dto>
         {
             public bool RequestFilter { get; set; }
             public bool ResponseFilter { get; set; }
@@ -19,10 +22,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             public object Any(Dto r) => r;
         }
 
-        private interface IDependency { }
-        private class Dependency : IDependency { }
+        public interface IDependency { }
+        public class Dependency : IDependency { }
 
-        private class TypedRequestFilter : ITypedFilter<Dto>
+        public class TypedRequestFilter : ITypedFilter<Dto>
         {
             public TypedRequestFilter(IDependency dependency) => Dependency = dependency;
 
@@ -31,7 +34,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             public void Invoke(IRequest req, IResponse res, Dto dto) => dto.RequestFilter = true;
         }
 
-        private class TypedResponseFilter : ITypedFilter<Dto>
+        public class TypedResponseFilter : ITypedFilter<Dto>
         {
             public TypedResponseFilter(IDependency dependency) => Dependency = dependency;
 
@@ -68,7 +71,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Request_filter_auto_wired()
         {
-            // Arrange
             var filter = appHost.GetContainer().Resolve<TypedRequestFilter>();
 
             // Assert

@@ -10,18 +10,14 @@ namespace ServiceStack.Host
     {
         private readonly static ILog Logger = LogManager.GetLogger(typeof(ServiceRoutes));
 
-        public List<RestPath> RestPaths { get; private set; }
-
-        public ServiceRoutes()
-        {
-            RestPaths = new List<RestPath>();
-        }
+        private List<RestPath> restPaths = new List<RestPath>();
+        public IEnumerable<RestPath> RestPaths { get => restPaths; }
 
         public IServiceRoutes Add<TRequest>(string restPath)
         {
             if (HasExistingRoute(typeof(TRequest), restPath)) return this;
 
-            RestPaths.Add(new RestPath(typeof(TRequest), restPath));
+            restPaths.Add(new RestPath(typeof(TRequest), restPath));
             return this;
         }
 
@@ -29,7 +25,7 @@ namespace ServiceStack.Host
         {
             if (HasExistingRoute(typeof(TRequest), restPath)) return this;
 
-            RestPaths.Add(new RestPath(typeof(TRequest), restPath, verbs));
+            restPaths.Add(new RestPath(typeof(TRequest), restPath, verbs));
             return this;
         }
 
@@ -37,7 +33,7 @@ namespace ServiceStack.Host
         {
             if (HasExistingRoute(requestType, restPath)) return this;
 
-            RestPaths.Add(new RestPath(requestType, restPath, verbs));
+            restPaths.Add(new RestPath(requestType, restPath, verbs));
             return this;
         }
 
@@ -45,10 +41,7 @@ namespace ServiceStack.Host
         {
             if (HasExistingRoute(requestType, restPath)) return this;
 
-            RestPaths.Add(new RestPath(requestType, restPath, verbs)
-            {
-                Priority = priority
-            });
+            restPaths.Add(new RestPath(requestType, restPath, verbs) { Priority = priority });
             return this;
         }
 
@@ -56,7 +49,7 @@ namespace ServiceStack.Host
         {
             if (HasExistingRoute(requestType, restPath)) return this;
 
-            RestPaths.Add(new RestPath(requestType, restPath, verbs, summary, notes));
+            restPaths.Add(new RestPath(requestType, restPath, verbs, summary, notes));
             return this;
         }
 

@@ -39,7 +39,7 @@ namespace ServiceStack.Authentication.OAuth2
 
             // https://developer.foursquare.com/overview/versioning
             DateTime versionDate;
-            if (!DateTime.TryParse(appSettings.GetString("oauth.{0}.Version".Fmt(Name)), out versionDate)) 
+            if (!DateTime.TryParse(appSettings.Get("oauth.{0}.Version".Fmt(Name)), out versionDate)) 
                 versionDate = DateTime.UtcNow;
 
             // version dates before June 9, 2012 will automatically be rejected
@@ -50,13 +50,13 @@ namespace ServiceStack.Authentication.OAuth2
 
             // Profile Image URL requires dimensions (Width x height) in the URL (default = 64x64 and minimum = 16x16)
             int profileImageWidth;
-            if (!int.TryParse(appSettings.GetString("oauth.{0}.ProfileImageWidth".Fmt(Name)), out profileImageWidth))
+            if (!int.TryParse(appSettings.Get("oauth.{0}.ProfileImageWidth".Fmt(Name)), out profileImageWidth))
                 profileImageWidth = 64;
 
             this.ProfileImageWidth = Math.Max(profileImageWidth, 16);
 
             int profileImageHeight;
-            if (!int.TryParse(appSettings.GetString("oauth.{0}.ProfileImageHeight".Fmt(Name)), out profileImageHeight))
+            if (!int.TryParse(appSettings.Get("oauth.{0}.ProfileImageHeight".Fmt(Name)), out profileImageHeight))
                 profileImageHeight = 64;
 
             this.ProfileImageHeight = Math.Max(profileImageHeight, 16);

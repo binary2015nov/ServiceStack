@@ -15,7 +15,7 @@ namespace ServiceStack.Configuration
     {
         private OrmLiteSettings DbSettings
         {
-            get { return (OrmLiteSettings)base.settings; }
+            get { return (OrmLiteSettings)base.SettingsReader; }
         }
 
         public IDbConnectionFactory DbFactory
@@ -24,7 +24,7 @@ namespace ServiceStack.Configuration
         }
 
         public OrmLiteAppSettings(IDbConnectionFactory dbFactory)
-            : base(new OrmLiteSettings(dbFactory)) {}
+            : base(new OrmLiteSettings(dbFactory)) { }
 
         class OrmLiteSettings : ISettingsWriter
         {
@@ -44,7 +44,7 @@ namespace ServiceStack.Configuration
                 }
             }
 
-            public List<string> GetAllKeys()
+            public IEnumerable<string> GetAllKeys()
             {
                 using (var db = DbFactory.Open())
                 {
@@ -94,10 +94,10 @@ namespace ServiceStack.Configuration
             return base.Get(key, default(T));
         }
 
-        public override string GetString(string name)
-        {
-            return base.GetNullableString(name);
-        }
+        //public override string GetString(string name)
+        //{
+        //    return base.GetNullableString(name);
+        //}
 
         public override void Set<T>(string key, T value)
         {

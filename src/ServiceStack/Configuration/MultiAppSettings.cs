@@ -4,12 +4,11 @@ using System.Linq;
 
 namespace ServiceStack.Configuration
 {
-    public class MultiAppSettings : AppSettingsBase, ISettings
+    public class MultiAppSettings : AppSettingsBase
     {
-        public MultiAppSettings(params IAppSettings[] appSettings)
-            : base(new MultiSettingsWrapper(appSettings))
+        public MultiAppSettings(params IAppSettings[] appSettings) : base(new MultiSettingsWrapper(appSettings))
         {
-            this.instance = (MultiSettingsWrapper)settings;
+            this.instance = (MultiSettingsWrapper)SettingsReader;
         }
 
         private MultiSettingsWrapper instance;
@@ -29,11 +28,11 @@ namespace ServiceStack.Configuration
             public string Get(string key)
             {
                 return appSettings
-                    .Select(appSetting => appSetting.GetString(key))
+                    .Select(appSetting => appSetting.Get(key))
                     .FirstOrDefault(value => value != null);
             }
 
-            public List<string> GetAllKeys()
+            public IEnumerable<string> GetAllKeys()
             {
                 var allKeys = new HashSet<string>();
                 appSettings.Each(s => s.GetAllKeys().Each(x => allKeys.Add(x)));

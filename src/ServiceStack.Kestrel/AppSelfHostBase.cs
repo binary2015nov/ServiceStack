@@ -174,7 +174,7 @@ namespace ServiceStack
         /// <summary>
         /// Override to Confgiure .NET Core App
         /// </summary>
-        public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env) {}
+        public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env) { }
 
         public static AppSelfHostBase HostInstance => (AppSelfHostBase)PlatformNetCore.HostInstance;
 

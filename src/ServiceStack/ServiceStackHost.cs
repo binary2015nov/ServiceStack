@@ -35,13 +35,13 @@ namespace ServiceStack
 
         public readonly DateTime CreatedAt = DateTime.Now;
 
+        public string ServiceName { get; set; }
+
+        public Assembly[] ServiceAssemblies { get; set; }
+
         public HostConfig Config { get; private set; }
 
         public IAppSettings AppSettings { get; set; }
-
-        public string ServiceName { get; set; }
-
-        public Assembly[] ServiceAssemblies { get; private set; }
 
         protected ServiceStackHost(string serviceName, params Assembly[] assembliesWithServices)
         {
@@ -49,10 +49,10 @@ namespace ServiceStack
             ServiceAssemblies = assembliesWithServices;
             Config = new HostConfig { DebugMode = GetType().GetAssembly().IsDebugBuild() };
             AppSettings = new AppSettings();
-            Metadata = new ServiceMetadata();
             Container = new Container { DefaultOwner = Owner.External };
             ContentTypes = ServiceStack.Host.ContentTypes.Default;
             Routes = new ServiceRoutes();
+            Metadata = new ServiceMetadata();
             PreRequestFilters = new List<Action<IRequest, IResponse>>();
             RequestConverters = new List<Func<IRequest, object, object>>();
             ResponseConverters = new List<Func<IRequest, object, object>>();

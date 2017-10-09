@@ -265,8 +265,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         private static ServerEventsClient CreateServerEventsClient(params string[] channels)
         {
-            var client = new ServerEventsClient(Config.AbsoluteBaseUri, channels);
-            return client;
+            return new ServerEventsClient(Config.AbsoluteBaseUri, channels);
         }
 
         [Test]

@@ -5,24 +5,19 @@ namespace ServiceStack.Configuration
 {
     public class EnvironmentVariableSettings : AppSettingsBase
     {
-        class EnvironmentSettingsWrapper : ISettings
+        class EnvironmentSettingsWrapper : ISettingsReader
         {
             public string Get(string key)
             {
                 return Environment.GetEnvironmentVariable(key);
             }
 
-            public List<string> GetAllKeys()
+            public IEnumerable<string> GetAllKeys()
             {
                 return Environment.GetEnvironmentVariables().Keys.Map(x => x.ToString());
             }
         }
 
-        public EnvironmentVariableSettings() : base(new EnvironmentSettingsWrapper()) {}
-
-        public override string GetString(string name)
-        {
-            return base.GetNullableString(name);
-        }
+        public EnvironmentVariableSettings() : base(new EnvironmentSettingsWrapper()) { }
     }
 }

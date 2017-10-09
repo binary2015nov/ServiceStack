@@ -37,7 +37,7 @@ namespace ServiceStack.Validation
 
             if (ScanAppHostAssemblies)
             {
-                appHost.GetContainer().RegisterValidators(((ServiceStackHost)appHost).ServiceAssemblies.ToArray());
+                appHost.GetContainer().RegisterValidators(appHost.ServiceAssemblies);
             }
         }
        

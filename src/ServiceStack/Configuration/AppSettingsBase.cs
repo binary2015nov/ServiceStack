@@ -1,103 +1,95 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using ServiceStack.Text;
 
 namespace ServiceStack.Configuration
 {
     public delegate string ParsingStrategyDelegate(string originalSetting);
 
-    public class AppSettingsBase : IAppSettings, ISettingsWriter
+    /// <summary>
+    /// Provides a collection of keys and values that contains application settings. This is an abstract class.
+    /// </summary>
+    public abstract class AppSettingsBase : IAppSettings
     {
-        protected ISettings settings;
-        protected ISettingsWriter settingsWriter; 
+        protected ISettingsReader SettingsReader;
 
-        protected const string ErrorAppsettingNotFound = "Unable to find App Setting: {0}";
+        protected ISettingsWriter SettingsWriter;
 
+        /// <summary>
+        /// Gets or sets the prefix of key, which lets you retrieve a setting with the tier first before falling back to the original key. 
+        /// E.g a tier of 'Live' looks for 'Live.{Key}' or if not found falls back to '{Key}'.
+        /// </summary>
         public string Tier { get; set; }
 
         public ParsingStrategyDelegate ParsingStrategy { get; set; }
 
-        public AppSettingsBase(ISettings settings=null)
+        /// <summary>
+        /// Initializes a new instance of the ServiceStack.Configuration.AppSettingsBase class using the specified settings reader.
+        /// </summary>
+        /// <param name="reader">The instance of class to read the settings.</param>
+        protected AppSettingsBase(ISettingsReader reader = null)
         {
-            Init(settings);
+            SettingsReader = reader;
+            SettingsWriter = (reader as ISettingsWriter) ?? new DictionarySettings();
         }
 
-        protected void Init(ISettings settings)
+        /// <summary>
+        /// Gets the string value associated with the specified key.
+        /// </summary>
+        /// <param name="key">The specified key.</param>
+        /// <returns>The string value associated with the specified key. If the specified key is not found, return null.</returns>
+        public virtual string Get(string key)
         {
-            this.settings = settings;
-            this.settingsWriter = settings as ISettingsWriter;
+            return GetNullableString(key);
         }
 
-        public virtual string GetNullableString(string name)
+        public virtual IEnumerable<string> GetAllKeys()
         {
-            var value = Tier != null
-                ? Get($"{Tier}.{name}") ?? Get(name)
-                : Get(name);
+            var keys = SettingsWriter.GetAllKeys().ToHashSet();
+            if (SettingsReader != SettingsWriter)
+                SettingsReader.GetAllKeys().Each(x => keys.Add(x));
 
-            return ParsingStrategy != null
-                ? ParsingStrategy(value)
-                : value;
-        }
-
-        public string Get(string name)
-        {
-            var value = settingsWriter?.Get(name);
-            return value ?? settings.Get(name);
+            return keys;
         }
 
         public virtual Dictionary<string, string> GetAll()
         {
-            var keys = GetAllKeys();
-            var to = new Dictionary<string,string>();
-            foreach (var key in keys)
+            var dictionary = new Dictionary<string, string>();
+            foreach (var key in GetAllKeys())
             {
-                to[key] = GetNullableString(key);
+                dictionary[key] = Get(key);
             }
-            return to;
-        }
-
-        public virtual List<string> GetAllKeys()
-        {
-            var keys = settings.GetAllKeys().ToHashSet();
-            settingsWriter?.GetAllKeys().Each(x => keys.Add(x));
-
-            return keys.ToList();
+            return dictionary;
         }
 
         public virtual bool Exists(string key)
         {
-            return GetNullableString(key) != null;
-        }
+            if (SettingsWriter.GetAllKeys().Contains(key))
+                return true;
 
-        public virtual string GetString(string name)
-        {
-            return GetNullableString(name);
-        }
+            if (SettingsWriter != SettingsReader)
+                return SettingsReader.GetAllKeys().Contains(key);
 
-        public virtual string GetRequiredString(string name)
-        {
-            var value = GetNullableString(name);
-            if (value == null)
-                throw new ConfigurationErrorsException(string.Format(ErrorAppsettingNotFound, name));
-
-            return value;
+            return false;
         }
 
         public virtual IList<string> GetList(string key)
         {
-            var value = GetString(key);
-            return value == null 
-                ? new List<string>() 
+            var value = Get(key);
+            return value == null
+                ? new List<string>()
                 : ConfigUtils.GetListFromAppSettingValue(value);
         }
 
         public virtual IDictionary<string, string> GetDictionary(string key)
         {
-            var value = GetString(key);
             try
             {
+                var value = Get(key);
                 return ConfigUtils.GetDictionaryFromAppSettingValue(value);
             }
             catch (Exception ex)
@@ -108,42 +100,44 @@ namespace ServiceStack.Configuration
             }
         }
 
-        public virtual T Get<T>(string name)
+        public virtual T Get<T>(string key)
         {
-            var stringValue = GetNullableString(name);
-            return stringValue != null 
-                ? TypeSerializer.DeserializeFromString<T>(stringValue) 
-                : default(T);
+            return Get(key, default(T));
         }
 
-        public virtual T Get<T>(string name, T defaultValue)
+        public virtual T Get<T>(string key, T defaultValue)
         {
-            var stringValue = GetNullableString(name);
-
-            T ret = defaultValue;
             try
             {
-                if (stringValue != null)
-                {
-                    ret = TypeSerializer.DeserializeFromString<T>(stringValue);
-                }
+                var value = Get(key);
+                return value != null ? TypeSerializer.DeserializeFromString<T>(value) : defaultValue;            
             }
             catch (Exception ex)
             {
-                var message = $"The {name} setting had an invalid format. " +
-                              $"The value \"{stringValue}\" could not be cast to type {typeof(T).FullName}";
-                throw new ConfigurationErrorsException(message, ex);
+                throw new ConfigurationErrorsException(
+                    $"The {key} setting had an invalid format, could not be cast to the type {typeof(T).FullName}.", ex);
             }
-
-            return ret;
         }
 
         public virtual void Set<T>(string key, T value)
         {
-            if (settingsWriter == null)
-                settingsWriter = new DictionarySettings();
+            SettingsWriter.Set(key, value);
+        }
 
-            settingsWriter.Set(key, value);
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string GetRaw(string key)
+        {
+            return SettingsWriter.Get(key) ?? SettingsReader.Get(key);
+        }
+
+        protected virtual string GetNullableString(string key)
+        {
+            var value = Tier != null ? GetRaw($"{Tier}.{key}") ?? GetRaw(key) : GetRaw(key);
+
+            return ParsingStrategy != null
+                ? ParsingStrategy(value)
+                : value;
         }
     }
 

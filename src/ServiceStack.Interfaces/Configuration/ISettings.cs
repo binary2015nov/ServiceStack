@@ -19,7 +19,7 @@ namespace ServiceStack.Configuration
         /// Return all keys in this configuration source.
         /// </summary>
         /// <returns></returns>
-        List<string> GetAllKeys();
+        IEnumerable<string> GetAllKeys();
     }
 
     public interface ISettingsWriter : ISettingsReader

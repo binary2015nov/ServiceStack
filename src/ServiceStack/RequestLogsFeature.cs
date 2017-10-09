@@ -1,6 +1,6 @@
 ﻿using System;
+using ServiceStack.Auth;
 using ServiceStack.Admin;
-using ServiceStack.Configuration;
 using ServiceStack.Host;
 using ServiceStack.Web;
 

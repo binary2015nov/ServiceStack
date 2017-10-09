@@ -1,9 +1,10 @@
 ﻿using Funq;
 using NUnit.Framework;
+using ServiceStack.Host;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
-    [TestFixture]
+    [TestFixture, Ignore("Uncomment the commented code to test")]
     public class SharedDtoTests
     {
         [Route("/shareddto")]
@@ -22,13 +23,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        public class Service2 : IService
-        {
-            public object Post(RequestDto req)
-            {
-                return new ResponseDto { ServiceName = GetType().Name };
-            }
-        }
+        //public class Service2 : IService
+        //{
+        //    public object Post(RequestDto req)
+        //    {
+        //        return new ResponseDto { ServiceName = GetType().Name };
+        //    }
+        //}
 
         class SharedDtoAppHost : AppHostHttpListenerBase
         {
@@ -36,6 +37,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             public SharedDtoAppHost() : base("Shared dto tests", typeof(Service1).GetAssembly()) { }
 
             public override void Configure(Container container) { }
+
+            protected override ServiceController CreateServiceController()
+            {
+                return base.CreateServiceController();
+            }
         }
 
         private ServiceStackHost AppHost;
@@ -69,7 +75,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [Test, TestCaseSource(nameof(RestClients))]
-        public void Can_call_service2(IRestClient client)
+        public void Cannot_call_service2(IRestClient client)
         {
             try
             {

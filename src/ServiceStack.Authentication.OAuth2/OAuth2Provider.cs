@@ -17,24 +17,24 @@ namespace ServiceStack.Authentication.OAuth2
         protected OAuth2Provider(IAppSettings appSettings, string realm, string provider)
             : base(appSettings, realm, provider)
         {
-            this.ConsumerKey = appSettings.GetString("oauth.{0}.ClientId".Fmt(provider))
-                ?? appSettings.GetString("oauth.{0}.ConsumerKey".Fmt(provider))
-                ?? FallbackConfig(appSettings.GetString("oauth.ConsumerKey"));
-            this.ConsumerSecret = appSettings.GetString("oauth.{0}.ClientSecret".Fmt(provider))
-                ?? appSettings.GetString("oauth.{0}.ConsumerSecret".Fmt(provider))
-                ?? FallbackConfig(appSettings.GetString("oauth.ConsumerSecret"));
-            var scopes = appSettings.GetString("oauth.{0}.Scopes".Fmt(provider))
-                ?? FallbackConfig(appSettings.GetString("oauth.Scopes")) ?? "";
+            this.ConsumerKey = appSettings.Get("oauth.{0}.ClientId".Fmt(provider))
+                ?? appSettings.Get("oauth.{0}.ConsumerKey".Fmt(provider))
+                ?? FallbackConfig(appSettings.Get("oauth.ConsumerKey"));
+            this.ConsumerSecret = appSettings.Get("oauth.{0}.ClientSecret".Fmt(provider))
+                ?? appSettings.Get("oauth.{0}.ConsumerSecret".Fmt(provider))
+                ?? FallbackConfig(appSettings.Get("oauth.ConsumerSecret"));
+            var scopes = appSettings.Get("oauth.{0}.Scopes".Fmt(provider))
+                ?? FallbackConfig(appSettings.Get("oauth.Scopes")) ?? "";
             this.Scopes = scopes.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 
-            this.RequestTokenUrl = appSettings.GetString("oauth.{0}.RequestTokenUrl".Fmt(provider))
-                ?? FallbackConfig(appSettings.GetString("oauth.RequestTokenUrl"));
-            this.AuthorizeUrl = appSettings.GetString("oauth.{0}.AuthorizeUrl".Fmt(provider))
-                ?? FallbackConfig(appSettings.GetString("oauth.AuthorizeUrl"));
-            this.AccessTokenUrl = appSettings.GetString("oauth.{0}.AccessTokenUrl".Fmt(provider))
-                ?? FallbackConfig(appSettings.GetString("oauth.AccessTokenUrl"));
-            this.UserProfileUrl = appSettings.GetString("oauth.{0}.UserProfileUrl".Fmt(provider))
-                ?? FallbackConfig(appSettings.GetString("oauth.UserProfileUrl"));
+            this.RequestTokenUrl = appSettings.Get("oauth.{0}.RequestTokenUrl".Fmt(provider))
+                ?? FallbackConfig(appSettings.Get("oauth.RequestTokenUrl"));
+            this.AuthorizeUrl = appSettings.Get("oauth.{0}.AuthorizeUrl".Fmt(provider))
+                ?? FallbackConfig(appSettings.Get("oauth.AuthorizeUrl"));
+            this.AccessTokenUrl = appSettings.Get("oauth.{0}.AccessTokenUrl".Fmt(provider))
+                ?? FallbackConfig(appSettings.Get("oauth.AccessTokenUrl"));
+            this.UserProfileUrl = appSettings.Get("oauth.{0}.UserProfileUrl".Fmt(provider))
+                ?? FallbackConfig(appSettings.Get("oauth.UserProfileUrl"));
 
             this.SaveExtendedUserInfo = appSettings.Get($"oauth.{provider}.SaveExtendedUserInfo", true);
         }

@@ -64,10 +64,10 @@ namespace ServiceStack.Auth
             this.Provider = oAuthProvider;
             if (appSettings != null)
             {
-                this.CallbackUrl = appSettings.GetString($"oauth.{oAuthProvider}.CallbackUrl")
-                    ?? FallbackConfig(appSettings.GetString("oauth.CallbackUrl"));
-                this.RedirectUrl = appSettings.GetString($"oauth.{oAuthProvider}.RedirectUrl")
-                    ?? FallbackConfig(appSettings.GetString("oauth.RedirectUrl"));
+                this.CallbackUrl = appSettings.Get($"oauth.{oAuthProvider}.CallbackUrl")
+                    ?? FallbackConfig(appSettings.Get("oauth.CallbackUrl"));
+                this.RedirectUrl = appSettings.Get($"oauth.{oAuthProvider}.RedirectUrl")
+                    ?? FallbackConfig(appSettings.Get("oauth.RedirectUrl"));
             }
         }
 

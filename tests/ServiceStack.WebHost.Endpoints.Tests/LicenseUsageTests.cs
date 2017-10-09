@@ -135,13 +135,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
-    [Ignore("Free license"),TestFixture]
+    [TestFixture, Ignore("Free license")]
     public class RegisteredLicenseUsageTests : LicenseUsageTests
     {
         [Test]
         public void Allows_registration_of_11_operations()
         {
-            Licensing.RegisterLicense(new AppSettings().GetString("servicestack:license"));
+            Licensing.RegisterLicense(new AppSettings().Get("servicestack:license"));
 
             using (var appHost = new LicenseTestsAppHost(typeof(Services10), typeof(Service1)))
             {
