@@ -26,7 +26,7 @@ namespace ServiceStack
             EmbeddedResourceSources = new HashSet<Assembly> { GetType().GetAssembly() };
             EnableAccessRestrictions = true;
             MetadataRedirectPath = null;
-            DefaultContentType = null;
+            DefaultContentType = MimeTypes.Json;
             PreferredContentTypes = new List<string> {
                 MimeTypes.Html, MimeTypes.Json, MimeTypes.Xml, MimeTypes.Jsv
             };

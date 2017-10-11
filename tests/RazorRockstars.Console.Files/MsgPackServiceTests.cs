@@ -164,7 +164,7 @@ namespace RazorRockstars.Console.Files
         AppHost appHost;
 
         [OneTimeSetUp]
-        public void OnTestFixtureSetUp()
+        public void TestFixtureSetUp()
         {
             LogManager.LogFactory = new ConsoleLogFactory();
 
@@ -175,14 +175,9 @@ namespace RazorRockstars.Console.Files
         }
 
         [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
+        public void TestFixtureTearDown()
         {
-            Dispose();
-        }
-
-        public void Dispose()
-        {
-            appHost?.Dispose();
+            appHost.Dispose();
         }
 
         MsgPackEmail request = new MsgPackEmail

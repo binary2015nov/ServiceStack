@@ -33,7 +33,7 @@ namespace ServiceStack.Common.Tests
         {
             return new MultiAppSettings(
                 new DictionarySettings(GetConfigDictionary()),
-                new AppSettings());
+                AppSettings.Default);
         }
 
         public override Dictionary<string, string> GetConfigDictionary()
@@ -49,7 +49,7 @@ namespace ServiceStack.Common.Tests
     {
         public override AppSettingsBase GetAppSettings()
         {
-            return new AppSettings();
+            return AppSettings.Default;
         }
 
         public override Dictionary<string, string> GetConfigDictionary()
@@ -395,7 +395,7 @@ ObjectKey {SomeSetting:Test,SomeOtherSetting:12,FinalSetting:Final}";
             var appSettings = GetAppSettings();
             var allKeys = appSettings.GetAllKeys();
 
-            Assert.That(allKeys, Is.EquivalentTo(GetConfigDictionary().Keys));
+            Assert.That(allKeys, Is.SupersetOf(GetConfigDictionary().Keys));
         }
 
         [Test]

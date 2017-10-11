@@ -14,51 +14,46 @@ namespace ServiceStack.WebHost.Endpoints.Tests.IntegrationTests
 	{
 		protected string BaseUrl = Config.ListeningOn;
 
-        private IntegrationTestAppHost appHost;
+		private IntegrationTestAppHost appHost;
 
-        [OneTimeSetUp]
-	    public void TestFixtureSetUp()
-	    {
+		[OneTimeSetUp]
+		public void TestFixtureSetUp()
+		{
+            LogManager.LogFactory = new DebugLogFactory();
             appHost = new IntegrationTestAppHost();
-	        appHost.Init();
-            appHost.Start(BaseUrl);
-        }
+			appHost.Init();
+			appHost.Start(BaseUrl);
+		}
 
-        [OneTimeTearDown]
-        public void TestFixtureTearDown()
-        {
-            appHost.Dispose();
-        }
+		[OneTimeTearDown]
+		public void TestFixtureTearDown()
+		{
+			appHost.Dispose();
+		}
 
-	    //Fiddler can debug local HTTP requests when using the hostname
+		//Fiddler can debug local HTTP requests when using the hostname
 		//private const string BaseUrl = "http://io:8081/";
 
 		public class IntegrationTestAppHost : AppHostHttpListenerBase 
 		{
-            public IntegrationTestAppHost()
-                : base("ServiceStack Examples", typeof(RestMovieService).GetAssembly())
-            {
-                LogManager.LogFactory = new DebugLogFactory();
-            }
+			public IntegrationTestAppHost() : base("ServiceStack Examples", typeof(RestMovieService).GetAssembly()) { }
 
-            public override void Configure(Container container)
-            {
-                container.Register<IAppSettings>(new AppSettings());
+			public override void Configure(Container container)
+			{
+				container.Register(c => new ExampleConfig(AppSettings));
+				//var appConfig = container.Resolve<ExampleConfig>();
 
-                container.Register(c => new ExampleConfig(c.Resolve<IAppSettings>()));
-                //var appConfig = container.Resolve<ExampleConfig>();
+				container.Register<IDbConnectionFactory>(c =>
+					 new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider));
 
-                container.Register<IDbConnectionFactory>(c =>
-                     new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider));
+				Routes.Add<Movies>("/custom-movies", "GET")
+					  .Add<Movies>("/custom-movies/genres/{Genre}")
+					  .Add<Movie>("/custom-movies", "POST,PUT")
+					  .Add<Movie>("/custom-movies/{Id}");
 
-                Routes.Add<Movies>("/custom-movies", "GET")
-                      .Add<Movies>("/custom-movies/genres/{Genre}")
-                      .Add<Movie>("/custom-movies", "POST,PUT")
-                      .Add<Movie>("/custom-movies/{Id}");
-
-                ConfigureDatabase.Init(container.Resolve<IDbConnectionFactory>());
-            }
-        }
+				ConfigureDatabase.Init(container.Resolve<IDbConnectionFactory>());
+			}
+		}
 
 		public void SendToEachEndpoint<TRes>(object request, Action<TRes> validate)
 		{

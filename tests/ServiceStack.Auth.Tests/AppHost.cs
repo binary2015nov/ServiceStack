@@ -24,8 +24,10 @@ namespace ServiceStack.AuthWeb.Tests
     public class AppHost : AppHostBase
 #endif
     {
-        public AppHost()
-            : base("Test Auth", typeof(AppHost).Assembly) { }
+        public AppHost() : base("Test Auth", typeof(AppHost).Assembly)
+        {
+            Config.UseCamelCase = true;
+        }
 
         public override void Configure(Container container)
         {
@@ -44,11 +46,6 @@ namespace ServiceStack.AuthWeb.Tests
                 db.Insert(Rockstar.SeedData);
             }
 
-            JsConfig.EmitCamelCaseNames = true;
-
-            //Register Typed Config some services might need to access
-            var appSettings = new AppSettings();
-
             //Register a external dependency-free 
             container.Register<ICacheClient>(new MemoryCacheClient());
             //Configure an alt. distributed persistent cache that survives AppDomain restarts. e.g Redis
@@ -66,7 +63,7 @@ namespace ServiceStack.AuthWeb.Tests
         {
             //Enable and register existing services you want this host to make use of.
             //Look in Web.config for examples on how to configure your oauth providers, e.g. oauth.facebook.AppId, etc.
-            var appSettings = new AppSettings();
+            var appSettings = ServiceStack.Configuration.AppSettings.Default;
 
             //Register all Authentication methods you want to enable for this web app.            
             Plugins.Add(new AuthFeature(

@@ -27,12 +27,12 @@ namespace ServiceStack.Common.Tests.OAuth
 
         public CredentialsAuthProvider GetCredentialsAuthConfig()
         {
-            return new CredentialsAuthProvider(new AppSettings());
+            return new CredentialsAuthProvider(AppSettings.Default);
         }
 
         public TwitterAuthProvider GetTwitterAuthProvider()
         {
-            return new TwitterAuthProvider(new AppSettings())
+            return new TwitterAuthProvider(AppSettings.Default)
             {
                 AuthHttpGateway = new MockAuthHttpGateway(),
             };
@@ -40,7 +40,7 @@ namespace ServiceStack.Common.Tests.OAuth
 
         public FacebookAuthProvider GetFacebookAuthProvider()
         {
-            return new FacebookAuthProvider(new AppSettings())
+            return new FacebookAuthProvider(AppSettings.Default)
             {
                 AuthHttpGateway = new MockAuthHttpGateway(),
             };

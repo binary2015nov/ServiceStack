@@ -29,8 +29,7 @@ namespace ServiceStack.Common.Tests.OAuth
     {
         public override IUserAuthRepository CreateAuthRepo()
         {
-            var appSettings = new AppSettings();
-            var redisRepo = new RedisAuthRepository(new BasicRedisClientManager(new string[] { appSettings.Get("Redis.Host") ?? "localhost" }));
+            var redisRepo = new RedisAuthRepository(new BasicRedisClientManager(new string[] { AppSettings.Default.Get("Redis.Host") ?? "localhost" }));
             InitTest(redisRepo);
             return redisRepo;
         }

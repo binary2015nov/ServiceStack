@@ -32,10 +32,9 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         public class AsyncTaskAppHost : AppHostHttpListenerBase
         {
-            public AsyncTaskAppHost() 
-                : base(typeof(AsyncTaskAppHost).Name, typeof(AsyncTaskAppHost).GetAssembly()) { }
+            public AsyncTaskAppHost() : base(typeof(AsyncTaskAppHost).Name, typeof(AsyncTaskAppHost).GetAssembly()) { }
 
-            public override void Configure(Container container) {}
+            public override void Configure(Container container) { }
         }
 
         [Test]
@@ -141,8 +140,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public async Task VoidAsync()
         {
-            await CreateServiceClient()
-                .GetAsync(new VoidAsync { Message = "VoidAsync" });
+            await CreateServiceClient().GetAsync(new VoidAsync { Message = "VoidAsync" });
         }
 
         [TestFixture]

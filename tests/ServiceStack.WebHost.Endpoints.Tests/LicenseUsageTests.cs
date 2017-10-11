@@ -141,7 +141,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Allows_registration_of_11_operations()
         {
-            Licensing.RegisterLicense(new AppSettings().Get("servicestack:license"));
+            Licensing.RegisterLicense(AppSettings.Default.Get("servicestack:license"));
 
             using (var appHost = new LicenseTestsAppHost(typeof(Services10), typeof(Service1)))
             {

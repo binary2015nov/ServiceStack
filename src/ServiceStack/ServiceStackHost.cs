@@ -48,7 +48,7 @@ namespace ServiceStack
             ServiceName = serviceName;
             ServiceAssemblies = assembliesWithServices;
             Config = new HostConfig { DebugMode = GetType().GetAssembly().IsDebugBuild() };
-            AppSettings = new AppSettings();
+            AppSettings = ServiceStack.Configuration.AppSettings.Default;
             Container = new Container { DefaultOwner = Owner.External };
             ContentTypes = ServiceStack.Host.ContentTypes.Default;
             Routes = new ServiceRoutes();
@@ -139,6 +139,7 @@ namespace ServiceStack
             Metadata.ApiVersion = Config.ApiVersion;
             Metadata.ServiceName = ServiceName;
 
+            Container.Register(AppSettings);
             Container.Register<IHashProvider>(c => new SaltedHash()).ReusedWithin(ReuseScope.None);
             if (Config.DebugMode)           
                 Plugins.Add(new RequestInfoFeature());
@@ -300,13 +301,10 @@ namespace ServiceStack
             delayLoadPlugin = true;
             LoadPluginsInternal(plugins);
 
-            AfterPluginsLoaded(specifiedContentType);
+            AfterPluginsLoaded();
 
             if (!TestMode && Container.Exists<IAuthSession>())
                 throw new Exception(ErrorMessages.ShouldNotRegisterAuthSession);
-
-            if (!Container.Exists<IAppSettings>())
-                Container.Register(AppSettings);
 
             if (!Container.Exists<ICacheClient>())
             {
@@ -377,16 +375,8 @@ namespace ServiceStack
             HttpHandlerFactory.Init();
         }
 
-        private void AfterPluginsLoaded(string specifiedContentType)
+        private void AfterPluginsLoaded()
         {
-            if (!specifiedContentType.IsNullOrEmpty())
-                Config.DefaultContentType = specifiedContentType;
-            else if (Config.DefaultContentType.IsNullOrEmpty())
-                Config.DefaultContentType = MimeTypes.Json;
-
-            Config.PreferredContentTypes.Remove(Config.DefaultContentType);
-            Config.PreferredContentTypes.Insert(0, Config.DefaultContentType);
-
             MetadataFeature metadataFeature = GetPlugin<MetadataFeature>();
             metadataFeature?.AddSection(MetadataFeature.EnabledFeatures);
             foreach (var plugin in Plugins)
@@ -595,12 +585,12 @@ namespace ServiceStack
         /// <summary>
         /// Occurs when the Service throws an Exception.
         /// </summary>
-        public virtual object OnServiceException(IRequest httpReq, object request, Exception ex)
+        public virtual object OnServiceException(IRequest request, object requestDto, Exception ex)
         {
             object lastError = null;
             foreach (var errorHandler in ServiceExceptionHandlers)
             {
-                lastError = errorHandler(httpReq, request, ex) ?? lastError;
+                lastError = errorHandler(request, requestDto, ex) ?? lastError;
             }
             return lastError;
         }

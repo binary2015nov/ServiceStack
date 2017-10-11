@@ -9,6 +9,8 @@ namespace ServiceStack.Configuration
     /// </summary>
     public class AppSettings : AppSettingsBase
     {
+        public static readonly AppSettings Default = new AppSettings();
+
         private class ConfigurationManagerWrapper : ISettingsReader
         {
 #if NETSTANDARD2_0
