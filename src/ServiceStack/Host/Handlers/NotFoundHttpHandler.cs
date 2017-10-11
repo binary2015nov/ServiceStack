@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using ServiceStack.Text;
 using ServiceStack.Web;
 
@@ -15,7 +16,7 @@ namespace ServiceStack.Host.Handlers
         public string DefaultRootFileName { get; set; }
         public string DefaultHandler { get; set; }
 
-        public override void ProcessRequest(IRequest request, IResponse response, string operationName)
+        public override Task ProcessRequestAsync(IRequest request, IResponse response, string operationName)
         {
             HostContext.AppHost.OnLogError(typeof(NotFoundHttpHandler), $"{request.UserHostAddress} Request not found: {request.RawUrl}");
 

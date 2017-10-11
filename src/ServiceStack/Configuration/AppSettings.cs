@@ -18,7 +18,7 @@ namespace ServiceStack.Configuration
 
             public string Get(string key)
             {
-#if !NETSTANDARD1_6
+#if !NETSTANDARD2_0
                 return ConfigurationManager.AppSettings[key];
 #else
                 string value;
@@ -30,7 +30,7 @@ namespace ServiceStack.Configuration
 
             public IEnumerable<string> GetAllKeys()
             {
-#if !NETSTANDARD1_6
+#if !NETSTANDARD2_0
                 return ConfigurationManager.AppSettings.AllKeys;
 #else
                 return AppSettings.Keys;

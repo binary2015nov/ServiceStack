@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD1_6
+﻿#if NETSTANDARD2_0
 
 using System;
 using System.Collections.Generic;
@@ -330,16 +330,6 @@ namespace ServiceStack.Mvc
             }
 
             await format.RenderView(req, res.OutputStream, viewData, view);
-        }
-
-        public override object CreateRequest(IRequest request, string operationName)
-        {
-            return null;
-        }
-
-        public override object GetResponse(IRequest httpReq, object request)
-        {
-            return null;
         }
     }
 

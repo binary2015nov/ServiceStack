@@ -1,10 +1,11 @@
-﻿#if !NETSTANDARD1_6
+﻿#if !NETSTANDARD2_0
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using ServiceStack.Host.AspNet;
 using ServiceStack.Host.Handlers;
@@ -17,7 +18,7 @@ namespace ServiceStack.MiniProfiler.UI
 	/// <summary>
 	/// Understands how to route and respond to MiniProfiler UI urls.
 	/// </summary>
-	public class MiniProfilerHandler : /*IRouteHandler, */ HttpAsyncTaskHandler
+    public class MiniProfilerHandler : /*IRouteHandler, */ HttpAsyncTaskHandler
 	{
 		public static IHttpHandler MatchesRequest(IHttpRequest request)
 		{
@@ -32,22 +33,22 @@ namespace ServiceStack.MiniProfiler.UI
 			const string format =
 @"<link rel=""stylesheet"" type=""text/css"" href=""{path}ssr-includes.css?v={version}""{closeXHTML}>
 <script type=""text/javascript"">
-	if (!window.jquip) document.write(unescape(""%3Cscript src='{path}ssr-jquip.all.js?v={version}' type='text/javascript'%3E%3C/script%3E""));
+    if (!window.jquip) document.write(unescape(""%3Cscript src='{path}ssr-jquip.all.js?v={version}' type='text/javascript'%3E%3C/script%3E""));
 </script>
 <script type=""text/javascript"" src=""{path}ssr-includes.js?v={version}""></script>
 <script type=""text/javascript"">
-	jQuery(function() {{
-		MiniProfiler.init({{
-			ids: {ids},
-			path: '{path}',
-			version: '{version}',
-			renderPosition: '{position}',
-			showTrivial: {showTrivial},
-			showChildrenTime: {showChildren},
-			maxTracesToShow: {maxTracesToShow},
-			showControls: {showControls}
-		}});
-	}});
+    jQuery(function() {{
+        MiniProfiler.init({{
+            ids: {ids},
+            path: '{path}',
+            version: '{version}',
+            renderPosition: '{position}',
+            showTrivial: {showTrivial},
+            showChildrenTime: {showChildren},
+            maxTracesToShow: {maxTracesToShow},
+            showControls: {showControls}
+        }});
+    }});
 </script>";
 
 			var result = "";
@@ -60,11 +61,11 @@ namespace ServiceStack.MiniProfiler.UI
 				var ids = Profiler.Settings.Storage.GetUnviewedIds(profiler.User);
 				ids.Add(profiler.Id);
 
-				path = (path ?? VirtualPathUtility.ToAbsolute(Profiler.Settings.RouteBasePath).EnsureTrailingSlash()) + HostContext.Config.HandlerFactoryPath;
+                path = (path ?? VirtualPathUtility.ToAbsolute(Profiler.Settings.RouteBasePath).EnsureTrailingSlash()) + HostContext.Config.HandlerFactoryPath;
 
 				result = format.Format(new {
 					//path = VirtualPathUtility.ToAbsolute(MiniProfiler.Settings.RouteBasePath).EnsureTrailingSlash(),
-					path = !string.IsNullOrEmpty(path) ? path.EnsureTrailingSlash() : "",
+                    path = !string.IsNullOrEmpty(path) ? path.EnsureTrailingSlash() : "",
 					version = Profiler.Settings.Version,
 					ids = ids.ToJson(),
 					position = (position ?? Profiler.Settings.PopupRenderPosition).ToString().ToLower(),
@@ -79,11 +80,11 @@ namespace ServiceStack.MiniProfiler.UI
 			return new HtmlString(result);
 		}
 
-		public static string GetFileNameWithoutExtension(string pathInfo)
-		{
-			//Path.GetFileNameWithoutExtension() throws exception with illegal chars
-			return pathInfo.LastLeftPart('.').LastRightPart('/');
-		}
+        public static string GetFileNameWithoutExtension(string pathInfo)
+        {
+            //Path.GetFileNameWithoutExtension() throws exception with illegal chars
+            return pathInfo.LastLeftPart('.').LastRightPart('/');
+        }
 
 		//internal static void RegisterRoutes()
 		//{
@@ -119,9 +120,9 @@ namespace ServiceStack.MiniProfiler.UI
 		/// <summary>
 		/// Try to keep everything static so we can easily be reused.
 		/// </summary>
-		public override bool IsReusable => true;
+		public bool IsReusable => true;
 
-		public override void ProcessRequest(IRequest httpReq, IResponse httpRes, string operationName)
+	    public override Task ProcessRequestAsync(IRequest httpReq, IResponse httpRes, string operationName)
 		{
 			var path = httpReq.PathInfo;
 
@@ -144,7 +145,7 @@ namespace ServiceStack.MiniProfiler.UI
 					break;
 			}
 
-			httpRes.Write(output);
+			return httpRes.WriteAsync(output);
 		}
 
 		/// <summary>
@@ -229,7 +230,7 @@ namespace ServiceStack.MiniProfiler.UI
 		{
 			httpRes.ContentType = "text/html";
 			var sb = StringBuilderCache.Allocate()
-				.AppendLine("<html><head>")
+                .AppendLine("<html><head>")
 				.AppendFormat("<title>{0} ({1} ms) - MvcMiniProfiler Results</title>", profiler.Name, profiler.DurationMilliseconds)
 				.AppendLine()
 				.AppendLine("<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js'></script>")
@@ -238,10 +239,10 @@ namespace ServiceStack.MiniProfiler.UI
 				.AppendLine(";</script>")
 				.Append(RenderIncludes(profiler)) // figure out how to better pass display options
 				.AppendLine("</head><body><div class='profiler-result-full'></div></body></html>");
-			return StringBuilderCache.Retrieve(sb);
-		}
+            return StringBuilderCache.ReturnAndFree(sb);
+        }
 
-		private static string GetResource(string filename)
+        private static string GetResource(string filename)
 		{
 			filename = filename.ToLower();
 			string result;

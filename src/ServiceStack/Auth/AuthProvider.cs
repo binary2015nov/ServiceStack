@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using ServiceStack.Configuration;
 using ServiceStack.Logging;
 using ServiceStack.Web;
@@ -154,8 +155,7 @@ namespace ServiceStack.Auth
         {
             session.AuthProvider = Provider;
 
-            var userSession = session as AuthUserSession;
-            if (userSession != null)
+            if (session is AuthUserSession userSession)
             {
                 LoadUserAuthInfo(userSession, tokens, authInfo);
                 HostContext.TryResolve<IAuthMetadataProvider>().SafeAddMetadata(tokens, authInfo);
@@ -318,6 +318,12 @@ namespace ServiceStack.Auth
 
         public abstract object Authenticate(IServiceBase authService, IAuthSession session, Authenticate request);
 
+        public virtual Task OnFailedAuthenticationAsync(IAuthSession session, IRequest httpReq, IResponse httpRes)
+        {
+            OnFailedAuthentication(session, httpReq, httpRes);
+            return TypeConstants.EmptyTask;
+        }
+
         public virtual void OnFailedAuthentication(IAuthSession session, IRequest httpReq, IResponse httpRes)
         {
             if (httpRes.StatusCode == (int)HttpStatusCode.OK)
@@ -326,19 +332,17 @@ namespace ServiceStack.Auth
             httpRes.EndRequest();
         }
 
-        public static void HandleFailedAuth(IAuthProvider authProvider,
+        public static Task HandleFailedAuth(IAuthProvider authProvider,
             IAuthSession session, IRequest httpReq, IResponse httpRes)
         {
-            var baseAuthProvider = authProvider as AuthProvider;
-            if (baseAuthProvider != null)
-            {
-                baseAuthProvider.OnFailedAuthentication(session, httpReq, httpRes);
-                return;
-            }
-            httpRes.AddHeader(HttpHeaders.WwwAuthenticate, $"{authProvider.Provider} realm=\"{authProvider.AuthRealm}\"");
-            httpRes.StatusCode = (int)HttpStatusCode.Unauthorized;
+            if (authProvider is AuthProvider baseAuthProvider)
+                return baseAuthProvider.OnFailedAuthenticationAsync(session, httpReq, httpRes);
 
+            httpRes.StatusCode = (int)HttpStatusCode.Unauthorized;
+            httpRes.AddHeader(HttpHeaders.WwwAuthenticate, $"{authProvider.Provider} realm=\"{authProvider.AuthRealm}\"");
             httpRes.EndRequest();
+
+            return TypeConstants.EmptyTask;
         }
 
         protected virtual bool UserNameAlreadyExists(IAuthRepository authRepo, IUserAuth userAuth, IAuthTokens tokens = null)
@@ -440,11 +444,9 @@ namespace ServiceStack.Auth
         {
             if (!isHtml)
             {
-                var httpRes = failedResult as IHttpResult;
-                if (httpRes != null)
+                if (failedResult is IHttpResult httpRes)
                 {
-                    string location;
-                    if (httpRes.Headers.TryGetValue(HttpHeaders.Location, out location))
+                    if (httpRes.Headers.TryGetValue(HttpHeaders.Location, out var location))
                     {
                         var parts = location.SplitOnLast("f=");
                         if (parts.Length == 2)
@@ -501,8 +503,7 @@ namespace ServiceStack.Auth
 
         public static void SaveSession(this IAuthProvider provider, IServiceBase authService, IAuthSession session, TimeSpan? sessionExpiry = null)
         {
-            var authProvider = provider as AuthProvider;
-            var persistSession = authProvider == null || authProvider.PersistSession;
+            var persistSession = !(provider is AuthProvider authProvider) || authProvider.PersistSession;
             if (persistSession)
             {
                 authService.SaveSession(session, sessionExpiry);

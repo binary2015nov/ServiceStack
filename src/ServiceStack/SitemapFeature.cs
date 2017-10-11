@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading.Tasks;
 using ServiceStack.Host.Handlers;
 using ServiceStack.Text;
 using ServiceStack.Web;
@@ -116,7 +117,7 @@ namespace ServiceStack
                 this.feature = feature;
             }
 
-            public override void ProcessRequest(IRequest httpReq, IResponse httpRes, string operationName)
+            public override async Task ProcessRequestAsync(IRequest httpReq, IResponse httpRes, string operationName)
             {
                 if (HostContext.ApplyCustomHandlerRequestFilters(httpReq, httpRes))
                     return;
@@ -143,7 +144,7 @@ namespace ServiceStack
                     if (sitemap.Location != null || sitemap.AtPath != null)
                         xml.AppendLine($"  <loc>{(sitemap.Location ?? sitemap.AtPath.ToAbsoluteUri()).EncodeXml()}</loc>");
                     if (sitemap.LastModified != null)
-                        xml.AppendLine($"  <lastmod>{sitemap.LastModified.Value.ToString("yyyy-MM-dd")}</lastmod>");
+                        xml.AppendLine($"  <lastmod>{sitemap.LastModified.Value:yyyy-MM-dd}</lastmod>");
 
                     if (sitemap.CustomXml != null)
                         xml.AppendLine(sitemap.CustomXml);
@@ -155,8 +156,8 @@ namespace ServiceStack
                     xml.AppendLine(feature.CustomXml.SitemapIndexFooterXml);
 
                 xml.AppendLine("</sitemapindex>");
-                var text = StringBuilderCache.Retrieve(xml);
-                httpRes.EndHttpHandlerRequest(skipClose: true, afterHeaders: r => r.Write(text));
+                var text = StringBuilderCache.ReturnAndFree(xml);
+                await httpRes.EndHttpHandlerRequestAsync(skipClose: true, afterHeaders: r => r.WriteAsync(text));
             }
         }
 
@@ -172,7 +173,7 @@ namespace ServiceStack
                 this.urlSet = urlSet;
             }
 
-            public override void ProcessRequest(IRequest httpReq, IResponse httpRes, string operationName)
+            public override async Task ProcessRequestAsync(IRequest httpReq, IResponse httpRes, string operationName)
             {
                 if (HostContext.ApplyCustomHandlerRequestFilters(httpReq, httpRes))
                     return;
@@ -199,7 +200,7 @@ namespace ServiceStack
                     if (url.Location != null)
                         xml.AppendLine($"  <loc>{url.Location.EncodeXml()}</loc>");
                     if (url.LastModified != null)
-                        xml.AppendLine($"  <lastmod>{url.LastModified.Value.ToString("yyyy-MM-dd")}</lastmod>");
+                        xml.AppendLine($"  <lastmod>{url.LastModified.Value:yyyy-MM-dd}</lastmod>");
                     if (url.ChangeFrequency != null)
                         xml.AppendLine($"  <changefreq>{url.ChangeFrequency.Value.ToString().ToLower()}</changefreq>");
                     if (url.Priority != null)
@@ -216,8 +217,8 @@ namespace ServiceStack
 
                 xml.AppendLine("</urlset>");
 
-                var text = StringBuilderCache.Retrieve(xml);
-                httpRes.EndHttpHandlerRequest(skipClose: true, afterHeaders: r => r.Write(text));
+                var text = StringBuilderCache.ReturnAndFree(xml);
+                await httpRes.EndHttpHandlerRequestAsync(skipClose: true, afterHeaders: r => r.WriteAsync(text));
             }
         }
     }

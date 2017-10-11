@@ -156,8 +156,8 @@ namespace ServiceStack
         {
             var actionCtx = new ActionContext
             {
-                RequestFilters = TypeConstants<IHasRequestFilter>.EmptyArray,
-                ResponseFilters = TypeConstants<IHasResponseFilter>.EmptyArray,
+                RequestFilters = TypeConstants<IRequestFilterBase>.EmptyArray,
+                ResponseFilters = TypeConstants<IResponseFilterBase>.EmptyArray,
                 ServiceType = typeof(TService),
                 RequestType = typeof(TRequest),
                 ServiceAction = (instance, req) => invokeAction(service, request)
@@ -166,7 +166,8 @@ namespace ServiceStack
             requestContext = requestContext ?? new MockHttpRequest();
             ServiceController.InjectRequestContext(service, requestContext);
             var runner = HostContext.CreateServiceRunner<TRequest>(actionCtx);
-            var response = runner.Execute(requestContext, service, request);
+            var responseTask = runner.ExecuteAsync(requestContext, service, request);
+            var response = responseTask.Result;
             return response;
         }
     }

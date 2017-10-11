@@ -85,38 +85,38 @@ namespace ServiceStack.Support.Markdown
 
 		public string TransformHtml(string markdownText)
 		{
-			var html = Page.Markdown.Transform(markdownText);
+		    var html = Page.Markdown.Transform(markdownText);
 
-			return CleanHtml(html);
+		    return CleanHtml(html);
 		}
 
-		public static string CleanHtml(string html)
-		{
-			// ^ is added before ^<html></html> tags to trick Markdown into not thinking its a HTML
-			// Start tag so it doesn't skip it and encodes the inner body as normal.
-			// We need to Un markdown encode the result i.e. <p>^<div id="searchresults"></p>
+	    public static string CleanHtml(string html)
+	    {
+            // ^ is added before ^<html></html> tags to trick Markdown into not thinking its a HTML
+	        // Start tag so it doesn't skip it and encodes the inner body as normal.
+	        // We need to Un markdown encode the result i.e. <p>^<div id="searchresults"></p>
 
-			var pos = 0;
-			var hasEscapedTags = false;
-			while ((pos = html.IndexOf(EscapedStartTagArtefact, pos, StringComparison.CurrentCulture)) != -1)
-			{
-				hasEscapedTags = true;
+	        var pos = 0;
+	        var hasEscapedTags = false;
+            while ((pos = html.IndexOf(EscapedStartTagArtefact, pos, StringComparison.CurrentCulture)) != -1)
+	        {
+	            hasEscapedTags = true;
 
-				var endPos = html.IndexOf("</p>", pos, StringComparison.CurrentCulture);
-				if (endPos == -1) return html; //Unexpected Error so skip
+	            var endPos = html.IndexOf("</p>", pos, StringComparison.CurrentCulture);
+	            if (endPos == -1) return html; //Unexpected Error so skip
 
-				html = html.Substring(0, endPos)
-					   + html.Substring(endPos + 4);
+	            html = html.Substring(0, endPos)
+	                   + html.Substring(endPos + 4);
 
-				pos = endPos;
-			}
+	            pos = endPos;
+	        }
 
-			if (hasEscapedTags) html = html.Replace(EscapedStartTagArtefact, "");
+	        if (hasEscapedTags) html = html.Replace(EscapedStartTagArtefact, "");
 
-			return html;
-		}
+	        return html;
+	    }
 
-		public string Transform(string markdownText)
+	    public string Transform(string markdownText)
 		{
 			return this.RenderHtml ? TransformHtml(markdownText) : markdownText;
 		}
@@ -162,7 +162,7 @@ namespace ServiceStack.Support.Markdown
 
 	public class MemberExprBlock : TemplateBlock
 	{
-		private static readonly ILog Logger = LogManager.GetLogger(typeof(MemberExprBlock));
+		private static ILog Log = LogManager.GetLogger(typeof(MemberExprBlock));
 
 		private string memberExpr;
 		private readonly string modelMemberExpr;
@@ -207,13 +207,13 @@ namespace ServiceStack.Support.Markdown
 			}
 		}
 
-		private void InitializeValueFn(object memberExprValue)
-		{
-			valueFn = this.ReferencesSelf 
-				? Convert.ToString 
-				: DataBinder.CompileToString(memberExprValue.GetType(), modelMemberExpr);
-		}
-		
+        private void InitializeValueFn(object memberExprValue)
+        {
+            valueFn = this.ReferencesSelf 
+                ? Convert.ToString 
+                : DataBinder.CompileToString(memberExprValue.GetType(), modelMemberExpr);
+        }
+        
 		public override void Write(MarkdownViewBase instance, TextWriter textWriter, Dictionary<string, object> scopeArgs)
 		{
 			object memberExprValue;
@@ -240,10 +240,10 @@ namespace ServiceStack.Support.Markdown
 					textWriter.Write(memberExprValue);
 					return;
 				}
-				if (valueFn == null)
-				{
-					InitializeValueFn(memberExprValue);
-				}
+                if (valueFn == null)
+                {
+                    InitializeValueFn(memberExprValue);
+                }
 				var strValue = this.ReferencesSelf
 					? Convert.ToString(memberExprValue)
 					: valueFn(memberExprValue);
@@ -252,7 +252,7 @@ namespace ServiceStack.Support.Markdown
 			}
 			catch (Exception ex)
 			{
-				Logger.Error("MemberExprBlock: " + ex.Message, ex);
+				Log.Error("MemberExprBlock: " + ex.Message, ex);
 			}
 		}
 	}
@@ -349,9 +349,9 @@ namespace ServiceStack.Support.Markdown
 
 		public static string Extract(string content, List<StatementExprBlock> allStatements)
 		{
-			var sb = StringBuilderCache.Allocate();
+            var sb = StringBuilderCache.Allocate();
 
-			var initialCount = allStatements.Count;
+            var initialCount = allStatements.Count;
 			int pos;
 			var lastPos = 0;
 			while ((pos = content.IndexOf('@', lastPos)) != -1)
@@ -409,7 +409,7 @@ namespace ServiceStack.Support.Markdown
 				sb.Append(lastBlock);
 			}
 
-			return allStatements.Count > initialCount ? StringBuilderCache.Retrieve(sb) : content;
+			return allStatements.Count > initialCount ? StringBuilderCache.ReturnAndFree(sb) : content;
 		}
 
 		protected void WriteStatement(MarkdownViewBase instance, TextWriter textWriter, Dictionary<string, object> scopeArgs)
@@ -422,10 +422,10 @@ namespace ServiceStack.Support.Markdown
 			else
 			{
 				//Buffer Markdown output before converting and writing HTML
-				var sw = StringWriterCacheAlt.Allocate();
-				WriteInternal(instance, sw, scopeArgs);
+			    var sw = StringWriterCacheAlt.Allocate();
+                WriteInternal(instance, sw, scopeArgs);
 
-				var markdown = StringWriterCacheAlt.ReturnAndFree(sw);
+                var markdown = StringWriterCacheAlt.ReturnAndFree(sw);
 				var html = Transform(markdown);
 				textWriter.Write(html);
 			}
@@ -446,8 +446,8 @@ namespace ServiceStack.Support.Markdown
 
 		public Type GetType(string typeName)
 		{
-			var type = Evaluator.FindType(typeName)
-				?? AssemblyUtils.FindType(typeName);
+            var type = Evaluator.FindType(typeName)
+                ?? AssemblyUtils.FindType(typeName);
 			if (type == null)
 			{
 				var parts = typeName.Split(new[] { '<', '>' });
@@ -631,15 +631,15 @@ namespace ServiceStack.Support.Markdown
 			else
 			{
 				//Buffer Markdown output before converting and writing HTML
-				var sw = StringWriterCacheAlt.Allocate();
-				foreach (var item in memberExprEnumerator)
-				{
-					scopeArgs[this.EnumeratorName] = item;
-					base.Write(instance, sw, scopeArgs);
-				}
+			    var sw = StringWriterCacheAlt.Allocate();
+                foreach (var item in memberExprEnumerator)
+                {
+                    scopeArgs[this.EnumeratorName] = item;
+                    base.Write(instance, sw, scopeArgs);
+                }
 
-				var markdown = StringWriterCacheAlt.ReturnAndFree(sw);
-				var renderedMarkup = Transform(markdown);
+			    var markdown = StringWriterCacheAlt.ReturnAndFree(sw);
+                var renderedMarkup = Transform(markdown);
 				textWriter.Write(renderedMarkup);
 			}
 		}
@@ -714,7 +714,7 @@ namespace ServiceStack.Support.Markdown
 				var paramName = paramNames[i];
 				var paramValue = paramValues[i];
 
-				exprParams[paramName] = paramValue != null ? paramValue.GetType() : typeof(object);
+                exprParams[paramName] = paramValue != null ? paramValue.GetType() : typeof(object);
 			}
 			return exprParams;
 		}
@@ -871,14 +871,14 @@ namespace ServiceStack.Support.Markdown
 			else
 			{
 				//Buffer Markdown output before converting and writing HTML
-				var sw = StringWriterCacheAlt.Allocate();
-				foreach (var templateBlock in ElseChildBlocks)
-				{
-					templateBlock.Write(instance, sw, scopeArgs);
-				}
+			    var sw = StringWriterCacheAlt.Allocate();
+                foreach (var templateBlock in ElseChildBlocks)
+                {
+                    templateBlock.Write(instance, sw, scopeArgs);
+                }
 
-				var markdown = StringWriterCacheAlt.ReturnAndFree(sw);
-				var html = Transform(markdown);
+			    var markdown = StringWriterCacheAlt.ReturnAndFree(sw);
+                var html = Transform(markdown);
 				textWriter.Write(html);
 			}
 		}
@@ -919,10 +919,10 @@ namespace ServiceStack.Support.Markdown
 			var methodName = usesBaseType ? parts[0] : parts[1];
 
 			Type type = null;
-#if !NETSTANDARD1_6
-			if (typePropertyName == "Html")
+#if !NETSTANDARD2_0
+            if (typePropertyName == "Html")
 			{
-				type = markdownPage.ExecutionContext.BaseType.HasGenericType()
+                type = markdownPage.ExecutionContext.BaseType.HasGenericType()
 					   ? typeof(HtmlHelper<>)
 					   : typeof(HtmlHelper);
 			}
@@ -939,27 +939,27 @@ namespace ServiceStack.Support.Markdown
 					"Unable to resolve type '{0}'. Check type exists in Config.MarkdownBaseType or Page.Markdown.MarkdownGlobalHelpers",
 					typePropertyName));
 
-			try
-			{
-				var mi = methodName == "Partial" 
-					? type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-						.FirstOrDefault(m => m.GetParameters().Length == 2 && m.Name == methodName)
-					: type.GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance);
-#if !NETSTANDARD1_6
-				if (mi == null)
-				{
-					mi = HtmlHelper.GetMethod(methodName);
-					if (mi == null)
-						throw new ArgumentException("Unable to resolve method '" + methodExpr + "' on type " + type.GetOperationName());
-				}
+            try
+            {
+                var mi = methodName == "Partial" 
+                    ? type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                        .FirstOrDefault(m => m.GetParameters().Length == 2 && m.Name == methodName)
+                    : type.GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance);
+#if !NETSTANDARD2_0
+                if (mi == null)
+                {
+                    mi = HtmlHelper.GetMethod(methodName);
+                    if (mi == null)
+                        throw new ArgumentException("Unable to resolve method '" + methodExpr + "' on type " + type.GetOperationName());
+                }
 #endif
 
-				base.ReturnType = mi.ReturnType;
-			}
-			catch (Exception)
-			{
-				throw;
-			}
+                base.ReturnType = mi.ReturnType;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
 
 			var isMemberExpr = Condition.IndexOf('(') != -1;
 			if (!isMemberExpr || this.WriteRawHtml)

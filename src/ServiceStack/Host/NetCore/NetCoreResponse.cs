@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD1_6
+﻿#if NETSTANDARD2_0
 
 using System;
 using System.Collections.Generic;
@@ -18,7 +18,7 @@ namespace ServiceStack.Host.NetCore
 {
     public class NetCoreResponse : IHttpResponse
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(NetCoreResponse));
+        private static ILog Log = LogManager.GetLogger(typeof(NetCoreResponse));
 
         private readonly NetCoreRequest request;
         private readonly HttpResponse response;
@@ -58,7 +58,7 @@ namespace ServiceStack.Host.NetCore
             }
             catch (Exception ex)
             {
-                Logger.Error($"Failed Adding Headers[{name}]={value}: {ex.Message}", ex);
+                Log.Error($"Failed Adding Headers[{name}]={value}: {ex.Message}", ex);
             }
         }
 
@@ -76,18 +76,6 @@ namespace ServiceStack.Host.NetCore
         public void Redirect(string url)
         {
             response.Redirect(url);
-        }
-
-        public void Write(string text)
-        {
-            var bytes = text.ToUtf8Bytes();
-            if (bytes.Length > 0)
-                hasResponseBody = true;
-            
-            if (PlatformNetCore.HostInstance.Config?.DisableChunkedEncoding == true)
-                 response.ContentLength = bytes.Length;
-
-            response.Body.Write(bytes, 0, bytes.Length);
         }
 
         bool closed = false;
@@ -121,8 +109,11 @@ namespace ServiceStack.Host.NetCore
 
         public void SetContentLength(long contentLength)
         {
-            if (contentLength >= 0)
+            if (Platforms.PlatformNetCore.HostInstance.Config?.DisableChunkedEncoding == true && contentLength >= 0)
                 response.ContentLength = contentLength;
+            
+            if (contentLength > 0)
+                hasResponseBody = true;
         }
 
         public object OriginalResponse => response;
@@ -171,7 +162,7 @@ namespace ServiceStack.Host.NetCore
             }
             catch (Exception ex)
             {
-                Logger.Warn($"Could not Set-Cookie '{cookie.Name}': " + ex.Message, ex);
+                Log.Warn($"Could not Set-Cookie '{cookie.Name}': " + ex.Message, ex);
             }
         }
 

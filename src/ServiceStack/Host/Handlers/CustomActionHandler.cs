@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Web;
 using ServiceStack.Web;
 
@@ -10,10 +11,7 @@ namespace ServiceStack.Host.Handlers
 
         public CustomActionHandler(Action<IRequest, IResponse> action)
         {
-            if (action == null)
-                throw new NullReferenceException("action");
-
-            Action = action;
+            Action = action ?? throw new NullReferenceException(nameof(action));
             this.RequestName = GetType().Name;
         }
 
@@ -24,6 +22,26 @@ namespace ServiceStack.Host.Handlers
 
             Action(httpReq, httpRes);
             httpRes.EndHttpHandlerRequest(skipHeaders:true);
+        }
+    }
+
+    public class CustomActionHandlerAsync : HttpAsyncTaskHandler
+    {
+        public Func<IRequest, IResponse, Task> Action { get; set; }
+
+        public CustomActionHandlerAsync(Func<IRequest, IResponse, Task> action)
+        {
+            Action = action ?? throw new NullReferenceException(nameof(action));
+            this.RequestName = GetType().Name;
+        }
+
+        public override async Task ProcessRequestAsync(IRequest httpReq, IResponse httpRes, string operationName)
+        {
+            if (HostContext.ApplyCustomHandlerRequestFilters(httpReq, httpRes))
+                return;
+
+            await Action(httpReq, httpRes);
+            httpRes.EndHttpHandlerRequest(skipHeaders: true);
         }
     }
 }

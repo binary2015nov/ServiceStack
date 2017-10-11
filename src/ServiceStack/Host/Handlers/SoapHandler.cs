@@ -1,4 +1,4 @@
-#if !NETSTANDARD1_6
+#if !NETSTANDARD2_0
 
 using System;
 using System.IO;
@@ -106,16 +106,15 @@ namespace ServiceStack.Host.Handlers
             {
                 var useXmlSerializerRequest = requestType.HasAttribute<XmlSerializerFormatAttribute>();
 
-                var request = appHost.ApplyRequestConverters(httpReq, 
+                var request = appHost.ApplyRequestConvertersAsync(httpReq, 
                     useXmlSerializerRequest
                         ? XmlSerializableSerializer.Instance.DeserializeFromString(requestXml, requestType)
                         : Serialization.DataContractSerializer.Instance.DeserializeFromString(requestXml, requestType)
-                );
+                ).Result;
 
                 httpReq.Dto = request;
 
-                var requiresSoapMessage = request as IRequiresSoapMessage;
-                if (requiresSoapMessage != null)
+                if (request is IRequiresSoapMessage requiresSoapMessage)
                 {
                     requiresSoapMessage.Message = requestMsg;
                 }
@@ -127,22 +126,23 @@ namespace ServiceStack.Host.Handlers
                 var hasRequestFilters = HostContext.GlobalRequestFilters.Count > 0
                     || FilterAttributeCache.GetRequestFilterAttributes(request.GetType()).Any();
 
-                if (hasRequestFilters && HostContext.ApplyRequestFilters(httpReq, httpRes, request))
-                    return EmptyResponse(requestMsg, requestType);
+                if (hasRequestFilters)
+                {
+                    HostContext.ApplyRequestFiltersAsync(httpReq, httpRes, request).Wait();
+                    if (httpRes.IsClosed)
+                        return EmptyResponse(requestMsg, requestType);
+                }
 
                 httpReq.RequestAttributes |= requestAttributes;
                 var response = ExecuteService(request, httpReq);
 
-                var taskResponse = response as Task;
-                if (taskResponse != null)
-                {
-                    taskResponse.Wait();
-                    response = TypeAccessor.Create(taskResponse.GetType())[taskResponse, "Result"];
-                }
+                if (response is Task taskResponse)
+                    response = taskResponse.GetResult();
 
-                response = appHost.ApplyResponseConverters(httpReq, response);
+                response = appHost.ApplyResponseConvertersAsync(httpReq, response).Result;
 
-                if (appHost.ApplyResponseFilters(httpReq, httpRes, response))
+                appHost.ApplyResponseFiltersAsync(httpReq, httpRes, response).Wait();
+                if (httpRes.IsClosed)
                     return EmptyResponse(requestMsg, requestType);
 
                 var httpResult = response as IHttpResult;
@@ -375,16 +375,6 @@ namespace ServiceStack.Host.Handlers
             return requestOperationName != null
                     ? contentType.Replace(requestOperationName, requestOperationName + "Response")
                     : (this.HandlerAttributes == RequestAttributes.Soap11 ? MimeTypes.Soap11 : MimeTypes.Soap12);
-        }
-
-        public override object CreateRequest(IRequest request, string operationName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override object GetResponse(IRequest httpReq, object request)
-        {
-            throw new NotImplementedException();
         }
     }
 }

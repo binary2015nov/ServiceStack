@@ -1,4 +1,4 @@
-#if !NETSTANDARD1_6
+#if !NETSTANDARD2_0
 
 //Copyright (c) ServiceStack, Inc. All Rights Reserved.
 //License: https://raw.github.com/ServiceStack/ServiceStack/master/license.txt
@@ -110,11 +110,6 @@ namespace ServiceStack.Host.AspNet
         }
 
         public object Dto { get; set; }
-
-        public void Write(string text)
-        {
-            response.Write(text);
-        }
 
         public void Close()
         {

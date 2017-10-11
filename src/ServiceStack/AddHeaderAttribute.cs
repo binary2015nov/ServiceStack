@@ -60,7 +60,7 @@ namespace ServiceStack
 
         public string ContentType
         {
-            get { return Name == HttpHeaders.ContentType ? Value : null; }
+            get => Name == HttpHeaders.ContentType ? Value : null;
             set
             {
                 Name = HttpHeaders.ContentType;
@@ -70,7 +70,7 @@ namespace ServiceStack
 
         public string DefaultContentType
         {
-            get { return Name == "DefaultContentType" ? Value : null; }
+            get => Name == "DefaultContentType" ? Value : null;
             set
             {
                 Name = "DefaultContentType";
@@ -80,7 +80,7 @@ namespace ServiceStack
 
         public string ContentEncoding
         {
-            get { return Name == HttpHeaders.ContentEncoding ? Value : null; }
+            get => Name == HttpHeaders.ContentEncoding ? Value : null;
             set
             {
                 Name = HttpHeaders.ContentEncoding;
@@ -90,7 +90,7 @@ namespace ServiceStack
 
         public string ContentLength
         {
-            get { return Name == HttpHeaders.ContentLength ? Value : null; }
+            get => Name == HttpHeaders.ContentLength ? Value : null;
             set
             {
                 Name = HttpHeaders.ContentLength;
@@ -100,7 +100,7 @@ namespace ServiceStack
 
         public string ContentDisposition
         {
-            get { return Name == HttpHeaders.ContentDisposition ? Value : null; }
+            get => Name == HttpHeaders.ContentDisposition ? Value : null;
             set
             {
                 Name = HttpHeaders.ContentDisposition;
@@ -110,7 +110,7 @@ namespace ServiceStack
 
         public string Location
         {
-            get { return Name == HttpHeaders.Location ? Value : null; }
+            get => Name == HttpHeaders.Location ? Value : null;
             set
             {
                 Name = HttpHeaders.Location;
@@ -120,7 +120,7 @@ namespace ServiceStack
 
         public string SetCookie
         {
-            get { return Name == HttpHeaders.SetCookie ? Value : null; }
+            get => Name == HttpHeaders.SetCookie ? Value : null;
             set
             {
                 Name = HttpHeaders.SetCookie;
@@ -130,7 +130,7 @@ namespace ServiceStack
 
         public string ETag
         {
-            get { return Name == HttpHeaders.ETag ? Value : null; }
+            get => Name == HttpHeaders.ETag ? Value : null;
             set
             {
                 Name = HttpHeaders.ETag;
@@ -140,7 +140,7 @@ namespace ServiceStack
 
         public string CacheControl
         {
-            get { return Name == HttpHeaders.CacheControl ? Value : null; }
+            get => Name == HttpHeaders.CacheControl ? Value : null;
             set
             {
                 Name = HttpHeaders.CacheControl;
@@ -150,7 +150,7 @@ namespace ServiceStack
 
         public string LastModified
         {
-            get { return Name == HttpHeaders.LastModified ? Value : null; }
+            get => Name == HttpHeaders.LastModified ? Value : null;
             set
             {
                 Name = HttpHeaders.LastModified;

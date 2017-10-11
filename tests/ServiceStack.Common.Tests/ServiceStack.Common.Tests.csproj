@@ -54,7 +54,7 @@
     <Reference Include="System.Net" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
 
-    <Reference Include="..\..\lib\pcl\ServiceStack.Interfaces.dll" />
+    <Reference Include="..\..\lib\net45\ServiceStack.Interfaces.dll" />
     <Reference Include="..\..\lib\net45\ServiceStack.Text.dll" />
     <Reference Include="..\..\lib\net45\ServiceStack.Redis.dll" />
     <Reference Include="..\..\lib\net45\ServiceStack.OrmLite.dll" />
@@ -93,6 +93,17 @@
     <Reference Include="..\..\lib\netstandard1.3\ServiceStack.OrmLite.SqlServer.dll" />
     <Reference Include="..\..\lib\netstandard1.6\ServiceStack.Aws.dll" />
     <ProjectReference Include="..\..\src\ServiceStack.Kestrel\ServiceStack.Kestrel.csproj" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.4.0" />
+
+    <ProjectReference Include="..\..\src\ServiceStack.Kestrel\ServiceStack.Kestrel.csproj" />
+    <Reference Include="..\..\lib\netstandard2.0\ServiceStack.Interfaces.dll" />
+    <Reference Include="..\..\lib\netstandard2.0\ServiceStack.Text.dll" />
+    <Reference Include="..\..\lib\netstandard2.0\ServiceStack.Redis.dll" />
+    <Reference Include="..\..\lib\netstandard2.0\ServiceStack.OrmLite.dll" />
+    <Reference Include="..\..\lib\netstandard2.0\ServiceStack.OrmLite.Sqlite.dll" />
+    <Reference Include="..\..\lib\netstandard2.0\ServiceStack.OrmLite.SqlServer.dll" />
+    <Reference Include="..\..\lib\netstandard2.0\ServiceStack.Aws.dll" />
   </ItemGroup>
 
   <ItemGroup>

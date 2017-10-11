@@ -91,12 +91,12 @@ namespace ServiceStack
         /// <summary>
         /// Add Request Converter to convert Request DTO's
         /// </summary>
-        List<Func<IRequest, object, object>> RequestConverters { get; }
+        List<Func<IRequest, object, Task<object>>> RequestConverters { get; }
 
         /// <summary>
         /// Add Response Converter to convert Response DTO's
         /// </summary>
-        List<Func<IRequest, object, object>> ResponseConverters { get; }
+        List<Func<IRequest, object, Task<object>>> ResponseConverters { get; }
 
         /// <summary>
         /// Add Request Filters for HTTP Requests
@@ -112,6 +112,11 @@ namespace ServiceStack
         /// Add Response Filters for HTTP Responses
         /// </summary>
         List<Action<IRequest, IResponse, object>> GlobalResponseFilters { get; }
+
+        /// <summary>
+        /// Add Async Response Filters for HTTP Responses
+        /// </summary>
+        List<Func<IRequest, IResponse, object, Task>> GlobalResponseFiltersAsync { get; set; }
 
         /// <summary>
         /// Add Request Filters for MQ/TCP Requests

@@ -35,11 +35,11 @@ namespace ServiceStack
 {
     public abstract partial class ServiceStackHost
     {
-        public virtual object ApplyRequestConverters(IRequest req, object requestDto)
+        public virtual async Task<object> ApplyRequestConvertersAsync(IRequest req, object requestDto)
         {
             foreach (var converter in RequestConverters)
             {
-                requestDto = converter(req, requestDto) ?? requestDto;
+                requestDto = await converter(req, requestDto) ?? requestDto;
                 if (req.Response.IsClosed)
                     return requestDto;
             }
@@ -47,11 +47,11 @@ namespace ServiceStack
             return requestDto;
         }
 
-        public virtual object ApplyResponseConverters(IRequest req, object responseDto)
+        public virtual async Task<object> ApplyResponseConvertersAsync(IRequest req, object responseDto)
         {
             foreach (var converter in ResponseConverters)
             {
-                responseDto = converter(req, responseDto) ?? responseDto;
+                responseDto = await converter(req, responseDto) ?? responseDto;
                 if (req.Response.IsClosed)
                     return responseDto;
             }
@@ -89,35 +89,45 @@ namespace ServiceStack
             }
         }
 
+        [Obsolete("Use ApplyRequestFiltersAsync")]
+        public virtual bool ApplyRequestFilters(IRequest req, IResponse res, object requestDto)
+        {
+            ApplyRequestFiltersAsync(req, res, requestDto).Wait();
+            return res.IsClosed;
+        }
+
         /// <summary>
         /// Applies the request filters. Returns whether or not the request has been handled 
         /// and no more processing should be done.
         /// </summary>
         /// <returns></returns>
-        public virtual bool ApplyRequestFilters(IRequest req, IResponse res, object requestDto)
+        public virtual async Task ApplyRequestFiltersAsync(IRequest req, IResponse res, object requestDto)
         {
-            req.ThrowIfNull("req");
-            res.ThrowIfNull("res");
+            if (req == null) throw new ArgumentNullException(nameof(req));
+            if (res == null) throw new ArgumentNullException(nameof(res));
 
             if (res.IsClosed)
-                return true;
+                return;
 
-            using (Profiler.Current.Step("Executing Request Filters"))
+            using (Profiler.Current.Step("Executing Request Filters Async"))
             {
                 if (!req.IsMultiRequest())
-                    return ApplyRequestFiltersSingle(req, res, requestDto);
+                {
+                    await ApplyRequestFiltersSingleAsync(req, res, requestDto);
+                    return;
+                }
 
                 var dtos = (IEnumerable)requestDto;
                 foreach (var dto in dtos)
                 {
-                    if (ApplyRequestFiltersSingle(req, res, dto))
-                        return true;
+                    await ApplyRequestFiltersSingleAsync(req, res, dto);
+                    if (res.IsClosed)
+                        return;
                 }
-                return false;
             }
         }
 
-        protected virtual bool ApplyRequestFiltersSingle(IRequest req, IResponse res, object requestDto)
+        protected virtual async Task ApplyRequestFiltersSingleAsync(IRequest req, IResponse res, object requestDto)
         {
             //Exec all RequestFilter attributes with Priority < 0
             var attributes = FilterAttributeCache.GetRequestFilterAttributes(requestDto.GetType());
@@ -126,19 +136,33 @@ namespace ServiceStack
             {
                 var attribute = attributes[i];
                 Container.AutoWire(attribute);
-                attribute.RequestFilter(req, res, requestDto);
+                if (attribute is IHasRequestFilter filterSync)
+                    filterSync.RequestFilter(req, res, requestDto);
+                else if (attribute is IHasRequestFilterAsync filterAsync)
+                    await filterAsync.RequestFilterAsync(req, res, requestDto);
+
                 Release(attribute);
-                if (res.IsClosed) return res.IsClosed;
+                if (res.IsClosed) 
+                    return;
             }
 
             ExecTypedFilters(GlobalTypedRequestFilters, req, res, requestDto);
-            if (res.IsClosed) return res.IsClosed;
+            if (res.IsClosed) 
+                return;
 
             //Exec global filters
             foreach (var requestFilter in GlobalRequestFilters)
             {
                 requestFilter(req, res, requestDto);
-                if (res.IsClosed) return res.IsClosed;
+                if (res.IsClosed) 
+                    return;
+            }
+            
+            foreach (var requestFilter in GlobalRequestFiltersAsync)
+            {
+                await requestFilter(req, res, requestDto);
+                if (res.IsClosed) 
+                    return;
             }
 
             //Exec remaining RequestFilter attributes with Priority >= 0
@@ -146,135 +170,57 @@ namespace ServiceStack
             {
                 var attribute = attributes[i];
                 Container.AutoWire(attribute);
-                attribute.RequestFilter(req, res, requestDto);
-                Release(attribute);
-                if (res.IsClosed) return res.IsClosed;
-            }
+                
+                if (attribute is IHasRequestFilter filterSync)
+                    filterSync.RequestFilter(req, res, requestDto);
+                else if (attribute is IHasRequestFilterAsync filterAsync)
+                    await filterAsync.RequestFilterAsync(req, res, requestDto);
 
+                Release(attribute);
+                if (res.IsClosed) 
+                    return;
+            }
+        }
+
+        [Obsolete("Use ApplyResponseFiltersAsync")]
+        public virtual bool ApplyResponseFilters(IRequest req, IResponse res, object response)
+        {
+            ApplyResponseFiltersAsync(req, res, response).Wait();
             return res.IsClosed;
         }
-
-        public virtual Task ApplyRequestFiltersAsync(IRequest req, IResponse res, object requestDto)
-        {
-            if (GlobalRequestFiltersAsync.Count == 0)
-                return TypeConstants.EmptyTask;
-
-            using (Profiler.Current.Step("Executing Request Filters Async"))
-            {
-                if (!req.IsMultiRequest())
-                    return ApplyRequestFiltersSingleAsync(req, res, requestDto);
-
-                var dtos = (IEnumerable)requestDto;
-                var enumerator = dtos.GetEnumerator();
-                var tcs = new TaskCompletionSource<object>();
-                tcs.Task.ContinueWith(_ => { using (enumerator as IDisposable) {} }, TaskContinuationOptions.ExecuteSynchronously);
-
-                Action<Task> recursiveBody = null;
-                recursiveBody = t => {
-                    try
-                    {
-                        if (t?.IsCanceled == true)
-                        {
-                            tcs.TrySetCanceled();
-                        }
-                        else if (t?.IsFaulted == true)
-                        {
-                            tcs.TrySetException(t.Exception);
-                        }
-                        else if (enumerator.MoveNext() && !res.IsClosed)
-                        {
-                            ApplyRequestFiltersSingleAsync(req, res, enumerator.Current)
-                                .ContinueWith(recursiveBody, TaskContinuationOptions.ExecuteSynchronously);
-                        }
-                        else
-                        {
-                            tcs.TrySetResult(null);
-                        }
-                    }
-                    catch (Exception exc)
-                    {
-                        tcs.TrySetException(exc);
-                    }
-                };
-
-                recursiveBody(null);
-                return tcs.Task;
-            }
-        }
-
-        protected virtual Task ApplyRequestFiltersSingleAsync(IRequest req, IResponse res, object requestDto)
-        {
-            return IterateAsyncFilters(GlobalRequestFiltersAsync, req, res, requestDto);
-        }
-
-        public static Task IterateAsyncFilters(IEnumerable<Func<IRequest, IResponse, object, Task>> asyncIterator, 
-            IRequest req, IResponse res, object dto)
-        {
-            var enumerator = asyncIterator.GetEnumerator();
-            var tcs = new TaskCompletionSource<object>();
-            tcs.Task.ContinueWith(_ => enumerator.Dispose(), TaskContinuationOptions.ExecuteSynchronously);
-
-            Action<Task> recursiveBody = null;
-            recursiveBody = t => {
-                try
-                {
-                    if (t?.IsCanceled == true)
-                    {
-                        tcs.TrySetCanceled();
-                    }
-                    else if (t?.IsFaulted == true)
-                    {
-                        tcs.TrySetException(t.Exception);
-                    }
-                    else if (enumerator.MoveNext() && !res.IsClosed)
-                    {
-                        enumerator.Current(req, res, dto)
-                            .ContinueWith(recursiveBody, TaskContinuationOptions.ExecuteSynchronously);
-                    }
-                    else
-                    {
-                        tcs.TrySetResult(null);
-                    }
-                }
-                catch (Exception exc)
-                {
-                    tcs.TrySetException(exc);
-                }
-            };
-
-            recursiveBody(null);
-            return tcs.Task;
-        }
-
-
+        
         /// <summary>
         /// Applies the response filters. Returns whether or not the request has been handled 
         /// and no more processing should be done.
         /// </summary>
         /// <returns></returns>
-        public virtual bool ApplyResponseFilters(IRequest req, IResponse res, object response)
+        public virtual async Task ApplyResponseFiltersAsync(IRequest req, IResponse res, object response)
         {
-            req.ThrowIfNull("req");
-            res.ThrowIfNull("res");
+            if (req == null) throw new ArgumentNullException(nameof(req));
+            if (res == null) throw new ArgumentNullException(nameof(res));
 
             if (res.IsClosed)
-                return true;
-            using (Profiler.Current.Step("Executing Response Filters"))
+                return;
+
+            using (Profiler.Current.Step("Executing Request Filters Async"))
             {
                 var batchResponse = req.IsMultiRequest() ? response as IEnumerable : null;
                 if (batchResponse == null)
-                    return ApplyResponseFiltersSingle(req, res, response);
+                {
+                    await ApplyResponseFiltersSingleAsync(req, res, response);
+                    return;
+                }
 
                 foreach (var dto in batchResponse)
                 {
-                    if (ApplyResponseFiltersSingle(req, res, dto))
-                        return true;
+                    await ApplyResponseFiltersSingleAsync(req, res, dto);
+                    if (res.IsClosed)
+                        return;
                 }
-                return false;
             }
         }
 
-        protected virtual bool ApplyResponseFiltersSingle(IRequest req, IResponse res, object response)
+        protected virtual async Task ApplyResponseFiltersSingleAsync(IRequest req, IResponse res, object response)
         {
             var attributes = req.Dto != null
                 ? FilterAttributeCache.GetResponseFilterAttributes(req.Dto.GetType())
@@ -288,23 +234,38 @@ namespace ServiceStack
                 {
                     var attribute = attributes[i];
                     Container.AutoWire(attribute);
-                    attribute.ResponseFilter(req, res, response);
+                    
+                    if (attribute is IHasResponseFilter filterSync)
+                        filterSync.ResponseFilter(req, res, response);
+                    else if (attribute is IHasResponseFilterAsync filterAsync)
+                        await filterAsync.ResponseFilterAsync(req, res, response);
+
                     Release(attribute);
-                    if (res.IsClosed) return res.IsClosed;
+                    if (res.IsClosed) 
+                        return;
                 }
             }
 
             if (response != null)
             {
                 ExecTypedFilters(GlobalTypedResponseFilters, req, res, response);
-                if (res.IsClosed) return res.IsClosed;
+                if (res.IsClosed) 
+                    return;
             }
 
             //Exec global filters
             foreach (var responseFilter in GlobalResponseFilters)
             {
                 responseFilter(req, res, response);
-                if (res.IsClosed) return res.IsClosed;
+                if (res.IsClosed) 
+                    return;
+            }
+
+            foreach (var responseFilter in GlobalResponseFiltersAsync)
+            {
+                await responseFilter(req, res, response);
+                if (res.IsClosed) 
+                    return;
             }
 
             //Exec remaining RequestFilter attributes with Priority >= 0
@@ -314,13 +275,17 @@ namespace ServiceStack
                 {
                     var attribute = attributes[i];
                     Container.AutoWire(attribute);
-                    attribute.ResponseFilter(req, res, response);
+                    
+                    if (attribute is IHasResponseFilter filterSync)
+                        filterSync.ResponseFilter(req, res, response);
+                    else if (attribute is IHasResponseFilterAsync filterAsync)
+                        await filterAsync.ResponseFilterAsync(req, res, response);
+
                     Release(attribute);
-                    if (res.IsClosed) return res.IsClosed;
+                    if (res.IsClosed) 
+                        return;
                 }
             }
-
-            return res.IsClosed;
         }
 
         public virtual bool ApplyMessageRequestFilters(IRequest req, IResponse res, object requestDto)
@@ -364,9 +329,8 @@ namespace ServiceStack
         {
             if (typedFilters.Count == 0) return;
 
-            ITypedFilter typedFilter;
             var dtoType = dto.GetType();
-            typedFilters.TryGetValue(dtoType, out typedFilter);
+            typedFilters.TryGetValue(dtoType, out var typedFilter);
             if (typedFilter != null)
             {
                 typedFilter.Invoke(req, res, dto);

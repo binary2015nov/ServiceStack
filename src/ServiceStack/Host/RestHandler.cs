@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
+using ServiceStack.Host.Handlers;
 using ServiceStack.MiniProfiler;
 using ServiceStack.Web;
 
-namespace ServiceStack.Host.Handlers
+namespace ServiceStack.Host
 {
-    public class RestHandler : ServiceStackHandlerBase
+    public class RestHandler
+        : ServiceStackHandlerBase, IRequestHttpHandler
     {
         public RestHandler()
         {
@@ -59,113 +62,73 @@ namespace ServiceStack.Host.Handlers
 
         public override bool RunAsAsync() => true;
 
-        public override Task ProcessRequestAsync(IRequest httpReq, IResponse httpRes, string operationName)
+        public override async Task ProcessRequestAsync(IRequest httpReq, IResponse httpRes, string operationName)
         {
             try
             {
                 var restPath = GetRestPath(httpReq.Verb, httpReq.PathInfo);
                 if (restPath == null)
-                {
-                    return new NotSupportedException("No RestPath found for: " + httpReq.Verb + " " + httpReq.PathInfo)
-                        .AsTaskException();
-                }
+                    throw new NotSupportedException("No RestPath found for: " + httpReq.Verb + " " + httpReq.PathInfo);
+
                 httpReq.SetRoute(restPath as RestPath);
-                httpReq.OperationName = restPath.RequestType.GetOperationName();
+                httpReq.OperationName = operationName = restPath.RequestType.GetOperationName();
 
-                var appHost = HostContext.AppHost;
                 if (appHost.ApplyPreRequestFilters(httpReq, httpRes))
-                    return TypeConstants.EmptyTask;
-
-                var callback = httpReq.GetJsonpCallback();
-                var doJsonp = HostContext.Config.AllowJsonpRequests
-                              && !string.IsNullOrEmpty(callback);
+                    return;
 
                 if (ResponseContentType != null)
                     httpReq.ResponseContentType = ResponseContentType;
 
                 appHost.AssertContentType(httpReq.ResponseContentType);
 
-                var request = httpReq.Dto = CreateRequest(httpReq, restPath);
+                var request = httpReq.Dto = await CreateRequestAsync(httpReq, restPath);
 
-                if (appHost.ApplyRequestFilters(httpReq, httpRes, request))
-                    return TypeConstants.EmptyTask;
+                await appHost.ApplyRequestFiltersAsync(httpReq, httpRes, request);
+                if (httpRes.IsClosed)
+                    return;
 
-                return appHost.ApplyRequestFiltersAsync(httpReq, httpRes, request)
-                    .Continue(t =>
-                    {
-                        if (t.IsFaulted)
-                            return t;
+                var requestContentType = ContentFormat.GetEndpointAttributes(httpReq.ResponseContentType);
+                httpReq.RequestAttributes |= HandlerAttributes | requestContentType;
 
-                        if (t.IsCanceled)
-                            httpRes.EndRequest();
+                var rawResponse = await GetResponseAsync(httpReq, request);
+                if (httpRes.IsClosed)
+                    return;
 
-                        if (httpRes.IsClosed)
-                            return TypeConstants.EmptyTask;
-
-                        var rawResponse = GetResponse(httpReq, request);
-
-                        if (httpRes.IsClosed)
-                            return TypeConstants.EmptyTask;
-
-                        return HandleResponse(rawResponse, response =>
-                        {
-                            UpdateResponseContentType(httpReq, response);
-                            response = appHost.ApplyResponseConverters(httpReq, response);
-
-                            if (appHost.ApplyResponseFilters(httpReq, httpRes, response))
-                                return TypeConstants.EmptyTask;
-
-                            if (httpReq.ResponseContentType.Contains("jsv") && !string.IsNullOrEmpty(httpReq.QueryString[Keywords.Debug]))
-                                return WriteDebugResponse(httpRes, response);
-
-                            if (doJsonp && !(response is CompressedResult))
-                                return httpRes.WriteToResponse(httpReq, response, (callback + "(").ToUtf8Bytes(), ")".ToUtf8Bytes());
-
-                            return httpRes.WriteToResponse(httpReq, response);
-                        });
-                    })
-                    .Unwrap()
-                    .Continue(t =>
-                    {
-                        if (t.IsFaulted)
-                        {
-                            var taskEx = t.Exception.UnwrapIfSingleException();
-                            return !HostContext.Config.WriteErrorsToResponse
-                                ? taskEx.ApplyResponseConverters(httpReq).AsTaskException()
-                                : HandleException(httpReq, httpRes, operationName, taskEx.ApplyResponseConverters(httpReq));
-                        }
-                        return t;
-                    })
-                    .Unwrap();
+                await HandleResponse(httpReq, httpRes, rawResponse);
+            }
+            //sync with GenericHandler
+            catch (TaskCanceledException tce)
+            {
+                httpRes.StatusCode = (int)HttpStatusCode.PartialContent;
+                httpRes.EndRequest();
             }
             catch (Exception ex)
             {
-                return !HostContext.Config.WriteErrorsToResponse
-                    ? ex.ApplyResponseConverters(httpReq).AsTaskException()
-                    : HandleException(httpReq, httpRes, operationName, ex.ApplyResponseConverters(httpReq));
+                if (!appHost.Config.WriteErrorsToResponse)
+                {
+                    await appHost.ApplyResponseConvertersAsync(httpReq, ex);
+                }
+                else
+                {
+                    await HandleException(httpReq, httpRes, operationName,
+                        await appHost.ApplyResponseConvertersAsync(httpReq, ex) as Exception ?? ex);
+                }
             }
         }
 
-        public override object GetResponse(IRequest request, object requestDto)
-        {
-            var requestContentType = ContentFormat.GetEndpointAttributes(request.ResponseContentType);
-
-            request.RequestAttributes |= HandlerAttributes | requestContentType;
-
-            return ExecuteService(requestDto, request);
-        }
-
-        public static object CreateRequest(IRequest httpReq, IRestPath restPath)
+        public static Task<object> CreateRequestAsync(IRequest httpReq, IRestPath restPath)
         {
             using (Profiler.Current.Step("Deserialize Request"))
             {
                 var dtoFromBinder = GetCustomRequestFromBinder(httpReq, restPath.RequestType);
                 if (dtoFromBinder != null)
-                    return HostContext.AppHost.ApplyRequestConverters(httpReq, dtoFromBinder);
+                    return HostContext.AppHost.ApplyRequestConvertersAsync(httpReq, dtoFromBinder);
 
                 var requestParams = httpReq.GetFlattenedRequestParams();
-                return HostContext.AppHost.ApplyRequestConverters(httpReq,
+                var taskResponse = HostContext.AppHost.ApplyRequestConvertersAsync(httpReq,
                     CreateRequest(httpReq, restPath, requestParams));
+
+                return taskResponse;
             }
         }
 
@@ -190,12 +153,12 @@ namespace ServiceStack.Host.Handlers
         /// Used in Unit tests
         /// </summary>
         /// <returns></returns>
-        public override object CreateRequest(IRequest httpReq, string operationName)
+        public Task<object> CreateRequestAsync(IRequest httpReq, string operationName)
         {
             if (this.RestPath == null)
                 throw new ArgumentNullException(nameof(RestPath), "No RestPath found");
 
-            return CreateRequest(httpReq, this.RestPath);
+            return CreateRequestAsync(httpReq, this.RestPath);
         }
     }
 

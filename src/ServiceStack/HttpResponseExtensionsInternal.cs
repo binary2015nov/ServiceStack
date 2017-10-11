@@ -355,32 +355,7 @@ namespace ServiceStack
             return TypeConstants.TrueTask;
         }
 
-        [Obsolete("Use WriteBytesToResponseAsync")]
-        public static void WriteBytesToResponse(this IResponse res, byte[] responseBytes, string contentType)
-        {
-            res.ContentType = HostContext.Config.AppendUtf8CharsetOnContentTypes.Contains(contentType)
-                ? contentType + ContentFormat.Utf8Suffix
-                : contentType;
-
-            res.ApplyGlobalResponseHeaders();
-            res.SetContentLength(responseBytes.Length);
-
-            try
-            {
-                res.OutputStream.Write(responseBytes, 0, responseBytes.Length);
-                res.Flush();
-            }
-            catch (Exception ex)
-            {
-                ex.HandleResponseWriteException(res.Request, res, contentType);
-            }
-            finally
-            {
-                res.EndRequest(skipHeaders: true);
-            }
-        }
-
-        public static async Task WriteBytesToResponseAsync(this IResponse res, byte[] responseBytes, string contentType, CancellationToken token = default(CancellationToken))
+        public static async Task WriteBytesToResponse(this IResponse res, byte[] responseBytes, string contentType, CancellationToken token = default(CancellationToken))
         {
             res.ContentType = HostContext.Config.AppendUtf8CharsetOnContentTypes.Contains(contentType)
                 ? contentType + ContentFormat.Utf8Suffix
@@ -404,17 +379,17 @@ namespace ServiceStack
             }
         }
 
-        public static void WriteError(this IResponse httpRes, IRequest httpReq, object dto, string errorMessage)
+        public static Task WriteError(this IResponse httpRes, IRequest httpReq, object dto, string errorMessage)
         {
-            httpRes.WriteErrorToResponse(httpReq, httpReq.ResponseContentType, dto.GetType().Name, errorMessage, null,
-                (int)HttpStatusCode.InternalServerError).Wait();
+            return httpRes.WriteErrorToResponse(httpReq, httpReq.ResponseContentType, dto.GetType().Name, errorMessage, null,
+                (int)HttpStatusCode.InternalServerError);
         }
 
-        public static void WriteError(this IResponse httpRes, object dto, string errorMessage)
+        public static Task WriteError(this IResponse httpRes, object dto, string errorMessage)
         {
             var httpReq = httpRes.Request;
-            httpRes.WriteErrorToResponse(httpReq, httpReq.ResponseContentType, dto.GetType().Name, errorMessage, null,
-                (int)HttpStatusCode.InternalServerError).Wait();
+            return httpRes.WriteErrorToResponse(httpReq, httpReq.ResponseContentType, dto.GetType().Name, errorMessage, null,
+                (int)HttpStatusCode.InternalServerError);
         }
 
         public static Task WriteError(this IResponse httpRes, Exception ex, int statusCode = 500, string errorMessage = null, string contentType = null)
@@ -507,7 +482,7 @@ namespace ServiceStack
             // (for example, so people can fix errors in their pages).
             if (HostContext.Config.DebugMode)
             {
-#if !NETSTANDARD1_6
+#if !NETSTANDARD2_0
                 if (ex is HttpCompileException compileEx && compileEx.Results.Errors.HasErrors)
                 {
                     errors = new List<ResponseError>();
@@ -542,7 +517,7 @@ namespace ServiceStack
             return false;
         }
 
-#if !NETSTANDARD1_6
+#if !NETSTANDARD2_0
         public static void ApplyGlobalResponseHeaders(this HttpListenerResponse httpRes)
         {
             if (HostContext.Config == null) return;
