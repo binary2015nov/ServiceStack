@@ -2,12 +2,12 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
-  <ItemGroup>
+  <!--<ItemGroup>
     <Folder Include="wwwroot\" />
-  </ItemGroup>
+  </ItemGroup>-->
   <ItemGroup>
+    <Reference Include="..\..\lib\netstandard2.0\ServiceStack.Text.dll" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
-    <ProjectReference Include="..\..\..\ServiceStack.Text\src\ServiceStack.Text\ServiceStack.Text.csproj" />
     <ProjectReference Include="..\..\src\ServiceStack.Interfaces\ServiceStack.Interfaces.csproj" />
     <ProjectReference Include="..\..\src\ServiceStack\ServiceStack.csproj" />
     <ProjectReference Include="..\..\src\ServiceStack.Client\ServiceStack.Client.csproj" />

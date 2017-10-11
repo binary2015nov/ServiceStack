@@ -63,14 +63,9 @@ namespace NetCoreWeb.Tests
 
     public class AppHost : AppHostBase
     {
-        public AppHost() : base("StreamTest", typeof(AppHost).Assembly)
-        {
-            AppSettings = new AppSettings();
-        }
+        public AppHost() : base("StreamTest", typeof(AppHost).Assembly) { }
 
-        public override void Configure(Container container)
-        {
-        }
+        public override void Configure(Container container) { }
     }
 
     public class ImageService : Service

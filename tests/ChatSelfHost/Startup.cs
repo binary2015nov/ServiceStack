@@ -55,22 +55,19 @@ namespace Chat
 
     public class AppHost : AppHostBase
     {
-        public AppHost() : base("Chat", typeof(ServerEventsServices).GetTypeInfo().Assembly)
+        public AppHost() : base("Chat", typeof(ServerEventsServices).GetAssembly())
         {
             var liveSettings = MapProjectPath("~/appsettings.txt");
             AppSettings = File.Exists(liveSettings)
                 ? (IAppSettings)new TextFileSettings(liveSettings)
                 : new AppSettings();
+            Config.DefaultContentType = MimeTypes.Json;
+            Config.AllowSessionIdsInHttpParams = true;
+
         }
 
         public override void Configure(Container container)
         {
-            SetConfig(new HostConfig
-            {
-                DefaultContentType = MimeTypes.Json,
-                AllowSessionIdsInHttpParams = true,
-            });
-
             Plugins.Add(new RazorFormat());
             Plugins.Add(new ServerEventsFeature());
 
@@ -329,8 +326,7 @@ namespace Chat
     {
         public object Get(GetUserDetails request)
         {
-            var session = GetSession();
-            return session.ConvertTo<GetUserDetailsResponse>();
+            return Request.GetSession().ConvertTo<GetUserDetailsResponse>();
         }
     }
 

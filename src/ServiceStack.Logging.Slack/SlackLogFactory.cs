@@ -111,18 +111,18 @@ namespace ServiceStack.Logging.Slack
                 throw new ArgumentNullException("appSettings");
 
             if(incomingWebHookUrl == null)
-                incomingWebHookUrl = appSettings.GetString(ConfigKeyFmt.Fmt("Url"));
+                incomingWebHookUrl = appSettings.Get(ConfigKeyFmt.Fmt("Url"));
 
             DebugEnabled = appSettings.Get<bool>(ConfigKeyFmt.Fmt("DebugEnabled"));
-            DefaultChannel = appSettings.GetString(ConfigKeyFmt.Fmt("DefaultChannel"));
-            IconEmoji = appSettings.GetString(ConfigKeyFmt.Fmt("IconEmoji"));
-            ErrorChannel = appSettings.GetString(ConfigKeyFmt.Fmt("ErrorChannel"));
-            DebugChannel = appSettings.GetString(ConfigKeyFmt.Fmt("DebugChannel"));
-            InfoChannel = appSettings.GetString(ConfigKeyFmt.Fmt("InfoChannel"));
-            FatalChannel = appSettings.GetString(ConfigKeyFmt.Fmt("FatalChannel"));
-            WarnChannel = appSettings.GetString(ConfigKeyFmt.Fmt("WarnChannel"));
-            BotUsername = appSettings.GetString(ConfigKeyFmt.Fmt("BotUsername"));
-            ChannelPrefix = appSettings.GetString(ConfigKeyFmt.Fmt("ChannelPrefix"));
+            DefaultChannel = appSettings.Get(ConfigKeyFmt.Fmt("DefaultChannel"));
+            IconEmoji = appSettings.Get(ConfigKeyFmt.Fmt("IconEmoji"));
+            ErrorChannel = appSettings.Get(ConfigKeyFmt.Fmt("ErrorChannel"));
+            DebugChannel = appSettings.Get(ConfigKeyFmt.Fmt("DebugChannel"));
+            InfoChannel = appSettings.Get(ConfigKeyFmt.Fmt("InfoChannel"));
+            FatalChannel = appSettings.Get(ConfigKeyFmt.Fmt("FatalChannel"));
+            WarnChannel = appSettings.Get(ConfigKeyFmt.Fmt("WarnChannel"));
+            BotUsername = appSettings.Get(ConfigKeyFmt.Fmt("BotUsername"));
+            ChannelPrefix = appSettings.Get(ConfigKeyFmt.Fmt("ChannelPrefix"));
         }
 
         public ILog GetLogger(Type type)

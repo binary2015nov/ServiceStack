@@ -12,12 +12,12 @@ namespace ServiceStack.Logging.Tests.UnitTests
             ILog log = LogManager.GetLogger(GetType());
             Assert.IsNotNull(log);
             Assert.IsNotNull(LogManager.LogFactory as NullLogFactory);
-            Assert.IsNotNull(log as NullDebugLogger);
+            Assert.IsNotNull(log as NullLogger);
 
             log = LogManager.GetLogger(GetType().Name);
             Assert.IsNotNull(log);
             Assert.IsNotNull(LogManager.LogFactory as NullLogFactory);
-            Assert.IsNotNull(log as NullDebugLogger);
+            Assert.IsNotNull(log as NullLogger);
         }
 
         [Test]
