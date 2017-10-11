@@ -8,16 +8,15 @@ namespace ServiceStack.Testing
 {
     public class BasicAppHost : ServiceStackHost
     {
-        public BasicAppHost(params Assembly[] serviceAssemblies)
-            : base(typeof(BasicAppHost).GetOperationName(),
-                   serviceAssemblies.Length > 0 ? serviceAssemblies : new[]
-                   {
+        public BasicAppHost(params Assembly[] serviceAssemblies) : base(typeof(BasicAppHost).GetOperationName(),
+            serviceAssemblies.Length > 0 ? serviceAssemblies : new[]
+            {
 #if !NETSTANDARD2_0
-                       Assembly.GetExecutingAssembly()
+                Assembly.GetExecutingAssembly()
 #else
-                       typeof(BasicAppHost).GetTypeInfo().Assembly
+                typeof(BasicAppHost).GetTypeInfo().Assembly
 #endif
-                   })
+            })
         {
             ExcludeAutoRegisteringServiceTypes.Clear();
             TestMode = true;

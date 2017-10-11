@@ -56,7 +56,7 @@ namespace ServiceStack
 
                 case "jsv":
                     return pathArray[1] == "metadata" ? new JsvMetadataHandler() : null;
-#if !NETSTANDARD1_6
+#if !NETSTANDARD2_0
                 case "soap11":
                     return pathArray[1] == "metadata"
                         ? new Soap11MetadataHandler() as IHttpHandler

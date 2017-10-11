@@ -408,8 +408,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             response = url.GetJsonFromUrl(responseFilter: res =>
             {
                 Assert.That(res.ContentType, Does.StartWith(MimeTypes.Json));
-            })
-                .FromJson<ServerCacheOnly>();
+            }).FromJson<ServerCacheOnly>();
 
             Assert.That(ServerCacheOnly.Count, Is.EqualTo(1));
             AssertEquals(response, request);

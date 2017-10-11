@@ -177,7 +177,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
                 AssertResponse<MovieResponse>(response, MimeTypes.Json, x =>
                 {
                     Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
-                    Assert.That(response.Headers["Location"], Is.EqualTo(ServiceClientBaseUri + "/movies/" + x.Movie.Id));
+                    Assert.That(response.Headers["Location"], Is.EqualTo(ServiceClientBaseUri + "movies/" + x.Movie.Id));
                 });
             }
             catch (WebException webEx)

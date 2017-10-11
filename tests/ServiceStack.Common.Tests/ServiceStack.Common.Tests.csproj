@@ -17,20 +17,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="packages.config" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="NUnit" Version="3.7.1" />
+    <PackageReference Include="NUnit" Version="3.6.1" />
     <PackageReference Include="Moq" Version="4.7.99" />
     <PackageReference Include="Wire" Version="0.8.2" />
-    <PackageReference Include="AWSSDK.Core" Version="3.3.10.6" />
-    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.4.4" />
+    <PackageReference Include="AWSSDK.Core" Version="3.3.4.1" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.0.2" />
     <ProjectReference Include="..\..\src\ServiceStack.Client\ServiceStack.Client.csproj" />
     <ProjectReference Include="..\..\src\ServiceStack.Common\ServiceStack.Common.csproj" />
     <ProjectReference Include="..\..\src\ServiceStack\ServiceStack.csproj" />
@@ -63,7 +58,7 @@
     <Reference Include="..\..\lib\net45\ServiceStack.Aws.dll" />
   </ItemGroup>
 
-    <!-- Enable NunitLite build, becase NUnit is not supported on .NET Core SDK 1.0.2 
+  <!-- Enable NunitLite build, becase NUnit is not supported on .NET Core SDK 1.0.2 
    https://github.com/nunit/dotnet-test-nunit/issues/91 
    To enable NUnitLite pass /p:NUNITLITE=1 into msbuild arguments
    -->
@@ -83,16 +78,6 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="1.1.1" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.3.0" />
-    <Reference Include="..\..\lib\netstandard1.1\ServiceStack.Interfaces.dll" />
-    <Reference Include="..\..\lib\netstandard1.3\ServiceStack.Text.dll" />
-    <Reference Include="..\..\lib\netstandard1.3\ServiceStack.Redis.dll" />
-    <Reference Include="..\..\lib\netstandard1.3\ServiceStack.OrmLite.dll" />
-    <Reference Include="..\..\lib\netstandard1.3\ServiceStack.OrmLite.Sqlite.dll" />
-    <Reference Include="..\..\lib\netstandard1.3\ServiceStack.OrmLite.SqlServer.dll" />
-    <Reference Include="..\..\lib\netstandard1.6\ServiceStack.Aws.dll" />
-    <ProjectReference Include="..\..\src\ServiceStack.Kestrel\ServiceStack.Kestrel.csproj" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.4.0" />
 
@@ -110,10 +95,6 @@
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
 
 </Project>

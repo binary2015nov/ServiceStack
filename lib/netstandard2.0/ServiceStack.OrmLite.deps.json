@@ -19,9 +19,9 @@
           "System.Reflection.Emit.Lightweight": "4.3.0",
           "System.Reflection.TypeExtensions": "4.3.0",
           "System.Xml.XmlDocument": "4.3.0",
-          "ServiceStack.Common": "4.0.0.0",
+          "ServiceStack.Common": "4.5.0.0",
           "ServiceStack.Interfaces": "4.0.0.0",
-          "ServiceStack.Text": "4.0.0.0"
+          "ServiceStack.Text": "4.5.9.0"
         },
         "runtime": {
           "ServiceStack.OrmLite.dll": {}
@@ -470,7 +470,7 @@
           "lib/netstandard1.3/System.Xml.XmlDocument.dll": {}
         }
       },
-      "ServiceStack.Common/4.0.0.0": {
+      "ServiceStack.Common/4.5.0.0": {
         "runtime": {
           "ServiceStack.Common.dll": {}
         }
@@ -480,7 +480,7 @@
           "ServiceStack.Interfaces.dll": {}
         }
       },
-      "ServiceStack.Text/4.0.0.0": {
+      "ServiceStack.Text/4.5.9.0": {
         "runtime": {
           "ServiceStack.Text.dll": {}
         }
@@ -829,7 +829,7 @@
       "path": "system.xml.xmldocument/4.3.0",
       "hashPath": "system.xml.xmldocument.4.3.0.nupkg.sha512"
     },
-    "ServiceStack.Common/4.0.0.0": {
+    "ServiceStack.Common/4.5.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
@@ -839,7 +839,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "ServiceStack.Text/4.0.0.0": {
+    "ServiceStack.Text/4.5.9.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

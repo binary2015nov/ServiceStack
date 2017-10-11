@@ -54,12 +54,13 @@ namespace ServiceStack
             Routes = new ServiceRoutes();
             Metadata = new ServiceMetadata();
             PreRequestFilters = new List<Action<IRequest, IResponse>>();
-            RequestConverters = new List<Func<IRequest, object, object>>();
-            ResponseConverters = new List<Func<IRequest, object, object>>();
+            RequestConverters = new List<Func<IRequest, object, Task<object>>>();
+            ResponseConverters = new List<Func<IRequest, object, Task<object>>>();
             GlobalRequestFilters = new List<Action<IRequest, IResponse, object>>();
             GlobalRequestFiltersAsync = new List<Func<IRequest, IResponse, object, Task>>();
             GlobalTypedRequestFilters = new Dictionary<Type, ITypedFilter>();
             GlobalResponseFilters = new List<Action<IRequest, IResponse, object>>();
+            GlobalResponseFiltersAsync = new List<Func<IRequest, IResponse, object, Task>>();
             GlobalTypedResponseFilters = new Dictionary<Type, ITypedFilter>();
             GlobalMessageRequestFilters = new List<Action<IRequest, IResponse, object>>();
             GlobalMessageRequestFiltersAsync = new List<Func<IRequest, IResponse, object, Task>>();
@@ -67,7 +68,9 @@ namespace ServiceStack
             GlobalMessageResponseFilters = new List<Action<IRequest, IResponse, object>>();
             GlobalTypedMessageResponseFilters = new Dictionary<Type, ITypedFilter>();
             GatewayRequestFilters = new List<Action<IRequest, object>>();
+            GatewayRequestFiltersAsync = new List<Func<IRequest, object, Task>>();
             GatewayResponseFilters = new List<Action<IRequest, object>>();
+            GatewayResponseFiltersAsync = new List<Func<IRequest, object, Task>>();
             ViewEngines = new List<IViewEngine>();
             ServiceExceptionHandlers = new List<ServiceExceptionHandler>();
             UncaughtExceptionHandlers = new List<UncatchedExceptionHandler>();
@@ -498,15 +501,16 @@ namespace ServiceStack
         /// 
         /// Note one converter could influence the input for the next converter!
         /// </summary>
-        public List<Func<IRequest, object, object>> RequestConverters { get; private set; }
+        public List<Func<IRequest, object, Task<object>>> RequestConverters { get; private set; }
+
 
         /// <summary>
         /// Collection of ResponseConverters.
         /// Can be used to convert/change Output Dto
         /// 
-        /// Called directly after response is handled, even before <see cref="ApplyResponseFilters"></see>!
+        /// Called directly after response is handled, even before <see cref="ApplyResponseFiltersAsync"></see>!
         /// </summary>
-        public List<Func<IRequest, object, object>> ResponseConverters { get; private set; }
+        public List<Func<IRequest, object, Task<object>>> ResponseConverters { get; private set; }
 
         public List<Action<IRequest, IResponse, object>> GlobalRequestFilters { get; private set; }
 
@@ -515,6 +519,8 @@ namespace ServiceStack
         public Dictionary<Type, ITypedFilter> GlobalTypedRequestFilters { get; private set; }
 
         public List<Action<IRequest, IResponse, object>> GlobalResponseFilters { get; private set; }
+
+        public List<Func<IRequest, IResponse, object, Task>> GlobalResponseFiltersAsync { get; set; }
 
         public Dictionary<Type, ITypedFilter> GlobalTypedResponseFilters { get; private set; }
 
@@ -564,7 +570,11 @@ namespace ServiceStack
 
         public List<Action<IRequest, object>> GatewayRequestFilters { get; set; }
 
+        public List<Func<IRequest, object, Task>> GatewayRequestFiltersAsync { get; set; }
+
         public List<Action<IRequest, object>> GatewayResponseFilters { get; set; }
+
+        public List<Func<IRequest, object, Task>> GatewayResponseFiltersAsync { get; set; }
 
         [Obsolete("Renamed to VirtualFileSources")]
         public IVirtualPathProvider VirtualPathProvider
@@ -931,9 +941,6 @@ namespace ServiceStack
 
         public static string NormalizePathInfo(string pathInfo, string mode)
         {
-            if (mode?.Length > 0 && mode[0] == '/')
-                mode = mode.Substring(1);
-
             if (string.IsNullOrEmpty(mode))
                 return pathInfo;
 

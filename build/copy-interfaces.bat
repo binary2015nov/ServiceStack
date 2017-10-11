@@ -51,21 +51,21 @@ COPY ..\lib\netstandard2.0\ServiceStack.Client.dll ..\..\ServiceStack.Aws\lib\ne
 COPY ..\lib\net45\ServiceStack.dll ..\..\ServiceStack.Aws\lib\net45
 COPY ..\lib\netstandard2.0\ServiceStack.dll ..\..\ServiceStack.Aws\lib\netstandard2.0
 
-COPY ..\lib\net45\ServiceStack.Interfaces.dll ..\..\Admin\lib\net45
-COPY ..\lib\netstandard2.0\ServiceStack.Interfaces.dll ..\..\Admin\lib\netstandard2.0
-COPY ..\lib\net45\ServiceStack.Common.dll ..\..\Admin\lib\net45
-COPY ..\lib\netstandard2.0\ServiceStack.Common.dll ..\..\Admin\lib\netstandard2.0
-COPY ..\lib\net45\ServiceStack.Client.dll ..\..\Admin\lib\net45
-COPY ..\lib\netstandard2.0\ServiceStack.Client.dll ..\..\Admin\lib\netstandard2.0
-COPY ..\lib\netstandard2.0\ServiceStack.Client.dll ..\..\Admin\lib\netstandard2.0
-COPY ..\lib\net45\ServiceStack.dll ..\..\Admin\lib\net45
-COPY ..\lib\netstandard2.0\ServiceStack.dll ..\..\Admin\lib\netstandard2.0
+COPY ..\lib\net45\ServiceStack.Interfaces.dll ..\..\ServiceStack.Admin\lib\net45
+COPY ..\lib\netstandard2.0\ServiceStack.Interfaces.dll ..\..\ServiceStack.Admin\lib\netstandard2.0
+COPY ..\lib\net45\ServiceStack.Common.dll ..\..\ServiceStack.Admin\lib\net45
+COPY ..\lib\netstandard2.0\ServiceStack.Common.dll ..\..\ServiceStack.Admin\lib\netstandard2.0
+COPY ..\lib\net45\ServiceStack.Client.dll ..\..\ServiceStack.Admin\lib\net45
+COPY ..\lib\netstandard2.0\ServiceStack.Client.dll ..\..\ServiceStack.Admin\lib\netstandard2.0
+COPY ..\lib\netstandard2.0\ServiceStack.Client.dll ..\..\ServiceStack.Admin\lib\netstandard2.0
+COPY ..\lib\net45\ServiceStack.dll ..\..\ServiceStack.Admin\lib\net45
+COPY ..\lib\netstandard2.0\ServiceStack.dll ..\..\ServiceStack.Admin\lib\netstandard2.0
 
-COPY ..\lib\net45\ServiceStack.Interfaces.dll ..\..\Stripe\lib\net45
-COPY ..\lib\netstandard2.0\ServiceStack.Interfaces.dll ..\..\Stripe\lib\netstandard2.0
-COPY ..\lib\net45\ServiceStack.Client.dll ..\..\Stripe\lib\net45
-COPY ..\lib\netstandard2.0\ServiceStack.Client.dll ..\..\Stripe\lib\netstandard2.0
-COPY ..\lib\netstandard2.0\ServiceStack.Client.dll ..\..\Stripe\lib\netstandard2.0
-COPY ..\lib\net45\ServiceStack.Client.dll ..\..\Stripe\lib\net45
+COPY ..\lib\net45\ServiceStack.Interfaces.dll ..\..\ServiceStack.Stripe\lib\net45
+COPY ..\lib\netstandard2.0\ServiceStack.Interfaces.dll ..\..\ServiceStack.Stripe\lib\netstandard2.0
+COPY ..\lib\net45\ServiceStack.Client.dll ..\..\ServiceStack.Stripe\lib\net45
+COPY ..\lib\netstandard2.0\ServiceStack.Client.dll ..\..\ServiceStack.Stripe\lib\netstandard2.0
+COPY ..\lib\netstandard2.0\ServiceStack.Client.dll ..\..\ServiceStack.Stripe\lib\netstandard2.0
+COPY ..\lib\net45\ServiceStack.Client.dll ..\..\ServiceStack.Stripe\lib\net45
 
 

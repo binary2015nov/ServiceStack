@@ -128,7 +128,5 @@ namespace ServiceStack.Api.Swagger
                 return pathInfo.StartsWith("/swagger-ui") ? new StaticFileHandler() : null;
             });
         }
-
-        public static bool IsEnabled => HostContext.HasPlugin<SwaggerFeature>();
     }
 }

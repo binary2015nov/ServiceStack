@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using ServiceStack.Auth;
 using ServiceStack.Configuration;
 using ServiceStack.Web;
@@ -27,9 +28,9 @@ namespace ServiceStack
         public RequiredRoleAttribute(params string[] roles)
             : this(ApplyTo.All, roles) { }
 
-        public override void Execute(IRequest req, IResponse res, object requestDto)
+        public override async Task ExecuteAsync(IRequest req, IResponse res, object requestDto)
         {
-            base.Execute(req, res, requestDto); //first check if session is authenticated
+            await base.ExecuteAsync(req, res, requestDto); //first check if session is authenticated
             if (res.IsClosed)
                 return; //AuthenticateAttribute already closed the request (ie auth failed)
             try

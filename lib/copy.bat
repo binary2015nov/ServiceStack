@@ -48,7 +48,7 @@ COPY ..\..\ServiceStack.OrmLite\src\ServiceStack.OrmLite.MySql\bin\%BUILD%\netst
 COPY ..\..\ServiceStack.Aws\src\ServiceStack.Aws\bin\%BUILD%\net45\ServiceStack.Aws.* net45
 COPY ..\..\ServiceStack.Aws\src\ServiceStack.Aws\bin\%BUILD%\netstandard2.0\ServiceStack.Aws.* netstandard2.0
 
-COPY ..\..\Admin\src\ServiceStack.Admin\bin\%BUILD%\net45\ServiceStack.Admin.* net45
-COPY ..\..\Admin\src\ServiceStack.Admin\bin\%BUILD%\netstandard2.0\ServiceStack.Admin.* netstandard2.0
+COPY ..\..\ServiceStack.Admin\src\ServiceStack.Admin\bin\%BUILD%\net45\ServiceStack.Admin.* net45
+COPY ..\..\ServiceStack.Admin\src\ServiceStack.Admin\bin\%BUILD%\netstandard2.0\ServiceStack.Admin.* netstandard2.0
 
 

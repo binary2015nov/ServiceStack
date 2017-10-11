@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 using ServiceStack.Auth;
 using ServiceStack.Web;
 
@@ -10,11 +12,13 @@ namespace ServiceStack
     /// requires authentication.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
-    public class AuthenticateAttribute : RequestFilterAttribute
+    public class AuthenticateAttribute : RequestFilterAsyncAttribute
     {
         /// <summary>
         /// Restrict authentication to a specific <see cref="IAuthProvider"/>.
-        /// For example, if this attribute should only permit access.
+        /// For example, if this attribute should only permit access
+        /// if the user is authenticated with <see cref="BasicAuthProvider"/>,
+        /// you should set this property to <see cref="BasicAuthProvider.Name"/>.
         /// </summary>
         public string Provider { get; set; }
 
@@ -31,8 +35,7 @@ namespace ServiceStack
         }
 
         public AuthenticateAttribute()
-            : this(ApplyTo.All)
-        { }
+            : this(ApplyTo.All) { }
 
         public AuthenticateAttribute(string provider)
             : this(ApplyTo.All)
@@ -46,7 +49,7 @@ namespace ServiceStack
             this.Provider = provider;
         }
 
-        public override void Execute(IRequest req, IResponse res, object requestDto)
+        public override async Task ExecuteAsync(IRequest req, IResponse res, object requestDto)
         {
             if (HostContext.HasValidAuthSecret(req))
                 return;
@@ -60,7 +63,7 @@ namespace ServiceStack
 
             if (matchingOAuthConfigs.Count() == 0)
             {
-                res.WriteError(req, requestDto, $"No Auth Provider found matching {this.Provider ?? "any"} provider");
+                await res.WriteError(req, requestDto, $"No OAuth Configs found matching {this.Provider ?? "any"} provider");
                 res.EndRequest();
                 return;
             }
@@ -77,7 +80,7 @@ namespace ServiceStack
             {
                 if (this.DoHtmlRedirectIfConfigured(req, res, true)) return;
 
-                AuthProvider.HandleFailedAuth(matchingOAuthConfigs.First(), session, req, res);
+                await AuthProvider.HandleFailedAuth(matchingOAuthConfigs.First(), session, req, res);
             }
         }
 

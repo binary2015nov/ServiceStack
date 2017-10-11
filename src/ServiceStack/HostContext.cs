@@ -4,6 +4,7 @@ using System.Configuration;
 using System.IO;
 using System.Net;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using System.Web;
 using Funq;
 using ServiceStack.Caching;
@@ -35,7 +36,7 @@ namespace ServiceStack
                     
             return AppHost;
         }
-#if !NETSTANDARD1_6
+#if !NETSTANDARD2_0
         public static bool IsAspNetHost => AppHost is AppHostBase;
         public static bool IsHttpListenerHost => AppHost is ServiceStack.Host.HttpListener.HttpListenerBase;
         public static bool IsNetCore => false;
@@ -90,14 +91,14 @@ namespace ServiceStack
             return AssertAppHost().ApplyPreRequestFilters(httpReq, httpRes);
         }
 
-        public static bool ApplyRequestFilters(IRequest httpReq, IResponse httpRes, object requestDto)
+        public static Task ApplyRequestFiltersAsync(IRequest httpReq, IResponse httpRes, object requestDto)
         {
-            return AssertAppHost().ApplyRequestFilters(httpReq, httpRes, requestDto);
+            return AssertAppHost().ApplyRequestFiltersAsync(httpReq, httpRes, requestDto);
         }
 
-        public static bool ApplyResponseFilters(IRequest httpReq, IResponse httpRes, object response)
+        public static Task ApplyResponseFiltersAsync(IRequest httpReq, IResponse httpRes, object response)
         {
-            return AssertAppHost().ApplyResponseFilters(httpReq, httpRes, response);
+            return AssertAppHost().ApplyResponseFiltersAsync(httpReq, httpRes, response);
         }
 
         /// <summary>
@@ -238,7 +239,7 @@ namespace ServiceStack
             AssertAppHost().HandleUncaughtException(httpReq, httpRes, operationName, ex);
         }
 
-#if !NETSTANDARD1_6
+#if !NETSTANDARD2_0
         /// <summary>
         /// Resolves and auto-wires a ServiceStack Service from a ASP.NET HttpContext.
         /// </summary>

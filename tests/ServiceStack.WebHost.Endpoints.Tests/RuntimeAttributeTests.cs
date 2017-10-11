@@ -8,6 +8,7 @@ using NUnit.Framework;
 using ServiceStack.Api.Swagger;
 using ServiceStack.Auth;
 using ServiceStack.DataAnnotations;
+using ServiceStack.Host;
 using ServiceStack.Host.Handlers;
 using ServiceStack.Web;
 
@@ -40,7 +41,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         private ServiceStackHost appHost;
 
         [OneTimeSetUp]
-        public void OnTestFixtureSetUp()
+        public void TestFixtureSetUp()
         {
             appHost = new RuntimeAttributeAppHost()
                 .Init()
@@ -48,15 +49,14 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
+        public void TestFixtureTearDown()
         {
             appHost.Dispose();
         }
 
         public class RuntimeAttributeAppHost : AppSelfHostBase
         {
-            public RuntimeAttributeAppHost()
-                : base(typeof(RuntimeAttributeTests).Name, typeof (RuntimeAttributeAppHost).GetAssembly())
+            public RuntimeAttributeAppHost() : base(typeof(RuntimeAttributeTests).Name, typeof (RuntimeAttributeAppHost).GetAssembly())
             {
                 typeof(RuntimeAttributes)
                     .AddAttributes(new RuntimeAttributeRequestFilter());

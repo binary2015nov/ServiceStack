@@ -202,7 +202,7 @@ namespace ServiceStack.Host.Handlers
             var response = GetRequestInfo(httpReq);
             response.HandlerFactoryArgs = HttpHandlerFactory.LastHandlerArgs;
             response.DebugString = "";
-#if !NETSTANDARD1_6        
+#if !NETSTANDARD2_0        
 
             if (HostContext.IsAspNetHost)
             {

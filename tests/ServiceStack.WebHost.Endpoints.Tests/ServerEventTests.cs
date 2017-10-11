@@ -1228,11 +1228,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
     }
 
-    class Conf
-    {
-        public const string AbsoluteBaseUri = "http://127.0.0.1:10010/";
-    }
-
     [TestFixture]
     public class ServerEventConnectionTests
     {
@@ -1240,17 +1235,18 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             return new ServerEventsAppHost()
                 .Init()
-                .Start(Conf.AbsoluteBaseUri);
+                .Start(Config.ListeningOn);
         }
 
         private static ServerEventsClient CreateServerEventsClient()
         {
-            var client = new ServerEventsClient(Conf.AbsoluteBaseUri);
-            return client;
+            return new ServerEventsClient(Config.ListeningOn);
         }
 
-        private readonly ServiceStackHost appHost;
-        public ServerEventConnectionTests()
+        private ServiceStackHost appHost;
+
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
             appHost = CreateAppHost();
         }
@@ -1311,13 +1307,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             return new ServerEventsAppHost { LimitToAuthenticatedUsers = true }
                 .Init()
-                .Start(Conf.AbsoluteBaseUri);
+                .Start(Config.ListeningOn);
         }
 
         private static ServerEventsClient CreateServerEventsClient()
         {
-            var client = new ServerEventsClient(Conf.AbsoluteBaseUri);
-            return client;
+            return new ServerEventsClient(Config.ListeningOn);
         }
 
         private ServiceStackHost appHost;
@@ -1394,7 +1389,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public async Task Channels_updated_after_Restart()
         {
-            using (var client = new ServerEventsClient(Conf.AbsoluteBaseUri, "home"))
+            using (var client = new ServerEventsClient(Config.ListeningOn, "home"))
             {
                 Assert.That(client.EventStreamUri.EndsWith("home"));
 

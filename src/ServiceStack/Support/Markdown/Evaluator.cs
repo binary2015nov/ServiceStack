@@ -11,206 +11,214 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Support.Markdown
 {
-	public class EvaluatorExecutionContext
-	{
-		public EvaluatorExecutionContext()
-		{
-			this.Items = new List<EvaluatorItem>();
-			this.TypeProperties = new Dictionary<string, Type>();
-		}
+    public class EvaluatorExecutionContext
+    {
+        public EvaluatorExecutionContext()
+        {
+            this.Items = new List<EvaluatorItem>();
+            this.TypeProperties = new Dictionary<string, Type>();
+        }
 
-		public Type BaseType { get; set; }
-		public Type[] GenericArgs { get; set; }
-		public IDictionary<string, Type> TypeProperties { get; set; }
+        public Type BaseType { get; set; }
+        public Type[] GenericArgs { get; set; }
+        public IDictionary<string, Type> TypeProperties { get; set; }
 
-		public List<EvaluatorItem> Items { get; private set; }
+        public List<EvaluatorItem> Items { get; private set; }
 
-		public Evaluator Build()
-		{
-			return new Evaluator(Items, BaseType, GenericArgs, TypeProperties);
-		}
-	}
+        public Evaluator Build()
+        {
+            return new Evaluator(Items, BaseType, GenericArgs, TypeProperties);
+        }
+    }
 
-	public class Evaluator
-	{
-		private static readonly ILog Logger = LogManager.GetLogger(typeof(Evaluator));
+    public class Evaluator
+    {
+        private static ILog Log = LogManager.GetLogger(typeof(Evaluator));
 
-		const string StaticMethodName = "__tmp";
-#if !NETSTANDARD1_6
+        const string StaticMethodName = "__tmp";
+#if !NETSTANDARD2_0
 		Assembly compiledAssembly;
 #endif
-		Type compiledType = null;
-		object compiled = null;
-		EmptyCtorDelegate compiledTypeCtorFn;
+        Type compiledType = null;
+        object compiled = null;
+        EmptyCtorDelegate compiledTypeCtorFn;
 
-		private Type BaseType { get; set; }
-		private Type[] GenericArgs { get; set; }
-		private IDictionary<string, Type> TypeProperties { get; set; }
+        private Type BaseType { get; set; }
+        private Type[] GenericArgs { get; set; }
+        private IDictionary<string, Type> TypeProperties { get; set; }
 
-		public static readonly List<Assembly> Assemblies = new List<Assembly> {
-			typeof(string).GetAssembly(),       //"system.dll",
+        public static readonly List<Assembly> Assemblies = new List<Assembly> {
+            typeof(string).GetAssembly(),       //"system.dll",
 //			typeof(XmlDocument).GetAssembly(),  //"system.xml.dll",
-			typeof(System.Web.HtmlString).GetAssembly(), //"system.web.dll",
-			typeof(Expression).GetAssembly(),   //"system.core.dll",
-			typeof(AppHostBase).GetAssembly(),  //"ServiceStack.dll",
-			typeof(JsConfig).GetAssembly(),     //"ServiceStack.Text.dll",
-			typeof(IService).GetAssembly(),   //"ServiceStack.Interfaces.dll",
-			typeof(UrnId).GetAssembly(), //"ServiceStack.Common.dll"
-		};
+            typeof(System.Web.HtmlString).GetAssembly(), //"system.web.dll",
+            typeof(Expression).GetAssembly(),   //"system.core.dll",
+            typeof(AppHostBase).GetAssembly(),  //"ServiceStack.dll",
+            typeof(JsConfig).GetAssembly(),     //"ServiceStack.Text.dll",
+            typeof(IService).GetAssembly(),   //"ServiceStack.Interfaces.dll",
+            typeof(UrnId).GetAssembly(), //"ServiceStack.Common.dll"
+        };
 
-		public static readonly List<string> AssemblyNames = new List<string> {
-			"System",
-			"System.Text",
+        public static readonly List<string> AssemblyNames = new List<string> {
+            "System",
+            "System.Text",
 //            "System.Xml",
-			"System.Web",
-			"System.Collections",
-			"System.Collections.Generic",
-			"System.Linq",
-			"System.Linq.Expressions",
-			"ServiceStack.Html",
-			"ServiceStack.Markdown"                                                                     
-		};
+            "System.Web",
+            "System.Collections",
+            "System.Collections.Generic",
+            "System.Linq",
+            "System.Linq.Expressions",
+            "ServiceStack.Html",
+            "ServiceStack.Markdown"
+        };
 
-		public static readonly Dictionary<string,string> NamespaceAssemblies = new Dictionary<string, string>();
+        public static readonly Dictionary<string, string> NamespaceAssemblies = new Dictionary<string, string>();
 
-		//Use NamespaceAssemblies if assemblyName is not also its namespace
-		public static void AddAssembly(string assemblyName)
-		{
-			if (NamespaceAssemblies.ContainsKey(assemblyName))
-				assemblyName = NamespaceAssemblies[assemblyName];
+        //Use NamespaceAssemblies if assemblyName is not also its namespace
+        public static void AddAssembly(string assemblyName)
+        {
+            if (NamespaceAssemblies.ContainsKey(assemblyName))
+                assemblyName = NamespaceAssemblies[assemblyName];
 
-			if (AssemblyNames.Contains(assemblyName)) return;
-			AssemblyNames.Add(assemblyName);
+            if (AssemblyNames.Contains(assemblyName)) return;
+            AssemblyNames.Add(assemblyName);
 
-			try {
-				var assembly = Assembly.Load(new AssemblyName(assemblyName));
-				if (!Assemblies.Contains(assembly))
-					Assemblies.Add(assembly);
-			} catch (System.IO.FileNotFoundException) {
-				//Possibly the assembly name differs from the namespace name
-				try
-				{
-					FindNamespaceInLoadedAssemblies(assemblyName);
-				}
-				catch (Exception ex) {
-					Logger.Error("Can't load assembly: " + assemblyName, ex);
-				}
-			} catch (Exception ex) {
-				Logger.Error("Can't load assembly: " + assemblyName, ex);
-			}
-		}
+            try
+            {
+                var assembly = Assembly.Load(new AssemblyName(assemblyName));
+                if (!Assemblies.Contains(assembly))
+                    Assemblies.Add(assembly);
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                //Possibly the assembly name differs from the namespace name
+                try
+                {
+                    FindNamespaceInLoadedAssemblies(assemblyName);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Can't load assembly: " + assemblyName, ex);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Can't load assembly: " + assemblyName, ex);
+            }
+        }
 
-		private static void FindNamespaceInLoadedAssemblies(string assemblyNamespace)
-		{
-#if !NETSTANDARD1_6
-			var assemblies = from assembly in AppDomain.CurrentDomain.GetAssemblies()
-							 from type in assembly.GetTypes()
-							 where type.Namespace == assemblyNamespace
-							 select type.Assembly;
+        private static void FindNamespaceInLoadedAssemblies(string assemblyNamespace)
+        {
+#if !NETSTANDARD2_0
+            var assemblies = from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                             from type in assembly.GetTypes()
+                             where type.Namespace == assemblyNamespace
+                             select type.Assembly;
 
-			foreach (var a in assemblies) {
-				if (!Assemblies.Contains(a))
-					Assemblies.Add(a);
-			}
+            foreach (var a in assemblies) {
+                if (!Assemblies.Contains(a))
+                    Assemblies.Add(a);
+            }
 #endif
-		}
+        }
 
-		public static Type FindType(string typeName)
-		{
-			if (typeName == null || typeName.Contains(".")) return null;
-			var type = Type.GetType(typeName);
-			if (type != null) return type;
-			
-			foreach (var assembly in Assemblies)
-			{
-				var searchType = assembly.GetName().Name + "." + typeName;
-				type = assembly.GetType(searchType);
-				if (type != null) 
-					return type;
-			}
+        public static Type FindType(string typeName)
+        {
+            if (typeName == null || typeName.Contains(".")) return null;
+            var type = Type.GetType(typeName);
+            if (type != null) return type;
 
-			return null;
-		}
+            foreach (var assembly in Assemblies)
+            {
+                var searchType = assembly.GetName().Name + "." + typeName;
+                type = assembly.GetType(searchType);
+                if (type != null)
+                    return type;
+            }
 
-		public Evaluator(IEnumerable<EvaluatorItem> items) : this(items, null, null, null) { }
+            return null;
+        }
 
-		public Evaluator(IEnumerable<EvaluatorItem> items,
-			Type baseType, Type[] genericArgs, IDictionary<string, Type> typeProperties)
-		{
-			this.BaseType = baseType;
-			this.GenericArgs = genericArgs ?? TypeConstants.EmptyTypeArray;
-			this.TypeProperties = typeProperties;
+        public Evaluator(IEnumerable<EvaluatorItem> items)
+            : this(items, null, null, null)
+        {
+        }
 
-			ConstructEvaluator(items);
-		}
+        public Evaluator(IEnumerable<EvaluatorItem> items, Type baseType, Type[] genericArgs, IDictionary<string, Type> typeProperties)
+        {
+            this.BaseType = baseType;
+            this.GenericArgs = genericArgs ?? TypeConstants.EmptyTypeArray;
+            this.TypeProperties = typeProperties;
 
-		public Evaluator(Type returnType, string expression, string name)
-			: this(returnType, expression, name, null) { }
+            ConstructEvaluator(items);
+        }
 
-		public Evaluator(Type returnType, string expression, string name, IDictionary<string, Type> exprParams)
-		{
-			EvaluatorItem[] items = 
-			{
-				new EvaluatorItem {
-					ReturnType  = returnType, 
-					Expression = expression, 
-					Name = name,
-					Params = exprParams ?? new Dictionary<string, Type>(),
-				}
-			};
-			ConstructEvaluator(items);
-		}
+        public Evaluator(Type returnType, string expression, string name)
+            : this(returnType, expression, name, null) { }
 
-		public Evaluator(EvaluatorItem item)
-		{
-			EvaluatorItem[] items = { item };
-			ConstructEvaluator(items);
-		}
+        public Evaluator(Type returnType, string expression, string name, IDictionary<string, Type> exprParams)
+        {
+            EvaluatorItem[] items =
+            {
+                new EvaluatorItem {
+                    ReturnType  = returnType,
+                    Expression = expression,
+                    Name = name,
+                    Params = exprParams ?? new Dictionary<string, Type>(),
+                }
+            };
+            ConstructEvaluator(items);
+        }
 
-		public string GetTypeName(Type type)
-		{
-			try
-			{
-				//Inner classes?
-				var typeName = type == null
-					//|| type.FullName == null
-					? null
-					: StringBuilderCache.Allocate()
-						.Append(type.FullName.Replace('+', '.').LeftPart('`'));
+        public Evaluator(EvaluatorItem item)
+        {
+            EvaluatorItem[] items = { item };
+            ConstructEvaluator(items);
+        }
 
-				if (typeName == null) return null;
+        public string GetTypeName(Type type)
+        {
+            try
+            {
+                //Inner classes?
+                var typeName = type == null
+                    //|| type.FullName == null
+                    ? null
+                    : StringBuilderCache.Allocate()
+                        .Append(type.FullName.Replace('+', '.').LeftPart('`'));
 
-				if (type.HasGenericType()
-					//TODO: support GenericTypeDefinition properly
-					&& !type.IsGenericTypeDefinition()
-				)
-				{
-					var genericArgs = type.GetGenericArguments();
+                if (typeName == null) return null;
 
-					typeName.Append("<");
-					var i = 0;
-					foreach (var genericArg in genericArgs)
-					{
-						if (i++ > 0)
-							typeName.Append(", ");
-						typeName.Append(GetTypeName(genericArg));
-					}
-					typeName.Append(">");
-				}
+                if (type.HasGenericType()
+                    //TODO: support GenericTypeDefinition properly
+                    && !type.IsGenericTypeDefinition()
+                )
+                {
+                    var genericArgs = type.GetGenericArguments();
 
-				return StringBuilderCache.Retrieve(typeName);
-			}
-			catch (Exception ex)
-			{
-				Logger.Error("Get type name eror: " + ex.Message);
-				throw;
-			}
-		}
+                    typeName.Append("<");
+                    var i = 0;
+                    foreach (var genericArg in genericArgs)
+                    {
+                        if (i++ > 0)
+                            typeName.Append(", ");
+                        typeName.Append(GetTypeName(genericArg));
+                    }
+                    typeName.Append(">");
+                }
 
-		private static readonly bool IsVersion4AndUp = Type.GetType("System.Collections.Concurrent.Partitioner") != null;
-		
-#if NETSTANDARD1_6
-		private void ConstructEvaluator(IEnumerable<EvaluatorItem> items) { }
+                return StringBuilderCache.Retrieve(typeName);
+            }
+            catch (Exception)
+            {
+                //Console.WriteLine(ex);
+                throw;
+            }
+        }
+
+        private static readonly bool IsVersion4AndUp = Type.GetType("System.Collections.Concurrent.Partitioner") != null;
+
+#if NETSTANDARD2_0
+        private void ConstructEvaluator(IEnumerable<EvaluatorItem> items) { }
 #else
 		private static void AddAssembly(System.CodeDom.Compiler.CompilerParameters cp, string location)
 		{
@@ -223,9 +231,9 @@ namespace ServiceStack.Support.Markdown
 			cp.ReferencedAssemblies.Add(location);
 		}
 
-		private void ConstructEvaluator(IEnumerable<EvaluatorItem> items)
+        private void ConstructEvaluator(IEnumerable<EvaluatorItem> items)
 		{
-			var codeCompiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("CSharp");
+            var codeCompiler = System.CodeDom.Compiler.CodeDomProvider.CreateProvider("CSharp");
 
 			var cp = new System.CodeDom.Compiler.CompilerParameters 
 			{
@@ -233,11 +241,11 @@ namespace ServiceStack.Support.Markdown
 				GenerateInMemory = true,
 			};
 			Assemblies.ForEach(x => AddAssembly(cp, x.Location));
-			
+            
 			var code = StringBuilderCache.Allocate();
 
-			AssemblyNames.ForEach(x => 
-				code.AppendFormat("using {0};\n", x));
+            AssemblyNames.ForEach(x => 
+                code.AppendFormat("using {0};\n", x));
 
 			code.Append(
 @"
@@ -313,7 +321,7 @@ namespace CSharpEval
 			{
 				if (!Env.IsMono)
 				{
-					cp.ReferencedAssemblies.Add(Env.ReferenceAssembyPath + @"System.Core.dll");
+                    cp.ReferencedAssemblies.Add(Env.ReferenceAssembyPath + @"System.Core.dll");
 				}
 			}
 
@@ -366,102 +374,102 @@ namespace CSharpEval
 			{
 				assemblies.Add(assembly);
 
-				if (assembly.IsDynamic()) continue;
+                if (assembly.IsDynamic()) continue;
 				AddAssembly(cp, assembly.Location);
 			}
 		}
 #endif
 
-		private void AddPropertiesToTypeIfAny(StringBuilder code)
-		{
-			if (this.TypeProperties != null)
-			{
-				foreach (var typeProperty in TypeProperties)
-				{
-					var name = typeProperty.Key;
-					var type = typeProperty.Value;
-					var typeName = GetTypeName(type);
+        private void AddPropertiesToTypeIfAny(StringBuilder code)
+        {
+            if (this.TypeProperties != null)
+            {
+                foreach (var typeProperty in TypeProperties)
+                {
+                    var name = typeProperty.Key;
+                    var type = typeProperty.Value;
+                    var typeName = GetTypeName(type);
 
-					var mi = type.GetMember("Instance", BindingFlags.Static | BindingFlags.Public);
-					var hasSingleton = mi.Length > 0;
+                    var mi = type.GetMember("Instance", BindingFlags.Static | BindingFlags.Public);
+                    var hasSingleton = mi.Length > 0;
 
-					var returnExpr = hasSingleton
-									 ? typeName + ".Instance"
-									 : "new " + typeName + "()";
+                    var returnExpr = hasSingleton
+                                     ? typeName + ".Instance"
+                                     : "new " + typeName + "()";
 
-					code.AppendFormat("    public {0} {1} = {2};\n", typeName, name, returnExpr);
-				}
-			}
-		}
+                    code.AppendFormat("    public {0} {1} = {2};\n", typeName, name, returnExpr);
+                }
+            }
+        }
 
-		public T GetInstance<T>()
-		{
-			return (T)compiled;
-		}
+        public T GetInstance<T>()
+        {
+            return (T)compiled;
+        }
 
-		public object CreateInstance()
-		{
-			return compiledTypeCtorFn();
-		}
+        public object CreateInstance()
+        {
+            return compiledTypeCtorFn();
+        }
 
-		public MethodInfo GetCompiledMethodInfo(string name)
-		{
-			return compiledType.GetMethod(name);
-		}
+        public MethodInfo GetCompiledMethodInfo(string name)
+        {
+            return compiledType.GetMethod(name);
+        }
 
-		public object Evaluate(string name, params object[] exprParams)
-		{
-			return Evaluate(compiled, name, exprParams);
-		}
+        public object Evaluate(string name, params object[] exprParams)
+        {
+            return Evaluate(compiled, name, exprParams);
+        }
 
-		public object Evaluate(object instance, string name, params object[] exprParams)
-		{
-			try
-			{
-				var mi = compiledType.GetMethod(name);
-				return mi.Invoke(instance, exprParams);
-			}
-			catch (TargetInvocationException ex)
-			{
-				Console.WriteLine(ex.InnerException);
-				throw ex.InnerException;
-			}
-		}
+        public object Evaluate(object instance, string name, params object[] exprParams)
+        {
+            try
+            {
+                var mi = compiledType.GetMethod(name);
+                return mi.Invoke(instance, exprParams);
+            }
+            catch (TargetInvocationException ex)
+            {
+                Console.WriteLine(ex.InnerException);
+                throw ex.InnerException;
+            }
+        }
 
-		public T Eval<T>(string name, params object[] exprParams)
-		{
-			return (T)Evaluate(name, exprParams);
-		}
+        public T Eval<T>(string name, params object[] exprParams)
+        {
+            return (T)Evaluate(name, exprParams);
+        }
 
-		public static object Eval(string code)
-		{
-			var eval = new Evaluator(typeof(object), code, StaticMethodName);
-			return eval.Evaluate(StaticMethodName);
-		}
+        public static object Eval(string code)
+        {
+            var eval = new Evaluator(typeof(object), code, StaticMethodName);
+            return eval.Evaluate(StaticMethodName);
+        }
 
-		public static T Eval<T>(string code)
-		{
-			var eval = new Evaluator(typeof(T), code, StaticMethodName);
-			return (T)eval.Evaluate(StaticMethodName);
-		}
+        public static T Eval<T>(string code)
+        {
+            var eval = new Evaluator(typeof(T), code, StaticMethodName);
+            return (T)eval.Evaluate(StaticMethodName);
+        }
 
-	}
+    }
 
-	public class EvaluatorItem
-	{
-		public EvaluatorItem() { }
+    public class EvaluatorItem
+    {
+        public EvaluatorItem() { }
 
-		public EvaluatorItem(Type returnType, string name, string expression, IDictionary<string, Type> exprParams)
-		{
-			ReturnType = returnType;
-			Name = name;
-			Expression = expression;
-			Params = exprParams;
-		}
+        public EvaluatorItem(Type returnType, string name, string expression, IDictionary<string, Type> exprParams)
+        {
+            ReturnType = returnType;
+            Name = name;
+            Expression = expression;
+            Params = exprParams;
+        }
 
-		public Type ReturnType { get; set; }
-		public string Name { get; set; }
-		public string Expression { get; set; }
-		public IDictionary<string, Type> Params { get; set; }
-	}
+        public Type ReturnType { get; set; }
+        public string Name { get; set; }
+        public string Expression { get; set; }
+        public IDictionary<string, Type> Params { get; set; }
+    }
 }

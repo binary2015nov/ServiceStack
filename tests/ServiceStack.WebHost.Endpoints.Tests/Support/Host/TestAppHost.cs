@@ -6,12 +6,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 {
 	public class TestAppHost : ServiceStackHost
 	{
-        public TestAppHost(params Assembly[] assembliesWithServices)
-            : base("Example Service", 
-                    assembliesWithServices.Length > 0 ? assembliesWithServices : new[] { typeof(Nested).GetAssembly() })
+		public TestAppHost(params Assembly[] assembliesWithServices)
+			: base("Example Service", assembliesWithServices.Length > 0 ? assembliesWithServices : new[] { typeof(Nested).GetAssembly() })
 		{
 
-        }
+		}
 
 		public override void Configure(Container container)
 		{
@@ -19,6 +18,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 		}
 	}
 
-    public interface IFoo { }
-    public class Foo : IFoo { }
+	public interface IFoo { }
+	public class Foo : IFoo { }
 }

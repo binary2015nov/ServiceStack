@@ -12,7 +12,7 @@ namespace ServiceStack.Host
 {
     public class ServiceRunner<TRequest> : IServiceRunner<TRequest>
     {
-        protected static readonly ILog Log = LogManager.GetLogger(typeof(ServiceRunner<>));
+        protected static readonly ILog Logger = LogManager.GetLogger(typeof(ServiceRunner<>));
 
         protected readonly IAppHost AppHost;
         protected readonly ActionContext ActionContext;
@@ -102,7 +102,7 @@ namespace ServiceStack.Host
 
                 var response = AfterEachRequest(req, requestDto, ServiceAction(instance, requestDto));
 
-                if (HostContext.StrictMode)
+                if (HostContext.Config.StrictMode)
                 {
                     if (response != null && response.GetType().IsValueType())
                         throw new StrictModeException(
@@ -177,7 +177,7 @@ namespace ServiceStack.Host
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("Error while logging req: " + req.Dump(), ex);
+                    Logger.Error("Error while logging req: " + req.Dump(), ex);
                 }
             }
         }

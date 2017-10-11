@@ -318,29 +318,30 @@ namespace ServiceStack.Host
         {
             if (req == null) return;
 
-            var serviceRequiresContext = service as IRequiresRequest;
-            if (serviceRequiresContext != null)
+            if (service is IRequiresRequest serviceRequiresContext)
             {
                 serviceRequiresContext.Request = req;
             }
         }
 
+        [Obsolete("Use ApplyResponseFiltersAsync")]
         public object ApplyResponseFilters(object response, IRequest req)
         {
-            var taskResponse = response as Task;
-            if (taskResponse != null)
+            return ApplyResponseFiltersAsync(response, req).Result;
+        }
+
+        private async Task<object> ApplyResponseFiltersAsync(object response, IRequest req)
+        {
+            if (response is Task taskResponse)
             {
+                await taskResponse;
                 response = taskResponse.GetResult();
             }
 
-            return ApplyResponseFiltersInternal(response, req);
-        }
+            response = await appHost.ApplyResponseConvertersAsync(req, response);
 
-        private object ApplyResponseFiltersInternal(object response, IRequest req)
-        {
-            response = appHost.ApplyResponseConverters(req, response);
-
-            if (appHost.ApplyResponseFilters(req, req.Response, response))
+            await appHost.ApplyResponseFiltersAsync(req, req.Response, response);
+            if (req.Response.IsClosed)
                 return req.Response.Dto;
 
             return response;
@@ -360,20 +361,19 @@ namespace ServiceStack.Host
         public object ExecuteMessage(IMessage message, IRequest req)
         {
             RequestContext.Instance.StartRequestContext();
-            
+
             req.PopulateFromRequestIfHasSessionId(message.Body);
 
-            req.Dto = appHost.ApplyRequestConverters(req, message.Body);
+            req.Dto = appHost.ApplyRequestConvertersAsync(req, message.Body).Result;
             if (appHost.ApplyMessageRequestFilters(req, req.Response, message.Body))
                 return req.Response.Dto;
 
             var response = Execute(message.Body, req);
 
-            var taskResponse = response as Task;
-            if (taskResponse != null)
+            if (response is Task taskResponse)
                 response = taskResponse.GetResult();
 
-            response = appHost.ApplyResponseConverters(req, response);
+            response = appHost.ApplyResponseConvertersAsync(req, response).Result;
 
             if (appHost.ApplyMessageResponseFilters(req, req.Response, response))
                 response = req.Response.Dto;
@@ -406,27 +406,37 @@ namespace ServiceStack.Host
             return appHost.OnAfterExecute(req, requestDto, handlerFn(req, requestDto));
         }
 
+        /// <summary>
+        /// Execute a Service with a Request DTO.
+        /// </summary>
+        public virtual async Task<object> ExecuteAsync(object requestDto, IRequest req) //Used by HTTP handlers to Execute Services
+        {
+            return await Task.Run(() => Execute(requestDto, req));
+        }
+
         // Only Used internally by TypedFilterTests 
         public object Execute(object requestDto, IRequest req, bool applyFilters)
         {
             try
             {
                 req.SetInProcessRequest();
-                
+
                 if (applyFilters)
                 {
-                    requestDto = appHost.ApplyRequestConverters(req, requestDto);
-                    if (appHost.ApplyRequestFilters(req, req.Response, requestDto))
+                    requestDto = appHost.ApplyRequestConvertersAsync(req, requestDto).Result;
+
+                    appHost.ApplyRequestFiltersAsync(req, req.Response, requestDto).Wait();
+                    if (req.Response.IsClosed)
                         return null;
                 }
 
                 var response = Execute(requestDto, req);
 
                 return applyFilters
-                    ? ApplyResponseFilters(response, req)
+                    ? ApplyResponseFiltersAsync(response, req).Result
                     : response;
             }
-            finally 
+            finally
             {
                 req.ReleaseIfInProcessRequest();
             }
@@ -443,34 +453,35 @@ namespace ServiceStack.Host
             try
             {
                 req.SetInProcessRequest();
-                
-                string contentType;
-                var restPath = RestHandler.FindMatchingRestPath(req.Verb, req.PathInfo, out contentType);
+
+                var restPath = RestHandler.FindMatchingRestPath(req.Verb, req.PathInfo, out _);
                 req.SetRoute(restPath as RestPath);
                 req.OperationName = restPath.RequestType.GetOperationName();
-                var requestDto = RestHandler.CreateRequest(req, restPath);
+                var requestDto = RestHandler.CreateRequestAsync(req, restPath).Result;
                 req.Dto = requestDto;
 
                 if (applyFilters)
                 {
-                    requestDto = appHost.ApplyRequestConverters(req, requestDto);
-                    if (appHost.ApplyRequestFilters(req, req.Response, requestDto))
+                    requestDto = appHost.ApplyRequestConvertersAsync(req, requestDto).Result;
+
+                    appHost.ApplyRequestFiltersAsync(req, req.Response, requestDto).Wait();
+                    if (req.Response.IsClosed)
                         return null;
                 }
 
                 var response = Execute(requestDto, req);
 
-                return applyFilters 
-                    ? ApplyResponseFilters(response, req) 
+                return applyFilters
+                    ? ApplyResponseFiltersAsync(response, req).Result
                     : response;
             }
-            finally 
+            finally
             {
                 req.ReleaseIfInProcessRequest();
             }
         }
 
-        public Task<object> ExecuteAsync(object requestDto, IRequest req, bool applyFilters)
+        public async Task<object> GatewayExecuteAsync(object requestDto, IRequest req, bool applyFilters)
         {
             req.Dto = requestDto;
             var requestType = requestDto.GetType();
@@ -482,44 +493,41 @@ namespace ServiceStack.Host
 
             if (applyFilters)
             {
-                requestDto = appHost.ApplyRequestConverters(req, requestDto);
-                if (appHost.ApplyRequestFilters(req, req.Response, requestDto))
-                    return TypeConstants.EmptyTask;
+                requestDto = appHost.ApplyRequestConvertersAsync(req, requestDto);
+                appHost.ApplyRequestFiltersAsync(req, req.Response, requestDto).Wait();
+                if (req.Response.IsClosed)
+                    return null;
             }
 
             var handlerFn = GetService(requestType);
             var response = handlerFn(req, requestDto);
 
-            var taskObj = response as Task<object>;
-            if (taskObj != null)
+            if (response is Task<object> taskObj)
             {
-                return HostContext.Async.ContinueWith(req, taskObj, t => 
+                response = await taskObj;
+
+                if (response is Task[] tasks)
                 {
-                    var taskArray = t.Result as Task[];
-                    if (taskArray != null)
+                    await Task.WhenAll(tasks);
+
+                    object[] ret = null;
+                    for (int i = 0; i < tasks.Length; i++)
                     {
-                        return Task.Factory.ContinueWhenAll(taskArray, tasks =>
-                        {
-                            object[] ret = null;
-                            for (int i = 0; i < tasks.Length; i++)
-                            {
-                                var tResult = tasks[i].GetResult();
-                                if (ret == null)
-                                    ret = (object[])Array.CreateInstance(tResult.GetType(), tasks.Length);
+                        var tResult = tasks[i].GetResult();
+                        if (ret == null)
+                            ret = (object[])Array.CreateInstance(tResult.GetType(), tasks.Length);
 
-                                ret[i] = ApplyResponseFiltersInternal(tResult, req);
-                            }
-                            return (object)ret;
-                        });
+                        ret[i] = await ApplyResponseFiltersAsync(tResult, req);
                     }
+                    return ret;
+                }
 
-                    return ApplyResponseFiltersInternal(t.Result, req).AsTaskResult();
-                }).Unwrap();
+                return await ApplyResponseFiltersAsync(response, req);
             }
 
             return applyFilters
-                ? ApplyResponseFiltersInternal(response, req).AsTaskResult()
-                : response.AsTaskResult();
+                ? await ApplyResponseFiltersAsync(response, req)
+                : response;
         }
 
         public virtual ServiceExecFn GetService(Type requestType)

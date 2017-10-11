@@ -157,10 +157,10 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         }
     }
 
-    [TestFixture]
+    [Explicit, TestFixture]
     public class AsyncLoadTests
     {
-        private const int NoOfTimes = 1000;
+        const int NoOfTimes = 1000;
 
         [Test]
         public void Load_test_GetFactorialSync_sync()

@@ -581,10 +581,12 @@ namespace ServiceStack
 
         public virtual object OnAfterExecute(IRequest req, object requestDto, object response)
         {
-            if (req.Response.Dto == null)
-                req.Response.Dto = response;
+            var responseDto = response is Task responseTask ? responseTask.GetResult() : response;
 
-            return response;
+            if (req.Response.Dto == null)
+            req.Response.Dto = responseDto;
+
+            return responseDto;
         }
 
         public virtual MetadataTypesConfig GetTypesConfigForMetadata(IRequest req)

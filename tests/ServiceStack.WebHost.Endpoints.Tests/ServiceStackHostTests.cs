@@ -7,25 +7,25 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 	[TestFixture]
 	public class ServiceStackHostTests
 	{
-        ServiceStackHost appHost;
+		ServiceStackHost appHost;
 
-        [OneTimeSetUp]
-        public void TestFixtureSetUp()
-        {
-            appHost = new TestAppHost().Init();
-        }
+		[OneTimeSetUp]
+		public void TestFixtureSetUp()
+		{
+			appHost = new TestAppHost().Init();
+		}
 
-        [OneTimeTearDown]
-        public void TestFixtureTearDown()
-        {
-            appHost.Dispose();
-        }
+		[OneTimeTearDown]
+		public void TestFixtureTearDown()
+		{
+			appHost.Dispose();
+		}
 
 		[Test]
 		public void Can_run_nested_service()
 		{
 			var request = new Nested();
-			var response = appHost.ExecuteService(request) as NestedResponse;
+			var response = appHost.ExecuteService(request);
 
 			Assert.That(response, Is.Not.Null);
 		}

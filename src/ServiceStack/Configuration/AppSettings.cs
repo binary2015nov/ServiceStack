@@ -11,7 +11,7 @@ namespace ServiceStack.Configuration
     {
         private class ConfigurationManagerWrapper : ISettingsReader
         {
-#if NETSTANDARD1_6
+#if NETSTANDARD2_0
             private Dictionary<string, string> appSettings;
             public Dictionary<string, string> AppSettings { get { return appSettings ?? (appSettings = ConfigUtils.GetAppSettingsMap()); } }
 #endif

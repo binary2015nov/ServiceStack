@@ -8,8 +8,7 @@ using ServiceStack.Web;
 
 namespace ServiceStack.Host
 {
-    public class RestHandler
-        : ServiceStackHandlerBase, IRequestHttpHandler
+    public class RestHandler : ServiceStackHandlerBase, IRequestHttpHandler
     {
         public RestHandler()
         {

@@ -118,7 +118,7 @@ namespace ServiceStack
             };          
         }
 
-#if !NETSTANDARD1_6
+#if !NETSTANDARD2_0
         // Entry point for ASP.NET
         public IHttpHandler GetHandler(HttpContext context, string requestType, string url, string pathTranslated)
         {
@@ -264,6 +264,6 @@ namespace ServiceStack
             return null;
         }
 
-        public virtual void ReleaseHandler(IHttpHandler handler) { }
+        public void ReleaseHandler(IHttpHandler handler) { }
     }
 }

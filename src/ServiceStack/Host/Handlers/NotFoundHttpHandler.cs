@@ -75,8 +75,7 @@ namespace ServiceStack.Host.Handlers
 
                 }
             }
-            var text = sb.ToString();
-            response.EndHttpHandlerRequest(skipClose: true, afterHeaders: r => r.Write(text));
+            return response.EndHttpHandlerRequestAsync(skipClose: true, afterHeaders: r => r.WriteAsync(sb.ToString()));
         }
 
         public override bool IsReusable => true;

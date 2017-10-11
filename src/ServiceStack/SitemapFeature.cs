@@ -156,7 +156,7 @@ namespace ServiceStack
                     xml.AppendLine(feature.CustomXml.SitemapIndexFooterXml);
 
                 xml.AppendLine("</sitemapindex>");
-                var text = StringBuilderCache.ReturnAndFree(xml);
+                var text = StringBuilderCache.Retrieve(xml);
                 await httpRes.EndHttpHandlerRequestAsync(skipClose: true, afterHeaders: r => r.WriteAsync(text));
             }
         }
@@ -217,7 +217,7 @@ namespace ServiceStack
 
                 xml.AppendLine("</urlset>");
 
-                var text = StringBuilderCache.ReturnAndFree(xml);
+                var text = StringBuilderCache.Retrieve(xml);
                 await httpRes.EndHttpHandlerRequestAsync(skipClose: true, afterHeaders: r => r.WriteAsync(text));
             }
         }

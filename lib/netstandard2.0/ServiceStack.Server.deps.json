@@ -1354,7 +1354,6 @@
           "Microsoft.Extensions.Primitives": "2.0.0",
           "System.Collections.Specialized": "4.3.0",
           "System.Net.Requests": "4.3.0",
-          "System.Runtime.Serialization.Xml": "4.3.0",
           "System.ServiceModel.Primitives": "4.3.0",
           "System.Xml.XmlSerializer": "4.3.0"
         },

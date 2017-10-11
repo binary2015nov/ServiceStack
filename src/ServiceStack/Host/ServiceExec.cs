@@ -16,8 +16,7 @@ namespace ServiceStack.Host
         object Execute(IRequest request, IService service, object requestDto);
     }
 
-    class ServiceExec<TService> : IServiceExec
-        where TService : IService
+    class ServiceExec<TService> : IServiceExec where TService : IService
     {
         private const string ResponseDtoSuffix = "Response";
 
@@ -58,19 +57,19 @@ namespace ServiceStack.Host
                     returnMarker.GetGenericArguments()[0]
                     : mi.ReturnType != typeof(object) && mi.ReturnType != typeof(void) ?
                       mi.ReturnType
-#if NETSTANDARD1_6
+#if NETSTANDARD2_0
                     : Type.GetType(requestType.FullName + ResponseDtoSuffix + "," + requestType.GetAssembly().GetName().Name);
 #else
                     : AssemblyUtils.FindType(requestType.FullName + ResponseDtoSuffix);
 #endif
                 actionCtx.ResponseType = responseType;
-                var reqFilters = new List<IHasRequestFilter>();
-                var resFilters = new List<IHasResponseFilter>();
+                var reqFilters = new List<IRequestFilterBase>();
+                var resFilters = new List<IResponseFilterBase>();
 
                 foreach (var attr in mi.GetCustomAttributes(true))
                 {
-                    var hasReqFilter = attr as IHasRequestFilter;
-                    var hasResFilter = attr as IHasResponseFilter;
+                    var hasReqFilter = attr as IRequestFilterBase;
+                    var hasResFilter = attr as IResponseFilterBase;
 
                     if (hasReqFilter != null)
                         reqFilters.Add(hasReqFilter);

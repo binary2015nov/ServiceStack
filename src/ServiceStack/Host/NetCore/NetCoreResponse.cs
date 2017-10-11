@@ -18,7 +18,7 @@ namespace ServiceStack.Host.NetCore
 {
     public class NetCoreResponse : IHttpResponse
     {
-        private static ILog Log = LogManager.GetLogger(typeof(NetCoreResponse));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(NetCoreResponse));
 
         private readonly NetCoreRequest request;
         private readonly HttpResponse response;
@@ -58,7 +58,7 @@ namespace ServiceStack.Host.NetCore
             }
             catch (Exception ex)
             {
-                Log.Error($"Failed Adding Headers[{name}]={value}: {ex.Message}", ex);
+                Logger.Error($"Failed Adding Headers[{name}]={value}: {ex.Message}", ex);
             }
         }
 
@@ -109,7 +109,7 @@ namespace ServiceStack.Host.NetCore
 
         public void SetContentLength(long contentLength)
         {
-            if (Platforms.PlatformNetCore.HostInstance.Config?.DisableChunkedEncoding == true && contentLength >= 0)
+            if (PlatformNetCore.HostInstance.Config?.DisableChunkedEncoding == true && contentLength >= 0)
                 response.ContentLength = contentLength;
             
             if (contentLength > 0)
@@ -162,7 +162,7 @@ namespace ServiceStack.Host.NetCore
             }
             catch (Exception ex)
             {
-                Log.Warn($"Could not Set-Cookie '{cookie.Name}': " + ex.Message, ex);
+                Logger.Warn($"Could not Set-Cookie '{cookie.Name}': " + ex.Message, ex);
             }
         }
 

@@ -9,6 +9,7 @@ using System.Net;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using ServiceStack.Logging;
 using ServiceStack.MiniProfiler;
 using ServiceStack.Serialization;
 using ServiceStack.Text;
