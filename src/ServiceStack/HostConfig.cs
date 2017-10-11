@@ -146,8 +146,10 @@ namespace ServiceStack
         public List<string> PreferredContentTypes { get; private set; }
         public bool AllowJsonpRequests { get; set; }
         public bool AllowRouteContentTypeExtensions { get; set; }
-        public bool DebugMode { get; set; }
-        public bool StrictMode { get; set; }
+
+        private bool debugMode;
+        public bool DebugMode { get { return debugMode; } set { debugMode = value; if (StrictMode == null && value == true) StrictMode = value; } }
+        public bool? StrictMode { get; set; }
         public string DebugAspNetHostEnvironment { get; set; }
         public string DebugHttpListenerHostEnvironment { get; set; }
         public List<string> DefaultDocuments { get; private set; }

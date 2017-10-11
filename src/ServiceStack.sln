@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26823.1
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4EBD29DD-21A1-47B5-80DB-F9D58C91BED5}"
 EndProject
@@ -19,6 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{EB65E771
 		..\build\copy.bat = ..\build\copy.bat
 		..\README.md = ..\README.md
 		..\docs\2016\release-notes.md = ..\docs\2016\release-notes.md
+		..\NuGet\ServiceStack.Api.OpenApi\servicestack.api.openapi.nuspec = ..\NuGet\ServiceStack.Api.OpenApi\servicestack.api.openapi.nuspec
 		..\NuGet\ServiceStack.Api.Swagger\servicestack.api.swagger.nuspec = ..\NuGet\ServiceStack.Api.Swagger\servicestack.api.swagger.nuspec
 		..\NuGet\ServiceStack.Authentication.MongoDb\servicestack.authentication.mongodb.nuspec = ..\NuGet\ServiceStack.Authentication.MongoDb\servicestack.authentication.mongodb.nuspec
 		..\NuGet\ServiceStack.Authentication.NHibernate\servicestack.authentication.nhibernate.nuspec = ..\NuGet\ServiceStack.Authentication.NHibernate\servicestack.authentication.nhibernate.nuspec
@@ -29,8 +30,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{EB65E771
 		..\NuGet\ServiceStack.Caching.Memcached\servicestack.caching.memcached.nuspec = ..\NuGet\ServiceStack.Caching.Memcached\servicestack.caching.memcached.nuspec
 		..\NuGet\ServiceStack.Client\servicestack.client.nuspec = ..\NuGet\ServiceStack.Client\servicestack.client.nuspec
 		..\NuGet\ServiceStack.Common\servicestack.common.nuspec = ..\NuGet\ServiceStack.Common\servicestack.common.nuspec
+		..\NuGet\ServiceStack.Gap\servicestack.gap.nuspec = ..\NuGet\ServiceStack.Gap\servicestack.gap.nuspec
 		..\NuGet\ServiceStack.HttpClient\servicestack.httpclient.nuspec = ..\NuGet\ServiceStack.HttpClient\servicestack.httpclient.nuspec
 		..\NuGet\ServiceStack.Interfaces\servicestack.interfaces.nuspec = ..\NuGet\ServiceStack.Interfaces\servicestack.interfaces.nuspec
+		..\NuGet\ServiceStack.Kestrel\ServiceStack.Kestrel.nuspec = ..\NuGet\ServiceStack.Kestrel\ServiceStack.Kestrel.nuspec
 		..\NuGet\ServiceStack.Logging.Elmah\servicestack.logging.elmah.nuspec = ..\NuGet\ServiceStack.Logging.Elmah\servicestack.logging.elmah.nuspec
 		..\NuGet\ServiceStack.Logging.EntLib5\servicestack.logging.entlib5.nuspec = ..\NuGet\ServiceStack.Logging.EntLib5\servicestack.logging.entlib5.nuspec
 		..\NuGet\ServiceStack.Logging.EventLog\servicestack.logging.eventlog.nuspec = ..\NuGet\ServiceStack.Logging.EventLog\servicestack.logging.eventlog.nuspec
@@ -47,9 +50,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{EB65E771
 		..\NuGet\ServiceStack.Razor\servicestack.razor.nuspec = ..\NuGet\ServiceStack.Razor\servicestack.razor.nuspec
 		..\NuGet\ServiceStack.Server\servicestack.server.nuspec = ..\NuGet\ServiceStack.Server\servicestack.server.nuspec
 		..\NuGet\ServiceStack.Wire\servicestack.wire.nuspec = ..\NuGet\ServiceStack.Wire\servicestack.wire.nuspec
-		..\NuGet\ServiceStack.Api.OpenApi\servicestack.api.openapi.nuspec = ..\NuGet\ServiceStack.Api.OpenApi\servicestack.api.openapi.nuspec
-		..\NuGet\ServiceStack.Gap\servicestack.gap.nuspec = ..\NuGet\ServiceStack.Gap\servicestack.gap.nuspec
-		..\NuGet\ServiceStack.Kestrel\ServiceStack.Kestrel.nuspec = ..\NuGet\ServiceStack.Kestrel\ServiceStack.Kestrel.nuspec
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Formats", "Formats", "{CBDE0575-D09B-4B4D-8C62-5E03E54F6BE8}"
@@ -74,7 +74,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Signed", "Signed", "{C57AF9
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.Common.Tests", "..\tests\ServiceStack.Common.Tests\ServiceStack.Common.Tests.csproj", "{3FA9197A-462D-44CC-9AB3-61AF414D0B45}"
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Common.Tests", "..\tests\ServiceStack.Common.Tests\ServiceStack.Common.Tests.csproj", "{3FA9197A-462D-44CC-9AB3-61AF414D0B45}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.ServiceHost.Tests", "..\tests\ServiceStack.ServiceHost.Tests\ServiceStack.ServiceHost.Tests.csproj", "{94A33BC4-AC22-49A3-A38E-2ABFCD997ABA}"
 EndProject

@@ -157,7 +157,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         }
     }
 
-    [Explicit, TestFixture]
+    [Ignore("long runtime"), TestFixture]
     public class AsyncLoadTests
     {
         const int NoOfTimes = 1000;

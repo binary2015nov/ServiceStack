@@ -145,14 +145,7 @@ namespace ServiceStack
             
             Service.DefaultResolver = this;
             ServiceController = ServiceController ?? CreateServiceController();
-            try
-            {
-                Configure(Container);
-            }
-            catch (Exception ex)
-            {
-                OnStartupException(ex);
-            }
+            Configure(Container);      
             ConfigurePlugins();
             try
             {
@@ -640,10 +633,10 @@ namespace ServiceStack
 
         protected virtual void OnStartupException(Exception ex)
         {
-            if (Config.StrictMode)
-                throw ex;
-
             this.StartUpErrors.Add(DtoUtils.CreateErrorResponse(null, ex).GetResponseStatus());
+
+            if (Config.StrictMode.GetValueOrDefault())
+                throw ex;
         }
 
         public virtual void Release(object instance)
