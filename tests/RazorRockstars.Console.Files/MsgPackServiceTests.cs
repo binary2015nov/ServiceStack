@@ -69,7 +69,7 @@ namespace RazorRockstars.Console.Files
     [TestFixture]
     public class MsgPackServiceTests
     {
-        protected const string ListeningOn = "http://localhost:1338/";
+        protected const string ListeningOn = "http://localhost:3337/";
 
         AppHost appHost;
 
@@ -159,7 +159,7 @@ namespace RazorRockstars.Console.Files
     [TestFixture]
     public class WireServiceTests
     {
-        protected const string ListeningOn = "http://localhost:1339/";
+        protected const string ListeningOn = "http://localhost:3337/";
 
         AppHost appHost;
 

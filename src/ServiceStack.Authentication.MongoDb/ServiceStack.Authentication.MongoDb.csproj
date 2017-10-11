@@ -21,13 +21,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="..\..\lib\net45\ServiceStack.Interfaces.dll" />
+    <ProjectReference Include="..\ServiceStack.Interfaces\ServiceStack.Interfaces.csproj" />
     <ProjectReference Include="..\ServiceStack.Common\ServiceStack.Common.csproj" />
     <ProjectReference Include="..\ServiceStack\ServiceStack.csproj" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <DefineConstants>$(DefineConstants);NET45</DefineConstants>
+    <SignAssembly>True</SignAssembly>
+    <DelaySign>False</DelaySign>
+    <AssemblyOriginatorKeyFile>../servicestack-sn.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
