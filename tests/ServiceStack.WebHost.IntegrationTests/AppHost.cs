@@ -29,7 +29,7 @@ namespace ServiceStack.WebHost.IntegrationTests
 
         public AppHost() : base("ServiceStack WebHost IntegrationTests", typeof(AppHost).Assembly)
         {
-            Config.AdminAuthSecret = Constant.AuthSecret;
+            Config.AdminAuthSecret = Constants.AuthSecret;
             Config.ApiVersion = "2.0.0";
             Config.DebugMode = true;
             Config.UseCamelCase = true;
@@ -152,8 +152,7 @@ namespace ServiceStack.WebHost.IntegrationTests
 
         protected override void OnAfterInit()
         {
-            var resetMovies = this.Container.Resolve<ResetMoviesService>();
-            resetMovies.Post(null);
+            new ResetMoviesService().Post(new ResetMovies());
         }
 
         //Configure ServiceStack Authentication and CustomUserSession
@@ -161,17 +160,15 @@ namespace ServiceStack.WebHost.IntegrationTests
         {
             Routes.Add<Register>("/register");
 
-            var appSettings = AppSettings;
-
             Plugins.Add(new AuthFeature(() => new CustomUserSession(),
                 new IAuthProvider[] {
-                        new CredentialsAuthProvider(appSettings),
-                        new FacebookAuthProvider(appSettings),
-                        new TwitterAuthProvider(appSettings),
-                        new GoogleOpenIdOAuthProvider(appSettings),
-                        new OpenIdOAuthProvider(appSettings),
-                        new DigestAuthProvider(appSettings),
-                        new BasicAuthProvider(appSettings),
+                        new CredentialsAuthProvider(AppSettings),
+                        new FacebookAuthProvider(AppSettings),
+                        new TwitterAuthProvider(AppSettings),
+                        new GoogleOpenIdOAuthProvider(AppSettings),
+                        new OpenIdOAuthProvider(AppSettings),
+                        new DigestAuthProvider(AppSettings),
+                        new BasicAuthProvider(AppSettings),
                 }));
 
             Plugins.Add(new RegistrationFeature());

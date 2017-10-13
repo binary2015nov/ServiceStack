@@ -62,6 +62,9 @@ namespace ServiceStack.Host
 #else
                     : AssemblyUtils.FindType(requestType.FullName + ResponseDtoSuffix);
 #endif
+                if (responseType?.Name == "Task`1" && responseType.GetGenericArguments()[0] != typeof(object))
+                    responseType = responseType.GetGenericArguments()[0];
+
                 actionCtx.ResponseType = responseType;
                 var reqFilters = new List<IRequestFilterBase>();
                 var resFilters = new List<IResponseFilterBase>();

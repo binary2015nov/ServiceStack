@@ -13,11 +13,11 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             get
             {
                 return new IServiceClient[] {
-                    new JsonServiceClient(Constant.ServiceStackBaseHost),
-                    new JsvServiceClient(Constant.ServiceStackBaseHost),
-                    new XmlServiceClient(Constant.ServiceStackBaseHost),
-                    new Soap11ServiceClient(Constant.ServiceStackBaseHost),
-                    new Soap12ServiceClient(Constant.ServiceStackBaseHost)
+                    new JsonServiceClient(Constants.ServiceStackBaseHost),
+                    new JsvServiceClient(Constants.ServiceStackBaseHost),
+                    new XmlServiceClient(Constants.ServiceStackBaseHost),
+                    new Soap11ServiceClient(Constants.ServiceStackBaseHost),
+                    new Soap12ServiceClient(Constants.ServiceStackBaseHost)
                 };
             }
         }
@@ -27,14 +27,14 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             get
             {
                 return new IRestClient[] {
-                    new JsonServiceClient(Constant.ServiceStackBaseHost),
-                    new JsvServiceClient(Constant.ServiceStackBaseHost),
-                    new XmlServiceClient(Constant.ServiceStackBaseHost),
+                    new JsonServiceClient(Constants.ServiceStackBaseHost),
+                    new JsvServiceClient(Constants.ServiceStackBaseHost),
+                    new XmlServiceClient(Constants.ServiceStackBaseHost),
                 };
             }
         }
 
-        [Test, TestCaseSource("ServiceClients")]
+        [Test, TestCaseSource(nameof(ServiceClients))]
         public void Sync_Call_HelloWorld_with_Sync_ServiceClients_on_PreDefined_Routes(IServiceClient client)
         {
             var response = client.Send<HelloResponse>(new Hello { Name = "World!" });
@@ -42,7 +42,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             Assert.That(response.Result, Is.EqualTo("Hello, World!"));
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public async Task Async_Call_HelloWorld_with_ServiceClients_on_PreDefined_Routes(IServiceClient client)
         {
             var response = await client.SendAsync<HelloResponse>(new Hello { Name = "World!" });
@@ -50,7 +50,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             Assert.That(response.Result, Is.EqualTo("Hello, World!"));
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public void Sync_Call_HelloWorld_with_RestClients_on_UserDefined_Routes(IRestClient client)
         {
             var response = client.Get<HelloResponse>("/hello/World!");
@@ -58,7 +58,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             Assert.That(response.Result, Is.EqualTo("Hello, World!"));
         }
 
-        [Test, TestCaseSource("RestClients")]
+        [Test, TestCaseSource(nameof(RestClients))]
         public async Task Async_Call_HelloWorld_with_Async_ServiceClients_on_UserDefined_Routes(IServiceClient client)
         {
             var response = await client.GetAsync<HelloResponse>("/hello/World!");

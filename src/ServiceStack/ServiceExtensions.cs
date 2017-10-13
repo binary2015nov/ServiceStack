@@ -123,7 +123,7 @@ namespace ServiceStack
 
         public static TUserSession SessionAs<TUserSession>(this IRequest req)
         {
-            if (HostContext.TestMode)
+            if (HostContext.AppHost.TestMode)
             {
                 var mockSession = req.TryResolve<TUserSession>();
                 if (!Equals(mockSession, default(TUserSession)))

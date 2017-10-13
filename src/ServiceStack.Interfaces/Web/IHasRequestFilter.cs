@@ -18,20 +18,20 @@ namespace ServiceStack.Web
 		IRequestFilterBase Copy();
 	}
 	
-    /// <summary>
-    /// This interface can be implemented by an attribute
-    /// which adds an request filter for the specific request DTO the attribute marked.
-    /// </summary>
-    public interface IHasRequestFilter : IRequestFilterBase
-    {
-        /// <summary>
-        /// The request filter is executed before the service.
-        /// </summary>
-        /// <param name="req">The http request wrapper</param>
-        /// <param name="res">The http response wrapper</param>
-        /// <param name="requestDto">The request DTO</param>
-        void RequestFilter(IRequest req, IResponse res, object requestDto);
-    }
+	/// <summary>
+	/// This interface can be implemented by an attribute
+	/// which adds an request filter for the specific request DTO the attribute marked.
+	/// </summary>
+	public interface IHasRequestFilter : IRequestFilterBase
+	{
+		/// <summary>
+		/// The request filter is executed before the service.
+		/// </summary>
+		/// <param name="req">The http request wrapper</param>
+		/// <param name="res">The http response wrapper</param>
+		/// <param name="requestDto">The request DTO</param>
+		void RequestFilter(IRequest req, IResponse res, object requestDto);
+	}
 
 	/// <summary>
 	/// This interface can be implemented by an attribute

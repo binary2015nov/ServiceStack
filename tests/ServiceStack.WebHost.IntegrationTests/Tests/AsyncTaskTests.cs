@@ -125,7 +125,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             protected override IServiceClient CreateServiceClient()
             {
-                return new JsonServiceClient(Constant.ServiceStackBaseHost);
+                return new JsonServiceClient(Constants.ServiceStackBaseHost);
             }
         }
 
@@ -134,7 +134,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             protected override IServiceClient CreateServiceClient()
             {
-                return new JsvServiceClient(Constant.ServiceStackBaseHost);
+                return new JsvServiceClient(Constants.ServiceStackBaseHost);
             }
         }
 
@@ -143,7 +143,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             protected override IServiceClient CreateServiceClient()
             {
-                return new XmlServiceClient(Constant.ServiceStackBaseHost);
+                return new XmlServiceClient(Constants.ServiceStackBaseHost);
             }
         }
 
@@ -152,7 +152,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             protected override IServiceClient CreateServiceClient()
             {
-                return new CsvServiceClient(Constant.ServiceStackBaseHost);
+                return new CsvServiceClient(Constants.ServiceStackBaseHost);
             }
         }
     }
@@ -165,7 +165,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Load_test_GetFactorialSync_sync()
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
+            var client = new JsonServiceClient(Constants.ServiceStackBaseHost);
 
             for (var i = 0; i < NoOfTimes; i++)
             {
@@ -180,7 +180,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public async Task Load_test_GetFactorialSync_async()
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
+            var client = new JsonServiceClient(Constants.ServiceStackBaseHost);
 
             int i = 0;
 
@@ -200,7 +200,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Load_test_GetFactorialGenericAsync_sync()
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
+            var client = new JsonServiceClient(Constants.ServiceStackBaseHost);
 
             for (var i = 0; i < NoOfTimes; i++)
             {
@@ -215,7 +215,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public async Task Load_test_GetFactorialGenericAsync_async()
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
+            var client = new JsonServiceClient(Constants.ServiceStackBaseHost);
 
             int i = 0;
 

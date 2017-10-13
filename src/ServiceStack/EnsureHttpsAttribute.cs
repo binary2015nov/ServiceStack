@@ -33,7 +33,7 @@ namespace ServiceStack
                         return;
                 }
 
-                res.RedirectToUrl(req.AbsoluteUri.NormalizeScheme(true));
+                res.RedirectToUrl(req.AbsoluteUri.ToHttps());
             }
         }
     }

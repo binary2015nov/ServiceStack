@@ -32,7 +32,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
             try
             {
-                var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
+                var client = new JsonServiceClient(Constants.ServiceStackBaseHost);
                 client.Send(
                     new AssignRoles
                     {
@@ -101,7 +101,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
             try
             {
-                var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
+                var client = new JsonServiceClient(Constants.ServiceStackBaseHost);
                 client.Send(
                     new AssignRoles
                     {
@@ -189,10 +189,10 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
                 new AssignRoles
                 {
                     UserName = newUser.UserName,
-                    Roles = new List<string> { Constant.ContentManager },
+                    Roles = new List<string> { Constants.ContentManager },
                 });
 
-            Assert.That(assignResponse.AllRoles, Is.EquivalentTo(new[] { RoleName1, Constant.ContentManager }));
+            Assert.That(assignResponse.AllRoles, Is.EquivalentTo(new[] { RoleName1, Constants.ContentManager }));
 
             var response = newUserClient.Send(new ContentManagerOnly());
 
@@ -241,10 +241,10 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
                 new AssignRoles
                 {
                     UserName = newUser.UserName,
-                    Permissions = new List<string> { Constant.ContentPermission },
+                    Permissions = new List<string> { Constants.ContentPermission },
                 });
 
-            Assert.That(assignResponse.AllPermissions, Is.EquivalentTo(new[] { RoleName1, Constant.ContentPermission }));
+            Assert.That(assignResponse.AllPermissions, Is.EquivalentTo(new[] { RoleName1, Constants.ContentPermission }));
 
             var response = newUserClient.Send(new ContentPermissionOnly());
 
@@ -256,7 +256,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             try
             {
-                var jsonServiceClient = new JsonServiceClient(Constant.ServiceStackBaseHost);
+                var jsonServiceClient = new JsonServiceClient(Constants.ServiceStackBaseHost);
                 jsonServiceClient.Send<RequiresRoleInService>(new RequiresRoleInService());
 
                 Assert.Fail("Should not allow access to protected resource");
@@ -273,8 +273,8 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_access_authenticate_service_with_AuthSecret()
         {            
-           var webRes = Constant.ServiceStackBaseHost.AppendPath("requiresadmin")
-                .AddQueryParam("authsecret", Constant.AuthSecret).GetWebResponse();
+           var webRes = Constants.ServiceStackBaseHost.AppendPath("requiresadmin")
+                .AddQueryParam("authsecret", Constants.AuthSecret).GetWebResponse();
             Assert.That(webRes.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
     }

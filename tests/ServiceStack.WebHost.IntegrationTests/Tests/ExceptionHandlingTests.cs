@@ -114,7 +114,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     [TestFixture]
     public class ExceptionHandlingTests
     {
-        private const string ListeningOn = Constant.ServiceStackBaseHost + "/";
+        private const string ListeningOn = Constants.ServiceStackBaseHost + "/";
 
         protected static IRestClient[] ServiceClients =
         {

@@ -1,6 +1,6 @@
 ﻿namespace ServiceStack.WebHost.IntegrationTests
 {
-    public class Constant
+    public class Constants
     {
         public const string AbsoluteBaseUri = "http://localhost:50000/";
         public const string ServiceStackBaseHost = "http://localhost:50000/api/";

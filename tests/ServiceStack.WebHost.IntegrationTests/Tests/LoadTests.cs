@@ -13,7 +13,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_download_sync_pdf()
         {
-            var client = new ImagingService(Constant.ServiceStackBaseHost);
+            var client = new ImagingService(Constants.ServiceStackBaseHost);
 
             var pdfBytes = client.GetBytes("/sample.pdf");
 
@@ -25,7 +25,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public async Task Can_download_async_pdf()
         {
-            var client = new ImagingService(Constant.ServiceStackBaseHost);
+            var client = new ImagingService(Constants.ServiceStackBaseHost);
 
             var pdfBytes = await client.GetBytesAsync("/sample.pdf");
 
@@ -39,7 +39,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             const int NoOfTimes = 1000;
 
-            var client = new ImagingService(Constant.ServiceStackBaseHost);
+            var client = new ImagingService(Constants.ServiceStackBaseHost);
 
             var fetchTasks = new List<Task>();
 
@@ -62,8 +62,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
     public class ImagingService : JsonServiceClient
     {
-        public ImagingService(string url)
-            : base(url)
+        public ImagingService(string url) : base(url)
         {
             //Headers.Add("X-ApiKey", "blah ");  //This does not work on Async methods, but is should.
             RequestFilter += (request) =>

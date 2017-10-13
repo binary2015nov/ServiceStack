@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using ServiceStack.Logging;
 using ServiceStack.Web;
 
@@ -8,10 +9,8 @@ namespace ServiceStack.Host
 {
     public class ServiceRoutes : IServiceRoutes
     {
-        private readonly static ILog Logger = LogManager.GetLogger(typeof(ServiceRoutes));
-
         private List<RestPath> restPaths = new List<RestPath>();
-        public IEnumerable<RestPath> RestPaths { get => restPaths; }
+        public IEnumerable<RestPath> RestPaths { get { return restPaths; } }
 
         public IServiceRoutes Add<TRequest>(string restPath)
         {
@@ -53,20 +52,10 @@ namespace ServiceStack.Host
             return this;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool HasExistingRoute(Type requestType, string restPath)
         {
-            var existingRoute = RestPaths.FirstOrDefault(
-                x => x.RequestType == requestType && x.Path == restPath);
-
-            if (existingRoute != null)
-            {
-                var existingRouteMsg = "Existing Route for '{0}' at '{1}' already exists".Fmt(requestType.GetOperationName(), restPath);
-
-                Logger.Warn(existingRouteMsg);
-                return true;
-            }
-
-            return false;
+            return RestPaths.FirstOrDefault(x => x.RequestType == requestType && x.Path == restPath) != null;            
         }
     }
 }

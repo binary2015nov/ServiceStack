@@ -10,7 +10,7 @@ namespace ServiceStack
     {
         public const string PluginLinks = "Plugin Links";
         public const string DebugInfo = "Debug Info";
-        public const string EnabledFeatures = "EnabledFeatures";
+        public const string AvailableFeatures = "Available Features";
 
         public Dictionary<string, Dictionary<string, string>> Sections { get; private set; }
 

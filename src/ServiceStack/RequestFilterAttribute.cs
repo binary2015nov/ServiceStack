@@ -20,7 +20,7 @@ namespace ServiceStack
 
         public ApplyTo ApplyTo { get; set; }
 
-        public RequestFilterAttribute() : this(ApplyTo.All) {}
+        public RequestFilterAttribute() : this(ApplyTo.All) { }
 
         /// <summary>
         /// Creates a new <see cref="RequestFilterAttribute"/>
@@ -59,7 +59,7 @@ namespace ServiceStack
 
         public ApplyTo ApplyTo { get; set; }
 
-        public RequestFilterAsyncAttribute() : this(ApplyTo.All) {}
+        public RequestFilterAsyncAttribute() : this(ApplyTo.All) { }
 
         /// <summary>
         /// Creates a new <see cref="RequestFilterAttribute"/>

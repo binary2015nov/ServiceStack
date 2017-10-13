@@ -15,7 +15,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     {
         readonly HostConfig defaultConfig = new HostConfig();
 
-        public RestsTestBase() : base(Constant.ServiceStackBaseHost, typeof(HelloService).Assembly) { }
+        public RestsTestBase() : base(Constants.ServiceStackBaseHost, typeof(HelloService).Assembly) { }
 
         protected override void Configure(Container container) { }
 

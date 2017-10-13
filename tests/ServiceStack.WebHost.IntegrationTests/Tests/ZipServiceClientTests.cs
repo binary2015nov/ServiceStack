@@ -39,7 +39,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_send_GZip_client_request_list()
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseHost)
+            var client = new JsonServiceClient(Constants.ServiceStackBaseHost)
             {
                 RequestCompressionType = CompressionTypes.GZip,
             };
@@ -54,7 +54,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_send_GZip_client_request_list_HttpClient()
         {
-            var client = new JsonHttpClient(Constant.ServiceStackBaseHost)
+            var client = new JsonHttpClient(Constants.ServiceStackBaseHost)
             {
                 RequestCompressionType = CompressionTypes.GZip,
             };
@@ -69,7 +69,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_send_GZip_client_request()
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseHost)
+            var client = new JsonServiceClient(Constants.ServiceStackBaseHost)
             {
                 RequestCompressionType = CompressionTypes.GZip,
             };
@@ -80,7 +80,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_send_GZip_client_request_HttpClient()
         {
-            var client = new JsonHttpClient(Constant.ServiceStackBaseHost)
+            var client = new JsonHttpClient(Constants.ServiceStackBaseHost)
             {
                 RequestCompressionType = CompressionTypes.GZip,
             };
@@ -91,7 +91,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_send_Deflate_client_request()
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseHost)
+            var client = new JsonServiceClient(Constants.ServiceStackBaseHost)
             {
                 RequestCompressionType = CompressionTypes.Deflate,
             };
@@ -102,7 +102,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_send_Deflate_client_request_HttpClient()
         {
-            var client = new JsonHttpClient(Constant.ServiceStackBaseHost)
+            var client = new JsonHttpClient(Constants.ServiceStackBaseHost)
             {
                 RequestCompressionType = CompressionTypes.Deflate,
             };

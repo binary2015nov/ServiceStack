@@ -36,16 +36,16 @@ namespace ServiceStack.Host
 
         public void Add(Type serviceType, Type requestType, Type responseType)
         {
-            this.ServiceTypes.Add(serviceType);
-            this.RequestTypes.Add(requestType);
-
+            ServiceTypes.Add(serviceType);
+            RequestTypes.Add(requestType);
+        
             var restrictTo = requestType.FirstAttribute<RestrictAttribute>()
                           ?? serviceType.FirstAttribute<RestrictAttribute>();
 
             var reqFilterAttrs = new[] { requestType, serviceType }
-                .SelectMany(x => x.AllAttributes().OfType<IHasRequestFilter>()).ToList();
+                .SelectMany(x => x.AllAttributes().OfType<IRequestFilterBase>()).ToList();
             var resFilterAttrs = (responseType != null ? new[] { responseType, serviceType } : new[] { serviceType })
-                .SelectMany(x => x.AllAttributes().OfType<IHasResponseFilter>()).ToList();
+                    .SelectMany(x => x.AllAttributes().OfType<IResponseFilterBase>()).ToList();
 
             var authAttrs = reqFilterAttrs.OfType<AuthenticateAttribute>().ToList();
             var actions = GetImplementedActions(serviceType, requestType);
@@ -71,10 +71,7 @@ namespace ServiceStack.Host
             this.OperationsMap[requestType] = operation;
             this.OperationNamesMap[operation.Name.ToLowerInvariant()] = operation;
             if (responseType != null)
-            {
-                this.ResponseTypes.Add(responseType);
-                this.OperationsResponseMap[responseType] = operation;
-            }
+                ResponseTypes.Add(responseType);
 
             //Only count non-core ServiceStack Services, i.e. defined outside of ServiceStack.dll or Swagger
             var nonCoreServicesCount = OperationsMap.Values
@@ -568,8 +565,8 @@ namespace ServiceStack.Host
         public List<string> Actions { get; set; }
         public List<RestPath> Routes { get; set; }
         public bool IsOneWay => ResponseType == null;
-        public List<IHasRequestFilter> RequestFilterAttributes { get; set; }
-        public List<IHasResponseFilter> ResponseFilterAttributes { get; set; }
+        public List<IRequestFilterBase> RequestFilterAttributes { get; set; }
+        public List<IResponseFilterBase> ResponseFilterAttributes { get; set; }
         public bool RequiresAuthentication { get; set; }
         public List<string> RequiredRoles { get; set; }
         public List<string> RequiresAnyRole { get; set; }

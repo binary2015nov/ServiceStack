@@ -155,7 +155,7 @@ namespace ServiceStack.Common.Tests
         [Test]
         public void ToHttps_ignores_whitespace_at_beginning_of_string()
         {
-            Assert.That("  http://host.example.com".ToHttps(), Is.EqualTo("https://host.example.com"));
+            Assert.That("   http://host.example.com".ToHttps(), Is.EqualTo("https://host.example.com"));
         }
 
         [Test]

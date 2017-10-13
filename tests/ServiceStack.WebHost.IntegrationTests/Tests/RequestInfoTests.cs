@@ -10,7 +10,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     {        
         private RequestInfoResponse GetRequestInfoForPath(string path)
         {
-            var url = Constant.ServiceStackBaseHost.CombineWith(path).AddQueryParam("debug", "requestinfo");
+            var url = Constants.ServiceStackBaseHost.CombineWith(path).AddQueryParam("debug", "requestinfo");
             var json = url.GetJsonFromUrl();
             var info = json.FromJson<RequestInfoResponse>();
             return info;
@@ -18,7 +18,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
         private void AssertHasContent(string pathInfo, string accept, string containsContent)
         {
-            var url = Constant.ServiceStackBaseHost.AppendPath(pathInfo);
+            var url = Constants.ServiceStackBaseHost.AppendPath(pathInfo);
             var content = url.GetStringFromUrl(accept: accept);
             Assert.That(content, Does.Contain(containsContent));
         }
@@ -50,27 +50,27 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     {
         private void DoesRedirectToRemoveTrailingSlash(string dirWIthoutSlash)
         {
-            Constant.ServiceStackBaseHost.AppendPath(dirWIthoutSlash)
+            Constants.ServiceStackBaseHost.AppendPath(dirWIthoutSlash)
                 .GetStringFromUrl(accept: MimeTypes.Html,
                     requestFilter: req => req.AllowAutoRedirect = false,
                     responseFilter: res =>
                     {
                         Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
                         Assert.That(res.Headers[HttpHeaders.Location], 
-                            Is.EqualTo(Constant.ServiceStackBaseHost.AppendPath(dirWIthoutSlash + "/")));
+                            Is.EqualTo(Constants.ServiceStackBaseHost.AppendPath(dirWIthoutSlash + "/")));
                     });
         }
 
         private void DoesRedirectToAddTrailingSlash(string dirWithoutSlash)
         {
-            Constant.ServiceStackBaseHost.AppendPath(dirWithoutSlash)
+            Constants.ServiceStackBaseHost.AppendPath(dirWithoutSlash)
                 .GetStringFromUrl(accept: MimeTypes.Html,
                     requestFilter: req => req.AllowAutoRedirect = false,
                     responseFilter: res =>
                     {
                         Assert.That(res.StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
                         Assert.That(res.Headers[HttpHeaders.Location], 
-                            Is.EqualTo(Constant.ServiceStackBaseHost.AppendPath(dirWithoutSlash.TrimEnd('/'))));
+                            Is.EqualTo(Constants.ServiceStackBaseHost.AppendPath(dirWithoutSlash.TrimEnd('/'))));
                     });
         }
 

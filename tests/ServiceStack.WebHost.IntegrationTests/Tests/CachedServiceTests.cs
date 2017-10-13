@@ -12,14 +12,14 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [OneTimeSetUp]
         public void OnBeforeEachTest()
         {
-            var jsonClient = new JsonServiceClient(Constant.ServiceStackBaseHost);
+            var jsonClient = new JsonServiceClient(Constants.ServiceStackBaseHost);
             jsonClient.Post<ResetMoviesResponse>("reset-movies", new ResetMovies());
         }
 
         [Test]
         public void Can_call_Cached_WebService_with_JSON()
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
+            var client = new JsonServiceClient(Constants.ServiceStackBaseHost);
 
             var response = client.Get<MoviesResponse>("/cached/movies");
 
@@ -29,7 +29,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_call_Cached_WebService_with_ProtoBuf()
         {
-            var client = new ProtoBufServiceClient(Constant.ServiceStackBaseHost);
+            var client = new ProtoBufServiceClient(Constants.ServiceStackBaseHost);
 
             var response = client.Get<MoviesResponse>("/cached/movies");
 
@@ -39,7 +39,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_call_Cached_WebService_with_ProtoBuf_without_compression()
         {
-            var client = new ProtoBufServiceClient(Constant.ServiceStackBaseHost);
+            var client = new ProtoBufServiceClient(Constants.ServiceStackBaseHost);
             client.DisableAutoCompression = true;
             client.Get<MoviesResponse>("/cached/movies");
             var response2 = client.Get<MoviesResponse>("/cached/movies");
@@ -50,7 +50,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_call_Cached_WebService_with_JSONP()
         {
-            var url = Constant.ServiceStackBaseHost.AppendPath("/cached/movies?callback=cb");
+            var url = Constants.ServiceStackBaseHost.AppendPath("/cached/movies?callback=cb");
             var jsonp = url.GetJsonFromUrl();
             Assert.That(jsonp.StartsWith("cb("));
         }

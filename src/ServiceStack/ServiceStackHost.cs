@@ -35,24 +35,20 @@ namespace ServiceStack
 
         public readonly DateTime CreatedAt = DateTime.Now;
 
-        public string ServiceName { get; set; }
-
-        public Assembly[] ServiceAssemblies { get; set; }
-
         public HostConfig Config { get; private set; }
 
         public IAppSettings AppSettings { get; set; }
 
         protected ServiceStackHost(string serviceName, params Assembly[] assembliesWithServices)
         {
+            Metadata = new ServiceMetadata();
+            Config = new HostConfig { DebugMode = GetType().GetAssembly().IsDebugBuild() }; 
+            AppSettings = ServiceStack.Configuration.AppSettings.Default;
             ServiceName = serviceName;
             ServiceAssemblies = assembliesWithServices;
-            Config = new HostConfig { DebugMode = GetType().GetAssembly().IsDebugBuild() };
-            AppSettings = ServiceStack.Configuration.AppSettings.Default;
             Container = new Container { DefaultOwner = Owner.External };
             ContentTypes = ServiceStack.Host.ContentTypes.Default;
             Routes = new ServiceRoutes();
-            Metadata = new ServiceMetadata();
             PreRequestFilters = new List<Action<IRequest, IResponse>>();
             RequestConverters = new List<Func<IRequest, object, Task<object>>>();
             ResponseConverters = new List<Func<IRequest, object, Task<object>>>();
@@ -113,6 +109,10 @@ namespace ServiceStack
 
         public abstract void Configure(Container container);
 
+        public string ServiceName { get { return Metadata.ServiceName; } set { Metadata.ServiceName = value; } }
+
+        public Assembly[] ServiceAssemblies { get; set; }
+
         /// <summary>
         /// The AppHost.Container. Note: it is not thread safe to register dependencies after AppStart.
         /// </summary>
@@ -137,13 +137,12 @@ namespace ServiceStack
 
             Config.ServiceEndpointsMetadataConfig = ServiceEndpointsMetadataConfig.Create(Config.HandlerFactoryPath);
             Metadata.ApiVersion = Config.ApiVersion;
-            Metadata.ServiceName = ServiceName;
 
             Container.Register(AppSettings);
             Container.Register<IHashProvider>(c => new SaltedHash()).ReusedWithin(ReuseScope.None);
             if (Config.DebugMode)           
                 Plugins.Add(new RequestInfoFeature());
-            
+
             Service.DefaultResolver = this;
             ServiceController = ServiceController ?? CreateServiceController();
             Configure(Container);      
@@ -295,8 +294,6 @@ namespace ServiceStack
             if (Config.HandlerFactoryPath != null)
                 Config.HandlerFactoryPath = Config.HandlerFactoryPath.TrimStart('/');
 
-            var specifiedContentType = Config.DefaultContentType; //Before plugins loaded
-
             var plugins = Plugins.ToArray();
             delayLoadPlugin = true;
             LoadPluginsInternal(plugins);
@@ -349,7 +346,7 @@ namespace ServiceStack
             {
                 callback(this);
             }
-            //Register any routes configured on Metadata.Routes
+            //Register any routes configured on Routes
             foreach (var restPath in Routes.RestPaths)
             {
                 ServiceController.RegisterRestPath(restPath);
@@ -364,27 +361,19 @@ namespace ServiceStack
                     });
             }
 
-            foreach (var restPath in RestPaths)
-            {
-                Operation operation;
-                if (!Metadata.OperationsMap.TryGetValue(restPath.RequestType, out operation))
-                    continue;
-
-                operation.Routes.Add(restPath);
-            }
             HttpHandlerFactory.Init();
         }
 
         private void AfterPluginsLoaded()
         {
-            MetadataFeature metadataFeature = GetPlugin<MetadataFeature>();
-            metadataFeature?.AddSection(MetadataFeature.EnabledFeatures);
+            MetadataFeature feature = GetPlugin<MetadataFeature>();
+            feature?.AddSection(MetadataFeature.AvailableFeatures);
             foreach (var plugin in Plugins)
             {
                 try
                 {
                     string title = plugin.GetType().Name;
-                    metadataFeature?.AddLink(MetadataFeature.EnabledFeatures, "#" + title, title);
+                    feature?.AddLink(MetadataFeature.AvailableFeatures, "#" + title, title);
                     var preInitPlugin = plugin as IPostInitPlugin;
                     if (preInitPlugin != null)
                     {

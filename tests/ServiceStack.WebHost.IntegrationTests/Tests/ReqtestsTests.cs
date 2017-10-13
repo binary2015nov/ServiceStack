@@ -35,7 +35,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void AspNet_doesnt_transparently_decode_QueryStrings()
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
+            var client = new JsonServiceClient(Constants.ServiceStackBaseHost);
             var request = new Reqtests { QueryString = "pathseperator%2Ftest" };
             var response = client.Get(request);
             Assert.That(response.QueryString, Is.EqualTo(request.QueryString));

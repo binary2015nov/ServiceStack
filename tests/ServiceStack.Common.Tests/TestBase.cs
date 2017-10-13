@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using ServiceStack.Host;
 using ServiceStack.Host.Handlers;
-using ServiceStack.Logging;
 using ServiceStack.Messaging;
 using ServiceStack.Testing;
 using ServiceStack.Text;

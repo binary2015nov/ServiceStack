@@ -7,20 +7,20 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 {
 	[DataContract]
 	[Description("ServiceStack's Hello World web service.")]
-    [Route("/hello", Summary = @"Default hello service.", Notes = "Longer description for hello service.")]
-    [Route("/hello/{Name}", "GET", Summary = @"Says ""Hello"" to provided Name with GET.", 
-        Notes = "Longer description of the GET method which says \"Hello\"")]
-    [Route("/hello/{Name}", "POST", Summary = @"Says ""Hello"" to provided Name with POST.", 
-        Notes = "Longer description of the POST method which says \"Hello\"")]
-    [Route("/hello/{Name}", "PUT", Summary = @"Says ""Hello"" to provided Name with PUT.", 
-        Notes = "Longer description of the PUT method which says \"Hello\"")]
-    [Route("/hello/{Name}", "DELETE", Summary = @"Says ""Hello"" to provided Name with DELETE.", 
-        Notes = "Longer description of the DELETE method which says \"Hello\"")]
-    public class Hello
+	[Route("/hello", Summary = @"Default hello service.", Notes = "Longer description for hello service.")]
+	[Route("/hello/{Name}", "GET", Summary = @"Says ""Hello"" to provided Name with GET.", 
+		Notes = "Longer description of the GET method which says \"Hello\"")]
+	[Route("/hello/{Name}", "POST", Summary = @"Says ""Hello"" to provided Name with POST.", 
+		Notes = "Longer description of the POST method which says \"Hello\"")]
+	[Route("/hello/{Name}", "PUT", Summary = @"Says ""Hello"" to provided Name with PUT.", 
+		Notes = "Longer description of the PUT method which says \"Hello\"")]
+	[Route("/hello/{Name}", "DELETE", Summary = @"Says ""Hello"" to provided Name with DELETE.", 
+		Notes = "Longer description of the DELETE method which says \"Hello\"")]
+	public class Hello
 	{
-        [DataMember]
-        [ApiMember(Name = "Name", Description = "Name Description", ParameterType = "path", 
-            DataType = "string", IsRequired = true)]
+		[DataMember]
+		[ApiMember(Name = "Name", Description = "Name Description", ParameterType = "path", 
+			DataType = "string", IsRequired = true)]
 		public string Name { get; set; }
 	}
 
@@ -35,7 +35,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 	{
 		public object Any(Hello request)
 		{
-            return new HelloResponse { Result = "Hello, {0}".Fmt(request.Name ?? "World") };
+			return new HelloResponse { Result = "Hello, {0}".Fmt(request.Name ?? "World") };
 		}
 	}
 

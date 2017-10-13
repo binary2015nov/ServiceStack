@@ -260,9 +260,9 @@ ObjectKey {SomeSetting:Test,SomeOtherSetting:12,FinalSetting:Final}";
         public void Get_Casts_To_Specified_Type()
         {
             var appSettings = GetAppSettings();
-            var value = appSettings.Get<int>("IntKey", 1);
+            var value = appSettings.Get<int>("IntKey");
 
-            Assert.That(value, Is.EqualTo(42));
+            Assert.That(value, Is.Not.EqualTo(0));
         }
 
         [Test]

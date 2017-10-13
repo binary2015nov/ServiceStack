@@ -114,6 +114,9 @@ namespace ServiceStack.Host
                         return ManagedServiceExec(serviceExec, service, req, dto);
                     };
                     AddToRequestExecMap(requestType, serviceType, handlerFn);
+                    var responseType = actionMap[requestType].Select(p => p.ResponseType).FirstOrDefault();
+                    appHost.Metadata.Add(serviceType, requestType, responseType);
+
                     RegisterRestPaths(requestType);
                     if (typeof(IRequiresRequestStream).IsAssignableFrom(requestType))
                     {
@@ -129,13 +132,9 @@ namespace ServiceStack.Host
                             return rawReq;
                         };
                     }
-                    foreach (var actionContext in actionMap[requestType])
-                    {
-                        appHost.Metadata.Add(serviceType, requestType, actionContext.ResponseType);
-                        if (Logger.IsDebugEnabled)
-                            Logger.DebugFormat("Registering {0} service '{1}' with request '{2}'",
-                                actionContext.ResponseType != null ? "Reply" : "OneWay", serviceType.GetOperationName(), requestType.GetOperationName());
-                    }
+                    if (Logger.IsDebugEnabled)
+                        Logger.DebugFormat("Registering {0} service '{1}' with request '{2}'",
+                            responseType != null ? "Reply" : "OneWay", serviceType.GetOperationName(), requestType.GetOperationName());
                 }
                 serviceActionMap[serviceType] = actionMap;
                 appHost.Container.RegisterAutoWiredType(serviceType);
@@ -192,6 +191,11 @@ namespace ServiceStack.Host
                 RestPathMap[restPath.FirstMatchHashKey] = pathsAtFirstMatch;
             }
             pathsAtFirstMatch.Add(restPath);
+            Operation operation;
+            if (!appHost.Metadata.OperationsMap.TryGetValue(restPath.RequestType, out operation))
+                return;
+
+            operation.Routes.Add(restPath);
         }
 
         public IRestPath GetRestPathForRequest(string httpMethod, string pathInfo)
@@ -199,7 +203,7 @@ namespace ServiceStack.Host
             var matchUsingPathParts = RestPath.GetPathPartsForMatching(pathInfo);
 
             List<RestPath> firstMatches;
-            IRestPath bestMatch = null;
+            RestPath bestMatch = null;
 
             var yieldedHashMatches = RestPath.GetFirstMatchHashKeys(matchUsingPathParts);
             foreach (var potentialHashMatch in yieldedHashMatches)
@@ -249,11 +253,9 @@ namespace ServiceStack.Host
         private void AddToRequestExecMap(Type requestType, Type serviceType, ServiceExecFn handlerFn)
         {
             if (requestExecMap.ContainsKey(requestType))
-            {
                 throw new AmbiguousMatchException(
                     $"Could not register Request '{requestType.FullName}' with service '{serviceType.FullName}' as it has already been assigned to another service.\n" +
-                    "Each Request DTO can only be handled by 1 service.");
-            }
+                    "Each Request DTO can only be handled by 1 service.");          
 
             requestExecMap.Add(requestType, handlerFn);
 

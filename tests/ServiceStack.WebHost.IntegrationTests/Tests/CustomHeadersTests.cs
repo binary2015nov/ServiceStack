@@ -10,7 +10,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void GetRequest()
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
+            var client = new JsonServiceClient(Constants.ServiceStackBaseHost);
             client.Headers.Add("Foo", "abc123");
             var response = client.Get(new CustomHeaders());
             Assert.That(response.Foo, Is.EqualTo("abc123"));
@@ -20,7 +20,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void PostRequest()
         {
-            var client = new XmlServiceClient(Constant.ServiceStackBaseHost);
+            var client = new XmlServiceClient(Constants.ServiceStackBaseHost);
             client.Headers.Add("Bar", "abc123");
             client.Headers.Add("Foo", "xyz");
             var response = client.Post(new CustomHeaders());
@@ -31,7 +31,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Delete()
         {
-            var client = new ProtoBufServiceClient(Constant.ServiceStackBaseHost);
+            var client = new ProtoBufServiceClient(Constants.ServiceStackBaseHost);
             client.Headers.Add("Bar", "abc123");
             client.Headers.Add("Foo", "xyz");
             var response = client.Delete(new CustomHeaders());

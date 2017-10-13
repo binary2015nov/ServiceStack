@@ -104,7 +104,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             protected override IRestClientAsync CreateServiceClient()
             {
-                return new JsonServiceClient(Constant.ServiceStackBaseHost);
+                return new JsonServiceClient(Constants.ServiceStackBaseHost);
             }
         }
 
@@ -113,7 +113,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             protected override IRestClientAsync CreateServiceClient()
             {
-                return new JsvServiceClient(Constant.ServiceStackBaseHost);
+                return new JsvServiceClient(Constants.ServiceStackBaseHost);
             }
         }
 
@@ -122,7 +122,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             protected override IRestClientAsync CreateServiceClient()
             {
-                return new XmlServiceClient(Constant.ServiceStackBaseHost);
+                return new XmlServiceClient(Constants.ServiceStackBaseHost);
             }
         }
     }

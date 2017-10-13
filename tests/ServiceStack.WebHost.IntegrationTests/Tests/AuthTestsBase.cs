@@ -6,7 +6,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     public abstract class AuthenticationTestsBase
     {
         private JsonServiceClient serviceClient;
-        public JsonServiceClient ServiceClient => serviceClient ?? (serviceClient = new JsonServiceClient(Constant.ServiceStackBaseHost));
+        public JsonServiceClient ServiceClient => serviceClient ?? (serviceClient = new JsonServiceClient(Constants.ServiceStackBaseHost));
 
         protected Register AdminRegister;
 
@@ -22,10 +22,10 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             {
                 UserName = "Admin",
                 DisplayName = "The Admin User",
-                Email = Constant.AdminEmail,
+                Email = Constants.AdminEmail,
                 FirstName = "Admin",
                 LastName = "User",
-                Password = Constant.AdminPassword,
+                Password = Constants.AdminPassword,
             };
             try
             {
@@ -60,7 +60,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
         public JsonServiceClient Login(string userName, string password)
         {
-            var client = new JsonServiceClient(Constant.ServiceStackBaseHost);
+            var client = new JsonServiceClient(Constants.ServiceStackBaseHost);
             client.Send(new Authenticate
             {
                 UserName = userName,

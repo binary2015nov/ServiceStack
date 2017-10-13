@@ -555,47 +555,39 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public async Task Does_reconnect_on_lost_connection()
         {
-            try
+            using (var client1 = CreateServerEventsClient())
             {
-                using (var client1 = CreateServerEventsClient())
+                var serverEvents = appHost.TryResolve<IServerEvents>();
+                var msgs = new List<ServerEventMessage>();
+
+                client1.OnMessage = msgs.Add;
+
+                await client1.Connect();
+
+                var msgTask = client1.WaitForNextMessage();
+
+                client1.PostChat("msg1 from client1");
+
+                var msg1 = await msgTask.WaitAsync();
+
+                serverEvents.Reset(); //Dispose all existing subscriptions
+
+                using (var client2 = CreateServerEventsClient())
                 {
-                    var serverEvents = appHost.TryResolve<IServerEvents>();
-                    var msgs = new List<ServerEventMessage>();
+                    await client2.Connect();
 
-                    client1.OnMessage = msgs.Add;
+                    await Task.WhenAny(client1.Connect(), Task.Delay(2000));
 
-                    await client1.Connect();
-
-                    var msgTask = client1.WaitForNextMessage();
-
-                    client1.PostChat("msg1 from client1");
-
-                    var msg1 = await msgTask.WaitAsync();
-
-                    serverEvents.Reset(); //Dispose all existing subscriptions
-
-                    using (var client2 = CreateServerEventsClient())
-                    {
-                        await client2.Connect();
-
-                        await Task.WhenAny(client1.Connect(), Task.Delay(2000));
-
-                        msgTask = client1.WaitForNextMessage();
-                        client2.PostChat("msg2 from client2");
-                    }
-
-                    "Waiting for max 5s...".Print();
-                    var msg2 = await msgTask.WaitAsync(5000);
-
-                    var chatMsg2 = msg2.Json.FromJson<ChatMessage>();
-
-                    Assert.That(chatMsg2.Message, Is.EqualTo("msg2 from client2"));
+                    msgTask = client1.WaitForNextMessage();
+                    client2.PostChat("msg2 from client2");
                 }
-            }
-            catch (Exception ex)
-            {
-                ex.Message.Print();
-                throw;
+
+                "Waiting for max 5s...".Print();
+                var msg2 = await msgTask.WaitAsync(5000);
+
+                var chatMsg2 = msg2.Json.FromJson<ChatMessage>();
+
+                Assert.That(chatMsg2.Message, Is.EqualTo("msg2 from client2"));
             }
         }
 

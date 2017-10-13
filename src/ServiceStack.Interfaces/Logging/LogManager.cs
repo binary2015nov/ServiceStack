@@ -14,7 +14,7 @@ namespace ServiceStack.Logging
         /// </summary>
         public static ILogFactory LogFactory
         {
-            get { return logFactory ?? new NullLogFactory(); }
+            get { return logFactory ?? (logFactory = new NullLogFactory()); }
             set { logFactory = value; }
         }
 

@@ -25,7 +25,7 @@ namespace ServiceStack.VirtualPath
             Initialize();
         }
 
-        protected sealed override void Initialize() {}
+        protected sealed override void Initialize() { }
 
         public override string CombineVirtualPath(string basePath, string relativePath)
         {

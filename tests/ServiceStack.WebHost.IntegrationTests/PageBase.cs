@@ -13,7 +13,7 @@ namespace ServiceStack.WebHost.IntegrationTests
         {
             base.OnAuthenticated(authService, session, tokens, authInfo);
 
-            if (session.Email == Constant.AdminEmail)
+            if (session.Email == Constants.AdminEmail)
             {
                 var authRepo = authService.TryResolve<IAuthRepository>();
                 var userAuth = authRepo.GetUserAuth(session, tokens);

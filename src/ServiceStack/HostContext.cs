@@ -36,6 +36,7 @@ namespace ServiceStack
                     
             return AppHost;
         }
+
 #if !NETSTANDARD2_0
         public static bool IsAspNetHost => AppHost is AppHostBase;
         public static bool IsHttpListenerHost => AppHost is ServiceStack.Host.HttpListener.HttpListenerBase;
@@ -45,6 +46,7 @@ namespace ServiceStack
         public static bool IsHttpListenerHost => false;
         public static bool IsNetCore => true;
 #endif
+
         public static T TryResolve<T>() => AssertAppHost().TryResolve<T>();
 
         public static T Resolve<T>() => AssertAppHost().Resolve<T>();

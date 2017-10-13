@@ -176,11 +176,11 @@ namespace ServiceStack.Metadata
                     ListItemTemplate = @"<li><a href=""{0}"">{1}</a></li>"
                 }.ToString()
                 : "";
-            var features = metadata != null && metadata.Sections[MetadataFeature.EnabledFeatures].Count > 0
+            var features = metadata != null && metadata.Sections[MetadataFeature.AvailableFeatures].Count > 0
               ? new ListTemplate
               {
-                  Title = MetadataFeature.EnabledFeatures,
-                  ListItemsMap = ToAbsoluteUrls(metadata.Sections[MetadataFeature.EnabledFeatures]),
+                  Title = MetadataFeature.AvailableFeatures,
+                  ListItemsMap = ToAbsoluteUrls(metadata.Sections[MetadataFeature.AvailableFeatures]),
                   ListItemTemplate = @"<li><a href=""{0}"">{1}</a></li>"
               }.ToString()
               : "";
