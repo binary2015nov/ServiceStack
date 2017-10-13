@@ -8,7 +8,7 @@ using ServiceStack.Text;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
-    public class FileSystemVirtualPathProviderTests : VirtualPathProviderTestsBase
+    public class FileSystemVirtualPathProviderTests : VirtualPathProviderTests
     {
         private static string RootDir = "~/App_Data/files".MapProjectPath();
 
@@ -26,7 +26,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
-    public class InMemoryVirtualPathProviderTests : VirtualPathProviderTestsBase
+    public class MemoryVirtualFilesTests : VirtualPathProviderTests
     {
         public override IVirtualPathProvider GetPathProvider()
         {
@@ -36,7 +36,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
 
     [TestFixture]
-    public abstract class VirtualPathProviderTestsBase
+    public abstract class VirtualPathProviderTests
     {
         public abstract IVirtualPathProvider GetPathProvider();
 

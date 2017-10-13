@@ -46,6 +46,12 @@
     <DelaySign>False</DelaySign>
     <AssemblyOriginatorKeyFile>../servicestack-sn.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+    <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
+        <DefineConstants>$(DefineConstants);NET45</DefineConstants>
+        <SignAssembly>True</SignAssembly>
+        <DelaySign>False</DelaySign>
+        <AssemblyOriginatorKeyFile>../servicestack.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System.Net"/>
