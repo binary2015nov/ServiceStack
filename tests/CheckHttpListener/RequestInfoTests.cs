@@ -5,9 +5,7 @@ using ServiceStack.Host.Handlers;
 
 namespace CheckHttpListener
 {
-    public class RequestInfoServices : Service
-    {
-    }
+    public class RequestInfoServices : Service { }
 
     public partial class RequestInfoTests
     {
@@ -16,14 +14,14 @@ namespace CheckHttpListener
         private AppSelfHost appHost;
 
         [OneTimeSetUp]
-        public void OneTimeSetUp()
+        public void TestFixtureSetUp()
         {
             appHost = new AppSelfHost();
             appHost.Init().Start(BaseUrl);
         }
 
         [OneTimeTearDown]
-        public void OneTimeTearDown()
+        public void TestFixtureTearDown()
         {
             appHost.Stop();
         }

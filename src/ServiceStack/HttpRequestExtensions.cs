@@ -771,8 +771,7 @@ namespace ServiceStack
 
         public static string GetBaseUrl(this IRequest httpReq)
         {
-            return HostContext.AppHost.GetBaseUrl(httpReq).NormalizeScheme(
-                HostContext.Config.UseHttpsLinks || httpReq.GetHeader(HttpHeaders.XForwardedProtocol) == "https");
+            return HostContext.AppHost.GetBaseUrl(httpReq);
         }
 
         public static RequestAttributes ToRequestAttributes(string[] attrNames)

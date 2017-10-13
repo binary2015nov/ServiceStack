@@ -148,8 +148,6 @@
     <Content Include="Default.aspx" />
     <Content Include="default.html" />
     <Content Include="Subpages\Test.aspx" />
-    <EmbeddedResource Include="Templates\OperationControl.html" />
-    <EmbeddedResource Include="Templates\HtmlFormat.html" />
     <Content Include="user-notfound.htm" />
     <Content Include="user-default.htm" />
     <Content Include="Global.asax" />

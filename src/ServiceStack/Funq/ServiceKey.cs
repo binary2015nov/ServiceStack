@@ -10,9 +10,11 @@ namespace Funq
         {
             FactoryType = factoryType;
             ServiceName = serviceName;
-            hashCode = FactoryType.GetHashCode();
-            if (ServiceName != null)
-                hashCode ^= ServiceName.GetHashCode();
+
+            hashCode = factoryType.GetHashCode();
+            if (serviceName != null)
+                hashCode ^= serviceName.GetHashCode();
+
         }
 
         public Type FactoryType { get; private set; }

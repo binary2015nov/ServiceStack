@@ -35,10 +35,6 @@ namespace ServiceStack
 
         public readonly DateTime CreatedAt = DateTime.Now;
 
-        public HostConfig Config { get; private set; }
-
-        public IAppSettings AppSettings { get; set; }
-
         protected ServiceStackHost(string serviceName, params Assembly[] assembliesWithServices)
         {
             Metadata = new ServiceMetadata();
@@ -103,15 +99,13 @@ namespace ServiceStack
             };
         }
 
-        protected virtual void OnBeforeInit() { }
-
-        protected virtual void OnAfterInit() { }
-
-        public abstract void Configure(Container container);
-
         public string ServiceName { get { return Metadata.ServiceName; } set { Metadata.ServiceName = value; } }
 
         public Assembly[] ServiceAssemblies { get; set; }
+
+        public HostConfig Config { get; private set; }
+
+        public IAppSettings AppSettings { get; set; }
 
         /// <summary>
         /// The AppHost.Container. Note: it is not thread safe to register dependencies after AppStart.
@@ -121,6 +115,12 @@ namespace ServiceStack
         public string WebHostPhysicalPath { get; set; }
 
         public DateTime ReadyAt { get; private set; }
+
+        protected virtual void OnBeforeInit() { }
+
+        protected virtual void OnAfterInit() { }
+
+        public abstract void Configure(Container container);
 
         /// <summary>
         /// Initializes the AppHost.
@@ -745,7 +745,7 @@ namespace ServiceStack
                 ? absoluteUri.IndexOf("?", StringComparison.Ordinal)
                 : absoluteUri.IndexOf(httpReq.PathInfo.TrimEnd('/'), StringComparison.Ordinal) + 1;         
 
-            return index > 0 ? absoluteUri.Substring(0, index) : absoluteUri;
+            return Config.WebHostUrl = index > 0 ? absoluteUri.Substring(0, index) : absoluteUri;
         }
 
         public virtual string ResolvePhysicalPath(string virtualPath, IRequest httpReq)

@@ -56,7 +56,7 @@ namespace ServiceStack.Validation
                 //Serializing request successfully is not critical and only provides added error info
             }
 
-            return $"[{GetType().GetOperationName()}: {DateTime.UtcNow}]:\n[REQUEST: {requestString}]";
+            return $"[{GetType().GetOperationName()}: {DateTime.Now}]:\n[REQUEST: {requestString}]";
         }
     }
 
@@ -85,22 +85,24 @@ namespace ServiceStack.Validation
             }
         }
 
-        public static void RegisterValidator(this Container container, Type validator, ReuseScope scope=ReuseScope.None)
+        public static void RegisterValidator(this Container container, Type validator, ReuseScope scope = ReuseScope.None)
         {
-            var baseType = validator.BaseType();
-            if (validator.IsInterface() || baseType == null) return;
-            while (!baseType.IsGenericType())
+            if (validator.IsInterface())
+                return;
+
+            var type = validator;
+            while (!type.IsGenericType() && type.BaseType() != null)
             {
-                baseType = baseType.BaseType();
+                type = type.BaseType();
             }
 
-            var dtoType = baseType.GetGenericArguments()[0];
+            var dtoType = type.GetGenericArguments()[0];
             var validatorType = typeof(IValidator<>).GetCachedGenericType(dtoType);
 
             container.RegisterAutoWiredType(validator, validatorType, scope);
         }
 
-        public static bool HasAsyncValidators(this IValidator validator, string ruleSet=null)
+        public static bool HasAsyncValidators(this IValidator validator, string ruleSet = null)
         {
             var rules = validator as IEnumerable<IValidationRule>;
             if (rules != null)

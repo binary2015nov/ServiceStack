@@ -47,7 +47,7 @@ namespace CheckWeb
             Assert.That(GetRequestInfoForPath("dir/").PathInfo, Is.EqualTo("/dir/"));
             Assert.That(GetRequestInfoForPath("dir/sub/").PathInfo, Is.EqualTo("/dir/sub/"));
             Assert.That(GetRequestInfoForPath("dir/sub/").PathInfo, Is.EqualTo("/dir/sub/"));
-            Assert.That(GetRequestInfoForPath("swagger-ui/").PathInfo, Is.EqualTo("/swagger-ui"));
+            Assert.That(GetRequestInfoForPath("swagger-ui/").PathInfo, Is.EqualTo("/swagger-ui/"));
         }
     }
 

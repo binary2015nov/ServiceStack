@@ -52,15 +52,15 @@ A:hover {
   text-decoration: underline;
 }
 .ib {
-    position: relative;
-    display: -moz-inline-box;
-    display: inline-block;
+	position: relative;
+	display: -moz-inline-box;
+	display: inline-block;
 }
 * html .ib {
-    display: inline;
+	display: inline;
 }
 *:first-child + html .ib {
-    display: inline;
+	display: inline;
 }
 TABLE {
   border-collapse:collapse;
@@ -111,21 +111,21 @@ DL DL DD {
   font: 16px Arial;
 }
 HR {
-    display:none;
+	display:none;
 }
 TD DL HR
 {
-    display:block;
-    padding: 0;
-    clear: left;
-    border: none;
+	display:block;
+	padding: 0;
+	clear: left;
+	border: none;
 }
 TD DL
 {
-    padding: 4px;
-    margin: 0;
-    height:100%;
-    max-width: 700px;
+	padding: 4px;
+	margin: 0;
+	height:100%;
+	max-width: 700px;
 }
 DL TD DL DT {
   padding: 2px;
@@ -239,40 +239,42 @@ ${MvcIncludes}
   <b>from original url:</b>
   <a href="${ServiceUrl}">${ServiceUrl}</a>
   <b>in other formats:</b>
-  <a href="${ServiceUrl}format=json">json</a>
-  <a href="${ServiceUrl}format=xml">xml</a>
-  <a href="${ServiceUrl}format=csv">csv</a>
-  <a href="${ServiceUrl}format=jsv">jsv</a>
+  <a href="?format=json">json</a>
+  <a href="?format=xml">xml</a>
+  <a href="?format=csv">csv</a>
+  <a href="?format=jsv">jsv</a>
 </div>
 
 <div id="body">
   
   <div id="show-json">
-    <h3>This reports json data source</h3>
-    <textarea></textarea>
-    <button onclick="doc.body.className=null;">Close Window</button>
+	<h3>This reports json data source</h3>
+	<textarea></textarea>
+	<button onclick="doc.body.className=null;">Close Window</button>
   </div>
   
   <div id="content"></div>
 
 </div>
 
-<script>    !window.JSON && document.write(unescape('%3Cscript src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"%3E%3C/script%3E'))</script>
+<script>    
+	!window.JSON && document.write(unescape('%3Cscript src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"%3E%3C/script%3E'))
+</script>
 
 <script type="text/javascript">
 // <![CDATA[
 
 var doc = document, win = window,
-    $ = function(id) { return doc.getElementById(id); },
-    $$ = function(sel) { return doc.getElementsByTagName(sel); },
-    $each = function(fn) { for (var i=0,len=this.length; i<len; i++) fn(i, this[i], this); };
+	$ = function(id) { return doc.getElementById(id); },
+	$$ = function(sel) { return doc.getElementsByTagName(sel); },
+	$each = function(fn) { for (var i=0,len=this.length; i<len; i++) fn(i, this[i], this); };
 
 $.each = function(arr, fn) { $each.call(arr, fn); };
 
 var splitCase = function (t) { return typeof t != 'string' ? t : titleCase(t.replace(/([a-z0-9])([A-Z])/g, '$1 $2')); },
-    titleCase = function (s) { return s.replace(/\w\S*/g, function (t) { return t.charAt(0).toUpperCase() + t.substr(1).toLowerCase(); }); },
-    uniqueKeys = function(m){ var h={}; for (var i=0,len=m.length; i<len; i++) for (var k in m[i]) if (show(k)) h[k] = k; return h; },
-    keys = function(o){ var a=[]; for (var k in o) if (show(k)) a.push(k); return a; }
+	titleCase = function (s) { return s.replace(/\w\S*/g, function (t) { return t.charAt(0).toUpperCase() + t.substr(1).toLowerCase(); }); },
+	uniqueKeys = function(m){ var h={}; for (var i=0,len=m.length; i<len; i++) for (var k in m[i]) if (show(k)) h[k] = k; return h; },
+	keys = function(o){ var a=[]; for (var k in o) if (show(k)) a.push(k); return a; }
 var tbls = [];
 
 function val(m) {
@@ -312,18 +314,18 @@ function arr(m) {
 function makeRows(h,m) {
   var sb = '';
   for (var r=0,len=m.length; r<len; r++) {
-    sb += '<tr>';
-    var row = m[r];
-    for (var k in h) if (show(k)) sb += '<td>' + val(row[k]) + '</td>';
-    sb += '</tr>';
+	sb += '<tr>';
+	var row = m[r];
+	for (var k in h) if (show(k)) sb += '<td>' + val(row[k]) + '</td>';
+	sb += '</tr>';
   }  
   return sb;
 }
 
 var model = ${Dto},
-    txt = $$('TEXTAREA')[0],
-    humanize = ${Humanize} && location.hash.indexOf('dehumanize') == -1,
-    isIE = /msie/i.test(navigator.userAgent) && !/opera/i.test(navigator.userAgent);
+	txt = $$('TEXTAREA')[0],
+	humanize = ${Humanize} && location.hash.indexOf('dehumanize') == -1,
+	isIE = /msie/i.test(navigator.userAgent) && !/opera/i.test(navigator.userAgent);
 
 $("content").innerHTML = val(model);  
 txt.innerHTML=JSON.stringify(model);
@@ -331,19 +333,19 @@ txt.innerHTML=JSON.stringify(model);
 function showJson(){ doc.body.className='show-json'; txt.select(); txt.focus(); }
 
 doc.onclick = function(e) {
-    e = e || window.event, el = e.target || e.srcElement, cls = el.className;
-    if (el.tagName == 'B') el = el.parentNode;
-    if (el.tagName != 'TH') return;
-    el.className = cls == 'asc' ? 'desc' : (cls == 'desc' ? null : 'asc');
-    $.each($$('TH'), function(i,th){ if (th == el) return; th.className = null; });
-    clearSel();
-    var ids=el.id.split('-'), tId=ids[1], cId=ids[2];
+	e = e || window.event, el = e.target || e.srcElement, cls = el.className;
+	if (el.tagName == 'B') el = el.parentNode;
+	if (el.tagName != 'TH') return;
+	el.className = cls == 'asc' ? 'desc' : (cls == 'desc' ? null : 'asc');
+	$.each($$('TH'), function(i,th){ if (th == el) return; th.className = null; });
+	clearSel();
+	var ids=el.id.split('-'), tId=ids[1], cId=ids[2];
 	if (!tbls[tId]) return;
-    var tbl=tbls[tId].slice(0), h=uniqueKeys(tbl), col=keys(h)[cId], tbody=el.parentNode.parentNode.nextSibling;
-    if (!el.className){ setTableBody(tbody, makeRows(h,tbls[tId])); return; }
-    var d=el.className=='asc'?1:-1;
-    tbl.sort(function(a,b){ return cmp(a[col],b[col]) * d; });
-    setTableBody(tbody, makeRows(h,tbl));
+	var tbl=tbls[tId].slice(0), h=uniqueKeys(tbl), col=keys(h)[cId], tbody=el.parentNode.parentNode.nextSibling;
+	if (!el.className){ setTableBody(tbody, makeRows(h,tbls[tId])); return; }
+	var d=el.className=='asc'?1:-1;
+	tbl.sort(function(a,b){ return cmp(a[col],b[col]) * d; });
+	setTableBody(tbody, makeRows(h,tbl));
 }
 
 function setTableBody(tbody, html) {
@@ -356,8 +358,8 @@ function setTableBody(tbody, html) {
 function clearSel() {
   if (doc.selection && doc.selection.empty) doc.selection.empty();
   else if(win.getSelection) {
-    var sel=win.getSelection();
-    if (sel && sel.removeAllRanges) sel.removeAllRanges();
+	var sel=win.getSelection();
+	if (sel && sel.removeAllRanges) sel.removeAllRanges();
   }
 }
 
