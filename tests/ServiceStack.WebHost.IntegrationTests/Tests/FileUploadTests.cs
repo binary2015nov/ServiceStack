@@ -8,8 +8,7 @@ using ServiceStack.WebHost.IntegrationTests.Services;
 namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
     [TestFixture]
-    public class FileUploadTests
-        : RestsTestBase
+    public class FileUploadTests : RestsTestBase
     {
         public WebResponse UploadFile(string pathInfo, FileInfo fileInfo)
         {
@@ -98,7 +97,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         public void Can_GET_upload_file()
         {
             var uploadForm = new FileInfo("~/TestExistingDir/upload.html".MapHostAbsolutePath());
-            var webRequest = (HttpWebRequest)WebRequest.Create(base.ServiceClientBaseUri + "/fileuploads/TestExistingDir/upload.html");
+            var webRequest = WebRequest.CreateHttp(base.ServiceClientBaseUri + "/fileuploads/TestExistingDir/upload.html");
             var expectedContents = new StreamReader(uploadForm.OpenRead()).ReadToEnd();
 
             var webResponse = webRequest.GetResponse();
@@ -148,12 +147,4 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             Assert.That(response.CustomerId, Is.EqualTo(123));
         }
     }
-
-    //public static class TestExtensions
-    //{
-    //    public static string NormalizeNewLines(this string text)
-    //    {
-    //        return text.Replace("\r\n", "\n");
-    //    }
-    //}
 }

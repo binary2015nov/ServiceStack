@@ -120,7 +120,7 @@ namespace ServiceStack.Auth
 
         public override void InitSchema()
         {
-            hasInitSchema = true;
+            HasInitSchema = true;
 
             EachDb(db =>
             {
@@ -132,7 +132,7 @@ namespace ServiceStack.Auth
 
         public override void DropAndReCreateTables()
         {
-            hasInitSchema = true;
+            HasInitSchema = true;
 
             EachDb(db =>
             {
@@ -162,7 +162,7 @@ namespace ServiceStack.Auth
         where TUserAuthDetails : class, IUserAuthDetails
     {
         private readonly IDbConnectionFactory dbFactory;
-        public bool hasInitSchema;
+        public bool HasInitSchema { get; protected set; }
 
         public bool UseDistinctRoleTables { get; set; }
 
@@ -174,7 +174,7 @@ namespace ServiceStack.Auth
 
         public virtual void InitSchema()
         {
-            hasInitSchema = true;
+            HasInitSchema = true;
             Exec(db =>
             {
                 db.CreateTableIfNotExists<TUserAuth>();
@@ -185,7 +185,7 @@ namespace ServiceStack.Auth
 
         public virtual void DropAndReCreateTables()
         {
-            hasInitSchema = true;
+            HasInitSchema = true;
             Exec(db =>
             {
                 db.DropAndCreateTable<TUserAuth>();
@@ -296,11 +296,11 @@ namespace ServiceStack.Auth
 
             return Exec(db =>
             {
-                if (!hasInitSchema)
+                if (!HasInitSchema)
                 {
-                    hasInitSchema = db.TableExists<TUserAuth>();
+                    HasInitSchema = db.TableExists<TUserAuth>();
 
-                    if (!hasInitSchema)
+                    if (!HasInitSchema)
                         throw new Exception("OrmLiteAuthRepository Db tables have not been initialized. Try calling 'InitSchema()' in your AppHost Configure method.");
                 }
                 return GetUserAuthByUserName(db, userNameOrEmail);

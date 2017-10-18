@@ -6,7 +6,7 @@ using ServiceStack.WebHost.IntegrationTests.Services;
 
 namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
-    public abstract class AsyncRestClientTests
+    public abstract class AsyncRestClientTestsBase
     {
         protected abstract IRestClientAsync CreateServiceClient();
 
@@ -15,10 +15,10 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             var asyncClient = CreateServiceClient();
 
-            var response = await asyncClient.GetAsync<GetFactorialResponse>("factorial/3");
+            var response = await asyncClient.GetAsync<GetFactorialResponse>("factorial/sync/3");
 
             Assert.That(response, Is.Not.Null, "No response received");
-            Assert.That(response.Result, Is.EqualTo(GetFactorialService.GetFactorial(3)));
+            Assert.That(response.Result, Is.EqualTo(FactorialService.GetFactorial(3)));
         }
 
         [Test]
@@ -100,7 +100,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         }
 
         [TestFixture]
-        public class JsonAsyncRestServiceClientTests : AsyncRestClientTests
+        public class JsonAsyncRestServiceClientTests : AsyncRestClientTestsBase
         {
             protected override IRestClientAsync CreateServiceClient()
             {
@@ -109,7 +109,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         }
 
         [TestFixture]
-        public class JsvAsyncRestServiceClientTests : AsyncRestClientTests
+        public class JsvAsyncRestServiceClientTests : AsyncRestClientTestsBase
         {
             protected override IRestClientAsync CreateServiceClient()
             {
@@ -118,7 +118,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         }
 
         [TestFixture]
-        public class XmlAsyncRestServiceClientTests : AsyncRestClientTests
+        public class XmlAsyncRestServiceClientTests : AsyncRestClientTestsBase
         {
             protected override IRestClientAsync CreateServiceClient()
             {

@@ -46,19 +46,19 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             await AsyncDownloadWithProgress(new TestProgressTextFile());
         }
 
-        private async Task AsyncDownloadWithProgress<TResponse>(IReturn<TResponse> requestDto)
+        private async Task AsyncDownloadWithProgress<TResponse>(IReturn<TResponse> request)
         {
             AsyncServiceClient.BufferSize = 100;          
-            var asyncClient = new JsonServiceClient(Constants.ServiceStackBaseHost);
+            var client = new JsonServiceClient(Constants.ServiceStackBaseHost);
             var progress = new List<string>();
 
             //Note: total = -1 when 'Transfer-Encoding: chunked'
             //Available in ASP.NET or in HttpListener when downloading responses with known lengths: 
             //E.g: Strings, Files, etc.
-            asyncClient.OnDownloadProgress = (done, total) =>
+            client.OnDownloadProgress = (done, total) =>
                                                 progress.Add("{0}/{1} bytes downloaded".Fmt(done, total));
 
-            var response = await asyncClient.PostAsync(requestDto);
+            var response = await client.PostAsync(request);
 
             progress.Each(x => x.Print());
 

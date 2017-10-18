@@ -116,7 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
-    <EmbeddedResource Include="Content\static-sub-embedded.txt" />
+    <EmbeddedResource Include="Sub\static-sub-embedded.txt" />
     <Content Include="Content\default.html" />
     <Content Include="Content\default.css" />
     <Content Include="Content\img\bootstrap-apple-114x114.png" />
@@ -144,9 +144,9 @@
     <Content Include="Content\js\underscore.min.js" />
     <Content Include="Content\js\_blank.js" />
     <Content Include="Content\static-sub.txt" />
-    <EmbeddedResource Include="static-root-embedded.txt" />
     <Content Include="Default.aspx" />
     <Content Include="default.html" />
+    <EmbeddedResource Include="static-root-embedded.txt" />
     <Content Include="Subpages\Test.aspx" />
     <Content Include="user-notfound.htm" />
     <Content Include="user-default.htm" />
@@ -163,10 +163,12 @@
   <ItemGroup>
     <Compile Include="AppHost.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="Services\AsyncTaskServices.cs" />
     <Compile Include="Services\CookiesService.cs" />
     <Compile Include="Services\CustomPathServices.cs" />
     <Compile Include="Services\CustomRouteService.cs" />
+    <Compile Include="Services\FactorialService.cs" />
+    <Compile Include="Services\HelloZipService.cs" />
+    <Compile Include="Services\ProtoBufService.cs" />
     <Compile Include="Services\TemplateService.cs" />
     <Compile Include="Services\VerbOnlyService.cs" />
     <Compile Include="Shared\IocService.cs" />
@@ -183,7 +185,7 @@
     <Compile Include="Services\ReturnsVoidService.cs" />
     <Compile Include="Services\CustomHeadersService.cs" />
     <Compile Include="Services\EndpointAccessService.cs" />
-    <Compile Include="Services\HelloImage.cs" />
+    <Compile Include="Services\HelloImageService.cs" />
     <Compile Include="Services\RequestItemsService.cs" />
     <Compile Include="Services\SwaggerTestService.cs" />
     <Compile Include="Services\TestProgressService.cs" />
@@ -206,7 +208,6 @@
     <Compile Include="Services\ContentManagerOnly.cs" />
     <Compile Include="Services\ThrowsArgumentNullService.cs" />
     <Compile Include="Services\EchoMethodService.cs" />
-    <Compile Include="Tests\AuthTestsBase.cs" />
     <Compile Include="Services\BatchWidgetValidationService.cs" />
     <Compile Include="Services\CachedMoviesService.cs" />
     <Compile Include="Tests\RawRequestTests.cs" />
@@ -229,7 +230,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AlwaysThrowsService.cs" />
-    <Compile Include="Services\Secure.cs" />
+    <Compile Include="Services\SecureService.cs" />
     <Compile Include="Services\FileUploadService.cs" />
     <Compile Include="Services\MovieService.cs" />
     <Compile Include="Services\MoviesService.cs" />

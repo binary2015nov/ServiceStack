@@ -35,11 +35,13 @@ namespace ServiceStack
 
         public readonly DateTime CreatedAt = DateTime.Now;
 
+        public HostConfig Config { get; private set; }
+
         protected ServiceStackHost(string serviceName, params Assembly[] assembliesWithServices)
         {
-            Metadata = new ServiceMetadata();
-            Config = new HostConfig { DebugMode = GetType().GetAssembly().IsDebugBuild() }; 
+            Config = new HostConfig { DebugMode = GetType().Assembly.IsDebugBuild() }; 
             AppSettings = ServiceStack.Configuration.AppSettings.Default;
+            Metadata = new ServiceMetadata();
             ServiceName = serviceName;
             ServiceAssemblies = assembliesWithServices;
             Container = new Container { DefaultOwner = Owner.External };
@@ -103,8 +105,6 @@ namespace ServiceStack
 
         public Assembly[] ServiceAssemblies { get; set; }
 
-        public HostConfig Config { get; private set; }
-
         public IAppSettings AppSettings { get; set; }
 
         /// <summary>
@@ -135,6 +135,7 @@ namespace ServiceStack
             
             OnBeforeInit();
 
+            Config.EmbeddedResourceSources.Add(GetType().GetAssembly());
             Config.ServiceEndpointsMetadataConfig = ServiceEndpointsMetadataConfig.Create(Config.HandlerFactoryPath);
             Metadata.ApiVersion = Config.ApiVersion;
 

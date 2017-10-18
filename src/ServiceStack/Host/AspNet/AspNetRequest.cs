@@ -49,7 +49,7 @@ namespace ServiceStack.Host.AspNet
             this.OriginalPathInfo = GetPathInfo();
             this.PathInfo = HostContext.AppHost.ResolvePathInfo(this, OriginalPathInfo, out bool isDirectory);
             this.IsDirectory = isDirectory;
-            this.IsFile = !isDirectory && HostContext.VirtualFileSources.FileExists(PathInfo);
+            this.IsFile = !isDirectory && GetFile() != null;
         }
 
         [Obsolete("Use Resolver")]
@@ -310,9 +310,11 @@ namespace ServiceStack.Host.AspNet
 
         public Uri UrlReferrer => request.UrlReferrer;
 
-        public IVirtualFile GetFile() => HostContext.VirtualFileSources.GetFile(PathInfo);
+        private IVirtualFile virtualFile;
+        public IVirtualFile GetFile() => virtualFile ?? (virtualFile = HostContext.VirtualFileSources.GetFile(PathInfo));
 
-        public IVirtualDirectory GetDirectory() => HostContext.VirtualFileSources.GetDirectory(PathInfo);
+        private IVirtualDirectory virtualDirectory;
+        public IVirtualDirectory GetDirectory() => virtualDirectory ?? (virtualDirectory = HostContext.VirtualFileSources.GetDirectory(PathInfo));
 
         public bool IsDirectory { get; private set; }
 

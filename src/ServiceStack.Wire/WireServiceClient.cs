@@ -1,12 +1,12 @@
+using global::Wire;
+using System;
+using System.IO;
+using System.Runtime.Serialization;
+using ServiceStack.Web;
+using ServiceStack.Text;
+
 namespace ServiceStack.Wire
 {
-    using global::Wire;
-    using System;
-    using System.IO;
-    using System.Runtime.Serialization;
-    using ServiceStack.Web;
-    using ServiceStack.Text;
-
     public class WireServiceClient : ServiceClientBase
     {
         public override string Format => "x-wire";

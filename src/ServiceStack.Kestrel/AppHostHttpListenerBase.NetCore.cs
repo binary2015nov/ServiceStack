@@ -7,8 +7,7 @@ namespace ServiceStack
     public abstract class AppHostHttpListenerBase : AppSelfHostBase 
     {
         protected AppHostHttpListenerBase(string serviceName, params Assembly[] assembliesWithServices)
-            : base(serviceName, assembliesWithServices)
-        { }
+            : base(serviceName, assembliesWithServices) { }
     }
 
     public abstract class AppHostHttpListenerPoolBase : AppHostHttpListenerBase 

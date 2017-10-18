@@ -23,7 +23,8 @@ namespace ServiceStack
 
         public static bool IsServiceType(Type type)
         {
-            return typeof(IService).IsAssignableFrom(type) && !type.IsAbstract() && !type.IsGenericTypeDefinition() && !type.ContainsGenericParameters();
+            return typeof(IService).IsAssignableFrom(type) 
+                && !type.IsAbstract() && !type.IsGenericTypeDefinition() && !type.ContainsGenericParameters();
         }
 
         public static IEnumerable<MethodInfo> GetActions(Type type)
@@ -204,5 +205,4 @@ namespace ServiceStack
             Request.ReleaseIfInProcessRequest();
         }
     }
-
 }

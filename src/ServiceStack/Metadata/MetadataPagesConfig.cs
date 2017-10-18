@@ -56,10 +56,10 @@ namespace ServiceStack.Metadata
 
         public MetadataConfig GetMetadataConfig(string format)
         {
-            if (ignoredFormats.Contains(format)) return null;
-
             MetadataConfig conf;
-            metadataConfigMap.TryGetValue(format, out conf);
+            if (ignoredFormats.Contains(format) || !metadataConfigMap.TryGetValue(format, out conf))
+                return null;
+            
             return conf;
         }
 

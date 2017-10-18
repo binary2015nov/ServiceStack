@@ -5,8 +5,7 @@ using System.Threading.Tasks;
 
 namespace ServiceStack.Web
 {
-    public interface IContentTypes
-        : IContentTypeWriter, IContentTypeReader
+    public interface IContentTypes : IContentTypeWriter, IContentTypeReader
     {
         string GetFormatContentType(string format);
 

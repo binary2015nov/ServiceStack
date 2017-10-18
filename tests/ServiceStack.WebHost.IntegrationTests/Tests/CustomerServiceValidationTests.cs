@@ -9,8 +9,6 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     [TestFixture]
     public class CustomerServiceValidationTests
     {
-        private const string ListeningOn = Constants.ServiceStackBaseHost;
-
         private string[] ExpectedPostErrorFields = new[] {
             "Id",
             "LastName",
@@ -52,15 +50,15 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             get
             {
                 return new IServiceClient[] {
-                    new JsonServiceClient(ListeningOn),
-                    new JsvServiceClient(ListeningOn),
-                    new XmlServiceClient(ListeningOn),
+                    new JsonServiceClient(Constants.ServiceStackBaseHost),
+                    new JsvServiceClient(Constants.ServiceStackBaseHost),
+                    new XmlServiceClient(Constants.ServiceStackBaseHost),
                 };
             }
         }
 
 
-        [Test, TestCaseSource(typeof(CustomerServiceValidationTests), "ServiceClients")]
+        [Test, TestCaseSource(typeof(CustomerServiceValidationTests), nameof(ServiceClients))]
         public void Post_empty_request_throws_validation_exception(IServiceClient client)
         {
             try
@@ -83,7 +81,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             }
         }
 
-        [Test, TestCaseSource(typeof(CustomerServiceValidationTests), "ServiceClients")]
+        [Test, TestCaseSource(typeof(CustomerServiceValidationTests), nameof(ServiceClients))]
         public void Get_empty_request_throws_validation_exception(IRestClient client)
         {
             try
@@ -106,7 +104,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             }
         }
 
-        [Test, TestCaseSource(typeof(CustomerServiceValidationTests), "ServiceClients")]
+        [Test, TestCaseSource(typeof(CustomerServiceValidationTests), nameof(ServiceClients))]
         public void Post_ValidRequest_succeeds(IServiceClient client)
         {
             var response = client.Send(validRequest);

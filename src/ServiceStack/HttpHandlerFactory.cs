@@ -21,7 +21,6 @@ namespace ServiceStack
         public static HashSet<string> WebHostRootFileNames { get; private set; }
         private static string WebHostPhysicalPath;
         private static IHttpHandler DefaultHttpHandler;
-        private static IHttpHandler NonRootModeDefaultHttpHandler;
         private static IHttpHandler ForbiddenHttpHandler;
         private static IHttpHandler NotFoundHttpHandler;
         private static readonly IHttpHandler StaticFilesHandler = new StaticFileHandler();
@@ -43,10 +42,11 @@ namespace ServiceStack
             //Apache+mod_mono treats path="servicestack*" as path="*" so takes over root path, so we need to serve matching resources
             var hostedAtRootPath = AppHostConfig.HandlerFactoryPath.IsNullOrEmpty();
 
+#if !NETSTANDARD2_0
             //DefaultHttpHandler not supported in IntegratedPipeline mode
             if (!Platform.IsIntegratedPipeline && HostContext.IsAspNetHost && !hostedAtRootPath && !Env.IsMono)
                 DefaultHttpHandler = new DefaultHttpHandler();
-
+#endif
             var rootFiles = appHost.VirtualFileSources.GetRootFiles().ToList();
             DefaultRootFileName = null;
             foreach (var file in rootFiles)
@@ -75,14 +75,14 @@ namespace ServiceStack
             if (!AppHostConfig.DefaultRedirectPath.IsNullOrEmpty())
             {
                 DefaultHttpHandler = new RedirectHttpHandler { RelativeUrl = AppHostConfig.DefaultRedirectPath };
-                NonRootModeDefaultHttpHandler = new RedirectHttpHandler { RelativeUrl = AppHostConfig.DefaultRedirectPath };
+                //NonRootModeDefaultHttpHandler = new RedirectHttpHandler { RelativeUrl = AppHostConfig.DefaultRedirectPath };
             }
             else
             {
                 var metadataHandler = AppHostConfig.MetadataRedirectPath.IsNullOrEmpty()
                     ? new IndexPageHttpHandler() as IHttpHandler
                     : new RedirectHttpHandler { RelativeUrl = AppHostConfig.MetadataRedirectPath };
-               
+
                 if (hostedAtRootPath)
                 {
                     if (DefaultHttpHandler == null)
@@ -90,14 +90,14 @@ namespace ServiceStack
                 }
                 else
                 {
-                    NonRootModeDefaultHttpHandler = metadataHandler;
+                    DefaultHttpHandler = metadataHandler;
                 }
-            }
+            }      
 
             var defaultRedirectHanlder = DefaultHttpHandler as RedirectHttpHandler;
             var debugDefaultHandler = defaultRedirectHanlder != null
                 ? defaultRedirectHanlder.RelativeUrl
-                : typeof(DefaultHttpHandler).GetOperationName();
+                : DefaultHttpHandler.GetType().Name;
 
             ForbiddenHttpHandler = appHost.GetCustomErrorHttpHandler(HttpStatusCode.Forbidden) ?? new ForbiddenHttpHandler
             {
@@ -165,10 +165,11 @@ namespace ServiceStack
                 var catchAllHandler = GetCatchAllHandlerIfAny(httpReq.HttpMethod, pathInfo, httpReq.GetPhysicalPath());
                 if (catchAllHandler != null) return catchAllHandler;
 
-                if (location.IsNullOrEmpty())
-                    return DefaultHttpHandler;
+                return DefaultHttpHandler;
+                //if (location.IsNullOrEmpty())
+                //    return DefaultHttpHandler;
 
-                return NonRootModeDefaultHttpHandler;
+                //return NonRootModeDefaultHttpHandler;
             }
             return GetHandlerForPathInfo(httpReq, physicalPath) ?? NotFoundHttpHandler;
         }
@@ -231,10 +232,7 @@ namespace ServiceStack
                 if (catchAllHandler != null)
                     return catchAllHandler;
 
-                if (isDirectory)
-                    return StaticFilesHandler;
-
-                return ShouldAllow(pathInfo)
+                return isDirectory || ShouldAllow(pathInfo)
                     ? StaticFilesHandler
                     : ForbiddenHttpHandler;
             }

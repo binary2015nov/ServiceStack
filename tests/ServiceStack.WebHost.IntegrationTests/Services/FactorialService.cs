@@ -1,4 +1,4 @@
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace ServiceStack.WebHost.IntegrationTests.Services
@@ -67,15 +67,22 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
         public long ForNumber { get; set; }
     }
 
-    [Route("/voidasync")]
+    [Route("/factorial/voidasync/{ForNumber}")]
     [DataContract]
-    public class VoidAsync : IReturnVoid
+    public class GetFactorialVoidAsync : IReturnVoid
     {
         [DataMember]
-        public string Message { get; set; }
+        public long ForNumber { get; set; }
     }
 
-    public class GetFactorialAsyncService : IService
+    [DataContract]
+    public class GetFactorialResponse
+    {
+        [DataMember]
+        public long Result { get; set; }
+    }
+
+    public class FactorialService : IService
     {
         public object Any(GetFactorialSync request)
         {
@@ -135,7 +142,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
             });
         }
 
-        public async Task Any(VoidAsync request)
+        public async Task Any(GetFactorialVoidAsync request)
         {
             await Task.Delay(1);
         }

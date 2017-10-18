@@ -1,7 +1,5 @@
 using NUnit.Framework;
-using ServiceStack.Common;
 using ServiceStack.ProtoBuf;
-using ServiceStack.Text;
 using ServiceStack.WebHost.IntegrationTests.Services;
 
 namespace ServiceStack.WebHost.IntegrationTests.Tests
@@ -10,7 +8,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     public class CachedServiceTests
     {
         [OneTimeSetUp]
-        public void OnBeforeEachTest()
+        public void TestFixtureSetUp()
         {
             var jsonClient = new JsonServiceClient(Constants.ServiceStackBaseHost);
             jsonClient.Post<ResetMoviesResponse>("reset-movies", new ResetMovies());
@@ -52,6 +50,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             var url = Constants.ServiceStackBaseHost.AppendPath("/cached/movies?callback=cb");
             var jsonp = url.GetJsonFromUrl();
+            jsonp.Print();
             Assert.That(jsonp.StartsWith("cb("));
         }
     }

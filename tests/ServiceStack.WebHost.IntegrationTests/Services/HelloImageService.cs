@@ -11,7 +11,7 @@ using ServiceStack.Web;
 namespace ServiceStack.WebHost.IntegrationTests.Services
 {
     [Route("/HelloImage")]
-    public class HelloImage {}
+    public class HelloImage { }
 
     public class HelloImageService : IService
     {
@@ -31,7 +31,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
     }
 
     [Route("/HelloImage2")]
-    public class HelloImage2 {}
+    public class HelloImage2 { }
 
     public class HelloImage2Service : IService
     {
@@ -54,7 +54,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
     }
 
     [Route("/HelloImage3")]
-    public class HelloImage3 {}
+    public class HelloImage3 { }
 
     //Your own Custom Result, writes directly to response stream
     public class ImageResult : IDisposable, IStreamWriterAsync, IHasOptions
@@ -101,5 +101,4 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
             return new ImageResult(image); //terse + explicit is good :)
         }
     }
-
 }

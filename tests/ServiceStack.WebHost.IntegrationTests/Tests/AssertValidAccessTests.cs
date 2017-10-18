@@ -7,22 +7,59 @@ using ServiceStack.WebHost.IntegrationTests.Services;
 
 namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
-    [TestFixture]
-    public class AssertValidAccessTests : AuthenticationTestsBase
+    public abstract class AuthTestsBase
     {
-        private const string RoleName1 = "Role1";
-        private const string RoleName2 = "Role2";
+        public const string RoleName1 = "Role1";
+        public const string RoleName2 = "Role2";
 
-        private const string Permission1 = "Permission1";
-        private const string Permission2 = "Permission2";
+        public const string Permission1 = "Permission1";
+        public const string Permission2 = "Permission2";
 
+        protected JsonServiceClient UserClient = new JsonServiceClient(Constants.ServiceStackBaseHost);
+
+        public Register RegisterNewUser(bool autoLogin = false)
+        {
+            var userId = Environment.TickCount % 10000;
+
+            var registerDto = new Register
+            {
+                UserName = "UserName" + userId,
+                DisplayName = "DisplayName" + userId,
+                Email = "user{0}@sf.com".Fmt(userId),
+                FirstName = "FirstName" + userId,
+                LastName = "LastName" + userId,
+                Password = "Password" + userId,
+                AutoLogin = autoLogin
+            };
+
+            UserClient.Send(registerDto);
+
+            return registerDto;
+        }
+
+        public JsonServiceClient Login(string userName, string password)
+        {
+            var client = new JsonServiceClient(Constants.ServiceStackBaseHost);
+            client.Send(new Authenticate
+            {
+                UserName = userName,
+                Password = password,
+            });
+
+            return client;
+        }
+    }
+
+    [TestFixture]
+    public class AssertValidAccessTests : AuthTestsBase
+    {
         [Test]
         public void Authentication_does_return_session_cookies()
         {
             var newUser = RegisterNewUser(autoLogin: false);
 
-            var jsonServiceClient = Login(newUser.UserName, newUser.Password);
-            Assert.That(jsonServiceClient.CookieContainer.Count, Is.GreaterThan(0));
+            var client = Login(newUser.UserName, newUser.Password);
+            Assert.That(client.CookieContainer.Count, Is.GreaterThan(0));
         }
 
         [Test]
@@ -34,12 +71,11 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             {
                 var client = new JsonServiceClient(Constants.ServiceStackBaseHost);
                 client.Send(
-                    new AssignRoles
-                    {
+                    new AssignRoles {
                         UserName = newUser.UserName,
                         Roles = { RoleName1, RoleName2 },
                         Permissions = { Permission1, Permission2 }
-                    });
+                     });
 
                 Assert.Fail("Should not be allowed");
             }
@@ -56,7 +92,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
             try
             {
-                ServiceClient.Send(
+                UserClient.Send(
                     new AssignRoles
                     {
                         UserName = newUser.UserName,
@@ -78,7 +114,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             var newUser = RegisterNewUser();
 
-            var client = Login(AdminRegister.UserName, AdminRegister.Password);
+            var client = Login(Constants.AdminName, Constants.AdminPassword);
 
             var response = client.Send(
                 new AssignRoles
@@ -123,7 +159,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             var newUser = RegisterNewUser();
 
-            var client = Login(AdminRegister.UserName, AdminRegister.Password);
+            var client = Login(Constants.AdminName, Constants.AdminPassword);
 
             client.Send(
             new AssignRoles
@@ -154,7 +190,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
             try
             {
-                ServiceClient.Send(new ContentManagerOnly());
+                UserClient.Send(new ContentManagerOnly());
                 Assert.Fail("Should not be allowed - no roles");
             }
             catch (WebServiceException webEx)
@@ -163,7 +199,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
                 Assert.That(webEx.StatusDescription, Is.EqualTo(ErrorMessages.InvalidRole));
             }
 
-            var client = Login(AdminRegister.UserName, AdminRegister.Password);
+            var client = Login(Constants.AdminName, Constants.AdminPassword);
 
             client.Send(
                 new AssignRoles
@@ -206,7 +242,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
             try
             {
-                ServiceClient.Send(new ContentPermissionOnly());
+                UserClient.Send(new ContentPermissionOnly());
                 Assert.Fail("Should not be allowed - no permissions");
             }
             catch (WebServiceException webEx)
@@ -215,7 +251,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
                 Assert.That(webEx.StatusDescription, Is.EqualTo(ErrorMessages.InvalidPermission));
             }
 
-            var client = Login(AdminRegister.UserName, AdminRegister.Password);
+            var client = Login(Constants.AdminName, Constants.AdminPassword);
 
             client.Send(
                 new AssignRoles
@@ -256,8 +292,8 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         {
             try
             {
-                var jsonServiceClient = new JsonServiceClient(Constants.ServiceStackBaseHost);
-                jsonServiceClient.Send<RequiresRoleInService>(new RequiresRoleInService());
+                var client = new JsonServiceClient(Constants.ServiceStackBaseHost);
+                client.Send<RequiresRoleInService>(new RequiresRoleInService());
 
                 Assert.Fail("Should not allow access to protected resource");
             }
@@ -272,10 +308,12 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
         [Test]
         public void Can_access_authenticate_service_with_AuthSecret()
-        {            
-           var webRes = Constants.ServiceStackBaseHost.AppendPath("requiresadmin")
-                .AddQueryParam("authsecret", Constants.AuthSecret).GetWebResponse();
-            Assert.That(webRes.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        {
+            var client = new JsonServiceClient(Constants.ServiceStackBaseHost);
+
+            var response = client.Get<RequiresRoleInService>("/requiresadmin".AddQueryParam("authsecret", Constants.AuthSecret));
+ 
+            Assert.That(response, Is.Not.Null);
         }
     }
 }

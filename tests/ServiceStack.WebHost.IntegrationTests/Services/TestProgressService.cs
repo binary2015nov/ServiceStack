@@ -10,7 +10,6 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
     public class TestProgress : IReturn<List<Movie>> { }
     public class TestProgressString : IReturn<string> { }
     public class TestProgressBytes : IReturn<byte[]> { }
-
     public class TestProgressBytesHttpResult : IReturn<byte[]> { }
     public class TestProgressBinaryFile : IReturn<byte[]> { }
     public class TestProgressTextFile : IReturn<string> { }

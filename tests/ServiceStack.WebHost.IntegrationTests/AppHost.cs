@@ -1,6 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
-using Funq;
 using ServiceStack.Admin;
 using ServiceStack.Api.Swagger;
 using ServiceStack.Auth;
@@ -9,6 +9,7 @@ using ServiceStack.Caching;
 using ServiceStack.Common.Tests;
 using ServiceStack.Data;
 using ServiceStack.DataAnnotations;
+using ServiceStack.IO;
 using ServiceStack.Messaging;
 using ServiceStack.Messaging.Redis;
 using ServiceStack.MiniProfiler;
@@ -50,7 +51,7 @@ namespace ServiceStack.WebHost.IntegrationTests
             }
         }
 
-        public override void Configure(Container container)
+        public override void Configure(Funq.Container container)
         {
             this.PreRequestFilters.Add((req, res) =>
             {
@@ -156,7 +157,7 @@ namespace ServiceStack.WebHost.IntegrationTests
         }
 
         //Configure ServiceStack Authentication and CustomUserSession
-        private void ConfigureAuth(Container container)
+        private void ConfigureAuth(Funq.Container container)
         {
             Routes.Add<Register>("/register");
 
@@ -177,10 +178,14 @@ namespace ServiceStack.WebHost.IntegrationTests
                 new OrmLiteAuthRepository(c.Resolve<IDbConnectionFactory>()));
 
             var authRepo = (OrmLiteAuthRepository)container.Resolve<IAuthRepository>();
-            if (AppSettings.Get("RecreateTables", true))
-                authRepo.DropAndReCreateTables();
-            else
-                authRepo.InitSchema();
+            authRepo.DropAndReCreateTables();
+            authRepo.CreateUserAuth(new UserAuth {
+                UserName = Constants.AdminName,
+                DisplayName = "The Admin User",
+                Email = Constants.AdminEmail,
+                FirstName = "Admin",
+                LastName = "User",
+            }, Constants.AdminPassword);
         }
     }
 }

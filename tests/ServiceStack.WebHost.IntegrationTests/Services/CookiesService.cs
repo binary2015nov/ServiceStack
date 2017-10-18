@@ -4,7 +4,7 @@ using System.Linq;
 namespace ServiceStack.WebHost.IntegrationTests.Services
 {
     [Route("/cookies")]
-    public class Cookies : IReturn<CookiesResponse> {}
+    public class Cookies : IReturn<CookiesResponse> { }
 
     public class CookiesResponse
     {
@@ -13,7 +13,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
 
     public class CookiesService : Service
     {
-        public CookiesResponse Any(Cookies c)
+        public CookiesResponse Any(Cookies request)
         {
             var response = new CookiesResponse
             {

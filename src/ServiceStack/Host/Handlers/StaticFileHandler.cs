@@ -46,6 +46,11 @@ namespace ServiceStack.Host.Handlers
         private static readonly ILog Logger = LogManager.GetLogger(typeof(StaticFileHandler));
 
         public static int DefaultBufferSize = 1024 * 1024;
+        private static DateTime DefaultFileModified { get; set; }
+        private static string DefaultFilePath { get; set; }
+        private static byte[] DefaultFileContents { get; set; }
+        private static byte[] DefaultFileContentsGzip { get; set; }
+        private static byte[] DefaultFileContentsDeflate { get; set; }
 
         public static Action<IRequest, IResponse, IVirtualFile> ResponseFilter { get; set; }
 
@@ -77,11 +82,7 @@ namespace ServiceStack.Host.Handlers
         }
 
         public int BufferSize { get; set; }
-        private static DateTime DefaultFileModified { get; set; }
-        private static string DefaultFilePath { get; set; }
-        private static byte[] DefaultFileContents { get; set; }
-        private static byte[] DefaultFileContentsGzip { get; set; }
-        private static byte[] DefaultFileContentsDeflate { get; set; }
+
         public IVirtualNode VirtualNode { get; set; }
 
         /// <summary>
@@ -98,7 +99,8 @@ namespace ServiceStack.Host.Handlers
         public override async Task ProcessRequestAsync(IRequest request, IResponse response, string operationName)
         {
             HostContext.ApplyCustomHandlerRequestFilters(request, response);
-            if (response.IsClosed) return;
+            if (response.IsClosed)
+                return;
 
             await response.EndHttpHandlerRequestAsync(afterHeaders: async r =>
             {

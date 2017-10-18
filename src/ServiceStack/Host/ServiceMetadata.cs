@@ -11,7 +11,7 @@ using ServiceStack.Web;
 
 namespace ServiceStack.Host
 {
-    public class ServiceMetadata
+    public sealed class ServiceMetadata
     {
         public ServiceMetadata()
         {
@@ -25,12 +25,12 @@ namespace ServiceStack.Host
 
         public string ApiVersion { get; set; }
         public string ServiceName { get; set; }
-        public Dictionary<Type, Operation> OperationsMap { get; protected set; }
-        public Dictionary<Type, Operation> OperationsResponseMap { get; protected set; }
-        public Dictionary<string, Operation> OperationNamesMap { get; protected set; }
-        public HashSet<Type> RequestTypes { get; protected set; }
-        public HashSet<Type> ServiceTypes { get; protected set; }
-        public HashSet<Type> ResponseTypes { get; protected set; }
+        public Dictionary<Type, Operation> OperationsMap { get; private set; }
+        public Dictionary<Type, Operation> OperationsResponseMap { get; private set; }
+        public Dictionary<string, Operation> OperationNamesMap { get; private set; }
+        public HashSet<Type> RequestTypes { get; private set; }
+        public HashSet<Type> ServiceTypes { get; private set; }
+        public HashSet<Type> ResponseTypes { get; private set; }
 
         public IEnumerable<Operation> Operations => OperationsMap.Values;
 

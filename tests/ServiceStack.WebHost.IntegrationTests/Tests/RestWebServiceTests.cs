@@ -3,15 +3,12 @@ using System.IO;
 using System.Net;
 using System.Text;
 using NUnit.Framework;
-using ServiceStack.Text;
-using ServiceStack.Web;
 using ServiceStack.WebHost.IntegrationTests.Services;
 
 namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
     [TestFixture]
-    public class RestWebServiceTests
-        : RestsTestBase
+    public class RestWebServiceTests : RestsTestBase
     {
 
         [Test]

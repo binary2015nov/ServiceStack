@@ -33,12 +33,5 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             var webRes = Constants.ServiceStackBaseHost.AppendPath("webpage.forbidden").GetWebResponse();
             Assert.That(webRes.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
         }
-
-        [Test]
-        public void Can_Get_Custom_Route_Hello_response()
-        {
-            var response = Constants.ServiceStackBaseHost.AppendPath("hello").GetJsonFromUrl();
-            Assert.That(response.ToLower(), Is.EqualTo("{\"result\":\"hello, world\"}"));
-        }
     }
 }

@@ -435,7 +435,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        [Test]
+        [Test, Ignore("Long time to run")]
         public async Task Load_test_GetFactorialGenericAsync_async()
         {
             var client = new JsonServiceClient(Config.ListeningOn);

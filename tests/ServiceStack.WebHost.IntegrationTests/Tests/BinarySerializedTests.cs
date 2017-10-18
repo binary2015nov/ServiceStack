@@ -10,17 +10,6 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     [TestFixture]
     public class BinarySerializedTests
     {
-        private string RandomString(int Length)
-        {
-            var rnd = new Random();
-            var tmp = new StringBuilder();
-            for (Int64 i = 0; i < Length; i++)
-            {
-                tmp.Append(Convert.ToChar(((byte)rnd.Next(254))).ToString());
-            }
-            return Convert.ToBase64String(tmp.ToString().ToUtf8Bytes());
-        }
-
         [Test]
         public void Can_serialize_RandomString()
         {
@@ -59,8 +48,6 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_call_WebService_with_Protobuf()
         {
-            //new ProtoBufServiceTests().Can_Send_ProtoBuf_request();
-
             var client = new ProtoBufServiceClient(Constants.ServiceStackBaseHost);
 
             try
@@ -77,6 +64,17 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             {
                 Assert.Fail(webEx.Message);
             }
+        }
+
+        private string RandomString(int Length)
+        {
+            var rnd = new Random();
+            var tmp = new StringBuilder();
+            for (Int64 i = 0; i < Length; i++)
+            {
+                tmp.Append(Convert.ToChar(((byte)rnd.Next(254))).ToString());
+            }
+            return Convert.ToBase64String(tmp.ToString().ToUtf8Bytes());
         }
     }
 }

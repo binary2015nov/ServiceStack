@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Net;
 using NUnit.Framework;
-using Funq;
 using ServiceStack.Common.Tests;
 using ServiceStack.Host;
 using ServiceStack.Text;
@@ -17,7 +16,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
         public RestsTestBase() : base(Constants.ServiceStackBaseHost, typeof(HelloService).Assembly) { }
 
-        protected override void Configure(Container container) { }
+        protected override void Configure(Funq.Container container) { }
 
         public HttpWebResponse GetWebResponse(string uri, string acceptContentTypes)
         {
@@ -28,7 +27,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
 
         public static HttpWebResponse GetWebResponse(string httpMethod, string uri, string contentType, int contentLength)
         {
-            var webRequest = (HttpWebRequest)WebRequest.Create(uri);
+            var webRequest = WebRequest.CreateHttp(uri);
             webRequest.Accept = contentType;
             webRequest.ContentType = contentType;
             webRequest.Method = HttpMethods.Post;

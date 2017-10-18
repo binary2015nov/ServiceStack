@@ -16,7 +16,14 @@ namespace System.Web
 {
     public interface IHttpHandler
     {
-        //void ProcessRequest(HttpContext context);
+        //
+        // Summary:
+        //     Gets a value indicating whether another request can use the System.Web.IHttpHandler
+        //     instance.
+        //
+        // Returns:
+        //     true if the System.Web.IHttpHandler instance is reusable; otherwise, false.
+        bool IsReusable { get; }
     }
 
     public interface IHttpAsyncHandler : IHttpHandler
@@ -68,10 +75,10 @@ namespace System.Web
         //void ReleaseHandler(IHttpHandler handler);
     }
 
-    public class DefaultHttpHandler : IHttpHandler
-    {
+    //public class DefaultHttpHandler : IHttpHandler
+    //{
         //public void ProcessRequest(HttpContext context) {}
-    }
+    //}
 }
 
 namespace System.Web.UI
