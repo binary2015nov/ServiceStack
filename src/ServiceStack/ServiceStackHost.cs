@@ -623,8 +623,7 @@ namespace ServiceStack
         {
             try
             {
-                var iocAdapterReleases = Container.Adapter as IRelease;
-                if (iocAdapterReleases != null)
+                if (Container.Adapter is IRelease iocAdapterReleases)
                 {
                     iocAdapterReleases.Release(instance);
                 }

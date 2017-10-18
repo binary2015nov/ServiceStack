@@ -35,7 +35,7 @@ namespace ServiceStack
         {
             this.Headers = new Dictionary<string, string>();
             this.Cookies = new List<Cookie>();
-            this.ResponseFilter = ContentTypes.Default;
+            this.ResponseFilter = HostContext.AppHost?.ContentTypes ?? ContentTypes.Instance;
 
             this.Response = response;
             this.ContentType = contentType;

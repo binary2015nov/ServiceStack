@@ -97,9 +97,12 @@
         public const string HostDoesNotSupportSingletonRequest = "This AppHost does not support accessing the current Request via a Singleton";
 
         //Invalid State
-        public const string ConstructorNotFoundForType = "Constructor not found for Type '{0}'";
-        public const string ServiceNotFoundForType = "Service not found for Type '{0}'";
-        public const string CacheFeatureMustBeEnabled = "HttpCacheFeature Plugin must be registered to use {0}";
+        public static string ConstructorNotFoundForType = "Constructor not found for Type '{0}'";
+        public static string ServiceNotFoundForType = "Service not found for Type '{0}'";
+        public static string CacheFeatureMustBeEnabled = "HttpCacheFeature Plugin must be registered to use {0}";
+        
+        //Request
+        public static string ContentTypeNotSupported = "ContentType not supported '{0}'";
     }
 
     public static class HelpMessages
