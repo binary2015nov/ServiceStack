@@ -1,10 +1,12 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ServiceStack.Serialization;
 using ServiceStack.Templates;
 using ServiceStack.Web;
+using ServiceStack.Html;
 
 namespace ServiceStack.Formats
 {
@@ -18,14 +20,13 @@ namespace ServiceStack.Formats
 
         public static bool Humanize = true;
 
-        private IAppHost AppHost { get; set; }
-
         public const string ModelKey = "Model";
         public const string ErrorStatusKey = "__errorStatus";
 
+        public List<IViewEngine> ViewEngines { get; set; }
+
         public void Register(IAppHost appHost)
         {
-            AppHost = appHost;
             //Register this in ServiceStack with the custom formats
             appHost.ContentTypes.RegisterAsync(MimeTypes.Html, SerializeToStreamAsync, null);
             appHost.ContentTypes.RegisterAsync(MimeTypes.JsonReport, SerializeToStreamAsync, null);
@@ -33,6 +34,8 @@ namespace ServiceStack.Formats
             appHost.Config.DefaultContentType = MimeTypes.Html;
             appHost.Config.IgnoreFormatsInMetadata.Add(MimeTypes.Html.ToContentFormat());
             appHost.Config.IgnoreFormatsInMetadata.Add(MimeTypes.JsonReport.ToContentFormat());
+
+            ViewEngines = appHost.ViewEngines;
         }
 
         public async Task SerializeToStreamAsync(IRequest req, object response, Stream outputStream)
@@ -58,7 +61,7 @@ namespace ServiceStack.Formats
                         throw new ArgumentException("Cannot use Cached Result as ViewModel");
                 }
 
-                foreach (var viewEngine in AppHost.ViewEngines)
+                foreach (var viewEngine in ViewEngines)
                 {
                     var handled = await viewEngine.ProcessRequestAsync(req, response, outputStream);
                     if (handled)

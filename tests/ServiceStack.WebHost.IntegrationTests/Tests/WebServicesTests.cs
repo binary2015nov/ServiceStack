@@ -15,8 +15,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     {
         private const string TestString = "ServiceStack";
 
-        protected WebServicesTests()
-            : base(Constants.ServiceStackBaseHost, typeof(ReverseService).Assembly) { }
+        protected WebServicesTests() : base(Constants.ServiceStackBaseHost, typeof(ReverseService).Assembly) { }
 
         protected override void Configure(Funq.Container container) { }
 
@@ -113,7 +112,9 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         public void Request_items_are_preserved_between_filters()
         {
             var client = CreateNewServiceClient();
-            if (client is DirectServiceClient) return;
+            if (client is DirectServiceClient)
+                return;
+
             var response = client.Send<RequestItemsResponse>(new RequestItems { });
             Assert.That(response.Result, Is.EqualTo("MissionSuccess"));
         }

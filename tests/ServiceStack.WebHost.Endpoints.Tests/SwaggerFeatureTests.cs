@@ -303,7 +303,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			}
 		}
 
-		SwaggerFeatureAppHostHttpListener appHost;
+		private SwaggerFeatureAppHostHttpListener appHost;
 
 		[OneTimeSetUp]
 		public void TestFixtureSetUp()
@@ -321,20 +321,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
 		static IRestClient[] RestClients = 
 		{
-			new JsonServiceClient(ListeningOn)
-			//new XmlServiceClient(ServiceClientBaseUri),
+			new JsonServiceClient(ListeningOn),
+			//new XmlServiceClient(ListeningOn),
 		};
 
-		//[Test, Explicit]
-		//public void RunFor5Mins()
-		//{
-		//    appHost.LoadPlugin(new CorsFeature("http://localhost:50000"));
 
-		//    Debug.WriteLine(ListeningOn + "resources");
-		//    Thread.Sleep(TimeSpan.FromMinutes(5));
-		//}
-
-		[Test, TestCaseSource("RestClients")]
+		[Test, TestCaseSource(nameof(RestClients))]
 		public void Should_get_default_name_from_property(IRestClient client)
 		{
 			var resource = client.Get<SwaggerApiDeclaration>("/resource/swagger2/NameIsNotSetRequest");
@@ -344,7 +336,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			Assert.That(p.FirstOrDefault(t=>t.Name == "Name"), Is.Not.Null);
 		}
 
-		[Test, TestCaseSource("RestClients")]
+		[Test, TestCaseSource(nameof(RestClients))]
 		public void Should_group_similar_services(IRestClient client)
 		{
 			var resources = client.Get<SwaggerResourcesResponse>("/resources");
@@ -352,7 +344,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			Assert.That(swagger.Count(), Is.EqualTo(1));
 		}
 
-		[Test, TestCaseSource("RestClients")]
+		[Test, TestCaseSource(nameof(RestClients))]
 		public void Should_distinct_base_path(IRestClient client)
 		{
 			var resources = client.Get<SwaggerResourcesResponse>("/resources");
@@ -360,7 +352,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			Assert.That(swagger.Count(), Is.EqualTo(1));
 		}
 
-		[Test, TestCaseSource("RestClients")]
+		[Test, TestCaseSource(nameof(RestClients))]
 		public void Should_list_services(IRestClient client)
 		{
 			var resources = client.Get<SwaggerResourcesResponse>("/resources");
@@ -373,7 +365,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			Assert.That(swagger.Description, Is.EqualTo("Service Description"));
 		}
 
-		[Test, TestCaseSource("RestClients")]
+		[Test, TestCaseSource(nameof(RestClients))]
 		public void Should_use_webhosturl_as_resources_base_path_when_configured(IRestClient client)
 		{
 			const string webHostUrl = "https://host.example.com/_api";
@@ -390,7 +382,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			}
 		}
 
-		[Test, TestCaseSource("RestClients")]
+		[Test, TestCaseSource(nameof(RestClients))]
 		public void Should_use_webhosturl_as_resource_base_path_when_configured(IRestClient client)
 		{
 			const string webHostUrl = "https://host.example.com/_api";
@@ -407,7 +399,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			}
 		}
 
-		[Test, TestCaseSource("RestClients")]
+		[Test, TestCaseSource(nameof(RestClients))]
 		public void Should_use_https_for_resources_basepath_when_usehttpslinks_config_is_true(IRestClient client)
 		{
 			try
@@ -423,7 +415,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			}
 		}
 
-		[Test, TestCaseSource("RestClients")]
+		[Test, TestCaseSource(nameof(RestClients))]
 		public void Should_use_https_for_resource_basepath_when_usehttpslinks_config_is_true(IRestClient client)
 		{
 			try
@@ -441,7 +433,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			}
 		}
 
-		[Test, TestCaseSource("RestClients")]
+		[Test, TestCaseSource(nameof(RestClients))]
 		public void Should_retrieve_service_parameters(IRestClient client)
 		{
 			var resource = client.Get<SwaggerApiDeclaration>("/resource/swagger");
@@ -472,7 +464,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			Assert.That(postOperation.Method, Is.EqualTo("POST"));
 		}
 
-		[Test, TestCaseSource("RestClients")]
+		[Test, TestCaseSource(nameof(RestClients))]
 		public void Should_retrieve_response_class_name(IRestClient client)
 		{
 			var resource = client.Get<SwaggerApiDeclaration>("/resource/swaggerModels");
@@ -482,7 +474,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			Assert.That(postOperation.ResponseClass, Is.EqualTo(typeof(SwaggerFeatureResponse).Name));
 		}
 
-		[Test, TestCaseSource("RestClients")]
+		[Test, TestCaseSource(nameof(RestClients))]
 		public void Should_retrieve_list_response_type_info(IRestClient client)
 		{
 			var resource = client.Get<SwaggerApiDeclaration>("/resource/swaggerGetList");
@@ -493,7 +485,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			Assert.That(resource.Models.ContainsKey("SwaggerFeatureResponse"));
 		}
 
-		[Test, TestCaseSource("RestClients")]
+		[Test, TestCaseSource(nameof(RestClients))]
 		public void Should_retrieve_array_response_type_info(IRestClient client)
 		{
 			var resource = client.Get<SwaggerApiDeclaration>("/resource/swaggerGetArray");
@@ -504,7 +496,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			Assert.That(resource.Models.ContainsKey("SwaggerFeatureResponse"));
 		}
 
-		[Test, TestCaseSource("RestClients")]
+		[Test, TestCaseSource(nameof(RestClients))]
 		public void Should_retrieve_response_model(IRestClient client)
 		{
 			var resource = client.Get<SwaggerApiDeclaration>("/resource/swaggerModels");
@@ -519,7 +511,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			Assert.That(responseClassModel.Properties["IsSuccess"].Type, Is.EqualTo(SwaggerType.Boolean));
 		}
 
-		[Test, TestCaseSource("RestClients")]
+		[Test, TestCaseSource(nameof(RestClients))]
 		public void Should_retrieve_request_body_model(IRestClient client)
 		{
 			var resource = client.Get<SwaggerApiDeclaration>("/resource/swaggerModels");
@@ -579,7 +571,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			Assert.That(nestedClassModel.Properties["NestedProperty"].Description, Is.EqualTo("NestedProperty description"));
 		}
 
-		[Test, TestCaseSource("RestClients")]
+		[Test, TestCaseSource(nameof(RestClients))]
 		public void Should_retrieve_list_property_model(IRestClient client)
 		{
 			var resource = client.Get<SwaggerApiDeclaration>("/resource/swaggerModels");
@@ -596,7 +588,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			Assert.That(resource.Models.ContainsKey(key), Is.True);
 		}
 
-		[Test, TestCaseSource("RestClients")]
+		[Test, TestCaseSource(nameof(RestClients))]
 		public void Should_retrieve_array_property_model(IRestClient client)
 		{
 			var resource = client.Get<SwaggerApiDeclaration>("/resource/swaggerModels");
@@ -613,7 +605,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			Assert.That(resource.Models.ContainsKey(key), Is.True);
 		}
 
-		[Test, TestCaseSource("RestClients")]
+		[Test, TestCaseSource(nameof(RestClients))]
 		public void Should_retrieve_valid_nullable_fields(IRestClient client)
 		{
 			var resource = client.Get<SwaggerApiDeclaration>("/resource/swgnull");
@@ -636,7 +628,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		}
 
 		// Ordering defined by: http://msdn.microsoft.com/en-us/library/ms729813.aspx
-		[Test, TestCaseSource("RestClients")]
+		[Test, TestCaseSource(nameof(RestClients))]
 		public void Should_order_fields_with_DataMemberAttribute(IRestClient client)
 		{
 			var resource = client.Get<SwaggerApiDeclaration>("/resource/swgdatamemberorder");

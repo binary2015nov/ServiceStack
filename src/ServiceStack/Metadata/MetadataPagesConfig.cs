@@ -10,69 +10,46 @@ namespace ServiceStack.Metadata
         private readonly ServiceMetadata metadata;
         private readonly HashSet<string> ignoredFormats;
         private readonly Dictionary<string, MetadataConfig> metadataConfigMap;
-        public List<MetadataConfig> AvailableFormatConfigs { get; private set; }
+        public IEnumerable<MetadataConfig> AvailableFormatConfigs { get { return metadataConfigMap.Values; } }
 
-        public MetadataPagesConfig(
-            ServiceMetadata metadata,
-            ServiceEndpointsMetadataConfig metadataConfig,
-            HashSet<string> ignoredFormats,
-            List<string> contentTypeFormats)
+        public MetadataPagesConfig(ServiceMetadata metadata, IEnumerable<string> contentTypeFormats)
         {
-            this.ignoredFormats = ignoredFormats;
+            this.ignoredFormats = metadata.Config.IgnoreFormats;
             this.metadata = metadata;
 
-            metadataConfigMap = new Dictionary<string, MetadataConfig> {
-                {"xml", metadataConfig.Xml},
-                {"json", metadataConfig.Json},
-                {"jsv", metadataConfig.Jsv},
-#if !NETSTANDARD2_0
-                {"soap11", metadataConfig.Soap11},
-                {"soap12", metadataConfig.Soap12},
-#endif
-            };
-
-            AvailableFormatConfigs = new List<MetadataConfig>();
-
-            var config = GetMetadataConfig("xml");
-            if (config != null) AvailableFormatConfigs.Add(config);
-            config = GetMetadataConfig("json");
-            if (config != null) AvailableFormatConfigs.Add(config);
-            config = GetMetadataConfig("jsv");
-            if (config != null) AvailableFormatConfigs.Add(config);
+            metadataConfigMap = new Dictionary<string, MetadataConfig>();
 
             foreach (var format in contentTypeFormats)
             {
-                metadataConfigMap[format] = metadataConfig.Custom.Create(format);
-
-                config = GetMetadataConfig(format);
-                if (config != null) AvailableFormatConfigs.Add(config);
-            }
-
-            config = GetMetadataConfig("soap11");
-            if (config != null) AvailableFormatConfigs.Add(config);
-            config = GetMetadataConfig("soap12");
-            if (config != null) AvailableFormatConfigs.Add(config);
+                if (!ignoredFormats.Contains(format))
+                {
+                    var config = metadata.Config.GetEndpointConfig(format);
+                    if (config != null)
+                    {
+                        metadataConfigMap[format] = config;
+                    }
+                }
+            }         
         }
 
         public MetadataConfig GetMetadataConfig(string format)
         {
-            MetadataConfig conf;
-            if (ignoredFormats.Contains(format) || !metadataConfigMap.TryGetValue(format, out conf))
-                return null;
-            
-            return conf;
+            if (metadataConfigMap.ContainsKey(format))
+                return metadataConfigMap[format];
+
+            return null;
         }
 
-        public bool IsVisible(IRequest httpRequest, Format format, string operation)
+        public bool IsVisible(IRequest request, Format format, string operation)
         {
             if (ignoredFormats.Contains(format.FromFormat())) return false;
-            return metadata.IsVisible(httpRequest, format, operation);
+            return metadata.IsVisible(request, format, operation);
         }
 
-        public bool CanAccess(IRequest httpRequest, Format format, string operation)
+        public bool CanAccess(IRequest request, Format format, string operation)
         {
             if (ignoredFormats.Contains(format.FromFormat())) return false;
-            return metadata.CanAccess(httpRequest, format, operation);
+            return metadata.CanAccess(request, format, operation);
         }
 
         public bool CanAccess(Format format, string operation)

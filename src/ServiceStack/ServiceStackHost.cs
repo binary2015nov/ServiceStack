@@ -101,7 +101,7 @@ namespace ServiceStack
             };
         }
 
-        public string ServiceName { get { return Metadata.ServiceName; } set { Metadata.ServiceName = value; } }
+        public string ServiceName { get; set; }
 
         public Assembly[] ServiceAssemblies { get; set; }
 
@@ -134,10 +134,7 @@ namespace ServiceStack
                 WebHostPhysicalPath = GetWebRootPath();
             
             OnBeforeInit();
-
-            Config.EmbeddedResourceSources.Add(GetType().GetAssembly());
-            Config.ServiceEndpointsMetadataConfig = ServiceEndpointsMetadataConfig.Create(Config.HandlerFactoryPath);
-            Metadata.ApiVersion = Config.ApiVersion;
+            Metadata.Config = ServiceEndpointsMetadataConfig.Create(Config.HandlerFactoryPath);
 
             Container.Register(AppSettings);
             Container.Register<IHashProvider>(c => new SaltedHash()).ReusedWithin(ReuseScope.None);
@@ -292,14 +289,14 @@ namespace ServiceStack
             if ((Feature.MsgPack & Config.EnableFeatures) != Feature.MsgPack)
                 Plugins.RemoveAll(x => x is IMsgPackPlugin);  //external
 
-            if (Config.HandlerFactoryPath != null)
-                Config.HandlerFactoryPath = Config.HandlerFactoryPath.TrimStart('/');
 
             var plugins = Plugins.ToArray();
             delayLoadPlugin = true;
             LoadPluginsInternal(plugins);
 
             AfterPluginsLoaded();
+
+            Metadata.Config.IgnoreFormats = Config.IgnoreFormatsInMetadata;
 
             if (!TestMode && Container.Exists<IAuthSession>())
                 throw new Exception(ErrorMessages.ShouldNotRegisterAuthSession);
@@ -326,7 +323,7 @@ namespace ServiceStack
             {
                 Container.Register<IAuthRepository>(c => c.Resolve<IUserAuthRepository>());
             }
-
+            
             if (Config.LogUnobservedTaskExceptions)
             {
                 TaskScheduler.UnobservedTaskException += (sender, args) =>
@@ -728,7 +725,7 @@ namespace ServiceStack
             if (virtualPath.IsNullOrEmpty())      
                 return httpReq.AbsoluteUri;
 
-            var baseUrl = httpReq.GetBaseUrl();
+            var baseUrl = GetBaseUrl(httpReq);
             if (virtualPath.StartsWith("~"))
                 return baseUrl.AppendPath(virtualPath.TrimStart('~'));
 

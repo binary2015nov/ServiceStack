@@ -59,19 +59,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Caching", "Caching", "{5150
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AuthRepos", "AuthRepos", "{2E143186-E565-48B8-A8AE-6FE03B70FE68}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Signed", "Signed", "{C57AF946-06A7-4CFC-BC4D-F9E7AE4FC5C8}"
-	ProjectSection(SolutionItems) = preProject
-		..\NuGet.Signed\ServiceStack.Api.Swagger.Signed\servicestack.api.swagger.signed.nuspec = ..\NuGet.Signed\ServiceStack.Api.Swagger.Signed\servicestack.api.swagger.signed.nuspec
-		..\NuGet.Signed\ServiceStack.Authentication.OAuth2.Signed\servicestack.authentication.oauth2.signed.nuspec = ..\NuGet.Signed\ServiceStack.Authentication.OAuth2.Signed\servicestack.authentication.oauth2.signed.nuspec
-		..\NuGet.Signed\ServiceStack.Client.Signed\servicestack.client.signed.nuspec = ..\NuGet.Signed\ServiceStack.Client.Signed\servicestack.client.signed.nuspec
-		..\NuGet.Signed\ServiceStack.Common.Signed\servicestack.common.signed.nuspec = ..\NuGet.Signed\ServiceStack.Common.Signed\servicestack.common.signed.nuspec
-		..\NuGet.Signed\ServiceStack.Mvc.Signed\servicestack.mvc.signed.nuspec = ..\NuGet.Signed\ServiceStack.Mvc.Signed\servicestack.mvc.signed.nuspec
-		..\NuGet.Signed\ServiceStack.ProtoBuf.Signed\servicestack.protobuf.signed.nuspec = ..\NuGet.Signed\ServiceStack.ProtoBuf.Signed\servicestack.protobuf.signed.nuspec
-		..\NuGet.Signed\ServiceStack.Razor.Signed\servicestack.razor.signed.nuspec = ..\NuGet.Signed\ServiceStack.Razor.Signed\servicestack.razor.signed.nuspec
-		..\NuGet.Signed\ServiceStack.Server.Signed\servicestack.server.signed.nuspec = ..\NuGet.Signed\ServiceStack.Server.Signed\servicestack.server.signed.nuspec
-		..\NuGet.Signed\ServiceStack.Signed\servicestack.signed.nuspec = ..\NuGet.Signed\ServiceStack.Signed\servicestack.signed.nuspec
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.Common.Tests", "..\tests\ServiceStack.Common.Tests\ServiceStack.Common.Tests.csproj", "{3FA9197A-462D-44CC-9AB3-61AF414D0B45}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.ServiceHost.Tests", "..\tests\ServiceStack.ServiceHost.Tests\ServiceStack.ServiceHost.Tests.csproj", "{94A33BC4-AC22-49A3-A38E-2ABFCD997ABA}"
@@ -81,9 +68,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceStack.WebHost.Endpoints.Tests", "..\tests\ServiceStack.WebHost.Endpoints.Tests\ServiceStack.WebHost.Endpoints.Tests.csproj", "{55C5C6DA-1834-4BA8-8D2F-19C091B6FC81}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.WebHost.IntegrationTests", "..\tests\ServiceStack.WebHost.IntegrationTests\ServiceStack.WebHost.IntegrationTests.csproj", "{801771CD-2C19-463A-94F8-DF546825DF47}"
-	ProjectSection(ProjectDependencies) = postProject
-		{3170CB82-DFD4-4E65-8292-CEE38967D75F} = {3170CB82-DFD4-4E65-8292-CEE38967D75F}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.RazorHostTests", "..\tests\ServiceStack.RazorHostTests\ServiceStack.RazorHostTests.csproj", "{CEAB2047-A095-4A96-8B23-325C6BB5690D}"
 EndProject

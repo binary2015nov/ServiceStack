@@ -59,7 +59,7 @@ namespace ServiceStack.Metadata
 
         public virtual void Render(HtmlTextWriter output)
         {
-            var baseUrl = HttpRequest.ResolveAbsoluteUrl("~/");
+            var baseUrl = HttpRequest.GetBaseUrl();
             var renderedTemplate = HtmlTemplates.Format(HtmlTemplates.GetOperationControlTemplate(),
                 Title,
                 baseUrl.CombineWith(MetadataConfig.DefaultMetadataUri),

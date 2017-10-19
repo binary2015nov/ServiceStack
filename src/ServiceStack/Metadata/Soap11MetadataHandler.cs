@@ -31,7 +31,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             var operationControl = new Soap11OperationControl
             {
                 HttpRequest = httpReq,
-                MetadataConfig = HostContext.Config.ServiceEndpointsMetadataConfig,
+                MetadataConfig = HostContext.AppHost.Metadata.Config,
                 Title = HostContext.AppHost.ServiceName,
                 Format = this.Format,
                 OperationName = operationName,

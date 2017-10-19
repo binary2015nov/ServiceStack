@@ -21,7 +21,7 @@ namespace ServiceStack.Host
             = new Dictionary<string, StreamSerializerDelegate> {
                 { MimeTypes.Json, (r, o, s) => JsonDataContractSerializer.Instance.SerializeToStream(o, s) },
                 { MimeTypes.Jsv, (r, o, s) => TypeSerializer.SerializeToStream(o, s) },
-                { MimeTypes.Xml, (r, o, s) => XmlSerializer.SerializeToStream(o, s) },
+                { MimeTypes.Xml, (r, o, s) => XmlSerializer.Serialize(o, s) },
 #if !NETSTANDARD2_0
                 { MimeTypes.Soap11, SoapHandler.SerializeSoap11ToStream },
                 { MimeTypes.Soap12, SoapHandler.SerializeSoap12ToStream },
@@ -32,8 +32,12 @@ namespace ServiceStack.Host
             = new Dictionary<string, StreamDeserializerDelegate> {
                 { MimeTypes.Json, JsonDataContractSerializer.Instance.DeserializeFromStream },
                 { MimeTypes.Jsv, TypeSerializer.DeserializeFromStream },
-                { MimeTypes.Xml, XmlSerializer.DeserializeFromStream },
-                { MimeTypes.Soap11, XmlSerializer.DeserializeFromStream }, //"text/xml; charset=utf-8" also matches xml
+                { MimeTypes.Xml, (t, s) => XmlSerializer.Deserialize(s, t) },
+#if !NETSTANDARD2_0
+
+                { MimeTypes.Soap11, (t, s) => XmlSerializer.Deserialize(s, t) }, //"text/xml; charset=utf-8" also matches xml
+                { MimeTypes.Soap12, (t, s) => XmlSerializer.Deserialize(s, t) }
+#endif
             };
 
         public Dictionary<string, StreamSerializerDelegateAsync> ContentTypeSerializersAsync
@@ -46,7 +50,7 @@ namespace ServiceStack.Host
             = new Dictionary<string, StringSerializerDelegate> {
                 { MimeTypes.Json, (r, o) => JsonDataContractSerializer.Instance.SerializeToString(o) },
                 { MimeTypes.Jsv, (r, o) => TypeSerializer.SerializeToString(o) },
-                { MimeTypes.Xml, (r, o) => XmlSerializer.SerializeToString(o) },
+                { MimeTypes.Xml, (r, o) => XmlSerializer.Serialize(o) },
 #if !NETSTANDARD2_0
                 { MimeTypes.Soap11, (r,o) => SoapHandler.SerializeSoap11ToBytes(r, o).FromUtf8Bytes() },
                 { MimeTypes.Soap12, (r,o) => SoapHandler.SerializeSoap12ToBytes(r, o).FromUtf8Bytes() },
@@ -57,10 +61,11 @@ namespace ServiceStack.Host
             = new Dictionary<string, StringDeserializerDelegate> {
                 { MimeTypes.Json, JsonDataContractSerializer.Instance.DeserializeFromString },
                 { MimeTypes.Jsv, TypeSerializer.DeserializeFromString },
-                { MimeTypes.Xml, XmlSerializer.DeserializeFromString },
+                { MimeTypes.Xml, (c, t) => XmlSerializer.Deserialize(c, t) },
+
             };
 
-        public static HashSet<string> KnownFormats = new HashSet<string>
+        public readonly static HashSet<string> KnownFormats = new HashSet<string>
         {
             "json",
             "xml",
@@ -77,6 +82,10 @@ namespace ServiceStack.Host
             { "json", MimeTypes.Json },
             { "xml", MimeTypes.Xml },
             { "jsv", MimeTypes.Jsv },
+#if !NETSTANDARD2_0
+            { "soap11", MimeTypes.Soap11 },
+            { "soap12", MimeTypes.Soap12 }
+#endif
         };
 
         public string GetFormatContentType(string format)
@@ -100,8 +109,7 @@ namespace ServiceStack.Host
             SetContentTypeDeserializer(normalizedContentType, streamDeserializer);
         }
 
-        public void RegisterAsync(string contentType, 
-            StreamSerializerDelegateAsync streamSerializer, StreamDeserializerDelegateAsync streamDeserializer)
+        public void RegisterAsync(string contentType, StreamSerializerDelegateAsync streamSerializer, StreamDeserializerDelegateAsync streamDeserializer)
         {
             if (contentType.IsNullOrEmpty())
                 throw new ArgumentNullException(nameof(contentType));

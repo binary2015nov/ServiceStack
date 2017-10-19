@@ -1,23 +1,30 @@
+using System.Collections.Generic;
+
 namespace ServiceStack.Metadata
 {
     public class ServiceEndpointsMetadataConfig
     {
-        private ServiceEndpointsMetadataConfig() { }
+        private ServiceEndpointsMetadataConfig()
+        {
+            IgnoreFormats = new HashSet<string>();
+        }
 
         /// <summary>
         /// Changes the links for the servicestack/metadata page
         /// </summary>
-        public static ServiceEndpointsMetadataConfig Create(string serviceStackHandlerPrefix)
+        public static ServiceEndpointsMetadataConfig Create(string serviceStackHandlerPath)
         {
             var config = new MetadataConfig("{0}", "{0}", "/{0}/reply", "/{0}/oneway", "/{0}/metadata");
             return new ServiceEndpointsMetadataConfig
             {
-                DefaultMetadataUri = "/metadata",
-                Soap11 = new SoapMetadataConfig("soap11", "SOAP 1.1", "/soap11", "/soap11", "/soap11/metadata", "soap11"),
-                Soap12 = new SoapMetadataConfig("soap12", "SOAP 1.2", "/soap12", "/soap12", "/soap12/metadata", "soap12"),
+                DefaultMetadataUri = "/metadata",          
                 Xml = config.Create("xml"),
                 Json = config.Create("json"),
                 Jsv = config.Create("jsv"),
+#if !NETSTANDARD2_0
+                Soap11 = new SoapMetadataConfig("soap11", "SOAP 1.1", "/soap11", "/soap11", "/soap11/metadata", "soap11"),
+                Soap12 = new SoapMetadataConfig("soap12", "SOAP 1.2", "/soap12", "/soap12", "/soap12/metadata", "soap12"),
+#endif
                 Custom = config
             };
         }
@@ -29,6 +36,8 @@ namespace ServiceStack.Metadata
         public MetadataConfig Json { get; set; }
         public MetadataConfig Jsv { get; set; }
         public MetadataConfig Custom { get; set; }
+
+        public HashSet<string> IgnoreFormats { get; set; }
 
         public MetadataConfig GetEndpointConfig(string contentType)
         {

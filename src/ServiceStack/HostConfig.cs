@@ -166,11 +166,12 @@ namespace ServiceStack
         public List<string> ForbiddenPaths { get; private set; }
 
         public string WebHostUrl { get; set; }
-        public string HandlerFactoryPath { get; set; }
+
+        private string handlerFactoryPath;
+        public string HandlerFactoryPath { get { return handlerFactoryPath; } set { handlerFactoryPath = value.TrimPrefixes("/"); } }
+
         public string DefaultRedirectPath { get; set; }
         public string MetadataRedirectPath { get; set; }
-
-        public ServiceEndpointsMetadataConfig ServiceEndpointsMetadataConfig { get; set; }
         public string SoapServiceName { get; set; }
         public XmlWriterSettings XmlWriterSettings { get; set; }
         public bool EnableAccessRestrictions { get; set; }

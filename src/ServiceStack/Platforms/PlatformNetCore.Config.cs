@@ -45,7 +45,7 @@ namespace ServiceStack
             }
             catch (Exception ex)
             {
-                log.Warn("GetAppConfigPath() GetAssembly().Location: ", ex);
+                Logger.Warn("GetAppConfigPath() GetAssembly().Location: ", ex);
             }
 
             foreach (var configPath in appConfigPaths)
@@ -62,7 +62,7 @@ namespace ServiceStack
                 }
                 catch (Exception ex)
                 {
-                    log.Error("GetAppConfigPath(): ", ex);
+                    Logger.Error("GetAppConfigPath(): ", ex);
                 }
             }
 

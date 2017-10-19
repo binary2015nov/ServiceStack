@@ -61,8 +61,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		[TearDown]
 		public void OnTearDown()
 		{
-			if (appHost?.Config?.WebHostUrl != null)
-				appHost.Config.WebHostUrl = null;
+		    appHost.Config.WebHostUrl = null;
 		}
 
 		[Test]
@@ -74,6 +73,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			operationControl.Render(new HtmlTextWriter(stringWriter));
 
 			string html = stringWriter.ToString();
+			Console.WriteLine(html);
 			Assert.IsTrue(html.Contains("<a href=\"https://host.example.com/_api/metadata\">&lt;back to all web services</a>"));
 		}
 

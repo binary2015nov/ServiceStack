@@ -297,7 +297,7 @@ namespace ServiceStack.Host.Handlers
                 HostType = "{0} ({1})".Fmt(HostContext.IsAspNetHost ? "ASP.NET" : "SelfHost", hostType.BaseType()?.Name ?? hostType.Name),
                 StartedAt = HostContext.AppHost.ReadyAt.ToString("yyyy-MM-dd HH:mm:ss"),
                 Date = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
-                ServiceName = HostContext.AppHost.Metadata.ServiceName,
+                ServiceName = HostContext.AppHost.ServiceName,
                 HandlerFactoryPath = HostContext.AppHost.Config.HandlerFactoryPath,
                 UserHostAddress = httpReq.UserHostAddress,
                 HttpMethod = httpReq.Verb,

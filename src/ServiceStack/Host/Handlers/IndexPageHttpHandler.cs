@@ -9,7 +9,7 @@ namespace ServiceStack.Host.Handlers
 
         public override void ProcessRequest(IRequest request, IResponse response, string operationName)
         {
-            var defaultUrl = HostContext.Config.ServiceEndpointsMetadataConfig.DefaultMetadataUri;
+            var defaultUrl = HostContext.AppHost.Metadata.Config.DefaultMetadataUri;
 
             if (request.PathInfo == "/")
             {

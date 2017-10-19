@@ -2,12 +2,11 @@
 using NUnit.Framework;
 using ServiceStack;
 using ServiceStack.Host.Handlers;
+using Check.ServiceModel;
 
 namespace CheckWeb
 {
-    public class RequestInfoServices : Service
-    {
-    }
+    public class RequestInfoServices : Service { }
 
     public partial class RequestInfoTests
     {

@@ -18,10 +18,7 @@ namespace ServiceStack.Api.Swagger
     public class SwaggerResourcesResponse
     {
         [DataMember(Name = "swaggerVersion")]
-        public string SwaggerVersion
-        {
-            get { return "1.2"; }
-        }
+        public string SwaggerVersion { get; set; } = "1.2";
         [DataMember(Name = "apis")]
         public List<SwaggerResourceRef> Apis { get; set; }
         [DataMember(Name = "apiVersion")]
@@ -73,16 +70,16 @@ namespace ServiceStack.Api.Swagger
         public object Get(SwaggerResources request)
         {
             var basePath = base.Request.GetBaseUrl();
-            var operations = HostContext.Metadata;
+            var metadata = HostContext.Metadata;
             var result = new SwaggerResourcesResponse
             {
                 BasePath = basePath,
                 Apis = new List<SwaggerResourceRef>(),
-                ApiVersion = operations.ApiVersion,
-                Info = new SwaggerInfo { Title = operations.ServiceName }
+                ApiVersion = HostContext.AppHost.Config.ApiVersion,
+                Info = new SwaggerInfo { Title = HostContext.AppHost.ServiceName }
             };
-            var allTypes = operations.GetAllOperationTypes();
-            var allOperationNames = operations.GetAllOperationNames();
+            var allTypes = metadata.GetAllOperationTypes();
+            var allOperationNames = metadata.GetAllOperationNames();
             foreach (var operationName in allOperationNames)
             {
                 if (resourceFilterRegex != null && !resourceFilterRegex.IsMatch(operationName)) continue;
@@ -91,7 +88,7 @@ namespace ServiceStack.Api.Swagger
                 if (operationType == null) continue;
                 if (operationType == typeof(SwaggerResources) || operationType == typeof(SwaggerResource))
                     continue;
-                if (!operations.IsVisible(Request, Format.Json, operationName)) continue;
+                if (!metadata.IsVisible(Request, Format.Json, operationName)) continue;
 
                 CreateRestPaths(result.Apis, operationType, operationName);
             }

@@ -6,7 +6,6 @@ using ServiceStack.Api.Swagger;
 using ServiceStack.Auth;
 using ServiceStack.Authentication.OpenId;
 using ServiceStack.Caching;
-using ServiceStack.Common.Tests;
 using ServiceStack.Data;
 using ServiceStack.DataAnnotations;
 using ServiceStack.IO;
@@ -34,7 +33,7 @@ namespace ServiceStack.WebHost.IntegrationTests
             Config.ApiVersion = "2.0.0";
             Config.DebugMode = true;
             Config.UseCamelCase = true;
-            //Show StackTraces for easier debugging
+            Config.EmbeddedResourceSources.Add(GetType().GetAssembly());
             //var onlyEnableFeatures = Feature.All.Remove(Feature.Jsv | Feature.Soap);
             //Config.EnableFeatures = onlyEnableFeatures;       
         }
@@ -159,8 +158,6 @@ namespace ServiceStack.WebHost.IntegrationTests
         //Configure ServiceStack Authentication and CustomUserSession
         private void ConfigureAuth(Funq.Container container)
         {
-            Routes.Add<Register>("/register");
-
             Plugins.Add(new AuthFeature(() => new CustomUserSession(),
                 new IAuthProvider[] {
                         new CredentialsAuthProvider(AppSettings),
@@ -173,6 +170,8 @@ namespace ServiceStack.WebHost.IntegrationTests
                 }));
 
             Plugins.Add(new RegistrationFeature());
+
+            Routes.Add<Register>("/register");
 
             container.Register<IAuthRepository>(c =>
                 new OrmLiteAuthRepository(c.Resolve<IDbConnectionFactory>()));

@@ -159,7 +159,7 @@
     <Compile Include="Formats\IntroductionLayoutTests.cs" />
     <Compile Include="Formats\MarkdownFormatTests.cs" />
     <Compile Include="Formats_Razor\RazorTestBase.cs" />
-    <Compile Include="Formats\MockClass.cs" />
+    <Compile Include="Formats\CSharpEvalTests.cs" />
     <Compile Include="Formats\TemplateExtentionTests.cs" />
     <Compile Include="Formats\TemplateTests.cs" />
     <Compile Include="Formats\TextBlockTests.cs" />

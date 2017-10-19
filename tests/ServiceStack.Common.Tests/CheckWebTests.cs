@@ -44,12 +44,6 @@ namespace ServiceStack.Common.Tests
     {
         private const string BaseUri = "http://localhost:55799/";
 
-        [Test]
-        public void Can_send_echoes_POST()
-        {
-            var client = new JsonServiceClient(BaseUri);
-
-            var response = client.Post(new Echoes { Sentence = "Foo" });
-        }
+  
     }
 }

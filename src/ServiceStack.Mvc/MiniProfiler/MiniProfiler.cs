@@ -9,33 +9,33 @@ using ServiceStack.Text;
 
 namespace ServiceStack.Mvc.MiniProfiler
 {
-    public class MiniProfilerRouteHandler : IRouteHandler
-    {
-    	public MiniProfilerRouteHandler(MiniProfilerHandler miniProfilerHandler)
-    	{
-    		MiniProfilerHandler = miniProfilerHandler;
-    	}
+	public class MiniProfilerRouteHandler : IRouteHandler
+	{
+		public MiniProfilerRouteHandler(MiniProfilerHandler miniProfilerHandler)
+		{
+			MiniProfilerHandler = miniProfilerHandler;
+		}
 
-    	public MiniProfilerHandler MiniProfilerHandler { get; set; }
+		public MiniProfilerHandler MiniProfilerHandler { get; set; }
 
-    	public IHttpHandler GetHttpHandler(System.Web.Routing.RequestContext requestContext)
-    	{
-    		return MiniProfilerHandler;
-    	}
-    }
+		public IHttpHandler GetHttpHandler(System.Web.Routing.RequestContext requestContext)
+		{
+			return MiniProfilerHandler;
+		}
+	}
 
 	public static class MiniProfiler
 	{
 		internal static void RegisterRoutes()
 		{
 			var urls = new[] 
-		    { 
-		        "ssr-jquip.all", 
-		        "ssr-includes.js", 
-		        "ssr-includes.css", 
-		        "ssr-includes.tmpl", 
-		        "ssr-results"
-		    };
+			{ 
+				"ssr-jquip.all", 
+				"ssr-includes.js", 
+				"ssr-includes.css", 
+				"ssr-includes.tmpl", 
+				"ssr-results"
+			};
 			var routes = RouteTable.Routes;
 			var handler = new MiniProfilerRouteHandler(new MiniProfilerHandler());
 			var prefix = (Profiler.Settings.RouteBasePath ?? "").Replace("~/", "").WithTrailingSlash();

@@ -349,11 +349,7 @@ namespace ServiceStack
             }
         }
 
-        public MetadataPagesConfig MetadataPagesConfig => new MetadataPagesConfig(
-            Metadata,
-            Config.ServiceEndpointsMetadataConfig,
-            Config.IgnoreFormatsInMetadata,
-            ContentTypes.ContentTypeFormats.Keys.ToList());
+        public MetadataPagesConfig MetadataPagesConfig => new MetadataPagesConfig(Metadata, ContentTypes.ContentTypeFormats.Keys);
 
         public virtual TimeSpan GetDefaultSessionExpiry(IRequest req)
         {

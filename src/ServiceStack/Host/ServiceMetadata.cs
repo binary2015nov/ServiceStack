@@ -8,6 +8,7 @@ using ServiceStack.DataAnnotations;
 using ServiceStack.NativeTypes;
 using ServiceStack.NativeTypes.CSharp;
 using ServiceStack.Web;
+using ServiceStack.Metadata;
 
 namespace ServiceStack.Host
 {
@@ -21,16 +22,18 @@ namespace ServiceStack.Host
             this.OperationsMap = new Dictionary<Type, Operation>();
             this.OperationsResponseMap = new Dictionary<Type, Operation>();
             this.OperationNamesMap = new Dictionary<string, Operation>();
+            this.Config = ServiceEndpointsMetadataConfig.Create(string.Empty);
         }
 
-        public string ApiVersion { get; set; }
-        public string ServiceName { get; set; }
         public Dictionary<Type, Operation> OperationsMap { get; private set; }
         public Dictionary<Type, Operation> OperationsResponseMap { get; private set; }
         public Dictionary<string, Operation> OperationNamesMap { get; private set; }
         public HashSet<Type> RequestTypes { get; private set; }
         public HashSet<Type> ServiceTypes { get; private set; }
         public HashSet<Type> ResponseTypes { get; private set; }
+
+        public ServiceEndpointsMetadataConfig Config { get; set; }
+
 
         public IEnumerable<Operation> Operations => OperationsMap.Values;
 

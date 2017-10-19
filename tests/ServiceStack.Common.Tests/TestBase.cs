@@ -298,7 +298,7 @@ namespace ServiceStack.Common.Tests
                     };
                 }
                 var webServiceEx = new WebServiceException(exception.Message, exception);
-                if (onError != null) onError(response, webServiceEx);
+                onError?.Invoke(response, webServiceEx);
             }
 
             public void SetCredentials(string userName, string password)

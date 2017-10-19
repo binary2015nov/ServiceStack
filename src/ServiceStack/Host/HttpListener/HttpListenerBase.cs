@@ -42,8 +42,9 @@ namespace ServiceStack.Host.HttpListener
 
         protected HttpListenerBase(string serviceName, params Assembly[] assembliesWithServices) : base(serviceName, assembliesWithServices) { }
 
-        protected override void OnAfterInit()
+        public override void InitFinal()
         {
+            base.InitFinal();
             SetAppDomainData();
             if (Env.IsMono)
             {

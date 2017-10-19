@@ -1,6 +1,4 @@
-﻿using System;
-using System.Net;
-using Funq;
+﻿using System.Net;
 using NUnit.Framework;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
@@ -9,20 +7,23 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         class AppHost : AppSelfHostBase
         {
-            public AppHost() : base(nameof(ContentTypeDisabledTests), typeof(TestContentTypeService).Assembly) { }
-
-            public override void Configure(Container container)
+            public AppHost() : base(nameof(ContentTypeDisabledTests), typeof(TestContentTypeService).Assembly)
             {
-                SetConfig(new HostConfig {
-                    EnableFeatures = Feature.All.Remove(Feature.Xml | Feature.Csv | Feature.Jsv | Feature.Soap),
-                    DefaultContentType = MimeTypes.Json,
-                });
+                Config.EnableFeatures = Feature.All.Remove(Feature.Xml | Feature.Csv | Feature.Jsv | Feature.Soap);
+            }
+
+            public override void Configure(Funq.Container container) { }
+
+            protected override void OnAfterInit()
+            {
+                Config.DefaultContentType = MimeTypes.Json;
             }
         }
 
-        private readonly ServiceStackHost appHost;
+        private ServiceStackHost appHost;
 
-        public ContentTypeDisabledTests()
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
             appHost = new AppHost()
                 .Init()
@@ -30,7 +31,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OneTimeTearDown() => appHost.Dispose();
+        public void TestFixtureTearDown() => appHost.Dispose();
 
         [Test]
         public void Disabling_XML_ContentType_fallbacks_to_DefaultContentType()

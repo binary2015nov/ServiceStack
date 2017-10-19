@@ -1,15 +1,13 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using ServiceStack.Common;
 using ServiceStack.Text;
 
 namespace ServiceStack.Common.Tests.Perf
 {
     [Ignore("Benchmarks for deserializing basic .NET types")]
     [TestFixture]
-    public class StringParsePerf
-        : PerfTestBase
+    public class StringParsePerf : PerfTestBase
     {
         public StringParsePerf()
         {

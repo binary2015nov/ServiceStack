@@ -35,14 +35,14 @@ namespace ServiceStack
         {
             this.Headers = new Dictionary<string, string>();
             this.Cookies = new List<Cookie>();
-            this.ResponseFilter = HostContext.AppHost?.ContentTypes ?? ContentTypes.Instance;
+            this.ResponseFilter = HostContext.AppHost?.ContentTypes ?? ContentTypes.Default;
 
             this.Response = response;
             this.ContentType = contentType;
             this.StatusCode = statusCode;
         }
 
-        public HttpResult(FileInfo fileResponse, bool asAttachment)
+        public HttpResult(FileInfo fileResponse, bool asAttachment) 
             : this(fileResponse, MimeTypes.GetMimeType(fileResponse.Name), asAttachment) { }
 
         public HttpResult(FileInfo fileResponse, string contentType = null, bool asAttachment = false)

@@ -218,7 +218,7 @@ namespace ServiceStack.Metadata
             {
                 Request = httpReq,
                 MetadataConfig = HostContext.MetadataPagesConfig,
-                Title = metadata.ServiceName + " " + metadata.ApiVersion,
+                Title = HostContext.AppHost.ServiceName + " " + HostContext.AppHost.Config.ApiVersion,
                 Xsds = XsdTypes.Xsds,
                 XsdServiceTypesIndex = 1,
                 OperationNames = metadata.GetOperationNamesForMetadata(httpReq),
@@ -261,7 +261,7 @@ namespace ServiceStack.Metadata
             var operationControl = new OperationControl
             {
                 HttpRequest = httpReq,
-                MetadataConfig = HostContext.Config.ServiceEndpointsMetadataConfig,
+                MetadataConfig = HostContext.AppHost.Metadata.Config,
                 Title = HostContext.AppHost.ServiceName,
                 Format = this.Format,
                 OperationName = operationName,

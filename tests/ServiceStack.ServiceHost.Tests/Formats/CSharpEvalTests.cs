@@ -4,17 +4,11 @@ using NUnit.Framework;
 using ServiceStack;
 using ServiceStack.Html;
 
-namespace CSharpEval
+namespace ServiceStack.ServiceHost.Tests
 {
     [TestFixture]
-    public class _Expr
-     : ServiceStack.ServiceHost.Tests.Formats.TemplateTests.CustomMarkdownViewBase
+    public class CSharpEvalTests
     {
-        public MvcHtmlString EvalExpr_0()
-        {
-            return null;
-        }
-
         [Test]
         public void A()
         {
@@ -23,7 +17,7 @@ namespace CSharpEval
             Console.WriteLine(str.Substring(pos));
         }
 
-        //[Test]
+        [Test, Ignore("Performance")]
         public void Compare_access()
         {
             var filePath = "~/AppData/TestsResults/Customer.htm".MapProjectPath();

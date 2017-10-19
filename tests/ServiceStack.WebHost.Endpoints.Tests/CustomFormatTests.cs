@@ -29,22 +29,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         public class AppHost : AppHostHttpListenerBase
         {
-            public AppHost()
-                : base(typeof(CustomFormatTests).Name, typeof(CustomFormatTests).GetAssembly())
+            public AppHost() : base(typeof(CustomFormatTests).Name, typeof(CustomFormatTests).GetAssembly())
             {
                 Config.DefaultContentType = MimeTypes.Json;
                 Config.EnableFeatures = Feature.All.Remove(Feature.Html);
             }
 
-            public override void Configure(Container container)
-            {
-                ContentTypes.ClearCustomFilters();
-                SetConfig(new HostConfig
-                {
-                    DefaultContentType = MimeTypes.Json,
-                    EnableFeatures = Feature.All.Remove(Feature.Html)
-                });
-            }
+            public override void Configure(Container container) { }
         }
 
         private ServiceStackHost appHost;
@@ -66,7 +57,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Can_get_service_with_default_content_type()
         {
-            var json = Config.AbsoluteBaseUri.CombineWith("hellojson", "World")
+            var json = Config.AbsoluteBaseUri.AppendPaths("hellojson", "World")
                 .GetStringFromUrl(accept: "text/html,*/*;q=0.9");
 
             Assert.That(json, Is.EqualTo("{\"Name\":\"Hello, World!\"}")
