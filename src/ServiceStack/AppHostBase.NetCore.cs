@@ -95,7 +95,10 @@ namespace ServiceStack
             if (!string.IsNullOrEmpty(mode))
             {
                 if (pathInfo.IndexOf(mode, StringComparison.Ordinal) != 1)
+                {
                     await next();
+                    return;
+                }
 
                 pathInfo = pathInfo.Substring(mode.Length + 1);
             }
@@ -129,8 +132,7 @@ namespace ServiceStack
                 return;
             }
 
-            var serviceStackHandler = handler as IServiceStackHandler;
-            if (serviceStackHandler != null)
+            if (handler is IServiceStackHandler serviceStackHandler)
             {
                 if (serviceStackHandler is NotFoundHttpHandler)
                 {
@@ -141,8 +143,7 @@ namespace ServiceStack
                 if (!string.IsNullOrEmpty(serviceStackHandler.RequestName))
                     operationName = serviceStackHandler.RequestName;
 
-                var restHandler = serviceStackHandler as RestHandler;
-                if (restHandler != null)
+                if (serviceStackHandler is RestHandler restHandler)
                 {
                     httpReq.OperationName = operationName = restHandler.RestPath.RequestType.GetOperationName();
                 }
@@ -194,8 +195,7 @@ namespace ServiceStack
         {
             if (httpContext != null)
             {
-                object oRequest;
-                if (httpContext.Items.TryGetValue(Keywords.IRequest, out oRequest))
+                if (httpContext.Items.TryGetValue(Keywords.IRequest, out var oRequest))
                     return (IRequest) oRequest;
 
                 var req = httpContext.ToRequest();
