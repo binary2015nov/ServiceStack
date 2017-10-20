@@ -262,7 +262,7 @@ namespace ServiceStack.Metadata
             {
                 HttpRequest = httpReq,
                 MetadataConfig = HostContext.AppHost.Metadata.Config,
-                Title = HostContext.AppHost.ServiceName,
+                Title = HostContext.AppHost.ServiceName + " " + HostContext.AppHost.Config.ApiVersion,
                 Format = this.Format,
                 OperationName = operationName,
                 HostName = httpReq.GetUrlHostName(),

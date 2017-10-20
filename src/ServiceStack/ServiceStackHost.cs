@@ -134,7 +134,6 @@ namespace ServiceStack
                 WebHostPhysicalPath = GetWebRootPath();
             
             OnBeforeInit();
-            Metadata.Config = ServiceEndpointsMetadataConfig.Create(Config.HandlerFactoryPath);
 
             Container.Register(AppSettings);
             Container.Register<IHashProvider>(c => new SaltedHash()).ReusedWithin(ReuseScope.None);

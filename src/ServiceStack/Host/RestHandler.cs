@@ -15,14 +15,17 @@ namespace ServiceStack.Host
             this.HandlerAttributes = RequestAttributes.Reply;
         }
 
-        public static IRestPath FindMatchingRestPath(string httpMethod, string pathInfo, out string contentType)
+        public static IRestPath FindMatchingRestPath(IRequest request, out string contentType)
         {
-            pathInfo = GetSanitizedPathInfo(pathInfo, out contentType);
+            var pathInfo = GetSanitizedPathInfo(request.PathInfo, out contentType);   
+            request.ResponseContentType = contentType;
 
-            return HostContext.ServiceController.GetRestPathForRequest(httpMethod, pathInfo);
+            var restPath = HostContext.ServiceController.GetRestPathForRequest(request.Verb, pathInfo);
+            request.SetRoute(restPath);
+            return restPath;
         }
 
-        public static string GetSanitizedPathInfo(string pathInfo, out string contentType)
+        private static string GetSanitizedPathInfo(string pathInfo, out string contentType)
         {
             contentType = null;
             if (HostContext.Config.AllowRouteContentTypeExtensions)
@@ -41,19 +44,6 @@ namespace ServiceStack.Host
             return pathInfo;
         }
 
-        public IRestPath GetRestPath(string httpMethod, string pathInfo)
-        {
-            if (this.RestPath == null)
-            {
-                string contentType;
-                this.RestPath = FindMatchingRestPath(httpMethod, pathInfo, out contentType);
-
-                if (contentType != null)
-                    ResponseContentType = contentType;
-            }
-            return this.RestPath;
-        }
-
         public IRestPath RestPath { get; set; }
 
         // Set from SSHHF.GetHandlerForPathInfo()
@@ -65,11 +55,10 @@ namespace ServiceStack.Host
         {
             try
             {
-                var restPath = GetRestPath(httpReq.Verb, httpReq.PathInfo);
+                var restPath = httpReq.GetRoute();
                 if (restPath == null)
                     throw new NotSupportedException("No RestPath found for: " + httpReq.Verb + " " + httpReq.PathInfo);
-
-                httpReq.SetRoute(restPath as RestPath);
+    
                 httpReq.OperationName = operationName = restPath.RequestType.GetOperationName();
 
                 if (appHost.ApplyPreRequestFilters(httpReq, httpRes))
@@ -117,6 +106,9 @@ namespace ServiceStack.Host
 
         public static Task<object> CreateRequestAsync(IRequest httpReq, IRestPath restPath)
         {
+            if (restPath == null)
+                throw new ArgumentNullException(nameof(restPath));
+
             using (Profiler.Current.Step("Deserialize Request"))
             {
                 var dtoFromBinder = GetCustomRequestFromBinder(httpReq, restPath.RequestType);
@@ -155,7 +147,7 @@ namespace ServiceStack.Host
         public Task<object> CreateRequestAsync(IRequest httpReq, string operationName)
         {
             if (this.RestPath == null)
-                throw new ArgumentNullException(nameof(RestPath), "No RestPath found");
+                this.RestPath = httpReq.GetRoute();
 
             return CreateRequestAsync(httpReq, this.RestPath);
         }

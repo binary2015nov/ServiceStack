@@ -22,7 +22,7 @@
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
-    <IISExpressUseClassicPipelineMode />
+    <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\src\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <TargetFrameworkProfile />
@@ -152,7 +152,6 @@
     <Content Include="user-default.htm" />
     <Content Include="Global.asax" />
     <Content Include="Soap11WebService.asmx" />
-    <Content Include="_default.html" />
     <Content Include="TestExistingDir\default.html" />
     <Content Include="TestExistingDir\upload.html" />
     <Content Include="Web.config">
@@ -312,11 +311,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="static-root.txt" />
-    <Content Include="App.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Properties\DataSources\ServiceStack.ServiceInterface.ServiceModel.ResponseStatus.datasource" />
     <None Include="README.md" />
     <Content Include="sample.pdf" />
     <None Include="webpage.forbidden" />

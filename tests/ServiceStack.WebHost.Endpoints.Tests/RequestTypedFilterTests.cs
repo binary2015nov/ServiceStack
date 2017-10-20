@@ -1,5 +1,6 @@
 using Funq;
 using NUnit.Framework;
+using ServiceStack.Host;
 using ServiceStack.Model;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
@@ -66,8 +67,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         public class TypedFilterAppHost : AppSelfHostBase
         {
-            public TypedFilterAppHost() 
-                : base("Typed Filters", typeof(TypedFilterService).GetAssembly())
+            public TypedFilterAppHost() : base("Typed Filters", typeof(TypedFilterService).GetAssembly())
             {
             }
 
@@ -76,7 +76,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 RegisterTypedRequestFilter<ResourceType1>((req, res, dto) =>
                 {
                     var route = req.GetRoute();
-                    if (route != null && route.Path == "/tenant/{TenantName}/resourceType1")
+                    if (route != null && ((RestPath)route).Path == "/tenant/{TenantName}/resourceType1")
                     {
                         dto.SubResourceName = "CustomResource";
                     }

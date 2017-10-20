@@ -72,7 +72,7 @@ namespace ServiceStack
                             + "Check with https://github.com/ServiceStack/ServiceStack/wiki/Create-your-first-webservice to ensure you have configured ServiceStack properly.\n");
                 }
             }
-            var combinedPath = CombineHandlerFactoryPath(string.Empty, GetHandlerPathFromConfiguration(appConfig));
+            var combinedPath = CombineHandlerFactoryPath("", GetHandlerPathFromConfiguration(appConfig));
             //In some MVC Hosts auto-inferencing doesn't work, in these cases assume the most likely default of "/api" path
             //var isMvcHost = Type.GetType("System.Web.Mvc.Controller") != null;
             //if (isMvcHost)
@@ -86,7 +86,7 @@ namespace ServiceStack
 
         private static string CombineHandlerFactoryPath(string locationPath, string handlerPath)
         {
-            return locationPath.AppendPath(handlerPath.Replace("*", string.Empty)).Trim('/');
+            return locationPath.AppendPath(handlerPath.Replace("*", "")).Trim('/');
         }
 
         public static string GetHandlerPathFromConfiguration(System.Configuration.Configuration configuration)

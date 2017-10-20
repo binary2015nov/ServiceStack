@@ -136,7 +136,8 @@ namespace ServiceStack
             foreach (var rawHttpHandler in appHost.RawHttpHandlers)
             {
                 var handler = rawHttpHandler(httpReq);
-                if (handler != null) return handler;
+                if (handler != null)
+                    return handler;
             }
 
             string location = AppHostConfig.HandlerFactoryPath;
@@ -150,14 +151,11 @@ namespace ServiceStack
                 //If the fallback route can handle it, let it
                 if (AppHostConfig.FallbackRestPath != null)
                 {
-                    string contentType;
-                    var sanitizedPath = RestHandler.GetSanitizedPathInfo(pathInfo, out contentType);
-
-                    var restPath = AppHostConfig.FallbackRestPath(httpReq.HttpMethod, sanitizedPath, physicalPath);
+                    var restPath = AppHostConfig.FallbackRestPath(httpReq.HttpMethod, pathInfo, physicalPath);
                     if (restPath != null)
                     {
                         return new RestHandler { RestPath = restPath, Request = httpReq,
-                            RequestName = restPath.RequestType.GetOperationName(), ResponseContentType = contentType };
+                            RequestName = restPath.RequestType.GetOperationName() };
                     }
                 }
 
@@ -166,10 +164,6 @@ namespace ServiceStack
                 if (catchAllHandler != null) return catchAllHandler;
 
                 return DefaultHttpHandler;
-                //if (location.IsNullOrEmpty())
-                //    return DefaultHttpHandler;
-
-                //return NonRootModeDefaultHttpHandler;
             }
             return GetHandlerForPathInfo(httpReq, physicalPath) ?? NotFoundHttpHandler;
         }
@@ -218,9 +212,9 @@ namespace ServiceStack
             if (pathParts.Length == 0) return NotFoundHttpHandler;
 
             string contentType;
-            var restPath = RestHandler.FindMatchingRestPath(httpMethod, pathInfo, out contentType);
+            var restPath = RestHandler.FindMatchingRestPath(httpReq, out contentType);
             if (restPath != null)
-                return new RestHandler { RestPath = restPath, RequestName = restPath.RequestType.GetOperationName(), ResponseContentType = contentType };
+                return new RestHandler { RestPath = restPath, Request = httpReq, RequestName = restPath.RequestType.GetOperationName() };
 
             if (isFile || isDirectory)
             {

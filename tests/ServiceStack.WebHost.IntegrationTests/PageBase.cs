@@ -1,7 +1,6 @@
 using System.Web.UI;
 using ServiceStack.Auth;
 using ServiceStack.Caching;
-using ServiceStack.Configuration;
 
 namespace ServiceStack.WebHost.IntegrationTests
 {

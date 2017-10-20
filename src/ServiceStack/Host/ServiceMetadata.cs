@@ -34,7 +34,6 @@ namespace ServiceStack.Host
 
         public ServiceEndpointsMetadataConfig Config { get; set; }
 
-
         public IEnumerable<Operation> Operations => OperationsMap.Values;
 
         public void Add(Type serviceType, Type requestType, Type responseType)

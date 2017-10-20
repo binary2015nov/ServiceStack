@@ -981,16 +981,16 @@ namespace ServiceStack
             req.Response.AddHeader(HttpHeaders.XAutoBatchCompleted, completed.ToString());
         }
 
-        public static void SetRoute(this IRequest req, RestPath route)
+        public static void SetRoute(this IRequest req, IRestPath route)
         {
             req.Items[Keywords.Route] = route;
         }
 
-        public static RestPath GetRoute(this IRequest req)
+        public static IRestPath GetRoute(this IRequest req)
         {
             object route;
             req.Items.TryGetValue(Keywords.Route, out route);
-            return route as RestPath;
+            return route as IRestPath;
         }
 
         public static bool IsHtml(this IRequest req)

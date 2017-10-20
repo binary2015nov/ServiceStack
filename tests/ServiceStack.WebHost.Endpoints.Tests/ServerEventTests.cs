@@ -237,9 +237,9 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         private ServiceStackHost appHost;
 
-        public ServerEventsTests()
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
-            //LogManager.LogFactory = new ConsoleLogFactory(debugEnabled: true);
             appHost = CreateAppHost();
         }
 

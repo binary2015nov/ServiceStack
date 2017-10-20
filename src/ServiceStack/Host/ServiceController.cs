@@ -456,8 +456,7 @@ namespace ServiceStack.Host
             {
                 req.SetInProcessRequest();
 
-                var restPath = RestHandler.FindMatchingRestPath(req.Verb, req.PathInfo, out _);
-                req.SetRoute(restPath as RestPath);
+                var restPath = RestHandler.FindMatchingRestPath(req, out _);
                 req.OperationName = restPath.RequestType.GetOperationName();
                 var requestDto = RestHandler.CreateRequestAsync(req, restPath).Result;
                 req.Dto = requestDto;
