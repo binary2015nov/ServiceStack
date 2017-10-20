@@ -50,6 +50,7 @@ namespace ServiceStack.Host.AspNet
             this.PathInfo = HostContext.AppHost.ResolvePathInfo(this, OriginalPathInfo, out bool isDirectory);
             this.IsDirectory = isDirectory;
             this.IsFile = !isDirectory && GetFile() != null;
+            httpContext.Items[Keywords.IRequest] = this;
         }
 
         [Obsolete("Use Resolver")]

@@ -67,8 +67,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_execute_HEAD_Request_returning_custom_HttpResult()
         {
-            var response = Config.ListeningOn.AppendPath("custom-method","result").AddQueryParam("id", 1)
-                .SendStringToUrl(method: "HEAD",
+            var response = Config.ListeningOn.AppendPaths("custom-method","result").AddQueryParam("id", 1)
+                .GetStringFromUrl(method: "HEAD",
                     requestFilter: req => { req.Method = "HEAD"; }, 
                     responseFilter: res => {
                         Assert.That(res.Headers["X-Method"], Is.EqualTo("HEAD"));
@@ -83,8 +83,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_execute_HEAD_Request_writing_custom_headers()
         {
-            var response = Config.ListeningOn.AppendPath("custom-method","headers").AddQueryParam("id", 1)
-                .SendStringToUrl(method: "HEAD",
+            var response = Config.ListeningOn.AppendPaths("custom-method","headers").AddQueryParam("id", 1)
+                .GetStringFromUrl(method: "HEAD",
                     requestFilter: req => { req.Method = "HEAD"; }, 
                     responseFilter: res => {
                         Assert.That(res.Headers["X-Method"], Is.EqualTo("HEAD"));

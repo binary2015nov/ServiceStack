@@ -211,10 +211,10 @@ namespace ServiceStack
             var pathParts = pathInfo.TrimStart('/').Split('/');
             if (pathParts.Length == 0) return NotFoundHttpHandler;
 
-            string contentType;
+            string contentType = null;
             var restPath = RestHandler.FindMatchingRestPath(httpReq, out contentType);
             if (restPath != null)
-                return new RestHandler { RestPath = restPath, Request = httpReq, RequestName = restPath.RequestType.GetOperationName() };
+                return new RestHandler { RestPath = restPath, RequestName = restPath.RequestType.GetOperationName() };
 
             if (isFile || isDirectory)
             {
