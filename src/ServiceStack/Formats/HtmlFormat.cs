@@ -38,12 +38,12 @@ namespace ServiceStack.Formats
             ViewEngines = appHost.ViewEngines;
         }
 
-        public async Task SerializeToStreamAsync(IRequest req, object response, Stream outputStream)
+        public Task SerializeToStreamAsync(IRequest req, object response, Stream outputStream)
         {
             var res = req.Response;
-            if (req.GetItem("HttpResult") is IHttpResult httpResult && httpResult.Headers.ContainsKey(HttpHeaders.Location) 
-                && httpResult.StatusCode != System.Net.HttpStatusCode.Created)  
-                return;
+            if (req.GetItem("HttpResult") is IHttpResult httpResult && httpResult.Headers.ContainsKey(HttpHeaders.Location)
+                && httpResult.StatusCode != System.Net.HttpStatusCode.Created)
+                return TypeConstants.EmptyTask;
 
             try
             {
@@ -57,15 +57,16 @@ namespace ServiceStack.Formats
                 {
                     if (res.Dto != null)
                         response = res.Dto;
-                    else 
+                    else
                         throw new ArgumentException("Cannot use Cached Result as ViewModel");
                 }
 
                 foreach (var viewEngine in ViewEngines)
                 {
-                    var handled = await viewEngine.ProcessRequestAsync(req, response, outputStream);
-                    if (handled)
-                        return;
+                    var task = viewEngine.ProcessRequestAsync(req, response, outputStream);
+                    task.Wait();
+                    if (task.Result)
+                        return task;
                 }
             }
             catch (Exception ex)
@@ -85,8 +86,8 @@ namespace ServiceStack.Formats
                 res.ContentType = MimeTypes.Html;
             }
 
-            if (req.ResponseContentType != MimeTypes.Html && req.ResponseContentType != MimeTypes.JsonReport) 
-                return;
+            if (req.ResponseContentType != MimeTypes.Html && req.ResponseContentType != MimeTypes.JsonReport)
+                return TypeConstants.EmptyTask;
 
             var dto = response.GetDto();
             if (!(dto is string html))
@@ -111,7 +112,7 @@ namespace ServiceStack.Formats
             }
 
             var utf8Bytes = html.ToUtf8Bytes();
-            await outputStream.WriteAsync(utf8Bytes, 0, utf8Bytes.Length);
+            return outputStream.WriteAsync(utf8Bytes, 0, utf8Bytes.Length);
         }
     }
 }

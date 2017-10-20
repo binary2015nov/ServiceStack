@@ -33,12 +33,12 @@ namespace ServiceStack.Markdown
 
 	public abstract class MarkdownViewBase : ITemplatePage
 	{
-        /// <summary>
-        /// Reference to MarkdownViewEngine
-        /// </summary>
-        public IViewEngine ViewEngine { get; set; }
+		/// <summary>
+		/// Reference to MarkdownViewEngine
+		/// </summary>
+		public IViewEngine ViewEngine { get; set; }
 
-	    /// <summary>
+		/// <summary>
 		/// The AppHost so you can access configuration and resolve dependencies, etc.
 		/// </summary>
 		public IAppHost AppHost { get; set; }
