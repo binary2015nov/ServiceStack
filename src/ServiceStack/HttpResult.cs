@@ -309,7 +309,10 @@ namespace ServiceStack
 
             RequestContext.SetItem("HttpResult", this);
 
-            ResponseFilter.SerializeToStream(this.RequestContext, this.Response, responseStream);
+            if (Response != null)
+            {
+                ResponseFilter.SerializeToStream(this.RequestContext, this.Response, responseStream);
+            }
         }
         
         public bool IsPartialRequest => 
