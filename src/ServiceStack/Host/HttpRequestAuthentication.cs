@@ -27,15 +27,21 @@ namespace ServiceStack.Host
             if (auth == null) return null;
 
             var pos = auth.IndexOf(' ');
+            if (pos == -1)
+                return null;
             return auth.Substring(0, pos).EqualsIgnoreCase("Basic") ? auth.Substring(pos + 1) : null;
         }
 
         public static KeyValuePair<string, string>? GetBasicAuthUserAndPassword(this IRequest httpReq)
         {
             var userPassBase64 = httpReq.GetBasicAuth();
-            if (userPassBase64 == null) return null;
+            if (userPassBase64 == null)
+                return null;
+
             var userPass = Encoding.UTF8.GetString(Convert.FromBase64String(userPassBase64));
             var pos = userPass.IndexOf(':');
+            if (pos == -1)
+                return null;
             return new KeyValuePair<string, string>(userPass.Substring(0, pos), userPass.Substring(pos + 1));
         }
 

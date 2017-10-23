@@ -99,7 +99,7 @@ namespace ServiceStack.Formats
                 //var index = absoluteUrl.IndexOf('?');
                 //var url = index != -1 ? absoluteUrl.Substring(0, index) : absoluteUrl;
 
-                var now = DateTime.UtcNow;
+                var now = DateTime.Now;
                 var requestName = req.OperationName ?? dto.GetType().GetOperationName();
 
                 html = HtmlTemplates.GetHtmlFormatTemplate()

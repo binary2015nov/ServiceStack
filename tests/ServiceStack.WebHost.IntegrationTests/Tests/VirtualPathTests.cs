@@ -3,7 +3,6 @@
 
 
 using NUnit.Framework;
-using ServiceStack.Text;
 using ServiceStack.WebHost.IntegrationTests.Services;
 
 namespace ServiceStack.WebHost.IntegrationTests.Tests

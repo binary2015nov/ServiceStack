@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Funq;
 using NUnit.Framework;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
@@ -41,10 +40,9 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
     public class AppHostSmartPool : AppHostHttpListenerSmartPoolBase
     {
-        public AppHostSmartPool() 
-            : base("SmartPool Test", typeof(PerfServices).GetAssembly()) { }
+        public AppHostSmartPool() : base("SmartPool Test", typeof(PerfServices).GetAssembly()) { }
 
-        public override void Configure(Container container) { }
+        public override void Configure(Funq.Container container) { }
     }
 
     [TestFixture]

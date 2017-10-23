@@ -10,6 +10,8 @@ namespace ServiceStack.Caching
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MemoryCacheClient));
 
+        public readonly static MemoryCacheClient Default = new MemoryCacheClient();
+
         private ConcurrentDictionary<string, CacheEntry> memory;
         public bool FlushOnDispose { get; set; }
 

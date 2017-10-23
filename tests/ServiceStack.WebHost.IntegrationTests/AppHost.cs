@@ -167,11 +167,7 @@ namespace ServiceStack.WebHost.IntegrationTests
                         new OpenIdOAuthProvider(AppSettings),
                         new DigestAuthProvider(AppSettings),
                         new BasicAuthProvider(AppSettings),
-                }));
-
-            Plugins.Add(new RegistrationFeature());
-
-            Routes.Add<Register>("/register");
+                }) { IncludeRegistrationService = true });
 
             container.Register<IAuthRepository>(c =>
                 new OrmLiteAuthRepository(c.Resolve<IDbConnectionFactory>()));

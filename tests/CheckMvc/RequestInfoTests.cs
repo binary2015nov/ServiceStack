@@ -53,6 +53,7 @@ namespace CheckMvc
         }
     }
 
+    [TestFixture]
     public partial class RequestInfoTests
     {
         [Test]

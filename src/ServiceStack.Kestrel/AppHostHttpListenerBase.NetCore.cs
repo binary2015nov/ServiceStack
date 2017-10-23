@@ -1,5 +1,6 @@
 //Created for compatibility to run tests on .NET Core
 #if NETSTANDARD2_0
+
 using System.Reflection;
 
 namespace ServiceStack
@@ -28,4 +29,5 @@ namespace ServiceStack
         { }
     }
 }
+
 #endif

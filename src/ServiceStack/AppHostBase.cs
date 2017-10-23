@@ -2,7 +2,6 @@
 using System;
 using System.Reflection;
 using System.Web;
-using ServiceStack.Host.AspNet;
 using ServiceStack.Web;
 
 namespace ServiceStack

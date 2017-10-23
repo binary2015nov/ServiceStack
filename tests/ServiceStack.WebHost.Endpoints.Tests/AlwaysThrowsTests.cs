@@ -116,15 +116,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
     public class AlwaysThrowsAppHost : AppHostHttpListenerBase
     {
-        public AlwaysThrowsAppHost()
-            : base("Always Throws Service", typeof(AlwaysThrowsService).GetAssembly()) { }
+        public AlwaysThrowsAppHost() : base("Always Throws Service", typeof(AlwaysThrowsService).GetAssembly()) { }
 
         public override void Configure(Container container)
         {
             Plugins.Add(new ValidationFeature());
-
-            container.RegisterValidators(typeof(AlwaysThrowsValidator).GetAssembly());
-
             Plugins.Add(new CustomAuthenticationPlugin());
         }
     }
@@ -239,7 +235,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             var client = CreateNewServiceClient();
 #if !NETCORE
-            if (client is WcfServiceClient) return;
+            if (client is WcfServiceClient)
+                return;
 #endif
             try
             {

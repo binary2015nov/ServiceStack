@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using ServiceStack.Logging;
 using ServiceStack.Web;
 using ServiceStack.Text;
+using ServiceStack.Host.Handlers;
 
 namespace ServiceStack.Host.HttpListener
 {
@@ -40,7 +41,8 @@ namespace ServiceStack.Host.HttpListener
 
         public Action<HttpListenerContext> BeforeRequest { get; set; }
 
-        protected HttpListenerBase(string serviceName, params Assembly[] assembliesWithServices) : base(serviceName, assembliesWithServices) { }
+        protected HttpListenerBase(string serviceName, params Assembly[] assembliesWithServices)
+            : base(serviceName, assembliesWithServices) { }
 
         public override void InitFinal()
         {
@@ -52,6 +54,8 @@ namespace ServiceStack.Host.HttpListener
                 System.Web.Util.HttpEncoder.Current = System.Web.Util.HttpEncoder.Default;
             }
         }
+
+        public string HandlerPath { get { return Config.HandlerFactoryPath; } set { Config.HandlerFactoryPath = value; } }
 
         protected virtual void SetAppDomainData()
         {
@@ -146,7 +150,6 @@ namespace ServiceStack.Host.HttpListener
 
                 throw ex;
             }
-
             ThreadPool.QueueUserWorkItem(listenCallback);
         }
 
@@ -350,10 +353,32 @@ namespace ServiceStack.Host.HttpListener
         }
 
         /// <summary>
-        /// Overridable method that can be used to implement a custom hnandler
+        /// When overrided in the sub class, which can be used to implement a custom hnandler
         /// </summary>
         /// <param name="context"></param>
-        protected abstract Task ProcessRequestAsync(HttpListenerContext context);
+
+        protected virtual async Task ProcessRequestAsync(HttpListenerContext context)
+        {
+            if (string.IsNullOrEmpty(context.Request.RawUrl))
+                return;
+
+            RequestContext.Instance.StartRequestContext();
+
+            var operationName = context.Request.GetOperationName().UrlDecode();
+
+            var httpReq = context.ToRequest(operationName);
+            var httpRes = httpReq.Response;
+
+            var handler = HttpHandlerFactory.GetHandler(httpReq);
+
+            var serviceStackHandler = handler as IServiceStackHandler;
+            if (serviceStackHandler == null)
+                throw new NotImplementedException($"Cannot execute handler: {handler} at PathInfo: {httpReq.PathInfo}");
+
+            var task = serviceStackHandler.ProcessRequestAsync(httpReq, httpRes, operationName);
+            await HostContext.Async.ContinueWith(httpReq, task, x => httpRes.Close(), TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.AttachedToParent);
+            //Matches Exceptions handled in HttpListenerBase.InitTask() 
+        }
 
         /// <summary>
         /// Reserves the specified URL for non-administrator users and accounts. 

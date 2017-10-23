@@ -57,7 +57,7 @@ namespace ServiceStack
         {
             get
             {
-                return cache ?? (cache = RedisManager != null ? RedisManager.GetCacheClient() : ServiceExtensions.DefaultCache);
+                return cache ?? (cache = RedisManager != null ? RedisManager.GetCacheClient() : MemoryCacheClient.Default);
             }
             set { cache = value; }
         }

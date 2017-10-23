@@ -144,8 +144,7 @@ namespace ServiceStack.Host
             if (overrideVerb != null)
                 actionName = overrideVerb;
 
-            var operationName = requestDto.GetType().GetOperationName();
-            request.OperationName = operationName;
+            var operationName = request.OperationName ?? (request.OperationName = requestDto.GetType().GetOperationName());
             string format = request.ResponseContentType.ToContentFormat()?.ToUpper();
             InstanceExecFn action;
             if (execMap.TryGetValue(ActionContext.Key(actionName + format, operationName), out action) ||

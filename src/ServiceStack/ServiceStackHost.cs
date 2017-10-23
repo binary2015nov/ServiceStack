@@ -305,11 +305,11 @@ namespace ServiceStack
                 if (Container.Exists<IRedisClientsManager>())
                     Container.Register(c => c.Resolve<IRedisClientsManager>().GetCacheClient());
                 else
-                    Container.Register<ICacheClient>(ServiceExtensions.DefaultCache);
+                    Container.Register<ICacheClient>(MemoryCacheClient.Default);
             }
 
             if (!Container.Exists<MemoryCacheClient>())
-                Container.Register(ServiceExtensions.DefaultCache);
+                Container.Register(MemoryCacheClient.Default);
 
             if (Container.Exists<IMessageService>()
                 && !Container.Exists<IMessageFactory>())

@@ -2,7 +2,6 @@
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Funq;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
@@ -54,7 +53,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             public ZipAppHost() : base(nameof(ZipServiceClientTests), typeof(HelloZipService).GetAssembly()) { }
 
-            public override void Configure(Container container) { }
+            public override void Configure(Funq.Container container) { }
         }
 
         [Test]

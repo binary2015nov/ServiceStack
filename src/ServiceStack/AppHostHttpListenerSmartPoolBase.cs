@@ -10,7 +10,7 @@ using ServiceStack.Logging;
 
 namespace ServiceStack
 {
-    public abstract class AppHostHttpListenerSmartPoolBase : AppHostHttpListenerBase
+    public abstract class AppHostHttpListenerSmartPoolBase : AppHostHttpListenerPoolBase
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(AppHostHttpListenerSmartPoolBase));
 
@@ -42,31 +42,13 @@ namespace ServiceStack
         { threadPoolManager = new SmartThreadPool(IdleTimeout, poolSize); }
 
         protected AppHostHttpListenerSmartPoolBase(string serviceName, string handlerPath, params Assembly[] assembliesWithServices)
-            : this(serviceName, handlerPath, CalculatePoolSize(), assembliesWithServices)
+            : this(serviceName, handlerPath, PoolSize , assembliesWithServices)
         { }
 
         protected AppHostHttpListenerSmartPoolBase(string serviceName, string handlerPath, int poolSize, params Assembly[] assembliesWithServices)
             : base(serviceName, handlerPath, assembliesWithServices)
-        { threadPoolManager = new SmartThreadPool(IdleTimeout, poolSize); }
-
-        private bool disposed = false;
-
-        protected override void Dispose(bool disposing)
         {
-            if (disposed) return;
-
-            lock (this)
-            {
-                if (disposed) return;
-
-                if (disposing)
-                    threadPoolManager.Dispose();
-
-                // new shared cleanup logic
-                disposed = true;
-
-                base.Dispose(disposing);
-            }
+            threadPoolManager = new SmartThreadPool(IdleTimeout, poolSize);
         }
 
         // Loop here to begin processing of new requests.
@@ -135,6 +117,27 @@ namespace ServiceStack
             OnBeginRequest(context);
 
             threadPoolManager.QueueWorkItem(ProcessRequestContext, context);
+        }
+
+
+        private bool disposed = false;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposed) return;
+
+            lock (this)
+            {
+                if (disposed) return;
+
+                if (disposing)
+                    threadPoolManager.Dispose();
+
+                // new shared cleanup logic
+                disposed = true;
+
+                base.Dispose(disposing);
+            }
         }
     }
 }

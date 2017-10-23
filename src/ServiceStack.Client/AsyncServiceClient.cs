@@ -245,7 +245,7 @@ namespace ServiceStack
 
             PclExportClient.Instance.AddHeader(client, Headers);
 
-#if NET40 || NET45
+#if NET40 || NET45 || NETSTANDARD2_0
 
             client.UserAgent = UserAgent;
 
