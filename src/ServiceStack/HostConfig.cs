@@ -5,8 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml;
-using MarkdownSharp;
 using ServiceStack.Host;
+using ServiceStack.Logging;
 using ServiceStack.Markdown;
 using ServiceStack.Metadata;
 using ServiceStack.Serialization;
@@ -149,6 +149,7 @@ namespace ServiceStack
 
         private bool debugMode;
         public bool DebugMode { get { return debugMode; } set { debugMode = value; if (StrictMode == null && value == true) StrictMode = value; } }
+
         public bool? StrictMode { get; set; }
         public string DebugAspNetHostEnvironment { get; set; }
         public string DebugHttpListenerHostEnvironment { get; set; }
@@ -184,9 +185,6 @@ namespace ServiceStack
         public bool DisposeDependenciesAfterUse { get; set; }
         public bool LogUnobservedTaskExceptions { get; set; }
 
-        public MarkdownOptions MarkdownOptions { get; set; }
-        public Type MarkdownBaseType { get; set; }
-        public Dictionary<string, Type> MarkdownGlobalHelpers { get; set; }
         public Dictionary<string, string> HtmlReplaceTokens { get; set; }
 
         public HashSet<string> AppendUtf8CharsetOnContentTypes { get; private set; }

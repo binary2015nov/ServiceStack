@@ -85,7 +85,6 @@ namespace ServiceStack
             Plugins = new List<IPlugin> {
                 new HtmlFormat(),
                 new CsvFormat(),
-                new MarkdownFormat(),
                 new PredefinedRoutesFeature(),
                 new MetadataFeature(),
                 new NativeTypesFeature(),
@@ -609,6 +608,9 @@ namespace ServiceStack
 
         protected virtual void OnStartupException(Exception ex)
         {
+            if (Config.StrictMode)
+                throw ex;
+
             this.StartUpErrors.Add(DtoUtils.CreateErrorResponse(null, ex).GetResponseStatus());
 
             if (Config.StrictMode.GetValueOrDefault())

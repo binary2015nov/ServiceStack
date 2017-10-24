@@ -18,10 +18,10 @@ using ServiceStack.Web;
 
 namespace ServiceStack.Html
 {
-	public class HtmlHelper
-	{
-		public const string DefaultTemplate = null;
-		public const string EmptyTemplate = "";
+	public class HtmlHelper : IHtmlContext
+    {
+        public const string DefaultTemplate = null;
+        public const string EmptyTemplate = "";
 
 		public static string ValidationMessageCssClassNames = "help-block error";
 		public static string ValidationSummaryCssClassNames = "error-summary alert alert-danger";
@@ -501,23 +501,14 @@ namespace ServiceStack.Html
 			return errorStatus == null ? null : MvcHtmlString.Create(errorStatus.Message);
 		}
 
-		public MvcHtmlString RenderMarkdownToHtml(string markdown)
-		{
-			var feature = HostContext.GetPlugin<MarkdownFormat>();
-			return feature != null
-				? MvcHtmlString.Create(feature.Transform(markdown))
-				: new MvcHtmlString(new MarkdownSharp.Markdown().Transform(markdown));
-		}
-	}
-
-	public static class HtmlHelperExtensions
-	{
-		public static IRequest GetHttpRequest(this HtmlHelper html)
-		{
-			return html != null ? html.HttpRequest : null;
-		}
-	}
-
+        public MvcHtmlString RenderMarkdownToHtml(string markdown)
+        {
+            var feature = HostContext.GetPlugin<MarkdownFormat>();
+            return feature != null
+                ? MvcHtmlString.Create(feature.Transform(markdown))
+                : new MvcHtmlString(MarkdownConfig.Transform(markdown));
+        }
+    }
 }
 
 #endif
