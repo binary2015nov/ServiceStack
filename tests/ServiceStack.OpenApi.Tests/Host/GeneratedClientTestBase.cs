@@ -1,47 +1,59 @@
-﻿using System.Collections.Generic;
-using Funq;
+﻿using Funq;
 using NUnit.Framework;
 using ServiceStack.Api.OpenApi;
 using ServiceStack.Auth;
 using ServiceStack.Data;
+using ServiceStack.Logging;
 using ServiceStack.OpenApi.Tests.Services;
 using ServiceStack.OrmLite;
+using ServiceStack.Redis;
 using ServiceStack.Text;
+using System.Collections.Generic;
 
 namespace ServiceStack.OpenApi.Tests.Host
 {
     [TestFixture]
-    public abstract class GeneratedClientTestBase
+    public class GeneratedClientTestBase
     {
         TestAppHost appHost;
 
         [OneTimeSetUp]
-        public void TestFixtureSetUp()
+        public void OnTestFixtureSetUp()
         {
             appHost = new TestAppHost();
             appHost.Init();
-            appHost.Start(Constant.AbsoluteBaseUri);
+            appHost.Start(Config.AbsoluteBaseUri);
         }
 
         [OneTimeTearDown]
-        public void TestFixtureTearDown()
+        public void OnTestFixtureTearDown()
         {
             appHost.Dispose();
         }
     }
 
-    public class TestAppHost : AppSelfHostBase
+    public class TestAppHost
+        : AppSelfHostBase
     {
-        public TestAppHost() : base("ServiceStack Autorest Client", typeof(NativeTypesTestService).GetAssembly())
-        {
-            JsConfig.EmitCamelCaseNames = true;
+        //private static ILog log;
 
-            Config.DebugMode = true;
-            Config.Return204NoContentForEmptyResponse = true;
+        public TestAppHost()
+            : base("ServiceStack Autorest Client", typeof(NativeTypesTestService).GetAssembly())
+        {
+            //LogManager.LogFactory = new DebugLogFactory();
+            //log = LogManager.GetLogger(typeof(ExampleAppHostHttpListener));
         }
 
         public override void Configure(Container container)
         {
+            JsConfig.EmitCamelCaseNames = true;
+
+            SetConfig(new HostConfig
+            {
+                DebugMode = true,
+                Return204NoContentForEmptyResponse = true,
+            });
+
             container.Register<IDbConnectionFactory>(c => new OrmLiteConnectionFactory(
                 ":memory:", SqliteDialect.Provider));
 
@@ -99,8 +111,8 @@ namespace ServiceStack.OpenApi.Tests.Host
             */
         }
 
-        private void CreateUser(OrmLiteAuthRepository authRepo, int id, string username, string password, 
-            List<string> roles = null, List<string> permissions = null)
+        private void CreateUser(OrmLiteAuthRepository authRepo,
+    int id, string username, string password, List<string> roles = null, List<string> permissions = null)
         {
             string hash;
             string salt;
@@ -122,5 +134,6 @@ namespace ServiceStack.OpenApi.Tests.Host
 
             authRepo.AssignRoles(id.ToString(), roles, permissions);
         }
+
     }
 }
