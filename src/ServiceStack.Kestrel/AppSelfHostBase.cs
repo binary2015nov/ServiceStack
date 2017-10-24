@@ -106,7 +106,7 @@ namespace ServiceStack
 
                 if (serviceStackHandler is RestHandler restHandler)
                 {
-                    httpReq.OperationName = operationName = restHandler.RestPath.RequestType.GetOperationName();
+                    httpReq.OperationName = operationName = restHandler.RequestName;
                 }
 
                 try

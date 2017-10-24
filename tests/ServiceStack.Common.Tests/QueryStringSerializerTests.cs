@@ -21,12 +21,11 @@ namespace ServiceStack.Common.Tests
             using (new BasicAppHost(typeof (TestService).Assembly).Init())
             {
                 var restPath = new RestPath(typeof(TestRequest), "/service", "GET");
-                var restHandler = new RestHandler { RestPath = restPath };
-
+                var restHandler = new RestHandler();
                 var requestString = "ListOfA={ListOfB:[{Property:prop1},{Property:prop2}]}";
                 NameValueCollection queryString = HttpUtility.ParseQueryString(requestString);
                 var httpReq = new MockHttpRequest("service", "GET", "application/json", "service", queryString, new MemoryStream(), new NameValueCollection());
-
+                httpReq.SetRoute(restPath);
                 var request2 = (TestRequest)restHandler.CreateRequestAsync(httpReq, "service").Result;
 
                 Assert.That(request2.ListOfA.Count, Is.EqualTo(1));

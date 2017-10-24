@@ -12,19 +12,19 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 	[TestFixture]
 	public class RestHandlerTests
 	{
-        ServiceStackHost appHost;
+		ServiceStackHost appHost;
 
-        [OneTimeSetUp]
-        public void TestFixtureSetUp()
-        {
-            appHost = new TestAppHost().Init();
-        }
+		[OneTimeSetUp]
+		public void TestFixtureSetUp()
+		{
+			appHost = new TestAppHost().Init();
+		}
 
-        [OneTimeTearDown]
-        public void TestFixtureTearDown()
-        {
-            appHost.Dispose();
-        }
+		[OneTimeTearDown]
+		public void TestFixtureTearDown()
+		{
+			appHost.Dispose();
+		}
 
 		[Test]
 		public void Throws_binding_exception_when_unable_to_match_path_values()
@@ -33,21 +33,19 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			var request = ConfigureRequest(path);
 			var response = new Mock<IHttpResponse>().Object;
 
-			var handler = new RestHandler
-			{
-				RestPath = new RestPath(typeof(RequestType), path)
-			};
+			request.SetRoute(new RestPath(typeof(RequestType), path));
 
-		    try
-		    {
-    		    handler.ProcessRequestAsync(request, response, string.Empty).Wait();
-                Assert.Fail("Should throw ArgumentException");
-		    }
-		    catch (AggregateException aex)
-		    {
-                Assert.That(aex.InnerExceptions.Count, Is.EqualTo(1));
-                Assert.That(aex.InnerException.GetType().Name, Is.EqualTo("ArgumentException"));
-		    }
+			try
+			{
+				var handler = new RestHandler();
+				handler.ProcessRequestAsync(request, response, string.Empty).Wait();
+				Assert.Fail("Should throw ArgumentException");
+			}
+			catch (AggregateException aex)
+			{
+				Assert.That(aex.InnerExceptions.Count, Is.EqualTo(1));
+				Assert.That(aex.InnerException.GetType().Name, Is.EqualTo("ArgumentException"));
+			}
 		}
 
 		[Test]
@@ -57,32 +55,32 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			var request = ConfigureRequest(path);
 			var response = new Mock<IHttpResponse>().Object;
 
-			var handler = new RestHandler
+			var handler = new RestHandler();
+
+			request.SetRoute(new RestPath(typeof(RequestType), path));
+			
+
+			try
 			{
-				RestPath = new RestPath(typeof(RequestType), path)
-			};
+				handler.ProcessRequestAsync(request, response, string.Empty).Wait();
+				Assert.Fail("Should throw SerializationException");
+			}
+			catch (AggregateException aex)
+			{
+				Assert.That(aex.InnerExceptions.Count, Is.EqualTo(1));
+				Assert.That(aex.InnerException.GetType().Name, Is.EqualTo("SerializationException"));
+			}
+		}
 
-            try
-            {
-                handler.ProcessRequestAsync(request, response, string.Empty).Wait();
-                Assert.Fail("Should throw SerializationException");
-            }
-            catch (AggregateException aex)
-            {
-                Assert.That(aex.InnerExceptions.Count, Is.EqualTo(1));
-                Assert.That(aex.InnerException.GetType().Name, Is.EqualTo("SerializationException"));
-            }
-        }
+		private IHttpRequest ConfigureRequest(string path)
+		{
+			var request = new Mock<IHttpRequest>();
+			request.Setup(x => x.Items).Returns(new Dictionary<string, object>());
+			request.Setup(x => x.QueryString).Returns(PclExportClient.Instance.NewNameValueCollection());
+			request.Setup(x => x.PathInfo).Returns(path);
 
-        private IHttpRequest ConfigureRequest(string path)
-        {
-            var request = new Mock<IHttpRequest>();
-            request.Setup(x => x.Items).Returns(new Dictionary<string, object>());
-            request.Setup(x => x.QueryString).Returns(PclExportClient.Instance.NewNameValueCollection());
-            request.Setup(x => x.PathInfo).Returns(path);
-
-            return request.Object;
-        }
+			return request.Object;
+		}
 
 		public class RequestType
 		{
