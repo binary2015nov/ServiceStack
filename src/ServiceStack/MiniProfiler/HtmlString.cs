@@ -4,7 +4,7 @@ using System.IO;
 
 namespace ServiceStack.MiniProfiler
 {
-    public class HtmlString : IHtmlString, System.Web.IHtmlString
+	public class HtmlString : IHtmlString, System.Web.IHtmlString
 	{
 		private string value;
 

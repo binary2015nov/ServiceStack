@@ -667,7 +667,7 @@ namespace MarkdownDeep
 				sb.Append(sections[i]);
 			}
 
-		    return StringBuilderCache.Retrieve(sb);
+			return StringBuilderCache.Retrieve(sb);
 		}
 
 		// Split the markdown into sections, one section for each
@@ -710,8 +710,8 @@ namespace MarkdownDeep
 		// Join previously split sections back into one document
 		public static string JoinSections(List<string> sections)
 		{
-            var sb = StringBuilderCache.Allocate();
-            for (int i = 0; i < sections.Count; i++)
+			var sb = StringBuilderCache.Allocate();
+			for (int i = 0; i < sections.Count; i++)
 			{
 				if (i > 0)
 				{
@@ -725,7 +725,7 @@ namespace MarkdownDeep
 				sb.Append(sections[i]);
 			}
 
-		    return StringBuilderCache.Retrieve(sb);
+			return StringBuilderCache.Retrieve(sb);
 		}
 
 		// Add a link definition

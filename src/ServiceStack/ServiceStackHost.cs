@@ -88,7 +88,7 @@ namespace ServiceStack
                 new PredefinedRoutesFeature(),
                 new MetadataFeature(),
                 new NativeTypesFeature(),
-                new HttpCacheFeature(),
+                new HttpCacheFeature()
             };
             ExcludeAutoRegisteringServiceTypes = new HashSet<Type> {
                 typeof(AuthenticateService),
@@ -262,9 +262,6 @@ namespace ServiceStack
 
             if ((Feature.Csv & Config.EnableFeatures) != Feature.Csv)
                 Plugins.RemoveAll(x => x is CsvFormat);
-
-            if ((Feature.Markdown & Config.EnableFeatures) != Feature.Markdown)
-                Plugins.RemoveAll(x => x is MarkdownFormat);
 
             if ((Feature.PredefinedRoutes & Config.EnableFeatures) != Feature.PredefinedRoutes)
                 Plugins.RemoveAll(x => x is PredefinedRoutesFeature);
@@ -608,9 +605,6 @@ namespace ServiceStack
 
         protected virtual void OnStartupException(Exception ex)
         {
-            if (Config.StrictMode)
-                throw ex;
-
             this.StartUpErrors.Add(DtoUtils.CreateErrorResponse(null, ex).GetResponseStatus());
 
             if (Config.StrictMode.GetValueOrDefault())

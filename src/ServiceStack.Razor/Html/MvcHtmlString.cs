@@ -8,8 +8,7 @@ namespace ServiceStack.Html
     {
         private readonly string _value;
 
-        public MvcHtmlString(string value)
-            : base(value ?? string.Empty)
+        public MvcHtmlString(string value) : base(value ?? string.Empty)
         {
             _value = value ?? string.Empty;
         }

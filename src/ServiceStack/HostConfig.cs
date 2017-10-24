@@ -6,9 +6,6 @@ using System.Reflection;
 using System.Text;
 using System.Xml;
 using ServiceStack.Host;
-using ServiceStack.Logging;
-using ServiceStack.Markdown;
-using ServiceStack.Metadata;
 using ServiceStack.Serialization;
 using ServiceStack.Text;
 using ServiceStack.VirtualPath;
@@ -68,9 +65,6 @@ namespace ServiceStack
             ReturnsInnerException = true;
             DisposeDependenciesAfterUse = true;
             LogUnobservedTaskExceptions = true;
-            MarkdownOptions = new MarkdownOptions();
-            MarkdownBaseType = typeof(MarkdownViewBase);
-            MarkdownGlobalHelpers = new Dictionary<string, Type>();
             HtmlReplaceTokens = new Dictionary<string, string>();
             AddMaxAgeForStaticMimeTypes = new Dictionary<string, TimeSpan> {
                 { "image/gif", TimeSpan.FromHours(1) },
@@ -148,7 +142,7 @@ namespace ServiceStack
         public bool AllowRouteContentTypeExtensions { get; set; }
 
         private bool debugMode;
-        public bool DebugMode { get { return debugMode; } set { debugMode = value; if (StrictMode == null && value == true) StrictMode = value; } }
+        public bool DebugMode { get { return debugMode; } set { debugMode = value; if (StrictMode == null && value) StrictMode = value; } }
 
         public bool? StrictMode { get; set; }
         public string DebugAspNetHostEnvironment { get; set; }

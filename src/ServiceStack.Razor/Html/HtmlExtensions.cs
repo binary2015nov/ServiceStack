@@ -1,6 +1,4 @@
-﻿using ServiceStack.Text;
-
-namespace ServiceStack.Html
+﻿namespace ServiceStack.Html
 {
     public static class HtmlExtensions
     {
