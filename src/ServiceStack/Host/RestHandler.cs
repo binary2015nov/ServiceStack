@@ -44,8 +44,6 @@ namespace ServiceStack.Host
             return pathInfo;
         }
 
-        public IRestPath RestPath { get; set; }
-
         // Set from SSHHF.GetHandlerForPathInfo()
         public string ResponseContentType { get; set; }
 
@@ -146,10 +144,7 @@ namespace ServiceStack.Host
         /// <returns></returns>
         public Task<object> CreateRequestAsync(IRequest httpReq, string operationName)
         {
-            if (this.RestPath == null)
-                this.RestPath = httpReq.GetRoute();
-
-            return CreateRequestAsync(httpReq, this.RestPath);
+            return CreateRequestAsync(httpReq, httpReq.GetRoute());
         }
     }
 

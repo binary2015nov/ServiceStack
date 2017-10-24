@@ -154,7 +154,8 @@ namespace ServiceStack
                     var restPath = AppHostConfig.FallbackRestPath(httpReq.HttpMethod, pathInfo, physicalPath);
                     if (restPath != null)
                     {
-                        return new RestHandler { RestPath = restPath, Request = httpReq,
+                        httpReq.SetRoute(restPath);
+                        return new RestHandler { Request = httpReq,
                             RequestName = restPath.RequestType.GetOperationName() };
                     }
                 }
@@ -214,7 +215,7 @@ namespace ServiceStack
             string contentType = null;
             var restPath = RestHandler.FindMatchingRestPath(httpReq, out contentType);
             if (restPath != null)
-                return new RestHandler { RestPath = restPath, RequestName = restPath.RequestType.GetOperationName() };
+                return new RestHandler { RequestName = restPath.RequestType.GetOperationName() };
 
             if (isFile || isDirectory)
             {
@@ -237,8 +238,12 @@ namespace ServiceStack
             if (appHost.Config.FallbackRestPath != null)
             {
                 restPath = appHost.Config.FallbackRestPath(httpMethod, pathInfo, filePath);
+
                 if (restPath != null)
-                    return new RestHandler { RestPath = restPath, RequestName = restPath.RequestType.GetOperationName(), ResponseContentType = contentType };
+                {
+                    httpReq.SetRoute(restPath);
+                    return new RestHandler { RequestName = restPath.RequestType.GetOperationName(), ResponseContentType = contentType };
+                }
             }
 
             return null;

@@ -11,6 +11,7 @@ using ServiceStack.DataAnnotations;
 using ServiceStack.MsgPack;
 using ServiceStack.OrmLite;
 using ServiceStack.Razor;
+using ServiceStack.Formats;
 
 //The entire C# code for the stand-alone RazorRockstars demo.
 namespace RazorRockstars.Web
@@ -20,6 +21,7 @@ namespace RazorRockstars.Web
         public AppHost() : base("Test Razor", typeof (AppHost).Assembly)
         {
             Config.DebugMode = true;
+
             typeof(SwaggerResources)
                 .AddAttributes(new RestrictAttribute { VisibilityTo = RequestAttributes.None });
             typeof(SwaggerResource)
@@ -28,6 +30,7 @@ namespace RazorRockstars.Web
 
         public override void Configure(Container container)
         {
+            Plugins.Add(new MarkdownFormat());
             Plugins.Add(new RazorFormat());
             Plugins.Add(new MsgPackFormat());
             Plugins.Add(new SwaggerFeature { UseBootstrapTheme = true });
