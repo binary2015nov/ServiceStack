@@ -16,12 +16,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
-            LogManager.LogFactory = new ConsoleLogFactory();
             appHost = new ExampleAppHostHttpListener()
                 .Init()
                 .Start(Config.ListeningOn);
 
-            "ExampleAppHost Created at {0}, listening on {1}".Print(DateTime.Now, Config.ListeningOn);
+            "ExampleAppHost Created at {0}, listening on {1}".Print(appHost.CreatedAt, Config.ListeningOn);
         }
 
         [OneTimeTearDown]

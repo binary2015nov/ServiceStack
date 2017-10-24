@@ -167,6 +167,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     public abstract class WebServicesTests
     {
         public static string ListeningOn = Config.ListeningOn;
+
         private const string TestString = "ServiceStack";
 
         private ServiceStackHost appHost;
@@ -200,12 +201,35 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
             catch (WebServiceException webEx)
             {
-                var response = (AlwaysThrowsResponse)webEx.ResponseDto;
-                var expectedError = AlwaysThrowsService.GetErrorMessage(TestString);
-                Assert.That(response.ResponseStatus.ErrorCode,
+                var responseDto = (AlwaysThrowsResponse)webEx.ResponseDto;
+
+                Assert.That(responseDto.ResponseStatus.ErrorCode,
                     Is.EqualTo(typeof(NotImplementedException).Name));
-                Assert.That(response.ResponseStatus.Message,
-                    Is.EqualTo(expectedError));
+                Assert.That(responseDto.ResponseStatus.Message,
+                    Is.EqualTo(AlwaysThrowsService.GetErrorMessage(TestString)));
+            }
+        }
+
+        [Test]
+        public void Can_Handle_Http_Error_from_AlwaysThrowService()
+        {
+            var client = CreateNewServiceClient();
+            try
+            {
+                var response = client.Send<AlwaysThrowsResponse>(
+                    new AlwaysThrows { StatusCode = 406, Value = TestString });
+
+                Assert.Fail("Should throw HTTP errors");
+            }
+            catch (WebServiceException webEx)
+            {
+                var responseDto = (AlwaysThrowsResponse)webEx.ResponseDto;
+
+                Assert.That(webEx.StatusCode, Is.EqualTo(406));
+                Assert.That(responseDto.ResponseStatus.ErrorCode,
+                    Is.EqualTo(typeof(NotImplementedException).Name));
+                Assert.That(responseDto.ResponseStatus.Message,
+                    Is.EqualTo(AlwaysThrowsService.GetErrorMessage(TestString)));
             }
         }
 
@@ -224,9 +248,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             {
                 Assert.That(webEx.StatusCode, Is.EqualTo(400));
                 Assert.That(webEx.StatusDescription, Is.EqualTo(typeof(ArgumentNullException).Name));
-                //Assert.That(webEx.Message.Replace("\r\n", "\n"), Is.EqualTo("Value cannot be null.\nParameter name: Id"));
                 Assert.That(webEx.ErrorCode, Is.EqualTo(typeof(ArgumentNullException).Name));
-                //Assert.That(webEx.ErrorMessage.Replace("\r\n", "\n"), Is.EqualTo("Value cannot be null.\nParameter name: Id"));
             }
         }
 
@@ -248,12 +270,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             {
                 Assert.That(webEx.StatusCode, Is.EqualTo(404));
 
-                var response = (ErrorResponse)webEx.ResponseDto;
-                var expectedError = AlwaysThrowsService.GetErrorMessage(TestString);
-                Assert.That(response.ResponseStatus.ErrorCode,
+                var responseDto = (ErrorResponse)webEx.ResponseDto;
+                Assert.That(responseDto.ResponseStatus.ErrorCode,
                     Is.EqualTo(typeof(NotImplementedException).Name));
-                Assert.That(response.ResponseStatus.Message,
-                    Is.EqualTo(expectedError));
+                Assert.That(responseDto.ResponseStatus.Message,
+                    Is.EqualTo(AlwaysThrowsService.GetErrorMessage(TestString)));
             }
         }
 
@@ -270,13 +291,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
             catch (WebServiceException webEx)
             {
-                var response = (ErrorResponse)webEx.ResponseDto;
-                var status = response.ResponseStatus;
-                Assert.That(status.ErrorCode, Is.EqualTo("NotEmpty"));
-                Assert.That(status.Message, Is.EqualTo("'Value' should not be empty."));
-                Assert.That(status.Errors[0].ErrorCode, Is.EqualTo("NotEmpty"));
-                Assert.That(status.Errors[0].FieldName, Is.EqualTo("Value"));
-                Assert.That(status.Errors[0].Message, Is.EqualTo("'Value' should not be empty."));
+                var responseDto = (ErrorResponse)webEx.ResponseDto;
+                Assert.That(responseDto.ResponseStatus.ErrorCode, Is.EqualTo("NotEmpty"));
+                Assert.That(responseDto.ResponseStatus.Message, Is.EqualTo("'Value' should not be empty."));
+                Assert.That(responseDto.ResponseStatus.Errors[0].ErrorCode, Is.EqualTo("NotEmpty"));
+                Assert.That(responseDto.ResponseStatus.Errors[0].FieldName, Is.EqualTo("Value"));
+                Assert.That(responseDto.ResponseStatus.Errors[0].Message, Is.EqualTo("'Value' should not be empty."));
             }
         }
 

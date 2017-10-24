@@ -76,7 +76,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        private AppHost appHost;
+        private ServiceStackHost appHost;
 
         [OneTimeSetUp]
         public void TestFixtureSetUp()
@@ -119,7 +119,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_url_transparently_decode_QueryString()
         {
-            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
+            var client = new JsonServiceClient(Config.ListeningOn);
             var request = new Echo { Param = "test://?&% encoding" };
             var response = client.Get(request);
             Assert.That(response.Param, Is.EqualTo(request.Param));
@@ -128,7 +128,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_url_transparently_decode_PathInfo()
         {
-            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
+            var client = new JsonServiceClient(Config.ListeningOn);
             var request = new Echo { PathInfoParam = "test%2Fpath:?&% encoding" };
             var response = client.Get(request);
             Assert.That(response.PathInfoParam, Is.EqualTo(request.PathInfoParam));
@@ -137,7 +137,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_url_transparently_decode_RequestBody()
         {
-            var client = new JsonServiceClient(Config.AbsoluteBaseUri);
+            var client = new JsonServiceClient(Config.ListeningOn);
             var request = new Echo { Param = "test://?&% encoding" };
             var response = client.Post(request);
             Assert.That(response.Param, Is.EqualTo(request.Param));
@@ -148,7 +148,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             string param = "привіт";
 
-            var json = Config.AbsoluteBaseUri.CombineWith("/echo").PostStringToUrl(
+            var json = Config.ListeningOn.AppendPath("/echo").PostStringToUrl(
                 requestBody: "Param=" + param.UrlEncode(),
                 contentType: MimeTypes.FormUrlEncoded, accept: MimeTypes.Json);
 

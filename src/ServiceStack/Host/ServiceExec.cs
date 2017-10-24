@@ -113,8 +113,7 @@ namespace ServiceStack.Host
             var requestDtoParam = Expression.Parameter(typeof(object), "requestDto");
             var requestDtoStrong = Expression.Convert(requestDtoParam, requestType);
 
-            Expression callExecute = Expression.Call(
-                serviceStrong, mi, requestDtoStrong);
+            Expression callExecute = Expression.Call(serviceStrong, mi, requestDtoStrong);
 
             if (mi.ReturnType != typeof(void))
             {
@@ -144,7 +143,7 @@ namespace ServiceStack.Host
             if (overrideVerb != null)
                 actionName = overrideVerb;
 
-            var operationName = request.OperationName ?? (request.OperationName = requestDto.GetType().GetOperationName());
+            var operationName = request.OperationName = requestDto.GetType().GetOperationName();
             string format = request.ResponseContentType.ToContentFormat()?.ToUpper();
             InstanceExecFn action;
             if (execMap.TryGetValue(ActionContext.Key(actionName + format, operationName), out action) ||

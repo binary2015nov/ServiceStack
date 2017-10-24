@@ -32,8 +32,7 @@ namespace ServiceStack
         /// Initializes a new instance of the <see cref="ResponseStatus"/> class.
         /// A response status with an errorcode == failure
         /// </summary>
-        public ResponseStatus(string errorCode, string message)
-            : this(errorCode)
+        public ResponseStatus(string errorCode, string message) : this(errorCode)
         {
             this.Message = message;
         }

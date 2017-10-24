@@ -1,19 +1,8 @@
-using Funq;
 using NUnit.Framework;
 using ServiceStack.WebHost.Endpoints.Tests.Support.Host;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
-	public class TestConfigAppHostHttpListener : AppHostHttpListenerBase
-	{
-		public TestConfigAppHostHttpListener() : base("TestConfigAppHost Service", typeof(BclDtoService).GetAssembly())
-		{
-			Config.UseBclJsonSerializers = true;
-		}
-
-		public override void Configure(Container container) { }
-	}
-
 	[TestFixture]
 	public class AppHostConfigTests
 	{

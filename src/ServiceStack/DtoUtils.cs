@@ -176,7 +176,7 @@ namespace ServiceStack
                 //Serializing request successfully is not critical and only provides added error info
             }
 
-            return $"[{(request ?? new object()).GetType().GetOperationName()}: {DateTime.UtcNow}]:\n[REQUEST: {requestString}]";
+            return $"[{(request ?? new object()).GetType().GetOperationName()}: {DateTime.Now}]:\n[REQUEST: {requestString}]";
         }
     }
 }

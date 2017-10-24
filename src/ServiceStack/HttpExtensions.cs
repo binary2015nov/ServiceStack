@@ -146,7 +146,7 @@ namespace ServiceStack
             var headOrOptions = httpRes.Request.Verb == HttpMethods.Head || httpRes.Request.Verb == HttpMethods.Options;
             if (!headOrOptions)
             {
-                if (HostContext.Config == null || HostContext.Config.Return204NoContentForEmptyResponse)
+                if (HostContext.Config.Return204NoContentForEmptyResponse)
                 {
                     if (httpRes.StatusCode == (int)HttpStatusCode.OK)
                     {
