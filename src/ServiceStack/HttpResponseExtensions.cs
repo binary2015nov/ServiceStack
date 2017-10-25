@@ -257,17 +257,17 @@ namespace ServiceStack
         }
 
         [Obsolete("Use WriteAsync")]
-        public static void Write(this IResponse response, string contents)
+        public static void Write(this IResponse response, string s)
         {
 #if !NETSTANDARD2_0
             if (response is Host.AspNet.AspNetResponse aspRes)
             {
-                aspRes.Write(contents);
+                aspRes.Write(s);
                 return;
             }
 #endif
 
-            if (contents == null)
+            if (s == null)
             {
                 response.SetContentLength(0);
                 response.EndRequest();
@@ -278,7 +278,7 @@ namespace ServiceStack
             if (response.ContentType?.IndexOf(';') == -1)
                 response.ContentType += ContentFormat.Utf8Suffix;
 
-            var bytes = contents.ToUtf8Bytes();
+            var bytes = s.ToUtf8Bytes();
             response.SetContentLength(bytes.Length);
             response.OutputStream.Write(bytes, 0, bytes.Length);
         }

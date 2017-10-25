@@ -19,7 +19,7 @@ namespace ServiceStack.OpenApi.Tests
                 AllCollectionTypes = DtoHelper.GetAllCollectionTypes()
             };
 
-            using (var client = new ServiceStackAutorestClient(new Uri(Constant.AbsoluteBaseUri)))
+            using (var client = new ServiceStackAutorestClient(new Uri(Constants.AbsoluteBaseUri)))
             {
                 var result = client.HelloAllTypes.Post("123", null, null, dto);
             }
@@ -35,7 +35,7 @@ namespace ServiceStack.OpenApi.Tests
                 AllCollectionTypes = DtoHelper.GetAllCollectionTypes()
             };
 
-            using (var client = new ServiceStackAutorestClient(new Uri(Constant.AbsoluteBaseUri)))
+            using (var client = new ServiceStackAutorestClient(new Uri(Constants.AbsoluteBaseUri)))
             {
                 var result = client.HelloAllTypes.Get("123", dto.AllTypes.ToJsv(), null);
             }
@@ -51,7 +51,7 @@ namespace ServiceStack.OpenApi.Tests
                 AllCollectionTypes = DtoHelper.GetAllCollectionTypes()
             };
 
-            using (var client = new ServiceStackAutorestClient(new Uri(Constant.AbsoluteBaseUri)))
+            using (var client = new ServiceStackAutorestClient(new Uri(Constants.AbsoluteBaseUri)))
             {
                 var at = dto.AllTypes.ToJsv();
 
@@ -73,7 +73,7 @@ namespace ServiceStack.OpenApi.Tests
                 AllCollectionTypes = DtoHelper.GetAllCollectionTypes()
             };
 
-            using (var client = new ServiceStackAutorestClient(new Uri(Constant.AbsoluteBaseUri)))
+            using (var client = new ServiceStackAutorestClient(new Uri(Constants.AbsoluteBaseUri)))
             {
                 var result = client.HelloAllTypesWithResult.Post(body: dto);
 

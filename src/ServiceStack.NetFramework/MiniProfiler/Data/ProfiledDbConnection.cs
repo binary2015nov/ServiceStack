@@ -28,7 +28,7 @@ namespace ServiceStack.MiniProfiler.Data
             : base(connection, GetDbProfiler(profiler), autoDisposeConnection) {}
 
         public ProfiledDbConnection(IDbConnection connection, IProfiler profiler, bool autoDisposeConnection=true)
-            : base(connection, GetDbProfiler(profiler), autoDisposeConnection) {}
+            : base(connection, GetDbProfiler(profiler), autoDisposeConnection) { }
 
         private static IDbProfiler GetDbProfiler(IProfiler profiler)
         {

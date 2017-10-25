@@ -1,11 +1,7 @@
 #if !NETSTANDARD2_0
 
 using System;
-using System.Net;
 using System.Reflection;
-using System.Threading.Tasks;
-using ServiceStack.Host;
-using ServiceStack.Host.Handlers;
 using ServiceStack.Host.HttpListener;
 
 namespace ServiceStack
@@ -19,6 +15,15 @@ namespace ServiceStack
     /// </summary>
     public abstract class AppHostHttpListenerBase : HttpListenerBase
     {
+        public static int ThreadsPerProcessor = 16;
+
+        protected static int CalculatePoolSize()
+        {
+            return Environment.ProcessorCount * ThreadsPerProcessor;
+        }
+
+        public string HandlerPath { get { return Config.HandlerFactoryPath; } set { Config.HandlerFactoryPath = value; } }
+
         protected AppHostHttpListenerBase(string serviceName, params Assembly[] assembliesWithServices)
             : base(serviceName, assembliesWithServices) { }
 

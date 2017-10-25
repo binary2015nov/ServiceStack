@@ -152,14 +152,11 @@ namespace RazorRockstars.Web.Tests
         public const string Host = "http://localhost:1337";
         private const string BaseUri = Host + "/";
 
-        //private AppHost appHost;
-
         private Stopwatch startedAt;
 
         [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
-            LogManager.LogFactory = new ConsoleLogFactory();
             startedAt = Stopwatch.StartNew();
         }
 
@@ -182,7 +179,6 @@ namespace RazorRockstars.Web.Tests
         public void TestFixtureTearDown()
         {
             "Time Taken {0}ms".Fmt(startedAt.ElapsedMilliseconds).Print();
-            //appHost.Dispose();
         }
 
         protected static IRestClient[] RestClients =

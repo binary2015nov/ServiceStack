@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Runtime.Serialization;
 using ServiceStack.Admin;
 using ServiceStack.Api.Swagger;
@@ -78,6 +77,9 @@ namespace ServiceStack.WebHost.IntegrationTests
                     res.ReturnAuthRequired();
                 }
             });
+
+            Plugins.Add(new MiniProfilerFeature());
+
             container.Register<IDbConnectionFactory>(c =>
                 new OrmLiteConnectionFactory(
                     "~/App_Data/db.sqlite".MapHostAbsolutePath(),

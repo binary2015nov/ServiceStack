@@ -15,45 +15,34 @@ namespace ServiceStack.OpenApi.Tests.Host
     [TestFixture]
     public class GeneratedClientTestBase
     {
-        TestAppHost appHost;
+        private ServiceStackHost appHost;
 
         [OneTimeSetUp]
-        public void OnTestFixtureSetUp()
+        public void TestFixtureSetUp()
         {
             appHost = new TestAppHost();
             appHost.Init();
-            appHost.Start(Config.AbsoluteBaseUri);
+            appHost.Start(Constants.ListeningOn);
         }
 
         [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
+        public void TestFixtureTearDown()
         {
             appHost.Dispose();
         }
     }
 
-    public class TestAppHost
-        : AppSelfHostBase
+    public class TestAppHost : AppSelfHostBase
     {
-        //private static ILog log;
-
-        public TestAppHost()
-            : base("ServiceStack Autorest Client", typeof(NativeTypesTestService).GetAssembly())
+        public TestAppHost() : base("ServiceStack Autorest Client", typeof(NativeTypesTestService).GetAssembly())
         {
-            //LogManager.LogFactory = new DebugLogFactory();
-            //log = LogManager.GetLogger(typeof(ExampleAppHostHttpListener));
+            Config.UseCamelCase = true;
+            Config.DebugMode = true;
+            Config.Return204NoContentForEmptyResponse = true;
         }
 
         public override void Configure(Container container)
         {
-            JsConfig.EmitCamelCaseNames = true;
-
-            SetConfig(new HostConfig
-            {
-                DebugMode = true,
-                Return204NoContentForEmptyResponse = true,
-            });
-
             container.Register<IDbConnectionFactory>(c => new OrmLiteConnectionFactory(
                 ":memory:", SqliteDialect.Provider));
 

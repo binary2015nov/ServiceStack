@@ -12,7 +12,7 @@ namespace ServiceStack.OpenApi.Tests
         [Test]
         public void Can_get_annotated_service_with_array_enum()
         {
-            var client = new ServiceStackAutorestClient(new Uri(Constant.AbsoluteBaseUri));
+            var client = new ServiceStackAutorestClient(new Uri(Constants.AbsoluteBaseUri));
 
             var dto = new GetMovie { Id = 1, Includes = new[] {"Genres", "Releases" } };
 

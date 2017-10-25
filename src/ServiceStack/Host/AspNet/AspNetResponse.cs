@@ -18,8 +18,6 @@ namespace ServiceStack.Host.AspNet
 {
     public class AspNetResponse : IHttpResponse
     {
-        //private static readonly ILog Log = LogManager.GetLogger(typeof(HttpResponseWrapper));
-
         private readonly HttpResponseBase response;
 
         public AspNetResponse(HttpResponseBase response)
@@ -182,6 +180,11 @@ namespace ServiceStack.Host.AspNet
         public void ClearCookies()
         {
             response.Cookies.Clear();
+        }
+
+        public void Write(string s)
+        {
+            Response.Write(s);
         }
     }
 }

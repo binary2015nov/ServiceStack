@@ -34,21 +34,17 @@ namespace ServiceStack.Host.Handlers
         protected virtual Task CreateProcessRequestTask(IRequest httpReq, IResponse httpRes, string operationName)
         {
 #if !NETSTANDARD2_0
-            var currentCulture = Thread.CurrentThread.CurrentCulture;
-            var currentUiCulture = Thread.CurrentThread.CurrentUICulture;
-            var ctx = HttpContext.Current;
+            //var currentCulture = Thread.CurrentThread.CurrentCulture;
+            //var currentUiCulture = Thread.CurrentThread.CurrentUICulture;
 #endif
 
             //preserve Current Culture:
             return new Task(() =>
             {
-#if !NETSTANDARD2_0
-                Thread.CurrentThread.CurrentCulture = currentCulture;
-                Thread.CurrentThread.CurrentUICulture = currentUiCulture;
-                //HttpContext is not preserved in ThreadPool threads: http://stackoverflow.com/a/13558065/85785
-                if (HttpContext.Current == null)
-                    HttpContext.Current = ctx;
-#endif
+//#if !NETSTANDARD2_0
+//                Thread.CurrentThread.CurrentCulture = currentCulture;
+//                Thread.CurrentThread.CurrentUICulture = currentUiCulture;
+//#endif
 
                 ProcessRequest(httpReq, httpRes, operationName);
             });
@@ -70,7 +66,8 @@ namespace ServiceStack.Host.Handlers
         public virtual void ProcessRequest(IRequest httpReq, IResponse httpRes, string operationName)
         {
             Logger.Error($"HttpAsyncTaskHandler.ProcessRequest() that should never have been called, was just called from: {Environment.StackTrace}");
-            ProcessRequestAsync(httpReq, httpRes, operationName).Wait();
+            var task = ProcessRequestAsync(httpReq, httpRes, operationName);
+            task.Wait();
         }
 
         //.NET Core entry point for: 
@@ -84,7 +81,7 @@ namespace ServiceStack.Host.Handlers
         }
 
 #if !NETSTANDARD2_0
-        protected static bool DefaultHandledRequest(HttpListenerContext context) => false;
+    protected static bool DefaultHandledRequest(HttpListenerContext context) => false;
 
         protected static bool DefaultHandledRequest(HttpContextBase context) => false;
 
@@ -145,7 +142,7 @@ namespace ServiceStack.Host.Handlers
 
             if (DefaultHandledRequest(context)) return TypeConstants.EmptyTask;
 
-            var httpReq = context.Items[Keywords.IRequest] as IRequest ?? Request ?? new ServiceStack.Host.AspNet.AspNetRequest(context, operationName);
+            var httpReq = context.Items[Keywords.IRequest] as IRequest ?? new ServiceStack.Host.AspNet.AspNetRequest(context, operationName);
 
             if (RunAsAsync())
                 return ProcessRequestAsync(httpReq, httpReq.Response, operationName);

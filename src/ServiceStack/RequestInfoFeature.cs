@@ -21,11 +21,11 @@ namespace ServiceStack
                 return null;
 
             if (HostContext.Config.DebugMode || HostContext.HasValidAuthSecret(request))
-                return new RequestInfoHandler { Request = request };
+                return new RequestInfoHandler();
 
             var session = request.GetSession();     
             if (session != null && session.Roles.Contains("admin"))         
-                return new RequestInfoHandler { Request = request };
+                return new RequestInfoHandler();
             
             return null;
         }

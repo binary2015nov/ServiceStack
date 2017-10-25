@@ -171,7 +171,7 @@ namespace ServiceStack
         /// <summary>
         /// Override to Configure .NET Core dependencies
         /// </summary>
-        public virtual void ConfigureServices(IServiceCollection services) {}
+        public virtual void ConfigureServices(IServiceCollection services) { }
 
         /// <summary>
         /// Override to Confgiure .NET Core App

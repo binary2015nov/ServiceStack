@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using ServiceStack.Text;
 using ServiceStack.Web;
 
@@ -16,7 +17,7 @@ namespace ServiceStack.Host.Handlers
         public string DefaultRootFileName { get; set; }
         public string DefaultHandler { get; set; }
 
-        public override Task ProcessRequestAsync(IRequest request, IResponse response, string operationName)
+        public override void ProcessRequest(IRequest request, IResponse response, string operationName)
         {
             HostContext.AppHost.OnLogError(typeof(NotFoundHttpHandler), $"{request.UserHostAddress} Request not found: {request.RawUrl}");
 
@@ -53,8 +54,8 @@ namespace ServiceStack.Host.Handlers
                         .Append("<li>RawUrl: " + request.RawUrl + "</li>")
                         .Append("</ul>");
                 }
-                
-                sb.Append("</body></html>"); 
+
+                sb.Append("</body></html>");
             }
             else
             {
@@ -75,7 +76,8 @@ namespace ServiceStack.Host.Handlers
 
                 }
             }
-            return response.EndHttpHandlerRequestAsync(skipClose: true, afterHeaders: r => r.WriteAsync(sb.ToString()));
+            var text = sb.ToString();
+            response.EndHttpHandlerRequest(skipClose: true, afterHeaders: r => r.Write(text));
         }
 
         public override bool IsReusable => true;

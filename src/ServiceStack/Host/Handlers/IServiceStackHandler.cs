@@ -12,6 +12,7 @@ namespace ServiceStack.Host.Handlers
         IResponse Response { get; }
 
         Task ProcessRequestAsync(IRequest httpReq, IResponse httpRes, string operationName);
+
         void ProcessRequest(IRequest httpReq, IResponse httpRes, string operationName);
     }
 }

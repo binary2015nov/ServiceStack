@@ -7,18 +7,13 @@ using System;
 using System.Net;
 using System.Reflection;
 using System.Threading;
-using ServiceStack.Host.HttpListener;
 using ServiceStack.Logging;
 
 namespace ServiceStack
 {
-    public abstract class AppHostHttpListenerPoolBase : HttpListenerBase
+    public abstract class AppHostHttpListenerPoolBase : AppHostHttpListenerBase
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(AppHostHttpListenerPoolBase));
-
-        public static int ThreadsPerProcessor = 16;
-
-        public static int PoolSize => Environment.ProcessorCount * ThreadsPerProcessor;
 
         private class ThreadPoolManager : IDisposable
         {
@@ -76,7 +71,7 @@ namespace ServiceStack
         private readonly ThreadPoolManager threadPoolManager;
 
         protected AppHostHttpListenerPoolBase(string serviceName, params Assembly[] assembliesWithServices)
-            : this(serviceName, PoolSize, assembliesWithServices) { }
+            : this(serviceName, CalculatePoolSize(), assembliesWithServices) { }
 
         protected AppHostHttpListenerPoolBase(string serviceName, int poolSize, params Assembly[] assembliesWithServices)
             : base(serviceName, assembliesWithServices)
@@ -85,7 +80,7 @@ namespace ServiceStack
         }
 
         protected AppHostHttpListenerPoolBase(string serviceName, string handlerPath, params Assembly[] assembliesWithServices)
-            : this(serviceName, handlerPath, PoolSize, assembliesWithServices) { }
+            : this(serviceName, handlerPath, CalculatePoolSize(), assembliesWithServices) { }
 
         protected AppHostHttpListenerPoolBase(string serviceName, string handlerPath, int poolSize, params Assembly[] assembliesWithServices)
             : base(serviceName, assembliesWithServices)

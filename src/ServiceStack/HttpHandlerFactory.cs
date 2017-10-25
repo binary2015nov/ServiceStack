@@ -155,8 +155,7 @@ namespace ServiceStack
                     if (restPath != null)
                     {
                         httpReq.SetRoute(restPath);
-                        return new RestHandler { Request = httpReq,
-                            RequestName = restPath.RequestType.GetOperationName() };
+                        return new RestHandler { RequestName = restPath.RequestType.GetOperationName() };
                     }
                 }
 

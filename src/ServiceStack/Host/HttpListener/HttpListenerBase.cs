@@ -55,8 +55,6 @@ namespace ServiceStack.Host.HttpListener
             }
         }
 
-        public string HandlerPath { get { return Config.HandlerFactoryPath; } set { Config.HandlerFactoryPath = value; } }
-
         protected virtual void SetAppDomainData()
         {
             //Required for Mono to resolve VirtualPathUtility and Url.Content urls
