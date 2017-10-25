@@ -11,7 +11,7 @@ namespace ServiceStack.NetCore
         ILoggerFactory loggerFactory;
         private bool debugEnabled;
 
-        public NetCoreLogFactory(ILoggerFactory loggerFactory, bool debugEnabled=false)
+        public NetCoreLogFactory(ILoggerFactory loggerFactory, bool debugEnabled = false)
         {
             this.loggerFactory = loggerFactory;
             this.debugEnabled = debugEnabled;
@@ -32,7 +32,7 @@ namespace ServiceStack.NetCore
     {
         private ILogger log;
 
-        public NetCoreLog(ILogger logger, bool debugEnabled=false)
+        public NetCoreLog(ILogger logger, bool debugEnabled = false)
         {
             this.log = logger;
             this.IsDebugEnabled = debugEnabled;

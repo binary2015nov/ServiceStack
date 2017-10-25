@@ -12,8 +12,6 @@ namespace ServiceStack
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(PlatformNetCore));
         
-        public static ServiceStackHost HostInstance { get; set; }
-
         const string ErrorAppsettingNotFound = "Unable to find App Setting: {0}";
         public const string ConfigNullValue = "{null}";
         
@@ -26,7 +24,7 @@ namespace ServiceStack
 
         public override string GetAppConfigPath()
         {
-            var host = HostContext.AppHost ?? HostInstance;
+            var host = HostInstance;
 
             if (host == null) 
                 return null;

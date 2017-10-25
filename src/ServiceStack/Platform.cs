@@ -19,6 +19,8 @@ namespace ServiceStack
 
         public static bool IsIntegratedPipeline { get; protected set; }
 
+        public ServiceStackHost HostInstance { get; set; }
+
         public virtual HashSet<string> GetRazorNamespaces()
         {
             return new HashSet<string>();
@@ -144,7 +146,7 @@ namespace ServiceStack
         {
             JsConfig.Reset();
             PlatformExtensions.ClearRuntimeAttributes(); //Clears Runtime Attributes
-            ReflectionExtensions.Reset();   
+            ReflectionExtensions.Reset(); 
         }
     }
 }

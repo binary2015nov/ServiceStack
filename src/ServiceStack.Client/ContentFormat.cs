@@ -65,7 +65,7 @@ namespace ServiceStack
 
         public static string NormalizeContentType(string contentType)
         {
-            if (string.IsNullOrEmpty(contentType))
+            if (contentType.IsNullOrEmpty())
                 return null;
 
             if (contentType == MimeTypes.Soap11)

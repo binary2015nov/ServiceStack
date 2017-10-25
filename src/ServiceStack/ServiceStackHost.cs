@@ -39,6 +39,7 @@ namespace ServiceStack
 
         protected ServiceStackHost(string serviceName, params Assembly[] assembliesWithServices)
         {
+            Platform.Instance.HostInstance = this;
             Config = new HostConfig { DebugMode = GetType().Assembly.IsDebugBuild() }; 
             AppSettings = ServiceStack.Configuration.AppSettings.Default;
             Metadata = new ServiceMetadata();
@@ -128,6 +129,8 @@ namespace ServiceStack
         /// </summary>
         public virtual ServiceStackHost Init()
         {
+            if (Ready)
+                throw new InvalidOperationException($"The current method has already been invoked.");
             HostContext.AppHost = this;
             if (WebHostPhysicalPath.IsNullOrEmpty())
                 WebHostPhysicalPath = GetWebRootPath();

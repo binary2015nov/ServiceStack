@@ -17,8 +17,9 @@ namespace ServiceStack.Host
 
         public static IRestPath FindMatchingRestPath(IRequest request, out string contentType)
         {
-            var pathInfo = GetSanitizedPathInfo(request.PathInfo, out contentType);   
-            request.ResponseContentType = contentType;
+            var pathInfo = GetSanitizedPathInfo(request.PathInfo, out contentType);
+            if (contentType != null)
+                request.ResponseContentType = contentType;
 
             var restPath = HostContext.ServiceController.GetRestPathForRequest(request.Verb, pathInfo);
             request.SetRoute(restPath);

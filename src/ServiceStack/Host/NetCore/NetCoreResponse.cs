@@ -109,7 +109,7 @@ namespace ServiceStack.Host.NetCore
 
         public void SetContentLength(long contentLength)
         {
-            if (PlatformNetCore.HostInstance.Config?.DisableChunkedEncoding == true && contentLength >= 0)
+            if (HostContext.Config.DisableChunkedEncoding && contentLength >= 0)
                 response.ContentLength = contentLength;
             
             if (contentLength > 0)

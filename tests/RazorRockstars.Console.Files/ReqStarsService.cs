@@ -431,16 +431,16 @@ namespace RazorRockstars.Console.Files
 		[OneTimeSetUp]
 		public void TestFixtureSetUp()
 		{
-			LogManager.LogFactory = new ConsoleLogFactory();
+			//LogManager.LogFactory = new ConsoleLogFactory();
 			startedAt = Stopwatch.StartNew();
 			appHost = new AppHost {
 				EnableRazor = true, //Uncomment for faster tests!
 			};
 			appHost.Plugins.Add(new MsgPackFormat());
-			//appHost.Plugins.Add(new NetSerializerFormat());
-			//Fast
-			appHost.Init();
-			appHost.Config.DebugMode = true;
+            //appHost.Plugins.Add(new NetSerializerFormat());
+            //Fast
+            appHost.Config.DebugMode = true;
+            appHost.Init();
 			appHost.Start(ListeningOn);
 		}
 
@@ -986,7 +986,7 @@ namespace RazorRockstars.Console.Files
 		{
 			var html = "{0}/Pages/PartialExamples".Fmt(Host)
 				.GetStringFromUrl();
-
+            System.Console.WriteLine(html);
 			Assert.That(html, Does.Contain("<!--view:PartialExamples.cshtml-->"));
 			Assert.That(html, Does.Contain("<!--view:GetReqstar.cshtml-->"));
 			Assert.That(html, Does.Contain("<!--view:CustomReqstar.cshtml-->"));

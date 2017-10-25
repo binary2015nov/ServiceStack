@@ -12,7 +12,6 @@ using ServiceStack.Host.Handlers;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceStack.Configuration;
@@ -22,29 +21,25 @@ namespace ServiceStack
 {
     public abstract class AppHostBase : ServiceStackHost
     {
-        protected AppHostBase(string serviceName, params Assembly[] assembliesWithServices) : base(serviceName, assembliesWithServices) 
-        {
-            PlatformNetCore.HostInstance = this;
-        }
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(AppHostBase));
+
+        protected AppHostBase(string serviceName, params Assembly[] assembliesWithServices) 
+            : base(serviceName, assembliesWithServices) { }
 
         IApplicationBuilder app;
 
         public virtual void Bind(IApplicationBuilder app)
         {
-            this.app = app;
-            BindHost(this, app);
-            app.Use(ProcessRequest);
-        }
+            if (this.app == app)
+                return;
 
-        public static void BindHost(ServiceStackHost appHost, IApplicationBuilder app)
-        {
-            var logFactory = app.ApplicationServices.GetService<ILoggerFactory>();
-            if (logFactory != null)
+            if (!Ready)
             {
-                LogManager.LogFactory = new NetCoreLogFactory(logFactory);
+                Container.Adapter = new NetCoreContainerAdapter(app.ApplicationServices);
+                Init();
             }
 
-            appHost.Container.Adapter = new NetCoreContainerAdapter(app.ApplicationServices);
+            app.Use(ProcessRequest);
         }
 
         /// <summary>
@@ -118,12 +113,13 @@ namespace ServiceStack
             } 
             catch (Exception ex) //Request Initialization error
             {
-                var logFactory = context.Features.Get<ILoggerFactory>();
-                if (logFactory != null)
-                {
-                    var log = logFactory.CreateLogger(GetType());
-                    log.LogError(default(EventId), ex, ex.Message);
-                }
+                //var logFactory = context.Features.Get<ILoggerFactory>();
+                //if (logFactory != null)
+                //{
+                //    var log = logFactory.CreateLogger(GetType());
+                //    log.LogError(default(EventId), ex, ex.Message);
+                //}
+                Logger.Error(ex.Message, ex);
 
                 context.Response.ContentType = MimeTypes.PlainText;
                 await context.Response.WriteAsync($"{ex.GetType().Name}: {ex.Message}");
@@ -154,12 +150,13 @@ namespace ServiceStack
                 }
                 catch (Exception ex)
                 {
-                    var logFactory = context.Features.Get<ILoggerFactory>();
-                    if (logFactory != null)
-                    {
-                        var log = logFactory.CreateLogger(GetType());
-                        log.LogError(default(EventId), ex, ex.Message);
-                    }
+                    //var logFactory = context.Features.Get<ILoggerFactory>();
+                    //if (logFactory != null)
+                    //{
+                    //    var log = logFactory.CreateLogger(GetType());
+                    //    log.LogError(default(EventId), ex, ex.Message);
+                    //}
+                    Logger.Error(ex.Message, ex);
                 }
                 finally
                 {
@@ -212,14 +209,13 @@ namespace ServiceStack
         public static IApplicationBuilder UseServiceStack(this IApplicationBuilder app, AppHostBase appHost)
         {
             appHost.Bind(app);
-            appHost.Init();
             return app;
         }
 
-        public static IApplicationBuilder Use(this IApplicationBuilder app, System.Web.IHttpAsyncHandler httpHandler)
-        {
-            return app.Use(httpHandler.Middleware);
-        }
+        //public static IApplicationBuilder Use(this IApplicationBuilder app, System.Web.IHttpAsyncHandler httpHandler)
+        //{
+        //    return app.Use(httpHandler.Middleware);
+        //}
 
         public static IHttpRequest ToRequest(this HttpContext httpContext, string operationName = null)
         {
