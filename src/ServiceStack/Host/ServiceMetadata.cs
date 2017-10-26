@@ -151,22 +151,19 @@ namespace ServiceStack.Host
 
         public Type GetServiceTypeByRequest(Type requestType)
         {
-            Operation operation;
-            OperationsMap.TryGetValue(requestType, out operation);
+            OperationsMap.TryGetValue(requestType, out var operation);
             return operation?.ServiceType;
         }
 
         public Type GetServiceTypeByResponse(Type responseType)
         {
-            Operation operation;
-            OperationsResponseMap.TryGetValue(responseType, out operation);
+            OperationsResponseMap.TryGetValue(responseType, out var operation);
             return operation?.ServiceType;
         }
 
         public Type GetResponseTypeByRequest(Type requestType)
         {
-            Operation operation;
-            OperationsMap.TryGetValue(requestType, out operation);
+            OperationsMap.TryGetValue(requestType, out var operation);
             return operation?.ResponseType;
         }
 
@@ -180,20 +177,6 @@ namespace ServiceStack.Host
             }
             return allOperationTypes;
         }
-
-        private HashSet<Type> allSoapOperationTypes;
-        public HashSet<Type> GetAllSoapOperationTypes()
-        {
-            var operationTypes = allOperationTypes ?? GetAllOperationTypes();
-            return allSoapOperationTypes = operationTypes.Where(x => !x.IsGenericTypeDefinition() &&
-                  !x.AllAttributes<ExcludeAttribute>().Any(attr => attr.Feature.Has(Feature.Soap))).ToHashSet();
-        }
-
-        public bool IsExportSoapType(Type type)
-        {
-            return (allSoapOperationTypes ?? GetAllSoapOperationTypes()).Any(x => x.Equals(type));
-        }
-
 
         public List<string> GetAllOperationNames()
         {
@@ -556,6 +539,15 @@ namespace ServiceStack.Host
 
             return type;
         }
+        
+#if !NETSTANDARD2_0
+        public List<Type> GetAllSoapOperationTypes()
+        {
+            var operationTypes = GetAllOperationTypes();
+            var soapTypes = HostContext.AppHost.ExportSoapOperationTypes(operationTypes);
+            return soapTypes;
+        }
+#endif
     }
 
     public class Operation

@@ -60,8 +60,7 @@ namespace ServiceStack.Metadata
 
         public bool AlwaysHideInMetadata(string operationName)
         {
-            Operation operation;
-            metadata.OperationNamesMap.TryGetValue(operationName.ToLowerInvariant(), out operation);
+            metadata.OperationNamesMap.TryGetValue(operationName.ToLowerInvariant(), out var operation);
             return operation?.RestrictTo?.VisibilityTo == RequestAttributes.None;
         }
     }

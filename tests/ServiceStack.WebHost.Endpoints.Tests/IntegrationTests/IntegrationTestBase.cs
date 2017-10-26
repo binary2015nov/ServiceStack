@@ -38,10 +38,15 @@ namespace ServiceStack.WebHost.Endpoints.Tests.IntegrationTests
 		{
 			public IntegrationTestAppHost() : base("ServiceStack Examples", typeof(RestMovieService).GetAssembly()) { }
 
-			public override void Configure(Container container)
-			{
-				container.Register(c => new ExampleConfig(AppSettings));
-				//var appConfig = container.Resolve<ExampleConfig>();
+            public override void Configure(Container container)
+            {
+#if !NETCORE
+                Plugins.Add(new SoapFormat());
+#endif
+                container.Register<IAppSettings>(new AppSettings());
+
+                container.Register(c => new ExampleConfig(c.Resolve<IAppSettings>()));
+                //var appConfig = container.Resolve<ExampleConfig>();
 
 				container.Register<IDbConnectionFactory>(c =>
 					 new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider));
