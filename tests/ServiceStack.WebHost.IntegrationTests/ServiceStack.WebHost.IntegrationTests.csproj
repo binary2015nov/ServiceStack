@@ -160,7 +160,6 @@
     <Content Include="webpage.html" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppHost.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Services\CookiesService.cs" />
     <Compile Include="Services\CustomPathServices.cs" />

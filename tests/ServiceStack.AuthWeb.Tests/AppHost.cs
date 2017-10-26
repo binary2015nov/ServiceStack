@@ -47,6 +47,7 @@ namespace ServiceStack.AuthWeb.Tests
         {
             Config.AddRedirectParamsToQueryString = true;
             Config.DebugMode = true;
+            Config.UseCamelCase = true;
         }
 
         public override void Configure(Container container)
@@ -90,8 +91,6 @@ namespace ServiceStack.AuthWeb.Tests
                 db.DropAndCreateTable<Rockstar>();
                 db.Insert(Rockstar.SeedData);
             }
-
-            JsConfig.EmitCamelCaseNames = true;
 
             //Register a external dependency-free 
             container.Register<ICacheClient>(new MemoryCacheClient());
@@ -282,10 +281,10 @@ namespace ServiceStack.AuthWeb.Tests
 #endif
         }
 
-        public override HashSet<Type> ExportSoapOperationTypes()
+        public override List<Type> ExportSoapOperationTypes(IEnumerable<Type> operationTypes)
         {
             //return base.ExportSoapOperationTypes(operationTypes);
-            return new HashSet<Type> { typeof(Authenticate) };
+            return new List<Type> { typeof(Authenticate) };
         }
     }
 

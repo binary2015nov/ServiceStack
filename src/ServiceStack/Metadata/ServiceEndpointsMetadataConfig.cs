@@ -33,12 +33,12 @@ namespace ServiceStack.Metadata
 
         public MetadataConfig GetEndpointConfig(string contentType)
         {
-            if (format == "soap11")
+            if (contentType == "soap11")
                 return this.Soap11;
-            if (format == "soap12")
+            if (contentType == "soap12")
                 return this.Soap12;
 
-            return Custom.Create(format);
+            return Custom.Create(contentType);
         }
     }
 }

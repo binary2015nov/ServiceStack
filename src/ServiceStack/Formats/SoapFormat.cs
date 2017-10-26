@@ -49,7 +49,7 @@ namespace ServiceStack
     // Overridable APIs to customize SOAP behavior
     public abstract partial class ServiceStackHost
     {
-        public virtual List<Type> ExportSoapOperationTypes(List<Type> operationTypes)
+        public virtual List<Type> ExportSoapOperationTypes(IEnumerable<Type> operationTypes)
         {
             var types = operationTypes
                 .Where(x => !x.AllAttributes<ExcludeAttribute>()
