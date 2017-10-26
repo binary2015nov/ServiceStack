@@ -10,6 +10,7 @@ using ServiceStack.Host;
 using ServiceStack.Host.Handlers;
 using ServiceStack.Host.NetCore;
 using ServiceStack.NetCore;
+using ServiceStack.IO;
 using ServiceStack.Web;
 
 namespace ServiceStack
@@ -33,14 +34,17 @@ namespace ServiceStack
 
         protected override void OnBeforeInit()
         {
+            base.OnConfigLoad();
             if (app != null)
             {
                 //Initialize VFS
                 var env = app.ApplicationServices.GetService<IHostingEnvironment>();
                 WebHostPhysicalPath = env.WebRootPath ?? env.ContentRootPath;
+                Config.DebugMode = env.IsDevelopment();
 
+                //Set VirtualFiles to point to ContentRootPath (Project Folder)
+                VirtualFiles = new FileSystemVirtualFiles(env.ContentRootPath);
                 AppHostBase.RegisterLicenseFromAppSettings(AppSettings);
-
                 Config.MetadataRedirectPath = "metadata";
             }
         }
@@ -107,7 +111,7 @@ namespace ServiceStack
 
                 if (serviceStackHandler is RestHandler restHandler)
                 {
-                    httpReq.OperationName = operationName = restHandler.RequestName;
+                    httpReq.OperationName = operationName = restHandler.RestPath.RequestType.GetOperationName();
                 }
 
                 try
@@ -193,13 +197,14 @@ namespace ServiceStack
 
         protected override void Dispose(bool disposing)
         {
-            base.Dispose(disposing);
-
+            LogManager.LogFactory = null;
             if (disposing)
             {
                 this.WebHost?.Dispose();
                 this.WebHost = null;
             }
+
+            base.Dispose(disposing);
         }
     }    
 }

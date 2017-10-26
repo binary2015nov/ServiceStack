@@ -56,11 +56,13 @@ namespace ServiceStack
 
         protected override void OnBeforeInit()
         {
+            base.OnConfigLoad();
             if (app != null)
             {
                 //Initialize VFS
                 var env = app.ApplicationServices.GetService<IHostingEnvironment>();
-                WebHostPhysicalPath = env.ContentRootPath;
+                Config.WebHostPhysicalPath = env.ContentRootPath;
+                Config.DebugMode = env.IsDevelopment();
 
                 //Set VirtualFiles to point to ContentRootPath (Project Folder)
                 VirtualFiles = new FileSystemVirtualFiles(env.ContentRootPath);
@@ -201,6 +203,12 @@ namespace ServiceStack
                 return req;
             }
             return null;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            LogManager.LogFactory = null;
         }
     }
 
