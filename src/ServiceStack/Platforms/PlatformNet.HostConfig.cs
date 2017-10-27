@@ -43,8 +43,7 @@ namespace ServiceStack
 
         public override string GetAppConfigPath()
         {
-            if (HostContext.AppHost == null)
-                return null;
+            if (ServiceStackHost.Instance == null) return null;
 
             var configPath = "~/web.config".MapHostAbsolutePath();
             if (File.Exists(configPath))
