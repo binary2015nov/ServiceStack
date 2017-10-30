@@ -42,7 +42,7 @@ namespace CheckWeb
             //Config.UseHttpsLinks = true;
             Config.AppendUtf8CharsetOnContentTypes.Add(MimeTypes.Html);
             Config.UseCamelCase = true;
-            Config.AdminAuthSecret = "secretz",
+            Config.AdminAuthSecret = "secretz";
             //Config.AllowJsConfig = false;
 
             // Set to return JSON if no request content type is defined

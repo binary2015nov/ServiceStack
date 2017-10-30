@@ -316,7 +316,7 @@ namespace ServiceStack
     {
         public object Any(HotReloadFiles request)
         {
-            if (!HostContext.DebugMode)
+            if (!HostContext.Config.DebugMode)
                 throw new NotImplementedException("set 'debug true' in web.settings to enable this service");
 
             var pattern = request.Pattern ?? "*";

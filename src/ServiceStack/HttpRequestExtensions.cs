@@ -684,7 +684,7 @@ namespace ServiceStack
             var preferredContentTypes = HostContext.Config.PreferredContentTypes;
 
             var acceptsAnything = false;
-            var hasDefaultContentType = !defaultContentType.IsNullOrEmpty();
+            var hasDefaultContentType = !defaultContentType.IsNullOrEmpty() && defaultContentType != "*/*";
             if (acceptContentTypes != null)
             {
                 var hasPreferredContentTypes = new bool[preferredContentTypes.Count];

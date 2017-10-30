@@ -45,14 +45,6 @@ namespace RazorRockstars.Console.Files
             appHost.Dispose();
         }
 
-        //[Ignore("Debug Run")]
-        //[Test]
-        //public void RunFor10Mins()
-        //{
-        //    Process.Start(BaseUri);
-        //    Thread.Sleep(TimeSpan.FromMinutes(10));
-        //}
-
         [Test]
         public void Does_not_use_same_razor_page_instance()
         {

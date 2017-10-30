@@ -25,7 +25,7 @@ namespace RazorRockstars.Console.Files
         {
             Config.AdminAuthSecret = "secret";
             Config.DebugMode = true;
-            Config.EmbeddedResourceSources.Add(ServiceAssemblies[0]);
+            Config.EmbeddedResourceSources.Add(typeof(AppHost).Assembly);
         }
 
         public bool EnableRazor = true;
