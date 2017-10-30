@@ -141,7 +141,7 @@ namespace ServiceStack
             {
                 using (httpResult?.ResultScope?.Invoke())
                 {
-                    HostContext.ContentTypes.SerializeToStream(request, dto, compressionStream);
+                    HostContext.ContentTypes.SerializeToStreamAsync(request, dto, compressionStream).Wait();
                     compressionStream.Close();
                 }
 

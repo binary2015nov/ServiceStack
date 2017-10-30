@@ -311,7 +311,7 @@ namespace ServiceStack
 
             if (Response != null)
             {
-                ResponseFilter.SerializeToStream(this.RequestContext, this.Response, responseStream);
+                await ResponseFilter.SerializeToStreamAsync(this.RequestContext, this.Response, responseStream);
             }
         }
         
@@ -323,8 +323,7 @@ namespace ServiceStack
             var contentLength = GetContentLength().GetValueOrDefault(int.MaxValue); //Safe as guarded by IsPartialRequest
             var rangeHeader = RequestContext.GetHeader(HttpHeaders.Range);
 
-            long rangeStart, rangeEnd;
-            rangeHeader.ExtractHttpRanges(contentLength, out rangeStart, out rangeEnd);
+            rangeHeader.ExtractHttpRanges(contentLength, out var rangeStart, out var rangeEnd);
 
             if (rangeEnd > contentLength - 1)
                 rangeEnd = contentLength - 1;
@@ -454,6 +453,7 @@ namespace ServiceStack
         public void Dispose()
         {
             DisposeStream();
+            using (Response as IDisposable) {}
         }
     }
 

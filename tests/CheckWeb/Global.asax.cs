@@ -42,6 +42,7 @@ namespace CheckWeb
             //Config.UseHttpsLinks = true;
             Config.AppendUtf8CharsetOnContentTypes.Add(MimeTypes.Html);
             Config.UseCamelCase = true;
+            Config.AdminAuthSecret = "secretz",
             //Config.AllowJsConfig = false;
 
             // Set to return JSON if no request content type is defined
@@ -111,6 +112,8 @@ namespace CheckWeb
 
             container.Register<IDbConnectionFactory>(
                 new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider));
+            //container.Register<IDbConnectionFactory>(
+            //    new OrmLiteConnectionFactory("Server=localhost;Database=test;User Id=test;Password=test;", SqlServerDialect.Provider));
 
             using (var db = container.Resolve<IDbConnectionFactory>().Open())
             {

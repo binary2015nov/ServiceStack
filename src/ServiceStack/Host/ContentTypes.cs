@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using ServiceStack.Host.Handlers;
 using ServiceStack.Serialization;
 using ServiceStack.Text;
 using ServiceStack.Web;
@@ -53,6 +51,9 @@ namespace ServiceStack.Host
                 { MimeTypes.Xml, (c, t) => XmlSerializer.Deserialize(c, t) },
 
             };
+
+        public static StreamSerializerDelegateAsync UnknownContentTypeSerializer { get; set; } = SerializeUnknownContentType;
+        public static StreamDeserializerDelegateAsync UnknownContentTypeDeserializer { get; set; }
 
         public readonly static HashSet<string> KnownFormats = new HashSet<string>
         {
@@ -139,12 +140,36 @@ namespace ServiceStack.Host
         {
             ContentTypeDeserializers[ContentFormat.NormalizeContentType(contentType)] = streamDeserializer;
         }
+
+        public static async Task SerializeUnknownContentType(IRequest req, object response, Stream stream)
+        {
+            switch (response) 
+            {
+                case string text:
+                    await stream.WriteAsync(text);
+                    break;
+                case byte[] bytes:
+                    await stream.WriteAsync(bytes, 0, bytes.Length);
+                    break;
+                case Stream input:
+                    await input.CopyToAsync(stream);
+                    break;
+#if !NETSTANDARD2_0
+                case System.Drawing.Image img:
+                    img.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                    break;
+#endif
+                default:
+                    throw new NotSupportedException(ErrorMessages.ContentTypeNotSupported.Fmt(req.ResponseContentType));
+            }
+        }
         
         public byte[] SerializeToBytes(IRequest req, object response)
         {
             var contentType = ContentFormat.NormalizeContentType(req.ResponseContentType);
 
-            if (ContentTypeSerializers.TryGetValue(contentType, out var responseStreamWriter))
+            var responseStreamWriter = GetStreamSerializer(contentType);
+            if (responseStreamWriter != null)
             {
                 using (var ms = MemoryStreamFactory.GetStream())
                 {
@@ -154,7 +179,8 @@ namespace ServiceStack.Host
                 }
             }
 
-            if (ContentTypeSerializersAsync.TryGetValue(contentType, out var responseWriterAsync))
+            var responseWriterAsync = GetStreamSerializerAsync(contentType);
+            if (responseWriterAsync != null)
             {
                 using (var ms = MemoryStreamFactory.GetStream())
                 {
@@ -176,7 +202,8 @@ namespace ServiceStack.Host
                 return stringSerializer(req, response);
             }
 
-            if (ContentTypeSerializers.TryGetValue(contentType, out var responseStreamWriter))
+            var responseStreamWriter = GetStreamSerializer(contentType);
+            if (responseStreamWriter != null)
             {
                 using (var ms = MemoryStreamFactory.GetStream())
                 {
@@ -188,11 +215,12 @@ namespace ServiceStack.Host
                 }
             }
 
-            if (ContentTypeSerializersAsync.TryGetValue(contentType, out var responseWriter))
+            var responseWriterAsync = GetStreamSerializerAsync(contentType);
+            if (responseWriterAsync != null)
             {
                 using (var ms = MemoryStreamFactory.GetStream())
                 {
-                    responseWriter(req, response, ms).Wait();
+                    responseWriterAsync(req, response, ms).Wait();
 
                     var bytes = ms.ToArray();
                     var result = bytes.FromUtf8Bytes();
@@ -204,7 +232,7 @@ namespace ServiceStack.Host
             throw new NotSupportedException(ErrorMessages.ContentTypeNotSupported.Fmt(contentType));
         }
         
-        public void SerializeToStream(IRequest req, object response, Stream responseStream)
+        public async Task SerializeToStreamAsync(IRequest req, object response, Stream responseStream)
         {
             var contentType = ContentFormat.NormalizeContentType(req.ResponseContentType);
 
@@ -218,8 +246,7 @@ namespace ServiceStack.Host
             var serializerAsync = GetStreamSerializerAsync(contentType);
             if (serializerAsync != null)
             {
-                var task = serializerAsync(req, response, responseStream);
-                task.Wait();
+                await serializerAsync(req, response, responseStream);
                 return;
             }
             
@@ -235,7 +262,7 @@ namespace ServiceStack.Host
 
             var serializer = GetStreamSerializer(contentType);
             if (serializer == null) 
-                return null;
+                return UnknownContentTypeSerializer;
 
             return (httpReq, dto, stream) =>
             {
@@ -305,7 +332,7 @@ namespace ServiceStack.Host
 
             var deserializer = GetStreamDeserializer(contentType);
             if (deserializer == null) 
-                return null;
+                return UnknownContentTypeDeserializer;
 
             return (type, stream) => Task.FromResult(deserializer(type, stream));
         }
