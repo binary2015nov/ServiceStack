@@ -480,7 +480,7 @@ namespace Funq
             GetEntry<TService, TFunc>(name, true);
         }
 
-        private bool disposed = false;
+        private bool hasDisposed = false;
 
         /// <summary>
         /// Disposes the container and all instances owned by it (<see cref="Owner.Container"/>), as well as all child containers 
@@ -488,10 +488,10 @@ namespace Funq
         /// </summary>
         public virtual void Dispose()
         {
-            if (disposed)
+            if (hasDisposed)
                 return;
 
-            disposed = true;
+            hasDisposed = true;
 
             lock (disposables)
             {
@@ -514,14 +514,13 @@ namespace Funq
 
             foreach (var serviceEntry in services.Values)
             {
-                if (serviceEntry.Owner != Owner.Container)
-                    continue;
-                var disposable = serviceEntry.GetInstance() as IDisposable;
-                if (disposable != null && !(disposable is Container))
+                if (serviceEntry.GetInstance() is IDisposable disposable && !(disposable is Container))
                 {
                     disposable.Dispose();
                 }
             }
+
+            using (Adapter as IDisposable) { }
         }
     }
 

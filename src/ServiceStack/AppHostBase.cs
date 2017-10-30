@@ -13,12 +13,9 @@ namespace ServiceStack
     public abstract class AppHostBase : ServiceStackHost
     {
         protected AppHostBase(string serviceName, params Assembly[] assembliesWithServices)
-            : base(serviceName, assembliesWithServices) { }
-
-        public override ServiceStackHost Init()
+            : base(serviceName, assembliesWithServices)
         {
             Config.HandlerFactoryPath = PlatformNet.InferHttpHandlerPath();
-            return base.Init();
         }
 
         public override string ResolvePhysicalPath(string virtualPath, IRequest request)

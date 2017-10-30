@@ -56,12 +56,11 @@ namespace ServiceStack
 
         protected override void OnBeforeInit()
         {
-            base.OnConfigLoad();
             if (app != null)
             {
                 //Initialize VFS
                 var env = app.ApplicationServices.GetService<IHostingEnvironment>();
-                Config.WebHostPhysicalPath = env.ContentRootPath;
+                WebHostPhysicalPath = env.ContentRootPath;
                 Config.DebugMode = env.IsDevelopment();
 
                 //Set VirtualFiles to point to ContentRootPath (Project Folder)
@@ -141,11 +140,6 @@ namespace ServiceStack
                 if (!string.IsNullOrEmpty(serviceStackHandler.RequestName))
                     operationName = serviceStackHandler.RequestName;
 
-                if (serviceStackHandler is RestHandler restHandler)
-                {
-                    operationName = restHandler.RequestName;
-                }
-
                 try
                 {
                     await serviceStackHandler.ProcessRequestAsync(httpReq, httpRes, operationName);
@@ -208,7 +202,6 @@ namespace ServiceStack
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            LogManager.LogFactory = null;
         }
     }
 
@@ -219,11 +212,6 @@ namespace ServiceStack
             appHost.Bind(app);
             return app;
         }
-
-        //public static IApplicationBuilder Use(this IApplicationBuilder app, System.Web.IHttpAsyncHandler httpHandler)
-        //{
-        //    return app.Use(httpHandler.Middleware);
-        //}
 
         public static IHttpRequest ToRequest(this HttpContext httpContext, string operationName = null)
         {

@@ -104,7 +104,7 @@ namespace ServiceStack.Authentication.MongoDb
                 userAuth.Id = IncUserAuthCounter();
             var usersCollection = mongoDatabase.GetCollection<UserAuth>(UserAuthCol);
             usersCollection.ReplaceOne(u => u.Id == userAuth.Id, (UserAuth)userAuth, 
-                new UpdateOptions() {IsUpsert = true});
+                new UpdateOptions { IsUpsert = true });
         }
 
         private int IncUserAuthCounter()

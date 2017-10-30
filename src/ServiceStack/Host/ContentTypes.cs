@@ -29,6 +29,8 @@ namespace ServiceStack.Host
                 { MimeTypes.Json, JsonDataContractSerializer.Instance.DeserializeFromStream },
                 { MimeTypes.Jsv, TypeSerializer.DeserializeFromStream },
                 { MimeTypes.Xml, (t, s) => XmlSerializer.Deserialize(s, t) },
+                { "text/xml; charset=utf-8", (t, s) => XmlSerializer.Deserialize(s, t) }, //"text/xml; charset=utf-8" matches xml + soap11
+
             };
 
         public Dictionary<string, StreamSerializerDelegateAsync> ContentTypeSerializersAsync

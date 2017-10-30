@@ -21,7 +21,7 @@ namespace ServiceStack.Formats
 
 	public class MarkdownFormat : IViewEngine, IPlugin
 	{
-		private static readonly ILog Log = LogManager.GetLogger(typeof(MarkdownFormat));
+		private static readonly ILog Logger = LogManager.GetLogger(typeof(MarkdownFormat));
 
 		private const string ErrorPageNotFound = "Could not find Markdown page '{0}'";
 
@@ -96,8 +96,8 @@ namespace ServiceStack.Formats
 			foreach (var ns in appHost.Config.RazorNamespaces)
 				Evaluator.AddAssembly(ns);
 
-            this.MarkdownBaseType = this.MarkdownBaseType;
-            this.MarkdownGlobalHelpers = this.MarkdownGlobalHelpers;
+			this.MarkdownBaseType = this.MarkdownBaseType;
+			this.MarkdownGlobalHelpers = this.MarkdownGlobalHelpers;
 
 			this.ReplaceTokens = appHost.Config.HtmlReplaceTokens ?? new Dictionary<string, string>();
 			var webHostUrl = appHost.Config.WebHostUrl;
@@ -187,19 +187,19 @@ namespace ServiceStack.Formats
 			return GetViewPage(viewName, httpReq) != null;
 		}
 
-        public string RenderPartial(string pageName, object model, bool renderHtml, StreamWriter writer, IHtmlContext htmlHelper = null)
-        {
-            var markdownPage = ReloadIfNeeded(GetViewPage(pageName, htmlHelper.GetHttpRequest()));
-            var output = RenderDynamicPage(markdownPage, pageName, model, renderHtml, false);
-            
-            if (writer != null)
-            {
-                writer.Write(output);
-                writer.Flush();
-                return null;
-            }
-            return output;
-        }
+		public string RenderPartial(string pageName, object model, bool renderHtml, StreamWriter writer, IHtmlContext htmlHelper = null)
+		{
+			var markdownPage = ReloadIfNeeded(GetViewPage(pageName, htmlHelper.GetHttpRequest()));
+			var output = RenderDynamicPage(markdownPage, pageName, model, renderHtml, false);
+			
+			if (writer != null)
+			{
+				writer.Write(output);
+				writer.Flush();
+				return null;
+			}
+			return output;
+		}
 
 		public MarkdownPage GetViewPage(string viewName, IRequest httpReq)
 		{
@@ -425,7 +425,7 @@ namespace ServiceStack.Formats
 				}
 				catch (Exception ex)
 				{
-					Log.Error("AddTemplate(): " + ex.Message, ex);
+					Logger.Error("AddTemplate(): " + ex.Message, ex);
 				}
 			}
 		}
@@ -491,7 +491,7 @@ namespace ServiceStack.Formats
 			}
 			catch (Exception ex)
 			{
-				Log.Error("AddViewPage() page.Prepare(): " + ex.Message, ex);
+				Logger.Error("AddViewPage() page.Prepare(): " + ex.Message, ex);
 			}
 
 			try
@@ -507,7 +507,7 @@ namespace ServiceStack.Formats
 			}
 			catch (Exception ex)
 			{
-				Log.Error("Error compiling template " + page.Template + ": " + ex.Message, ex);
+				Logger.Error("Error compiling template " + page.Template + ": " + ex.Message, ex);
 			}
 		}
 
@@ -554,7 +554,7 @@ namespace ServiceStack.Formats
 			}
 			catch (Exception ex)
 			{
-				Log.Error("AddViewPage() template.Prepare(): " + ex.Message, ex);
+				Logger.Error("AddViewPage() template.Prepare(): " + ex.Message, ex);
 				return null;
 			}
 		}

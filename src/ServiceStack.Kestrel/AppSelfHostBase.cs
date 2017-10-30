@@ -34,7 +34,6 @@ namespace ServiceStack
 
         protected override void OnBeforeInit()
         {
-            base.OnConfigLoad();
             if (app != null)
             {
                 //Initialize VFS
@@ -105,17 +104,12 @@ namespace ServiceStack
                     await next();
                     return;
                 }
-
-                if (!string.IsNullOrEmpty(serviceStackHandler.RequestName))
-                    operationName = serviceStackHandler.RequestName;
-
-                if (serviceStackHandler is RestHandler restHandler)
-                {
-                    httpReq.OperationName = operationName = restHandler.RestPath.RequestType.GetOperationName();
-                }
-
+     
                 try
                 {
+                    if (!serviceStackHandler.RequestName.IsNullOrEmpty())
+                        operationName = serviceStackHandler.RequestName;
+
                     await serviceStackHandler.ProcessRequestAsync(httpReq, httpRes, operationName);
                 }
                 catch (Exception ex)
@@ -197,7 +191,6 @@ namespace ServiceStack
 
         protected override void Dispose(bool disposing)
         {
-            LogManager.LogFactory = null;
             if (disposing)
             {
                 this.WebHost?.Dispose();

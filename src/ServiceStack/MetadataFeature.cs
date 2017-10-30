@@ -76,7 +76,7 @@ namespace ServiceStack
 
                 default:
                     string contentType;
-                    if (HostContext.ContentTypes.ContentTypeFormats.TryGetValue(pathArray[0], out contentType))
+                    if (HostContext.ContentTypes.ContentTypeFormats.TryGetValue(pathArray[0], out contentType) && pathArray[1] == "metadata")
                     {
                         var format = ContentFormat.GetContentFormat(contentType);
                         return new CustomMetadataHandler(contentType, format);
