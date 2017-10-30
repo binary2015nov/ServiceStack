@@ -20,7 +20,7 @@ namespace AutorestClient.Models
         /// </summary>
         public GetErrorModel()
         {
-          CustomInit();
+            CustomInit();
         }
 
         /// <summary>

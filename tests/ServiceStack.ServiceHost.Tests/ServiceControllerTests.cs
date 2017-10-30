@@ -98,13 +98,12 @@ namespace ServiceStack.ServiceHost.Tests
                     new ServiceController(x, () => new[] {
                         typeof(GenericService<>).MakeGenericType(new[] { typeof(Generic3<>) })
                     })
-            }.Init())
+            })
             {
                 // Tell manager to register GenericService<Generic3<>>, which should not be possible since Generic3<> is an open type
-                var exception = Assert.Throws<System.NotImplementedException>(() =>
-                    appHost.ServiceController.GetService(typeof(Generic3<>)));
+                var exception = Assert.Throws<System.ArgumentException>(() => appHost.ServiceController.Init());
 
-                Assert.That(exception.Message, Does.Contain("Unable to resolve service"));
+                Assert.That(exception.Message, Does.Contain("is not a service type that implements IService"));
             }
         }
 
@@ -116,12 +115,12 @@ namespace ServiceStack.ServiceHost.Tests
                 UseServiceController = x => new ServiceController(x, () => new[]
                 {
                     typeof (GenericService<Generic1>),
-                    typeof (GenericService<>).MakeGenericType(new[] {typeof (Generic2)}),
+                    typeof (GenericService<>).MakeGenericType(new[] { typeof (Generic2) }),
                     // GenericService<Generic2> created through reflection
                     typeof (GenericService<Generic3<string>>),
                     typeof (GenericService<Generic3<int>>),
                     typeof (GenericService<>).MakeGenericType(new[]
-                        {typeof (Generic3<>).MakeGenericType(new[] {typeof (double)})}),
+                        { typeof (Generic3<>).MakeGenericType(new[] {typeof (double)}) }),
                     // GenericService<Generic3<double>> created through reflection
                 })
             }.Init())

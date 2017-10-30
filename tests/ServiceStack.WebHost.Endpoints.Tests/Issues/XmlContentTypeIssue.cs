@@ -35,7 +35,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Issues
 
         private ServiceStackHost appHost;
 
-        public XmlContentTypeIssue()
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
         {
             appHost = new AppHost()
                 .Init()

@@ -19,13 +19,13 @@ namespace ServiceStack.MiniProfiler.Data
         /// <param name="profiler">The currently started <see cref="IDbProfiler"/> or null.</param>
         /// <param name="autoDisposeConnection">Determines whether the ProfiledDbConnection will dispose the underlying connection.</param>
         public ProfiledDbConnection(DbConnection connection, IDbProfiler profiler, bool autoDisposeConnection = true)
-            : base(connection, profiler, autoDisposeConnection) {}
+            : base(connection, profiler, autoDisposeConnection) { }
 
         public ProfiledDbConnection(IDbConnection connection, IDbProfiler profiler, bool autoDisposeConnection=true)
-            : base(connection, profiler, autoDisposeConnection) {}
+            : base(connection, profiler, autoDisposeConnection) { }
 
         public ProfiledDbConnection(DbConnection connection, IProfiler profiler, bool autoDisposeConnection = true)
-            : base(connection, GetDbProfiler(profiler), autoDisposeConnection) {}
+            : base(connection, GetDbProfiler(profiler), autoDisposeConnection) { }
 
         public ProfiledDbConnection(IDbConnection connection, IProfiler profiler, bool autoDisposeConnection=true)
             : base(connection, GetDbProfiler(profiler), autoDisposeConnection) { }

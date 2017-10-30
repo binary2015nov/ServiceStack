@@ -52,6 +52,7 @@ namespace ServiceStack.AuthWeb.Tests
 
         public override void Configure(Container container)
         {
+            Plugins.Add(new MiniProfilerFeature());
             Plugins.Add(new RazorFormat());
             Plugins.Add(new ServerEventsFeature
             {

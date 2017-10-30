@@ -39,6 +39,7 @@ namespace ServiceStack.OpenApi.Tests.Host
             Config.UseCamelCase = true;
             Config.DebugMode = true;
             Config.Return204NoContentForEmptyResponse = true;
+            Config.StrictMode = false;
         }
 
         public override void Configure(Container container)

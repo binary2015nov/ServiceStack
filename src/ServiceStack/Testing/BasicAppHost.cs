@@ -20,7 +20,6 @@ namespace ServiceStack.Testing
         {
             ExcludeAutoRegisteringServiceTypes.Clear();
             TestMode = true;
-            Config.StrictMode = true;
             Plugins.Clear();
         }
 
