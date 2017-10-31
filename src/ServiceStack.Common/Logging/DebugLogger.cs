@@ -57,18 +57,21 @@ namespace ServiceStack.Logging
 		public bool IsDebugEnabled { get; set; }
 
 		public void Debug(object message, Exception exception)
-		{
-			Log(Name + LogLevels.Debug + message, exception);
+        {
+            if (IsDebugEnabled)
+                Log(Name + LogLevels.Debug + message, exception);
 		}
 
 		public void Debug(object message)
-		{
-			Log(Name + LogLevels.Debug + message);
+        {
+            if (IsDebugEnabled)
+                Log(Name + LogLevels.Debug + message);
 		}
 
 		public void DebugFormat(string format, params object[] args)
-		{
-			LogFormat(Name + LogLevels.Debug + format, args);
+        {
+            if (IsDebugEnabled)
+                LogFormat(Name + LogLevels.Debug + format, args);
 		}
 
 		public void Error(object message, Exception exception)

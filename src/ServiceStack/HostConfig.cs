@@ -127,11 +127,7 @@ namespace ServiceStack
         public string ApiVersion { get; set; }
 
         private RequestAttributes metadataVisibility;
-        public RequestAttributes MetadataVisibility
-        {
-            get => metadataVisibility;
-            set => metadataVisibility = value.ToAllowedFlagsSet();
-        }
+        public RequestAttributes MetadataVisibility { get { return metadataVisibility; } set { metadataVisibility = value.ToAllowedFlagsSet(); } }
 
         public HashSet<Assembly> EmbeddedResourceSources { get; private set; }
         public HashSet<string> EmbeddedResourceTreatAsFiles { get { return ResourceVirtualDirectory.EmbeddedResourceTreatAsFiles; } set { ResourceVirtualDirectory.EmbeddedResourceTreatAsFiles = value; } }

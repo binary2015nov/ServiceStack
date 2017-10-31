@@ -8,6 +8,7 @@ using ServiceStack.Authentication.OpenId;
 using ServiceStack.Caching;
 using ServiceStack.Data;
 using ServiceStack.DataAnnotations;
+using ServiceStack.Logging;
 using ServiceStack.Messaging;
 using ServiceStack.Messaging.Redis;
 using ServiceStack.MiniProfiler;
@@ -32,9 +33,8 @@ namespace ServiceStack.WebHost.IntegrationTests
             {
                 Config.AdminAuthSecret = Constants.AuthSecret;
                 Config.ApiVersion = "2.0.0";
-                Config.DebugMode = true;
                 Config.UseCamelCase = true;
-                Config.EmbeddedResourceSources.Add(GetType().GetAssembly());
+                Config.EmbeddedResourceSources.Add(GetType().Assembly);
                 //var onlyEnableFeatures = Feature.All.Remove(Feature.Jsv | Feature.Soap);
                 //Config.EnableFeatures = onlyEnableFeatures;       
             }
@@ -193,7 +193,7 @@ namespace ServiceStack.WebHost.IntegrationTests
 
         protected void Application_Start(object sender, EventArgs e)
         {
-            ServiceStack.Logging.LogManager.LogFactory = new ServiceStack.Logging.DebugLogFactory();
+            LogManager.LogFactory = new DebugLogFactory();
             new AppHost().Init();
         }
 

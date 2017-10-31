@@ -10,7 +10,8 @@ namespace ServiceStack.Logging
         private static ILogFactory logFactory;
 
         /// <summary>
-        /// Gets or sets the log factory used to create loggers. The default value is <see cref="ServiceStack.Logging.NullLogFactory"/>.
+        /// Gets or sets the log factory used to create loggers. The default value is
+        /// <see cref="ServiceStack.Logging.NullLogFactory"/>.
         /// </summary>
         public static ILogFactory LogFactory
         {

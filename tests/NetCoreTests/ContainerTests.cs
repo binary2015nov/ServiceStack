@@ -1,8 +1,6 @@
-﻿using System;
-using Funq;
+﻿using Funq;
 using NUnit.Framework;
 using ServiceStack;
-using ServiceStack.Testing;
 
 namespace NetCoreTests
 {
@@ -12,9 +10,7 @@ namespace NetCoreTests
         {
             public AppHost() : base(nameof(ContainerTests), typeof(ContainerTests).Assembly) { }
 
-            public override void Configure(Container container)
-            {
-            }
+            public override void Configure(Container container) { }
         }
         
         [Test]

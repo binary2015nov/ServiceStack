@@ -108,7 +108,7 @@ namespace ServiceStack
         public ServiceStackProvider(IHttpRequest request, IResolver resolver = null)
         {
             this.request = request;
-            this.resolver = resolver ?? Service.DefaultResolver ?? HostContext.AppHost;
+            this.resolver = resolver ?? Service.GlobalResolver ?? HostContext.AppHost;
         }
 
         private IResolver resolver;

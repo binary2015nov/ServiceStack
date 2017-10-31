@@ -59,7 +59,7 @@ namespace ServiceStack.Host.AspNet
         private IResolver resolver;
         public IResolver Resolver
         {
-            get { return resolver ?? Service.DefaultResolver; }
+            get { return resolver ?? Service.GlobalResolver; }
             set { resolver = value; }
         }
 

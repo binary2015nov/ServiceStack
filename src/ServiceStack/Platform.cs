@@ -10,16 +10,16 @@ namespace ServiceStack
 {
     public abstract class Platform
     {
-        public static Platform Instance =
+        public static bool IsIntegratedPipeline { get; protected set; }
+
+        public static ServiceStackHost HostInstance { get; set; }
+
+        public static Platform Instance = 
 #if NETSTANDARD2_0
             new PlatformNetCore();
 #else
             new PlatformNet();
 #endif
-
-        public static bool IsIntegratedPipeline { get; protected set; }
-
-        public ServiceStackHost HostInstance { get; set; }
 
         public virtual HashSet<string> GetRazorNamespaces()
         {

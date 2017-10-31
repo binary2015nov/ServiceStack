@@ -152,7 +152,7 @@ namespace ServiceStack.ServiceHost.Tests.UseCase
             var container = GetContainerWithDependencies();
 
             container.RegisterAutoWiredTypes(new[] { typeof(StoreCustomersService), typeof(GetCustomerService) });
-            Service.DefaultResolver = container;
+            Service.GlobalResolver = container;
             return new ContainerResolveCache();
         }
 

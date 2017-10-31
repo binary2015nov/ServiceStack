@@ -620,7 +620,7 @@ Plugins: {{ plugins | select: \n  - { it | typeName } }}
     {
         public IRequest Request { get; set; }
 
-        public virtual IResolver GetResolver() => Service.DefaultResolver;
+        public virtual IResolver GetResolver() => Service.GlobalResolver;
 
         public virtual T TryResolve<T>()
         {

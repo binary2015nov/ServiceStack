@@ -19,7 +19,7 @@ namespace ServiceStack.Testing
         private IResolver resolver;
         public IResolver Resolver
         {
-            get => resolver ?? Service.DefaultResolver;
+            get => resolver ?? Service.GlobalResolver;
             set => resolver = value;
         }
 

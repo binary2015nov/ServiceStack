@@ -16,6 +16,7 @@ using System.Web;
 using System.Xml;
 using ServiceStack.Auth;
 using ServiceStack.Caching;
+using ServiceStack.Configuration;
 using ServiceStack.Data;
 using ServiceStack.DataAnnotations;
 using ServiceStack.FluentValidation;
@@ -644,7 +645,7 @@ namespace ServiceStack
         /// <returns></returns>
         public virtual ICacheClient GetCacheClient(IRequest req)
         {
-            return this.GetCacheClient();
+            return ((IResolver)req).GetCacheClient();
         }
 
         /// <summary>

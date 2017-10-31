@@ -5,12 +5,16 @@ namespace ServiceStack.Metadata
 {
 	public abstract class WsdlTemplateBase
 	{
+		public const string DefaultWsdlNamespace = "http://schemas.servicestack.net/types";
+
 		public string Xsd { get; set; }
 		public string ServiceName { get; set; }
 		public IList<string> ReplyOperationNames { get; set; }
 		public IList<string> OneWayOperationNames { get; set; }
 		public string ReplyEndpointUri { get; set; }
 		public string OneWayEndpointUri { get; set; }
+
+		public string WsdlTargetNamespace { get { return HostContext.Config?.WsdlServiceNamespace ?? DefaultWsdlNamespace; } }
 
 		public abstract string WsdlName { get; }
 

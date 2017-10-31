@@ -11,12 +11,12 @@ namespace ServiceStack.Logging
     /// </summary>
     public class StringBuilderLogFactory : ILogFactory
     {
-        private StringBuilder sb;
+        private readonly StringBuilder sb = new StringBuilder();
+
         private readonly bool debugEnabled;
 
         public StringBuilderLogFactory(bool debugEnabled = true)
         {
-            sb = new StringBuilder();
             this.debugEnabled = debugEnabled;
         }
 

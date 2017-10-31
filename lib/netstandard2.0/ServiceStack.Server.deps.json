@@ -1340,7 +1340,6 @@
           "Microsoft.AspNetCore.Http.Abstractions": "2.0.0",
           "Microsoft.AspNetCore.Http.Extensions": "2.0.0",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "2.0.0",
-          "Microsoft.Extensions.Logging.Abstractions": "2.0.0",
           "Microsoft.Extensions.Primitives": "2.0.0",
           "ServiceStack.Client": "1.0.0",
           "ServiceStack.Common": "1.0.0",

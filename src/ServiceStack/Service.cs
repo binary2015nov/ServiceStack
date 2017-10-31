@@ -19,7 +19,7 @@ namespace ServiceStack
     /// </summary>
     public class Service : IService, IServiceBase, IDisposable
     {
-        public static IResolver DefaultResolver { get; set; }
+        public static IResolver GlobalResolver { get; set; }
 
         public static bool IsServiceType(Type type)
         {
@@ -76,7 +76,7 @@ namespace ServiceStack
         }
 
         private IResolver resolver;
-        public virtual IResolver GetResolver() => resolver ?? DefaultResolver;
+        public virtual IResolver GetResolver() => resolver ?? GlobalResolver;
 
         public virtual Service SetResolver(IResolver resolver)
         {

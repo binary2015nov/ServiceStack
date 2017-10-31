@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using ServiceStack.DataAnnotations;
+using ServiceStack.Metadata;
 using ServiceStack.NativeTypes;
 
 namespace ServiceStack
