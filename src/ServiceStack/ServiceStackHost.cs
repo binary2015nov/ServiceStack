@@ -21,6 +21,7 @@ using ServiceStack.IO;
 using ServiceStack.Logging;
 using ServiceStack.Messaging;
 using ServiceStack.Metadata;
+using ServiceStack.MiniProfiler;
 using ServiceStack.NativeTypes;
 using ServiceStack.Redis;
 using ServiceStack.Text;
@@ -729,9 +730,10 @@ namespace ServiceStack
             var absoluteUri = httpReq.AbsoluteUri;
             var index = httpReq.PathInfo.IsNullOrEmpty() || httpReq.PathInfo == "/"
                 ? absoluteUri.IndexOf("?", StringComparison.Ordinal)
-                : absoluteUri.IndexOf(httpReq.PathInfo.TrimEnd('/'), StringComparison.Ordinal) + 1;         
+                : absoluteUri.IndexOf(httpReq.PathInfo.TrimEnd('/'), StringComparison.Ordinal) + 1;
 
-            return Config.WebHostUrl = index > 0 ? absoluteUri.Substring(0, index) : absoluteUri;
+            var hostUrl = index > 0 ? absoluteUri.Substring(0, index) : absoluteUri;
+            return Config.WebHostUrl = hostUrl.WithTrailingSlash();
         }
 
         public virtual string ResolvePhysicalPath(string virtualPath, IRequest httpReq)
