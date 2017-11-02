@@ -39,6 +39,11 @@ namespace ServiceStack
         {
             return relativePath.MapHostAbsolutePath();
         }
+
+        protected override string GetWebRootPath()
+        {
+            return "~".MapHostAbsolutePath();
+        }
     }
 }
 #endif

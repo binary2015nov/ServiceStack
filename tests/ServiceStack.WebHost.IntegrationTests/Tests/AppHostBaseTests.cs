@@ -9,14 +9,14 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         [Test]
         public void Can_download_webpage_html_page()
         {
-            var html = (Constants.ServiceStackBaseHost + "webpage.html").GetHtmlFromUrl();
+            var html = Constants.ServiceStackBaseHost.AppendPath("webpage.html").GetHtmlFromUrl();
             Assert.That(html.Contains("ServiceStack.WebHost.IntegrationTests Web Page"));
         }
 
         [Test]
         public void Gets_404_on_non_existant_page()
         {
-            var webRes = (Constants.ServiceStackBaseHost + "nonexistant.html").GetWebResponse();
+            var webRes = Constants.ServiceStackBaseHost.AppendPath("nonexistant.html").GetWebResponse();
             Assert.That(webRes.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         }
 

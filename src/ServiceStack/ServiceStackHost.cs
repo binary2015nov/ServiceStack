@@ -48,6 +48,7 @@ namespace ServiceStack
             Container = new Container { DefaultOwner = Owner.External };
             ContentTypes = ServiceStack.Host.ContentTypes.Default;
             Routes = new ServiceRoutes();
+            WebHostPhysicalPath = GetWebRootPath();
             PreRequestFilters = new List<Action<IRequest, IResponse>>();
             RequestConverters = new List<Func<IRequest, object, Task<object>>>();
             ResponseConverters = new List<Func<IRequest, object, Task<object>>>();
@@ -129,16 +130,13 @@ namespace ServiceStack
         /// </summary>
         public virtual ServiceStackHost Init()
         {
-            if (Ready)
-                throw new InvalidOperationException($"The current method has been already invoked.");
+            if (Ready) throw new InvalidOperationException($"The current method has been already invoked.");
 
             HostContext.AppHost = this;
-            if (WebHostPhysicalPath.IsNullOrEmpty())
-                WebHostPhysicalPath = GetWebRootPath();
             
             OnBeforeInit();
 
-            Container.Register(AppSettings);
+            Container.Register<IAppSettings>(AppSettings);
             Container.Register<IHashProvider>(c => new SaltedHash()).ReusedWithin(ReuseScope.None);
             if (Config.DebugMode)           
                 Plugins.Add(new RequestInfoFeature());
@@ -408,7 +406,7 @@ namespace ServiceStack
         /// <summary>
         /// Gets Full Directory Path of where the app is running
         /// </summary>
-        protected virtual string GetWebRootPath() => "~".MapServerPath();
+        protected virtual string GetWebRootPath() => "~".MapAbsolutePath();
 
         [Obsolete("Renamed to GetVirtualFileSources")]
         public virtual List<IVirtualPathProvider> GetVirtualPathProviders()

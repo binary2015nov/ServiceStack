@@ -411,9 +411,9 @@ namespace ServiceStack.Host
         /// <summary>
         /// Execute a Service with a Request DTO.
         /// </summary>
-        public virtual async Task<object> ExecuteAsync(object requestDto, IRequest req) //Used by HTTP handlers to Execute Services
+        public virtual Task<object> ExecuteAsync(object requestDto, IRequest req) //Used by HTTP handlers to Execute Services
         {
-            return await Task.Run(() => Execute(requestDto, req));
+            return Task.Run(() => Execute(requestDto, req));
         }
 
         // Only Used internally by TypedFilterTests 
