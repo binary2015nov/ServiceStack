@@ -21,7 +21,6 @@ using ServiceStack.IO;
 using ServiceStack.Logging;
 using ServiceStack.Messaging;
 using ServiceStack.Metadata;
-using ServiceStack.MiniProfiler;
 using ServiceStack.NativeTypes;
 using ServiceStack.Redis;
 using ServiceStack.Text;
@@ -407,12 +406,6 @@ namespace ServiceStack
         /// Gets Full Directory Path of where the app is running
         /// </summary>
         protected virtual string GetWebRootPath() => "~".MapAbsolutePath();
-
-        [Obsolete("Renamed to GetVirtualFileSources")]
-        public virtual List<IVirtualPathProvider> GetVirtualPathProviders()
-        {
-            return GetVirtualFileSources();
-        }
 
         public virtual List<IVirtualPathProvider> GetVirtualFileSources()
         {
