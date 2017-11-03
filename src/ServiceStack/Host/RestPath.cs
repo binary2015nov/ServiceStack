@@ -125,7 +125,7 @@ namespace ServiceStack.Host
             return new RestRoute(RequestType, Path, AllowedVerbs, 0);
         }
 
-        public RestPath(Type requestType, string path, string verbs = null, string summary = null, string notes = null)
+        public RestPath(Type requestType, string path, string verbs = null, string summary = null, string notes = null, string matchRule = null)
         {
             this.RequestType = requestType;
             this.Summary = summary;
@@ -218,6 +218,7 @@ namespace ServiceStack.Host
 
             this.typeDeserializer = new StringMapTypeDeserializer(this.RequestType);
             RegisterCaseInsenstivePropertyNameMappings();
+            AfterInit();
         }
 
         private void RegisterCaseInsenstivePropertyNameMappings()
@@ -308,7 +309,7 @@ namespace ServiceStack.Host
             return IsMatch(httpReq.HttpMethod, pathInfoParts, out var wildcardMatchCount);
         }
 
-        public void AfterInit()
+        private void AfterInit()
         {
             if (this.MatchRule != null)
             {

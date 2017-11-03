@@ -1256,7 +1256,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                     ThreadPool.QueueUserWorkItem(_ => client.Start());
                 });
 
-                Thread.Sleep(100);
+                Thread.Sleep(500);
                 Assert.That(client.TimesStarted, Is.EqualTo(1));
 
                 10.Times(i =>

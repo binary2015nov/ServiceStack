@@ -808,7 +808,8 @@
         </member>
         <member name="P:ServiceStack.Logging.LogManager.LogFactory">
             <summary>
-            Gets or sets the log factory used to create loggers. The default value is <see cref="T:ServiceStack.Logging.NullLogFactory"/>.
+            Gets or sets the log factory used to create loggers. The default value is
+            <see cref="T:ServiceStack.Logging.NullLogFactory"/>.
             </summary>
         </member>
         <member name="T:ServiceStack.Logging.NullLogFactory">

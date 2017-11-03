@@ -9,6 +9,7 @@ using ServiceStack.Host;
 using ServiceStack.Serialization;
 using ServiceStack.Text;
 using ServiceStack.VirtualPath;
+using ServiceStack.Web;
 
 namespace ServiceStack
 {
@@ -43,6 +44,12 @@ namespace ServiceStack
             GlobalResponseHeaders = new Dictionary<string, string> {
                 { "Vary", "Accept" },
                 { "X-Powered-By", Env.ServerUserAgent },
+            };
+            RequestRules = new Dictionary<string, Func<IHttpRequest, bool>> {
+                {"AcceptsHtml", req => req.Accept?.IndexOf(MimeTypes.Html, StringComparison.Ordinal) >= 0 },
+                {"AcceptsJson", req => req.Accept?.IndexOf(MimeTypes.Json, StringComparison.Ordinal) >= 0 },
+                {"LastInt", req => int.TryParse(req.PathInfo.LastRightPart('/'), out _) },
+                {"!LastInt", req => !int.TryParse(req.PathInfo.LastRightPart('/'), out _) },
             };
             IgnoreFormatsInMetadata = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             AllowFileExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
@@ -167,7 +174,7 @@ namespace ServiceStack
         public XmlWriterSettings XmlWriterSettings { get; set; }
         public bool EnableAccessRestrictions { get; set; }
         public bool UseBclJsonSerializers { get { return JsonDataContractSerializer.Instance.UseBcl; } set { JsonDataContractSerializer.Instance.UseBcl = value; } }
-        
+        public Dictionary<string, Func<IHttpRequest, bool>> RequestRules { get; private set; }
         public Dictionary<string, string> GlobalResponseHeaders { get; set; }
         public Feature EnableFeatures { get; set; }
         public bool ReturnsInnerException { get; set; }

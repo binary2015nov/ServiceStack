@@ -1,6 +1,9 @@
-﻿using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
 using Funq;
 using NUnit.Framework;
+using ServiceStack.Web;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
@@ -65,18 +68,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         class AppHost : AppSelfHostBase
         {
-            public AppHost() : base(nameof(RouteMatchTests), typeof(RouteMatchService).Assembly) { }
+            public AppHost() : base(nameof(RouteMatchTests), typeof(RouteMatchService).Assembly)
+            {
+                Config.RequestRules.Add("AcceptsCsv", httpReq => httpReq.Accept?.IndexOf(MimeTypes.Csv) >= 0);              
+            }
 
             public override void Configure(Container container)
             {
-                SetConfig(new HostConfig
-                {
-                    RequestRules =
-                    {
-                        { "AcceptsCsv", httpReq => httpReq.Accept?.IndexOf(MimeTypes.Csv) >= 0 },
-                    }
-                });
-
                 Routes.Add(typeof(MatchesCsv), "/matchroute/csv", null, null, null, matchRule:"AcceptsCsv");
             }
         }
@@ -138,7 +136,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             var csv = Config.ListeningOn.AppendPath("matchroute/csv").AddQueryParam("name", "CSV")
                 .GetStringFromUrl(accept: MimeTypes.Csv);
-            Assert.That(csv.NormalizeNewLines(), Is.EqualTo("Name\nCSV"));
+            Assert.That(csv, Is.EqualTo("Name\r\nCSV\r\n"));
 
             try
             {

@@ -185,6 +185,7 @@ namespace ServiceStack.Host
                 RestPathMap[restPath.FirstMatchHashKey] = pathsAtFirstMatch;
             }
             pathsAtFirstMatch.Add(restPath);
+            
             Operation operation;
             if (!appHost.Metadata.OperationsMap.TryGetValue(restPath.RequestType, out operation))
                 return;
@@ -192,7 +193,16 @@ namespace ServiceStack.Host
             operation.Routes.Add(restPath);
         }
 
-        public IRestPath GetRestPathForRequest(string httpMethod, string pathInfo)
+        [Obsolete("Use GetRestPathForRequest(httpMethod, pathInfo, httpReq)")]
+        public IRestPath GetRestPathForRequest(string httpMethod, string pathInfo) => GetRestPathForRequest(httpMethod, pathInfo, null);
+
+        /// <summary>
+        /// Get Best Matching Route. 
+        /// </summary>
+        /// <param name="httpMethod"></param>
+        /// <param name="pathInfo"></param>
+        /// <param name="httpReq">If not null, ensures any Route matches any [Route(MatchRule)]</param>
+        public RestPath GetRestPathForRequest(string httpMethod, string pathInfo, IHttpRequest httpReq)
         {
             var matchUsingPathParts = RestPath.GetPathPartsForMatching(pathInfo);
 
@@ -460,10 +470,8 @@ namespace ServiceStack.Host
             try
             {
                 req.SetInProcessRequest();
-                
-                var restPath = req is IHttpRequest httpReq
-                    ? RestHandler.FindMatchingRestPath(httpReq, out _)
-                    : RestHandler.FindMatchingRestPath(req.Verb, req.PathInfo, out _);
+
+                var restPath = HostContext.ServiceController.GetRestPathForRequest(req.Verb, req.PathInfo, req as IHttpRequest);
 
                 req.OperationName = restPath.RequestType.GetOperationName();
                 var requestDto = RestHandler.CreateRequestAsync(req, restPath).Result;

@@ -55,7 +55,7 @@ namespace ServiceStack.Host
         {
             if (HasExistingRoute(requestType, restPath)) return this;
 
-            appHost.RestPaths.Add(new RestPath(requestType, restPath, verbs, summary, notes, matchRule));
+            restPaths.Add(new RestPath(requestType, restPath, verbs, summary, notes, matchRule));
             return this;
         }
 

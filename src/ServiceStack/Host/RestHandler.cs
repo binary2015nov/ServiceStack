@@ -15,18 +15,18 @@ namespace ServiceStack.Host
             this.HandlerAttributes = RequestAttributes.Reply;
         }
 
-        public static IRestPath FindMatchingRestPath(IRequest request, out string contentType)
+        public static IRestPath FindMatchingRestPath(IHttpRequest httpRequest, out string contentType)
         {
-            var pathInfo = GetSanitizedPathInfo(request.PathInfo, out contentType);
+            var pathInfo = GetSanitizedPathInfo(httpRequest.PathInfo, out contentType);
             if (contentType != null)
-                request.ResponseContentType = contentType;
+                httpRequest.ResponseContentType = contentType;
 
-            var restPath = HostContext.ServiceController.GetRestPathForRequest(request.Verb, pathInfo);
-            request.SetRoute(restPath);
+            var restPath = HostContext.ServiceController.GetRestPathForRequest(httpRequest.Verb, pathInfo, httpRequest);
+            httpRequest.SetRoute(restPath);
             return restPath;
         }
 
-        private static string GetSanitizedPathInfo(string pathInfo, out string contentType)
+        public static string GetSanitizedPathInfo(string pathInfo, out string contentType)
         {
             contentType = null;
             if (HostContext.Config.AllowRouteContentTypeExtensions)

@@ -25,12 +25,10 @@ namespace ServiceStack
         private static IHttpHandler NotFoundHttpHandler;
         private static readonly IHttpHandler StaticFilesHandler = new StaticFileHandler();
         private static bool HostAutoRedirectsDirs;
-        protected static HostConfig AppHostConfig;
 
         internal static void Init()
         {
             var appHost = HostContext.AppHost;
-            AppHostConfig = appHost.Config;
 
             WebHostRootFileNames = Env.IsWindows
                 ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -40,7 +38,7 @@ namespace ServiceStack
             HostAutoRedirectsDirs = HostContext.IsAspNetHost && !Env.IsMono;
 
             //Apache+mod_mono treats path="servicestack*" as path="*" so takes over root path, so we need to serve matching resources
-            var hostedAtRootPath = AppHostConfig.HandlerFactoryPath.IsNullOrEmpty();
+            var hostedAtRootPath = appHost.Config.HandlerFactoryPath.IsNullOrEmpty();
 
 #if !NETSTANDARD2_0
             //DefaultHttpHandler not supported in IntegratedPipeline mode
@@ -52,7 +50,7 @@ namespace ServiceStack
             foreach (var file in rootFiles)
             {
                 var fileNameLower = file.Name.ToLowerInvariant();
-                if (DefaultRootFileName == null && AppHostConfig.DefaultDocuments.Contains(fileNameLower))
+                if (DefaultRootFileName == null && appHost.Config.DefaultDocuments.Contains(fileNameLower))
                 {
                     //Can't serve Default.aspx pages so ignore and allow for next default document
                     if (!fileNameLower.EndsWith(".aspx"))
@@ -72,16 +70,15 @@ namespace ServiceStack
                 WebHostRootFileNames.Add(dir.Name);
             }
 
-            if (!AppHostConfig.DefaultRedirectPath.IsNullOrEmpty())
+            if (!appHost.Config.DefaultRedirectPath.IsNullOrEmpty())
             {
-                DefaultHttpHandler = new RedirectHttpHandler { RelativeUrl = AppHostConfig.DefaultRedirectPath };
-                //NonRootModeDefaultHttpHandler = new RedirectHttpHandler { RelativeUrl = AppHostConfig.DefaultRedirectPath };
+                DefaultHttpHandler = new RedirectHttpHandler { RelativeUrl = appHost.Config.DefaultRedirectPath };
             }
             else
             {
-                var metadataHandler = AppHostConfig.MetadataRedirectPath.IsNullOrEmpty()
+                var metadataHandler = appHost.Config.MetadataRedirectPath.IsNullOrEmpty()
                     ? new IndexPageHttpHandler() as IHttpHandler
-                    : new RedirectHttpHandler { RelativeUrl = AppHostConfig.MetadataRedirectPath };
+                    : new RedirectHttpHandler { RelativeUrl = appHost.Config.MetadataRedirectPath };
 
                 if (hostedAtRootPath)
                 {
@@ -103,7 +100,7 @@ namespace ServiceStack
             {
                 IsIntegratedPipeline = Platform.IsIntegratedPipeline,
                 WebHostPhysicalPath = WebHostPhysicalPath,
-                WebHostUrl = AppHostConfig.WebHostUrl,
+                WebHostUrl = appHost.Config.WebHostUrl,
                 DefaultRootFileName = DefaultRootFileName,
                 DefaultHandler = debugDefaultHandler,
             };
@@ -112,7 +109,7 @@ namespace ServiceStack
             {
                 IsIntegratedPipeline = Platform.IsIntegratedPipeline,
                 WebHostPhysicalPath = WebHostPhysicalPath,
-                WebHostUrl = AppHostConfig.WebHostUrl,
+                WebHostUrl = appHost.Config.WebHostUrl,
                 DefaultRootFileName = DefaultRootFileName,
                 DefaultHandler = debugDefaultHandler,
             };          
@@ -123,7 +120,7 @@ namespace ServiceStack
         public IHttpHandler GetHandler(HttpContext context, string requestType, string url, string pathTranslated)
         {
             var httpContext = context.Request.RequestContext.HttpContext;
-            var opeationName = AppHostConfig.StripApplicationVirtualPath? url.TrimPrefixes(context.Request.ApplicationPath) : url;
+            var opeationName = HostContext.AppHost.Config.StripApplicationVirtualPath? url.TrimPrefixes(context.Request.ApplicationPath) : url;
             var httpReq = new ServiceStack.Host.AspNet.AspNetRequest(httpContext, opeationName) { PhysicalPath = pathTranslated };
             return GetHandler(httpReq);
         }
@@ -140,7 +137,7 @@ namespace ServiceStack
                     return handler;
             }
 
-            string location = AppHostConfig.HandlerFactoryPath;
+            string location = appHost.Config.HandlerFactoryPath;
             var pathInfo = httpReq.PathInfo;
             string physicalPath = httpReq.PhysicalPath;
             lastHandlerArgs = httpReq.Verb + "|" + httpReq.RawUrl + "|" + physicalPath;
@@ -149,16 +146,13 @@ namespace ServiceStack
             if (pathInfo.IsNullOrEmpty() || pathInfo == "/")
             {
                 //If the fallback route can handle it, let it
-                if (AppHostConfig.FallbackRestPath != null)
+                var restPath = appHost.Config.FallbackRestPath?.Invoke(httpReq);
+                if (restPath != null)
                 {
-                    var restPath = AppHostConfig.FallbackRestPath(httpReq.HttpMethod, pathInfo, physicalPath);
-                    if (restPath != null)
-                    {
-                        httpReq.SetRoute(restPath);
-                        return new RestHandler { RequestName = restPath.RequestType.GetOperationName() };
-                    }
+                    httpReq.SetRoute(restPath);
+                    return new RestHandler { RequestName = restPath.RequestType.GetOperationName() };
                 }
-
+                
                 //e.g. CatchAllHandler to Process Markdown files
                 var catchAllHandler = GetCatchAllHandlerIfAny(httpReq.HttpMethod, pathInfo, httpReq.GetPhysicalPath());
                 if (catchAllHandler != null) return catchAllHandler;
@@ -173,7 +167,7 @@ namespace ServiceStack
             if (filePath.IsNullOrEmpty() || filePath == "/")
                 return true;
 
-            foreach (var path in AppHostConfig.ForbiddenPaths)
+            foreach (var path in HostContext.AppHost.Config.ForbiddenPaths)
             {
                 if (filePath.StartsWith(path))
                     return false;
@@ -184,10 +178,10 @@ namespace ServiceStack
                 return false;
 
             var fileExt = parts[1];
-            if (AppHostConfig.AllowFileExtensions.Contains(fileExt))
+            if (HostContext.AppHost.Config.AllowFileExtensions.Contains(fileExt))
                 return true;
 
-            foreach (var pathGlob in AppHostConfig.AllowFilePaths)
+            foreach (var pathGlob in HostContext.AppHost.Config.AllowFilePaths)
             {
                 if (filePath.GlobPath(pathGlob))
                     return true;
@@ -195,7 +189,7 @@ namespace ServiceStack
             return false;
         }
 
-        public static IHttpHandler GetHandlerForPathInfo(IRequest httpReq, string filePath)
+        public static IHttpHandler GetHandlerForPathInfo(IHttpRequest httpReq, string filePath)
         {
             var appHost = HostContext.AppHost;
 
@@ -234,17 +228,13 @@ namespace ServiceStack
             var handler = GetCatchAllHandlerIfAny(httpMethod, pathInfo, filePath);
             if (handler != null) return handler;
 
-            if (appHost.Config.FallbackRestPath != null)
+            restPath = appHost.Config.FallbackRestPath?.Invoke(httpReq);
+            if (restPath != null)
             {
-                restPath = appHost.Config.FallbackRestPath(httpMethod, pathInfo, filePath);
-
-                if (restPath != null)
-                {
-                    httpReq.SetRoute(restPath);
-                    return new RestHandler { RequestName = restPath.RequestType.GetOperationName(), ResponseContentType = contentType };
-                }
+                httpReq.SetRoute(restPath);
+                return new RestHandler { RequestName = restPath.RequestType.GetOperationName(), ResponseContentType = contentType };
             }
-
+            
             return null;
         }
 
