@@ -50,8 +50,9 @@ namespace ServiceStack.Host
 
         public override bool RunAsAsync() => true;
 
-        public override async Task ProcessRequestAsync(IRequest httpReq, IResponse httpRes, string operationName)
+        public override async Task ProcessRequestAsync(IRequest req, IResponse httpRes, string operationName)
         {
+            var httpReq = (IHttpRequest) req;
             try
             {
                 var restPath = httpReq.GetRoute();

@@ -51,10 +51,18 @@ namespace ServiceStack.Host
             return this;
         }
 
+        public IServiceRoutes Add(Type requestType, string restPath, string verbs, string summary, string notes, string matchRule)
+        {
+            if (HasExistingRoute(requestType, restPath)) return this;
+
+            appHost.RestPaths.Add(new RestPath(requestType, restPath, verbs, summary, notes, matchRule));
+            return this;
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool HasExistingRoute(Type requestType, string restPath)
         {
-            return RestPaths.FirstOrDefault(x => x.RequestType == requestType && x.Path == restPath) != null;            
+            return RestPaths.FirstOrDefault(x => x.RequestType == requestType && x.Path == restPath) != null;
         }
     }
 }

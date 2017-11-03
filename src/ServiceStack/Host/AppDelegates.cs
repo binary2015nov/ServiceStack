@@ -13,7 +13,7 @@ namespace ServiceStack.Host
 
 	public delegate object ServiceExceptionHandler(IRequest request, object requestDto, Exception ex);
 
-	public delegate RestPath FallbackRestPathDelegate(string httpMethod, string pathInfo, string filePath);
+    public delegate RestPath FallbackRestPathDelegate(IHttpRequest httpReq);
 
 	public interface ITypedFilter
 	{

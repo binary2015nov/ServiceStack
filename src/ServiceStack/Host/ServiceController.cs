@@ -148,20 +148,15 @@ namespace ServiceStack.Host
             var attrs = appHost.GetRouteAttributes(requestType);
             foreach (RouteAttribute attr in attrs)
             {
-                var restPath = new RestPath(requestType, attr.Path, attr.Verbs, attr.Summary, attr.Notes);
+                var restPath = new RestPath(requestType, attr.Path, attr.Verbs, attr.Summary, attr.Notes, attr.MatchRule);
 
-                var defaultAttr = attr as FallbackRouteAttribute;
-                if (defaultAttr != null)
+                if (attr is FallbackRouteAttribute defaultAttr)
                 {
                     if (appHost.Config.FallbackRestPath != null)
                         throw new NotSupportedException(
                             "Config.FallbackRestPath is already defined. Only 1 [FallbackRoute] is allowed.");
 
-                    appHost.Config.FallbackRestPath = (httpMethod, pathInfo, filePath) =>
-                    {
-                        var pathInfoParts = RestPath.GetPathPartsForMatching(pathInfo);
-                        return restPath.IsMatch(httpMethod, pathInfoParts) ? restPath : null;
-                    };
+                    appHost.Config.FallbackRestPath = httpReq => restPath.IsMatch(httpReq) ? restPath : null;
 
                     continue;
                 }
@@ -174,7 +169,7 @@ namespace ServiceStack.Host
             }
         }
 
-        private static readonly char[] InvalidRouteChars = new[] { '?', '&' };
+        private static readonly char[] InvalidRouteChars = { '?', '&' };
 
         public void RegisterRestPath(RestPath restPath)
         {
@@ -184,8 +179,7 @@ namespace ServiceStack.Host
                 throw new ArgumentException($"Route '{restPath.Path}' on '{restPath.RequestType.GetOperationName()}' contains invalid chars. " +
                                             "See http://docs.servicestack.net/routing for info on valid routes.");
 
-            List<RestPath> pathsAtFirstMatch;
-            if (!RestPathMap.TryGetValue(restPath.FirstMatchHashKey, out pathsAtFirstMatch))
+            if (!RestPathMap.TryGetValue(restPath.FirstMatchHashKey, out var pathsAtFirstMatch))
             {
                 pathsAtFirstMatch = new List<RestPath>();
                 RestPathMap[restPath.FirstMatchHashKey] = pathsAtFirstMatch;
@@ -213,6 +207,18 @@ namespace ServiceStack.Host
                 var bestScore = -1;
                 foreach (var restPath in firstMatches)
                 {
+                    //Match any  
+                    if (httpReq != null)
+                    {
+                        var matchFn = restPath.GetRequestRule();
+                        if (matchFn != null)
+                        {
+                            var validRoute = matchFn(httpReq);
+                            if (!validRoute)
+                                continue;
+                        }
+                    }
+                    
                     var score = restPath.MatchScore(httpMethod, matchUsingPathParts);
                     if (score > bestScore) 
                     {
@@ -298,8 +304,7 @@ namespace ServiceStack.Host
                 finally
                 {
                     //Gets disposed by AppHost or ContainerAdapter if set
-                    var taskResponse = response as Task;
-                    if (taskResponse != null)
+                    if (response is Task taskResponse)
                     {
                         HostContext.Async.ContinueWith(request, taskResponse, task => appHost.Release(service));
                     }
@@ -455,8 +460,11 @@ namespace ServiceStack.Host
             try
             {
                 req.SetInProcessRequest();
+                
+                var restPath = req is IHttpRequest httpReq
+                    ? RestHandler.FindMatchingRestPath(httpReq, out _)
+                    : RestHandler.FindMatchingRestPath(req.Verb, req.PathInfo, out _);
 
-                var restPath = RestHandler.FindMatchingRestPath(req, out _);
                 req.OperationName = restPath.RequestType.GetOperationName();
                 var requestDto = RestHandler.CreateRequestAsync(req, restPath).Result;
                 req.Dto = requestDto;

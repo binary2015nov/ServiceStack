@@ -66,36 +66,36 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 #endif
 		};
 
-		[Test]
-		public void Resolves_the_right_handler_for_expexted_paths()
-		{
-			foreach (var item in pathInfoMap)
-			{
-				var expectedType = item.Value;
-				var httpReq = new BasicRequest
-				{
-					PathInfo = item.Key,
-				};
-				var handler = HttpHandlerFactory.GetHandlerForPathInfo(httpReq, null);
-				Assert.That(handler.GetType(), Is.EqualTo(expectedType));
-			}
-		}
+        [Test]
+        public void Resolves_the_right_handler_for_expexted_paths()
+        {
+            foreach (var item in pathInfoMap)
+            {
+                var expectedType = item.Value;
+                var httpReq = new BasicHttpRequest
+                {
+                    PathInfo = item.Key,
+                };
+                var handler = HttpHandlerFactory.GetHandlerForPathInfo(httpReq, null);
+                Assert.That(handler.GetType(), Is.EqualTo(expectedType));
+            }
+        }
 
-		[Test]
-		public void Resolves_the_right_handler_for_case_insensitive_expexted_paths()
-		{
-			foreach (var item in pathInfoMap)
-			{
-				var expectedType = item.Value;
-				var lowerPathInfo = item.Key.ToLower();
-				lowerPathInfo.Print();
-				var httpReq = new BasicRequest
-				{
-					PathInfo = lowerPathInfo,
-				};
-				var handler = HttpHandlerFactory.GetHandlerForPathInfo(httpReq, null);
-				Assert.That(handler.GetType(), Is.EqualTo(expectedType));
-			}
-		}
-	}
+        [Test]
+        public void Resolves_the_right_handler_for_case_insensitive_expexted_paths()
+        {
+            foreach (var item in pathInfoMap)
+            {
+                var expectedType = item.Value;
+                var lowerPathInfo = item.Key.ToLower();
+                lowerPathInfo.Print();
+                var httpReq = new BasicHttpRequest
+                {
+                    PathInfo = lowerPathInfo,
+                };
+                var handler = HttpHandlerFactory.GetHandlerForPathInfo(httpReq, null);
+                Assert.That(handler.GetType(), Is.EqualTo(expectedType));
+            }
+        }
+    }
 }
