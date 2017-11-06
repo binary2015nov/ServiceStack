@@ -148,7 +148,7 @@ namespace ServiceStack.Host
             var attrs = appHost.GetRouteAttributes(requestType);
             foreach (RouteAttribute attr in attrs)
             {
-                var restPath = new RestPath(requestType, attr.Path, attr.Verbs, attr.Summary, attr.Notes, attr.MatchRule);
+                var restPath = new RestPath(requestType, attr.Path, attr.Verbs, attr.Summary, attr.Notes, attr.Matches);
 
                 if (attr is FallbackRouteAttribute defaultAttr)
                 {
@@ -201,7 +201,8 @@ namespace ServiceStack.Host
         /// </summary>
         /// <param name="httpMethod"></param>
         /// <param name="pathInfo"></param>
-        /// <param name="httpReq">If not null, ensures any Route matches any [Route(MatchRule)]</param>
+        /// <param name="httpReq">If not null, ensures any Route matches any [Route(Matches)]</param>
+        /// <returns></returns>
         public RestPath GetRestPathForRequest(string httpMethod, string pathInfo, IHttpRequest httpReq)
         {
             var matchUsingPathParts = RestPath.GetPathPartsForMatching(pathInfo);
@@ -217,7 +218,8 @@ namespace ServiceStack.Host
                 var bestScore = -1;
                 foreach (var restPath in firstMatches)
                 {
-                    //Match any  
+                    var matchScore = 0;
+                    //Handle [Route(Matches)]
                     if (httpReq != null)
                     {
                         var matchFn = restPath.GetRequestRule();
@@ -226,10 +228,12 @@ namespace ServiceStack.Host
                             var validRoute = matchFn(httpReq);
                             if (!validRoute)
                                 continue;
+
+                            matchScore = 1;
                         }
                     }
                     
-                    var score = restPath.MatchScore(httpMethod, matchUsingPathParts);
+                    var score = restPath.MatchScore(httpMethod, matchUsingPathParts) + matchScore;
                     if (score > bestScore) 
                     {
                         bestScore = score;

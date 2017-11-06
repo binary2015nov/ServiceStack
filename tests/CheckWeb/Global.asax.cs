@@ -179,6 +179,19 @@ namespace CheckWeb
             this.ConfigureView(container);
 
             this.StartUpErrors.Add(new ResponseStatus("Mock", "Startup Error"));
+
+            //PreRequestFilters.Add((req, res) =>
+            //{
+            //    if (req.PathInfo.StartsWith("/metadata") || req.PathInfo.StartsWith("/swagger-ui"))
+            //    {
+            //        var session = req.GetSession();
+            //        if (!session.IsAuthenticated)
+            //        {
+            //            res.StatusCode = (int)HttpStatusCode.Unauthorized;
+            //            res.EndRequest();
+            //        }
+            //    }
+            //});
         }
 
         public static Rockstar[] GetRockstars()
@@ -240,6 +253,15 @@ namespace CheckWeb
             var authRepo = new OrmLiteAuthRepository(container.Resolve<IDbConnectionFactory>());
             container.Register<IAuthRepository>(c => authRepo);
             authRepo.InitSchema();
+
+            authRepo.CreateUserAuth(new UserAuth
+            {
+                UserName = "test",
+                DisplayName = "Credentials",
+                FirstName = "First",
+                LastName = "Last",
+                FullName = "First Last",
+            }, "test");
         }
 
         /// <summary>

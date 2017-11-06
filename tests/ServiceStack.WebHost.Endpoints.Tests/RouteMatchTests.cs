@@ -7,13 +7,13 @@ using ServiceStack.Web;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
 {
-    [Route("/matchroute/html", MatchRule = "AcceptsHtml")]
+    [Route("/matches/html", Matches = "AcceptsHtml")]
     public class MatchesHtml : IReturn<MatchesHtml>
     {
         public string Name { get; set; }
     }
 
-    [Route("/matchroute/json", MatchRule = "AcceptsJson")]
+    [Route("/matches/json", Matches = "AcceptsJson")]
     public class MatchesJson : IReturn<MatchesJson>
     {
         public string Name { get; set; }
@@ -24,28 +24,88 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public string Name { get; set; }
     }
 
-    [Route("/matchlast/{Id}", MatchRule = @"LastInt")]
-    public class MatchesLastInt
+    [Route("/{SlugFirst}/matchrule")]
+    public class MatchesNotFirstInt
     {
-        public int Id { get; set; }
+        public string SlugFirst { get; set; }
     }
 
-    [Route("/matchlast/{Slug}", MatchRule = @"!LastInt")]
+    [Route("/{IdFirst}/matchrule", Matches = @"{int}/**")]
+    public class MatchesFirstInt
+    {
+        public int IdFirst { get; set; }
+    }
+
+    [Route("/matchrule/{SlugLast}")]
     public class MatchesNotLastInt
     {
-        public string Slug { get; set; }
+        public string SlugLast { get; set; }
     }
 
-    [Route("/matchregex/{Id}", MatchRule = @"PathInfo =~ \/[0-9]+$")]
-    public class MatchesId
+    [Route("/matchrule/{IdLast}", Matches = @"**/{int}")]
+    public class MatchesLastInt
     {
-        public int Id { get; set; }
+        public int IdLast { get; set; }
     }
 
-    [Route("/matchregex/{Slug}", MatchRule = @"PathInfo =~ \/[^0-9]+$")]
+    [Route("/matchrule/{Slug2}/remaining/path")]
+    public class MatchesSecondSlug
+    {
+        public string Slug2 { get; set; }
+    }
+
+    [Route("/matchrule/{Id2}/remaining/path", Matches = @"path/{int}/**")]
+    public class MatchesSecondInt
+    {
+        public int Id2 { get; set; }
+    }
+
+    [Route("/remaining/path/{Slug2}/matchrule")]
+    public class MatchesSecondLastSlug
+    {
+        public string Slug2 { get; set; }
+    }
+
+    [Route("/remaining/path/{Id2}/matchrule", Matches = @"**/{int}/path")]
+    public class MatchesSecondLastInt
+    {
+        public int Id2 { get; set; }
+    }
+
+    [Route("/matchregex/{Slug}")]
     public class MatchesSlug
     {
         public string Slug { get; set; }
+    }
+
+    [Route("/matchregex/{Id}", Matches = @"PathInfo =~ \/[0-9]+$")]
+    public class MatchesInt
+    {
+        public int Id { get; set; }
+    }
+
+    [Route("/matchexact/{Exact}", Matches = @"UserAgent = specific-client")]
+    public class MatchesExactUserAgent
+    {
+        public string Exact { get; set; }
+    }
+
+    [Route("/matchexact/{Any}")]
+    public class MatchesAnyUserAgent
+    {
+        public string Any { get; set; }
+    }
+
+    [Route("/matchsite/{Mobile}", Matches = "IsMobile")]
+    public class MatchMobileSite
+    {
+        public string Mobile { get; set; }
+    }
+
+    [Route("/matchsite/{Desktop}")]
+    public class MatchDesktopSite
+    {
+        public string Desktop { get; set; }
     }
 
     public class RouteMatchService : Service
@@ -54,11 +114,26 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public object Any(MatchesJson request) => request;
         public object Any(MatchesCsv request) => request;
 
-        public object Any(MatchesLastInt request) => request;
-        public object Any(MatchesNotLastInt request) => request;
+        public object Any(MatchesNotFirstInt request) => request;
+        public object Any(MatchesFirstInt request) => request;
 
-        public object Any(MatchesId request) => request;
+        public object Any(MatchesNotLastInt request) => request;
+        public object Any(MatchesLastInt request) => request;
+
+        public object Any(MatchesSecondSlug request) => request;
+        public object Any(MatchesSecondInt request) => request;
+
+        public object Any(MatchesSecondLastSlug request) => request;
+        public object Any(MatchesSecondLastInt request) => request;
+
         public object Any(MatchesSlug request) => request;
+        public object Any(MatchesInt request) => request;
+
+        public object Any(MatchesExactUserAgent request) => request;
+        public object Any(MatchesAnyUserAgent request) => request;
+
+        public object Any(MatchMobileSite request) => request;
+        public object Any(MatchDesktopSite request) => request;
     }
 
     public class RouteMatchTests
@@ -99,7 +174,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             try
             {
-                var html = Config.ListeningOn.AppendPath("matchroute/json").AddQueryParam("name", "JSON")
+                var html = Config.ListeningOn.AppendPath("matches/json").AddQueryParam("name", "JSON")
                     .GetStringFromUrl(accept: MimeTypes.Html);
                 Assert.Fail("Should throw");
             }
@@ -114,7 +189,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             var client = CreateClient();
 
-            var html = Config.ListeningOn.AppendPath("matchroute/html").AddQueryParam("name", "HTML")
+            var html = Config.ListeningOn.AppendPath("matches/html").AddQueryParam("name", "HTML")
                 .GetStringFromUrl(accept: MimeTypes.Html);
             Assert.That(html, Does.StartWith("<"));
 
@@ -134,7 +209,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             var client = CreateClient();
 
-            var csv = Config.ListeningOn.AppendPath("matchroute/csv").AddQueryParam("name", "CSV")
+            var csv = Config.ListeningOn.AppendPath("matches/csv").AddQueryParam("name", "CSV")
                 .GetStringFromUrl(accept: MimeTypes.Csv);
             Assert.That(csv, Is.EqualTo("Name\r\nCSV\r\n"));
 
@@ -150,21 +225,75 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [Test]
-        public void Can_match_on_builtin_LastInt()
+        public void Can_match_on_builtin_FirstInt()
         {
-            var json = Config.ListeningOn.AppendPath("matchlast/1")
+            var json = Config.ListeningOn.AppendPath("1/matchrule")
                 .GetJsonFromUrl();
 
-            Assert.That(json.ToLower(), Is.EqualTo("{\"id\":1}"));
+            Assert.That(json.ToLower(), Is.EqualTo("{\"idfirst\":1}"));
         }
 
         [Test]
-        public void Can_match_on_builtin_not_LastInt()
+        public void Can_match_on_builtin_NotFirstInt()
         {
-            var json = Config.ListeningOn.AppendPath("matchlast/name")
+            var json = Config.ListeningOn.AppendPath("name/matchrule")
                 .GetJsonFromUrl();
 
-            Assert.That(json.ToLower(), Is.EqualTo("{\"slug\":\"name\"}"));
+            Assert.That(json.ToLower(), Is.EqualTo("{\"slugfirst\":\"name\"}"));
+        }
+
+        [Test]
+        public void Can_match_on_builtin_LastInt()
+        {
+            var json = Config.ListeningOn.AppendPath("matchrule/1")
+                .GetJsonFromUrl();
+
+            Assert.That(json.ToLower(), Is.EqualTo("{\"idlast\":1}"));
+        }
+
+        [Test]
+        public void Can_match_on_builtin_NotLastInt()
+        {
+            var json = Config.ListeningOn.AppendPath("matchrule/name")
+                .GetJsonFromUrl();
+
+            Assert.That(json.ToLower(), Is.EqualTo("{\"sluglast\":\"name\"}"));
+        }
+
+        [Test]
+        public void Can_match_on_builtin_Second_Int()
+        {
+            var json = Config.ListeningOn.AppendPath("matchrule/1/remaining/path")
+                .GetJsonFromUrl();
+
+            Assert.That(json.ToLower(), Is.EqualTo("{\"id2\":1}"));
+        }
+
+        [Test]
+        public void Can_match_on_builtin_Second_NotInt()
+        {
+            var json = Config.ListeningOn.AppendPath("matchrule/name/remaining/path")
+                .GetJsonFromUrl();
+
+            Assert.That(json.ToLower(), Is.EqualTo("{\"slug2\":\"name\"}"));
+        }
+
+        [Test]
+        public void Can_match_on_builtin_SecondLast_Int()
+        {
+            var json = Config.ListeningOn.AppendPath("/remaining/path/1/matchrule")
+                .GetJsonFromUrl();
+
+            Assert.That(json.ToLower(), Is.EqualTo("{\"id2\":1}"));
+        }
+
+        [Test]
+        public void Can_match_on_builtin_SecondLast_NotInt()
+        {
+            var json = Config.ListeningOn.AppendPath("/remaining/path/name/matchrule")
+                .GetJsonFromUrl();
+
+            Assert.That(json.ToLower(), Is.EqualTo("{\"slug2\":\"name\"}"));
         }
 
         [Test]
@@ -183,6 +312,44 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 .GetJsonFromUrl();
 
             Assert.That(json.ToLower(), Is.EqualTo("{\"slug\":\"name\"}"));
+        }
+
+        [Test]
+        public void Can_match_on_exact_UserAgent()
+        {
+            var json = Config.ListeningOn.AppendPath("matchexact/specific-client")
+                .GetJsonFromUrl(req => req.UserAgent = "specific-client");
+
+            Assert.That(json.ToLower(), Is.EqualTo("{\"exact\":\"specific-client\"}"));
+        }
+
+        [Test]
+        public void Can_match_on_any_UserAgent()
+        {
+            var json = Config.ListeningOn.AppendPath("matchexact/any-client")
+                .GetJsonFromUrl(req => req.UserAgent = "any-client");
+
+            Assert.That(json.ToLower(), Is.EqualTo("{\"any\":\"any-client\"}"));
+        }
+
+        [Test]
+        public void Does_match_builtin_IsMobile_Rule_with_iPhone6UA()
+        {
+            const string iPhone6UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5376e Safari/8536.25";
+            var json = Config.ListeningOn.AppendPath("matchsite/iPhone6")
+                .GetJsonFromUrl(req => req.UserAgent = iPhone6UA);
+
+            Assert.That(json.ToLower(), Is.EqualTo("{\"mobile\":\"iphone6\"}"));
+        }
+
+        [Test]
+        public void Does_not_match_builtin_IsMobile_Rule_with_SafariUA()
+        {
+            const string SafariUA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7";
+            var json = Config.ListeningOn.AppendPath("matchsite/Safari")
+                .GetJsonFromUrl(req => req.UserAgent = SafariUA);
+
+            Assert.That(json.ToLower(), Is.EqualTo("{\"desktop\":\"safari\"}"));
         }
 
     }
