@@ -1486,7 +1486,7 @@
             i.e. Priorities below 0 are auto-generated have less precedence.
             </summary>
         </member>
-        <member name="P:ServiceStack.RouteAttribute.MatchRule">
+        <member name="P:ServiceStack.RouteAttribute.Matches">
             <summary>
             Must match rule defined in Config.RequestRules or Regex expression with format: 
             "{IHttpRequest.Field} =~ {pattern}", e.g "PathInfo =~ \/[0-9]+$"

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using ServiceStack.Host;
 using ServiceStack.Serialization;
@@ -45,11 +46,22 @@ namespace ServiceStack
                 { "Vary", "Accept" },
                 { "X-Powered-By", Env.ServerUserAgent },
             };
+            IsMobileRegex = new Regex("Mobile|iP(hone|od|ad)|Android|BlackBerry|IEMobile|Kindle|(hpw|web)OS|Fennec" +
+                "|Minimo|Opera M(obi|ini)|Blazer|Dolfin|Dolphin|Skyfire|Zune", RegexOptions.Compiled);
             RequestRules = new Dictionary<string, Func<IHttpRequest, bool>> {
                 {"AcceptsHtml", req => req.Accept?.IndexOf(MimeTypes.Html, StringComparison.Ordinal) >= 0 },
                 {"AcceptsJson", req => req.Accept?.IndexOf(MimeTypes.Json, StringComparison.Ordinal) >= 0 },
-                {"LastInt", req => int.TryParse(req.PathInfo.LastRightPart('/'), out _) },
-                {"!LastInt", req => !int.TryParse(req.PathInfo.LastRightPart('/'), out _) },
+                {"IsMobile", req => IsMobileRegex.IsMatch(req.UserAgent) },
+                {"{int}/**", req => int.TryParse(req.PathInfo.Substring(1).LeftPart('/'), out _) },
+                {"path/{int}/**", req => {
+                    var afterFirst = req.PathInfo.Substring(1).RightPart('/');
+                    return !string.IsNullOrEmpty(afterFirst) && int.TryParse(afterFirst.LeftPart('/'), out _);
+                }},
+                {"**/{int}", req => int.TryParse(req.PathInfo.LastRightPart('/'), out _) },
+                {"**/{int}/path", req => {
+                    var beforeLast = req.PathInfo.LastLeftPart('/');
+                    return !string.IsNullOrEmpty(beforeLast) && int.TryParse(beforeLast.LastRightPart('/'), out _);
+                }},
             };
             IgnoreFormatsInMetadata = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             AllowFileExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
@@ -174,6 +186,7 @@ namespace ServiceStack
         public XmlWriterSettings XmlWriterSettings { get; set; }
         public bool EnableAccessRestrictions { get; set; }
         public bool UseBclJsonSerializers { get { return JsonDataContractSerializer.Instance.UseBcl; } set { JsonDataContractSerializer.Instance.UseBcl = value; } }
+        public Regex IsMobileRegex { get; set; }
         public Dictionary<string, Func<IHttpRequest, bool>> RequestRules { get; private set; }
         public Dictionary<string, string> GlobalResponseHeaders { get; set; }
         public Feature EnableFeatures { get; set; }

@@ -15,6 +15,9 @@ COPY ..\..\ServiceStack\src\ServiceStack.Client\bin\%BUILD%\netstandard2.0\Servi
 COPY ..\..\ServiceStack\src\ServiceStack.Common\bin\%BUILD%\net45\ServiceStack.Common.* net45
 COPY ..\..\ServiceStack\src\ServiceStack.Common\bin\%BUILD%\netstandard2.0\ServiceStack.Common.* netstandard2.0
 
+COPY ..\..\ServiceStack\src\ServiceStack.NetFramework\bin\%BUILD%\net45\ServiceStack.NetFramework.* net45
+COPY ..\..\ServiceStack\src\ServiceStack.NetFramework\bin\%BUILD%\netstandard2.0\ServiceStack.NetFramework.* netstandard2.0
+
 COPY ..\..\ServiceStack\src\ServiceStack\bin\%BUILD%\net45\ServiceStack.dll net45
 COPY ..\..\ServiceStack\src\ServiceStack\bin\%BUILD%\net45\ServiceStack.xml net45
 COPY ..\..\ServiceStack\src\ServiceStack\bin\%BUILD%\netstandard2.0\ServiceStack.dll netstandard2.0
