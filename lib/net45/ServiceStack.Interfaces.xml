@@ -1486,6 +1486,12 @@
             i.e. Priorities below 0 are auto-generated have less precedence.
             </summary>
         </member>
+        <member name="P:ServiceStack.RouteAttribute.MatchRule">
+            <summary>
+            Must match rule defined in Config.RequestRules or Regex expression with format: 
+            "{IHttpRequest.Field} =~ {pattern}", e.g "PathInfo =~ \/[0-9]+$"
+            </summary>
+        </member>
         <member name="T:ServiceStack.FallbackRouteAttribute">
             <summary>
             Fallback routes have the lowest precedence, i.e. after normal Routes, static files or any matching Catch All Handlers.
@@ -2075,6 +2081,35 @@
             </param>
             <param name="notes">
                 The longer text to explain the behaviour of the REST. 
+            </param>
+            <returns>The same <see cref="T:ServiceStack.Web.IServiceRoutes"/> instance;
+            	never <see langword="null"/>.</returns>
+        </member>
+        <member name="M:ServiceStack.Web.IServiceRoutes.Add(System.Type,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            	Maps the specified REST path to the specified request DTO, 
+            	specifies the HTTP verbs supported by the path, and indicates
+            	the default MIME type of the returned response.
+            </summary>
+            <param name="requestType">
+            	The type of request DTO to map the path to.
+            </param>
+            <param name="restPath">The path to map the request DTO to.
+            	See <see cref="P:ServiceStack.RouteAttribute.Path">RouteAttribute.Path</see>
+            	for details on the correct format.</param>
+            <param name="verbs">
+            	The comma-delimited list of HTTP verbs supported by the path, 
+            	such as "GET,PUT,DELETE".
+            </param>
+            <param name="summary">
+                The short summary of what the REST does. 
+            </param>
+            <param name="notes">
+                The longer text to explain the behaviour of the REST. 
+            </param>
+            <param name="matchRule">
+                Must match rule defined in Config.RequestRules or Regex expression with format: 
+                "{IHttpRequest.Field} =~ {pattern}", e.g "PathInfo =~ \/[0-9]+$"
             </param>
             <returns>The same <see cref="T:ServiceStack.Web.IServiceRoutes"/> instance;
             	never <see langword="null"/>.</returns>

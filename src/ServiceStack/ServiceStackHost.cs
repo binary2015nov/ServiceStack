@@ -940,11 +940,11 @@ namespace ServiceStack
                     Container.Dispose();
                     Container = null;
                 }
-
-                Platform.Reset();
-                if (HostContext.AppHost == this) HostContext.AppHost = null;
             }
             //clear unmanaged resources here
+            Platform.Reset();
+            if (Ready)
+                HostContext.AppHost = null;
         }
 
         public void Dispose()

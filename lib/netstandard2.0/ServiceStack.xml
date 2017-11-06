@@ -4310,13 +4310,11 @@
             Provide for quick lookups based on hashes that can be determined from a request url
             </summary>
         </member>
-        <member name="M:ServiceStack.Host.RestPath.IsMatch(System.String,System.String[])">
+        <member name="M:ServiceStack.Host.RestPath.IsMatch(ServiceStack.Web.IHttpRequest)">
             <summary>
             For performance withPathInfoParts should already be a lower case string
             to minimize redundant matching operations.
             </summary>
-            <param name="httpMethod"></param>
-            <param name="withPathInfoParts"></param>
             <returns></returns>
         </member>
         <member name="M:ServiceStack.Host.RestPath.IsMatch(System.String,System.String[],System.Int32@)">
@@ -4328,6 +4326,14 @@
             <param name="withPathInfoParts"></param>
             <param name="wildcardMatchCount"></param>
             <returns></returns>
+        </member>
+        <member name="M:ServiceStack.Host.ServiceController.GetRestPathForRequest(System.String,System.String,ServiceStack.Web.IHttpRequest)">
+            <summary>
+            Get Best Matching Route. 
+            </summary>
+            <param name="httpMethod"></param>
+            <param name="pathInfo"></param>
+            <param name="httpReq">If not null, ensures any Route matches any [Route(MatchRule)]</param>
         </member>
         <member name="M:ServiceStack.Host.ServiceController.ExecuteMessage(ServiceStack.Messaging.IMessage)">
             <summary>
