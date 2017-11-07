@@ -420,7 +420,7 @@ namespace ServiceStack
                 ?? GlobalHtmlErrorHttpHandler
                 ?? GetNotFoundHandler();
 
-            handler.ProcessRequest(httpReq, httpRes, httpReq.OperationName);
+            handler.ProcessRequestAsync(httpReq, httpRes, httpReq.OperationName);
         }
 
         public IServiceStackHandler GetCustomErrorHandler(int errorStatusCode)
@@ -438,10 +438,7 @@ namespace ServiceStack
         public IServiceStackHandler GetCustomErrorHandler(HttpStatusCode errorStatus)
         {
             IServiceStackHandler httpHandler = null;
-            if (CustomErrorHttpHandlers != null)
-            {
-                CustomErrorHttpHandlers.TryGetValue(errorStatus, out httpHandler);
-            }
+            CustomErrorHttpHandlers?.TryGetValue(errorStatus, out httpHandler);
 
             return httpHandler;
         }
@@ -449,10 +446,7 @@ namespace ServiceStack
         public IServiceStackHandler GetNotFoundHandler()
         {
             IServiceStackHandler httpHandler = null;
-            if (CustomErrorHttpHandlers != null)
-            {
-                CustomErrorHttpHandlers.TryGetValue(HttpStatusCode.NotFound, out httpHandler);
-            }
+            CustomErrorHttpHandlers?.TryGetValue(HttpStatusCode.NotFound, out httpHandler);
 
             return httpHandler ?? new NotFoundHttpHandler();
         }

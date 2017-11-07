@@ -309,10 +309,8 @@ namespace ServiceStack.Auth
             var combinedRoles = new List<string>(session.Roles.Safe());
             var combinedPerms = new List<string>(session.Permissions.Safe());
 
-            if (roles != null)
-                combinedRoles.AddRange(roles);
-            if (permissions != null)
-                combinedPerms.AddRange(permissions);
+            roles.Each(x => combinedRoles.AddIfNotExists(x));
+            permissions.Each(x => combinedPerms.AddIfNotExists(x));
 
             if (combinedRoles.Count > 0)
                 jwtPayload["roles"] = combinedRoles.ToJson();
