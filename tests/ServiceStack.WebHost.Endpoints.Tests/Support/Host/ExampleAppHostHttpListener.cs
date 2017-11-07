@@ -535,8 +535,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 			{
 				ConfigureFilter(container);
 			}
-
-			Plugins.Add(new RequestInfoFeature());
 		}
 
 		protected override void OnAfterInit()

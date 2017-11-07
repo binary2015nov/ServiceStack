@@ -25,12 +25,13 @@ namespace ServiceStack
         public string HandlerPath { get { return Config.HandlerFactoryPath; } set { Config.HandlerFactoryPath = value; } }
 
         protected AppHostHttpListenerBase(string serviceName, params Assembly[] assembliesWithServices)
-            : base(serviceName, assembliesWithServices) { }
+            : this(serviceName, "", assembliesWithServices) { }
 
         protected AppHostHttpListenerBase(string serviceName, string handlerPath, params Assembly[] assembliesWithServices)
             : base(serviceName, assembliesWithServices)
         {
             HandlerPath = handlerPath;
+            Config.MetadataRedirectPath = HandlerPath.IsNullOrEmpty() ? "metadata" : handlerPath.AppendPath("metadata");
         }
     }
 }

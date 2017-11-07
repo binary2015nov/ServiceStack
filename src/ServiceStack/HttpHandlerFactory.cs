@@ -71,30 +71,13 @@ namespace ServiceStack
             }
 
             if (!appHost.Config.DefaultRedirectPath.IsNullOrEmpty())
-            {
                 DefaultHttpHandler = new RedirectHttpHandler { RelativeUrl = appHost.Config.DefaultRedirectPath };
-            }
-            else
-            {
-                var metadataHandler = appHost.Config.MetadataRedirectPath.IsNullOrEmpty()
-                    ? new IndexPageHttpHandler() as IHttpHandler
-                    : new RedirectHttpHandler { RelativeUrl = appHost.Config.MetadataRedirectPath };
 
-                if (hostedAtRootPath)
-                {
-                    if (DefaultHttpHandler == null)
-                        DefaultHttpHandler = metadataHandler;
-                }
-                else
-                {
-                    DefaultHttpHandler = metadataHandler;
-                }
-            }      
+            if (DefaultHttpHandler == null && !appHost.Config.MetadataRedirectPath.IsNullOrEmpty())
+                DefaultHttpHandler = new RedirectHttpHandler { RelativeUrl = appHost.Config.MetadataRedirectPath };
 
             var defaultRedirectHanlder = DefaultHttpHandler as RedirectHttpHandler;
-            var debugDefaultHandler = defaultRedirectHanlder != null
-                ? defaultRedirectHanlder.RelativeUrl
-                : DefaultHttpHandler.GetType().Name;
+            var debugDefaultHandler = defaultRedirectHanlder != null ? defaultRedirectHanlder.RelativeUrl : null;
 
             ForbiddenHttpHandler = appHost.GetCustomErrorHttpHandler(HttpStatusCode.Forbidden) ?? new ForbiddenHttpHandler
             {
@@ -112,7 +95,8 @@ namespace ServiceStack
                 WebHostUrl = appHost.Config.WebHostUrl,
                 DefaultRootFileName = DefaultRootFileName,
                 DefaultHandler = debugDefaultHandler,
-            };          
+            };
+            
         }
 
 #if !NETSTANDARD2_0
@@ -157,7 +141,7 @@ namespace ServiceStack
                 var catchAllHandler = GetCatchAllHandlerIfAny(httpReq.HttpMethod, pathInfo, httpReq.GetPhysicalPath());
                 if (catchAllHandler != null) return catchAllHandler;
 
-                return DefaultHttpHandler;
+                return DefaultHttpHandler ?? NotFoundHttpHandler;
             }
             return GetHandlerForPathInfo(httpReq, physicalPath) ?? NotFoundHttpHandler;
         }

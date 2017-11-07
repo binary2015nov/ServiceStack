@@ -83,9 +83,8 @@ namespace ServiceStack
             : this(serviceName, handlerPath, CalculatePoolSize(), assembliesWithServices) { }
 
         protected AppHostHttpListenerPoolBase(string serviceName, string handlerPath, int poolSize, params Assembly[] assembliesWithServices)
-            : base(serviceName, assembliesWithServices)
+            : base(serviceName, handlerPath, assembliesWithServices)
         {
-            HandlerPath = handlerPath;
             threadPoolManager = new ThreadPoolManager(poolSize);
         }
 

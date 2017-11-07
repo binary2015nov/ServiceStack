@@ -680,10 +680,7 @@ Plugins: {{ plugins | select: \n  - { it | typeName } }}
 
         public virtual IAuthSession GetSession(bool reload = false)
         {
-            var req = this.Request;
-            if (req.GetSessionId() == null)
-                req.CreateSessionIds(req.Response);
-            return req.GetSession(reload);
+            return Request.GetSession(reload);
         }
 
         protected virtual TUserSession SessionAs<TUserSession>()

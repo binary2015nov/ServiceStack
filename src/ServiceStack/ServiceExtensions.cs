@@ -113,7 +113,7 @@ namespace ServiceStack
 
         public static IAuthSession GetSession(this IServiceBase service, bool reload = false)
         {
-            return service.Request.GetSession(reload);
+            return service.Request?.GetSession(reload);
         }
 
         public static TUserSession SessionAs<TUserSession>(this IRequest req)

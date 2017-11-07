@@ -467,7 +467,7 @@ namespace ServiceStack
                 {
                     httpReq.Items["Model"] = errorDto;
                     httpReq.Items[HtmlFormat.ErrorStatusKey] = errorDto.GetResponseStatus();
-                    errorHandler.ProcessRequestAsync(httpReq, httpRes, httpReq.OperationName);
+                    errorHandler.ProcessRequest(httpReq, httpRes, httpReq.OperationName);
                     return true;
                 }
             }

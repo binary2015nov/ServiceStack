@@ -10,7 +10,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
     {        
         private RequestInfoResponse GetRequestInfoForPath(string path)
         {
-            var url = Constants.ServiceStackBaseHost.CombineWith(path).AddQueryParam("debug", "requestinfo");
+            var url = Constants.ServiceStackBaseHost.AppendPath(path).AddQueryParam("debug", "requestinfo");
             var json = url.GetJsonFromUrl();
             var info = json.FromJson<RequestInfoResponse>();
             return info;

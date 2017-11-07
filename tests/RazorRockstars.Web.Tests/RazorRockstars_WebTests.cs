@@ -12,7 +12,7 @@ namespace RazorRockstars.Web.Tests
 	[TestFixture]
 	public class RazorRockstars_WebTests
 	{
-		Stopwatch startedAt;
+		private Stopwatch startedAt;
 
 		[OneTimeSetUp]
 		public void TestFixtureSetUp()
@@ -55,11 +55,12 @@ namespace RazorRockstars.Web.Tests
 		{
 			try
 			{
-				Debug.WriteLine(url);
+				url.Print();
 				var text = url.GetStringFromUrl(accept: AcceptContentType, responseFilter: r => {
 					if (r.StatusCode != HttpStatusCode.OK)
 						Assert.Fail(url + " did not return 200 OK");
 				});
+                text.Print();
 				foreach (var item in containsItems)
 				{
 					if (!text.Contains(item))
@@ -267,7 +268,7 @@ namespace RazorRockstars.Web.Tests
 			AssertStatus(Host + "/fallback/extrapath", HttpStatusCode.NotFound);
 		}
 
-		[Explicit,Test]
+		[Explicit, Test]
 		public void Test_multithread_errors()
 		{
 			var times = 1000;
