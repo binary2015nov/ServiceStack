@@ -26,6 +26,8 @@ namespace RazorRockstars.Web
                 .AddAttributes(new RestrictAttribute { VisibilityTo = RequestAttributes.None });
             typeof(SwaggerResource)
                 .AddAttributes(new RestrictAttribute { VisibilityTo = RequestAttributes.None });
+
+            this.CustomErrorHttpHandlers[HttpStatusCode.ExpectationFailed] = new RazorHandler("/expectationfailed");
         }
 
         public override void Configure(Container container)
@@ -44,8 +46,6 @@ namespace RazorRockstars.Web
                 new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider));
 
             InitData(container);
-
-            this.CustomErrorHttpHandlers[HttpStatusCode.ExpectationFailed] = new RazorHandler("/expectationfailed");
         }
 
         public static void InitData(Container container)

@@ -96,7 +96,7 @@ namespace ServiceStack
             webReq.ContentType = httpReq.ContentType;
             webReq.Accept = httpReq.Accept;
 
-#if NET40 || NET45
+#if NET40 || NET45 || NETSTANDARD2_0
             webReq.UserAgent = httpReq.UserAgent;
             webReq.Referer = httpReq.UrlReferrer?.ToString();
             webReq.ServicePoint.Expect100Continue = false;

@@ -928,7 +928,7 @@ namespace ServiceStack
                 if (Proxy != null) client.Proxy = Proxy;
 #endif
 
-#if NET45 || NET40
+#if NET45 || NET40 || NETSTANDARD2_0
                 client.UserAgent = UserAgent;
                 client.AllowAutoRedirect = AllowAutoRedirect;
                 if (Timeout.HasValue) 

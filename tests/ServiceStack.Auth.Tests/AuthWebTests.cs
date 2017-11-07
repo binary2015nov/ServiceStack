@@ -2,12 +2,25 @@
 using System.Net;
 using NUnit.Framework;
 
-namespace ServiceStack.AuthWeb.Tests
+namespace ServiceStack.Auth.Tests
 {
     [TestFixture]
     public class AuthWebTests
     {
-        public const string BaseUri = "http://localhost:11001/";
+        public const string BaseUri = "http://localhost:11002/";
+
+        private AppHost appHost;
+
+        [OneTimeSetUp]
+        public void TestFixtureSetUp()
+        {
+            appHost = new AppHost();
+            appHost.Init();
+            appHost.Start(BaseUri);
+        }
+
+        [OneTimeTearDown]
+        public void TestFixtureTearDown() => appHost.Dispose();
 
         [Test]
         public void Can_authenticate_with_HTTP_Basic_Authentication()
@@ -16,20 +29,6 @@ namespace ServiceStack.AuthWeb.Tests
             client.UserName = "mythz";
             client.Password = "test";
             var response = client.Get(new RequiresAuth { Name = "Haz Access!" });
-            Assert.That(response.Name, Is.EqualTo("Haz Access!"));
-        }
-
-        [Test, Ignore("")]
-        public void Can_authenticate_with_ASPNET_Windows_Authentication()
-        {
-            var client = new JsonServiceClient(BaseUri)
-            {
-                //Credentials = CredentialCache.DefaultCredentials,
-                Credentials = new NetworkCredential("mythz", "test", "macbook")
-            };
-
-            var response = client.Get(new RequiresAuth { Name = "Haz Access!" });
-
             Assert.That(response.Name, Is.EqualTo("Haz Access!"));
         }
 

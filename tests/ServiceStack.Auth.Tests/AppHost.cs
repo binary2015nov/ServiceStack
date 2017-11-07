@@ -11,6 +11,7 @@ using ServiceStack.MiniProfiler.Data;
 using ServiceStack.OrmLite;
 using ServiceStack.Razor;
 using ServiceStack.Text;
+using System;
 
 #if HTTP_LISTENER
 namespace ServiceStack.Auth.Tests
@@ -37,7 +38,7 @@ namespace ServiceStack.AuthWeb.Tests
 
             container.Register<IDbConnectionFactory>(
                 new OrmLiteConnectionFactory(":memory:", SqliteDialect.Provider) {
-                    ConnectionFilter = x => new ProfiledDbConnection(x, Profiler.Current)
+                    //ConnectionFilter = x => new ProfiledDbConnection(x, Profiler.Current)
                 });
 
             using (var db = container.Resolve<IDbConnectionFactory>().Open())
@@ -102,7 +103,29 @@ namespace ServiceStack.AuthWeb.Tests
                 authRepo.DropAndReCreateTables(); //Drop and re-create all Auth and registration tables
             else
                 authRepo.InitSchema();   //Create only the missing tables
+            try
+            {
+                authRepo.CreateUserAuth(new UserAuth
+                {
+                    //Custom = "CustomUserAuth",
+                    DisplayName = "Credentials",
+                    FirstName = "First",
+                    LastName = "Last",
+                    FullName = "First Last",
+                    Email = "demis.bellot@gmail.com",
+                }, "test");
 
+                authRepo.CreateUserAuth(new UserAuth
+                {
+                    //Custom = "CustomUserAuth",
+                    DisplayName = "Credentials",
+                    FirstName = "First",
+                    LastName = "Last",
+                    FullName = "First Last",
+                    UserName = "mythz",
+                }, "test");
+            }
+            catch (Exception) { }
             Plugins.Add(new RequestLogsFeature());
         }
     }

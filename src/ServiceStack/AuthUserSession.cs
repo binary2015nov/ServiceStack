@@ -99,10 +99,10 @@ namespace ServiceStack
             return this.Roles != null && this.Roles.Contains(role);
         }
 
-        public virtual void OnRegistered(IRequest httpReq, IAuthSession session, IServiceBase service) {}
+        public virtual void OnRegistered(IRequest httpReq, IAuthSession session, IServiceBase service) { }
         public virtual void OnAuthenticated(IServiceBase authService, IAuthSession session, IAuthTokens tokens, Dictionary<string, string> authInfo) { }
-        public virtual void OnLogout(IServiceBase authService) {}
-        public virtual void OnCreated(IRequest httpReq) {}
+        public virtual void OnLogout(IServiceBase authService) { }
+        public virtual void OnCreated(IRequest httpReq) { }
     }
 
     public class WebSudoAuthUserSession : AuthUserSession, IWebSudoAuthSession

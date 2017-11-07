@@ -1,5 +1,6 @@
-﻿@using ServiceStack.Common
-@using ServiceStack.ServiceInterface.Auth
+﻿@using ServiceStack
+@using ServiceStack.Common
+@using ServiceStack.Auth
 @using ServiceStack.OrmLite
 
 <script>
@@ -28,7 +29,7 @@
     if (session.IsAuthenticated)
     {
         var userAuthId = session.UserAuthId.ToInt();
-        var userAuth = Db.QueryById<UserAuth>(userAuthId);
+        var userAuth = Db.Select<UserAuth>(t => t.Id == userAuthId);
         var authProviders = Db.Select<UserAuthDetails>(x => x.UserAuthId == userAuthId);
 
         <h2 style="color:green">Authenticated!</h2>

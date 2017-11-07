@@ -28,7 +28,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Issues
     {
          class AppHost : AppSelfHostBase
          {
-             public AppHost() : base(typeof(XmlContentTypeIssue).Name, typeof(XmlContentTypeIssue).GetAssembly()) { }
+             public AppHost() : base(typeof(XmlContentTypeIssue).Name, typeof(XmlContentTypeIssue).Assembly) { }
 
              public override void Configure(Container container) { }
          }
