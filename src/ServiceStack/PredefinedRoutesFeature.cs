@@ -17,7 +17,7 @@ namespace ServiceStack
 
         public IHttpHandler ProcessRequest(string httpMethod, string pathInfo, string filePath)
         {
-            var pathParts = pathInfo.TrimStart('/').Split('/');
+            var pathParts = pathInfo.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             if (pathParts.Length == 0) return null;
             return GetHandlerForPathParts(pathParts);
         }

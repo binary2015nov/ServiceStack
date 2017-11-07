@@ -73,8 +73,20 @@ namespace ServiceStack
             if (!appHost.Config.DefaultRedirectPath.IsNullOrEmpty())
                 DefaultHttpHandler = new RedirectHttpHandler { RelativeUrl = appHost.Config.DefaultRedirectPath };
 
-            if (DefaultHttpHandler == null && !appHost.Config.MetadataRedirectPath.IsNullOrEmpty())
-                DefaultHttpHandler = new RedirectHttpHandler { RelativeUrl = appHost.Config.MetadataRedirectPath };
+            var metadataHandler = new RedirectHttpHandler();
+            if (!appHost.Config.MetadataRedirectPath.IsNullOrEmpty())
+                metadataHandler.RelativeUrl = appHost.Config.MetadataRedirectPath;
+            else
+                metadataHandler.RelativeUrl = "metadata";
+            if (hostedAtRootPath)
+            {
+                if (DefaultHttpHandler == null)
+                    DefaultHttpHandler = metadataHandler;
+            }
+            else
+            {
+                DefaultHttpHandler = metadataHandler;
+            }
 
             var defaultRedirectHanlder = DefaultHttpHandler as RedirectHttpHandler;
             var debugDefaultHandler = defaultRedirectHanlder != null ? defaultRedirectHanlder.RelativeUrl : null;
