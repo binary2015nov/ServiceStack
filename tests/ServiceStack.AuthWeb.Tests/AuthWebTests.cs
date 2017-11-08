@@ -45,7 +45,7 @@ namespace ServiceStack.AuthWeb.Tests
                 {
                     UserName = "demis.bellot@gmail.com",
                     Password = "test",
-                    Meta = new Dictionary<string, string> { { "custom", "metadata" } }
+                    //Meta = new Dictionary<string, string> { { "custom", "metadata" } }
                 });
             }
             catch (Exception ex)

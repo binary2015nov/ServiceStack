@@ -71,13 +71,7 @@ namespace ServiceStack
             
             req.PopulateFromRequestIfHasSessionId(requestDto);
 
-            //Call before GetSession so Exceptions can bubble
-            if (!req.Items.ContainsKey(Keywords.HasPreAuthenticated))
-            {
-                req.Items[Keywords.HasPreAuthenticated] = true;
-                authProviders.OfType<IAuthWithRequest>()
-                    .Each(x => { try { x.PreAuthenticate(req, res); } catch { } });
-            }
+            PreAuthenticate(req, authProviders);
 
             var session = req.GetSession();
             if (session == null || !authProviders.Any(x => session.IsAuthorized(x.Provider)))
@@ -86,6 +80,16 @@ namespace ServiceStack
                     return;
 
                 await AuthProvider.HandleFailedAuth(authProviders.First(), session, req, res);
+            }
+        }
+
+        internal static void PreAuthenticate(IRequest req, IEnumerable<IAuthProvider> authProviders)
+        {
+            if (!req.Items.ContainsKey(Keywords.HasPreAuthenticated))
+            {
+                req.Items[Keywords.HasPreAuthenticated] = true;
+                authProviders.OfType<IAuthWithRequest>()
+                    .Each(x => { try { x.PreAuthenticate(req, req.Response); } catch { } });
             }
         }
 

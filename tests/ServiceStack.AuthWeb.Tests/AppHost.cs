@@ -119,16 +119,16 @@ namespace ServiceStack.AuthWeb.Tests
             Plugins.Add(new AuthFeature(
                 () => new CustomUserSession(), //Use your own typed Custom UserSession type
                 new IAuthProvider[] {
-                    //new AspNetWindowsAuthProvider() {
-                    //    LoadUserAuthFilter = LoadUserAuthInfo,
-                    //    AllowAllWindowsAuthUsers = true
-                    //},
                     new CredentialsAuthProvider {  //HTML Form post of UserName/Password credentials
                         SkipPasswordVerificationForInProcessRequests = true,
                         //CustomValidationFilter = authCtx => 
                         //    authCtx.Request.UserHostAddress.StartsWith("175.45.17")
                         //        ? HttpResult.Redirect("https://youtu.be/dQw4w9WgXcQ")
                         //        : null
+                    },
+                    new AspNetWindowsAuthProvider() {
+                        LoadUserAuthFilter = LoadUserAuthInfo,
+                        AllowAllWindowsAuthUsers = true
                     },
                     new JwtAuthProvider(appSettings), 
                     new ApiKeyAuthProvider(appSettings), 

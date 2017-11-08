@@ -33,10 +33,10 @@ namespace ServiceStack.Auth
 
         bool IsAuthorized(string provider);
 
-        void OnRegistered(IRequest httpReq, IAuthSession session, IServiceBase service);
+        void OnRegistered(IRequest req, IAuthSession session, IServiceBase service);
         void OnAuthenticated(IServiceBase authService, IAuthSession session, IAuthTokens tokens, Dictionary<string, string> authInfo);
         void OnLogout(IServiceBase authService);
-        void OnCreated(IRequest httpReq);
+        void OnCreated(IRequest req);
     }
 
     public interface IWebSudoAuthSession : IAuthSession

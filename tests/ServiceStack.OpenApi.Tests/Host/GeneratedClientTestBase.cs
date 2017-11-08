@@ -34,7 +34,7 @@ namespace ServiceStack.OpenApi.Tests.Host
 
     public class TestAppHost : AppSelfHostBase
     {
-        public TestAppHost() : base("ServiceStack Autorest Client", typeof(NativeTypesTestService).Assembly))
+        public TestAppHost() : base("ServiceStack Autorest Client", typeof(NativeTypesTestService).Assembly)
         {
             Config.UseCamelCase = true;
             Config.DebugMode = true;

@@ -54,8 +54,7 @@ namespace ServiceStack.Auth
             PersistSession = !GetType().HasInterface(typeof(IAuthWithRequest));
         }
 
-        protected AuthProvider(IAppSettings appSettings, string authRealm, string oAuthProvider)
-            : this()
+        protected AuthProvider(IAppSettings appSettings, string authRealm, string oAuthProvider) : this()
         {
             // Enhancement per https://github.com/ServiceStack/ServiceStack/issues/741
             this.AuthRealm = appSettings != null ? appSettings.Get("OAuthRealm", authRealm) : authRealm;

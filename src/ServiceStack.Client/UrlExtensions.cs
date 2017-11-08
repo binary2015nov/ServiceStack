@@ -141,8 +141,6 @@ namespace ServiceStack
 
         public static string GetFullyQualifiedName(this Type type)
         {
-            var sb = StringBuilderCache.Allocate().Append(type.Name);
-            if (type.IsGenericType)
             var sb = new StringBuilder(type.Name);
             if (type.IsGenericType)
             {

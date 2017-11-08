@@ -150,17 +150,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [Test]
-        public void Can_send_Deflate_client_request()
-        {
-            var client = new JsonServiceClient(Config.ListeningOn)
-            {
-                RequestCompressionType = CompressionTypes.Deflate,
-            };
-            var response = client.Post(new HelloZip { Name = "Deflate" });
-            Assert.That(response.Result, Is.EqualTo("Hello, Deflate"));
-        }
-
-        [Test]
         public void Can_send_Deflate_client_request_HttpClient()
         {
             var client = new JsonHttpClient(Config.ListeningOn)

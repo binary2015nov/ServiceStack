@@ -105,7 +105,7 @@ namespace ServiceStack.Formats
                 html = HtmlTemplates.GetHtmlFormatTemplate()
                     .Replace("${Dto}", json)
                     .Replace("${Title}", string.Format(TitleFormat, requestName, now))
-                    .Replace("${MvcIncludes}", MiniProfiler.Profiler.RenderIncludes().ToString())
+                    .Replace("${MvcIncludes}", MiniProfiler.Profiler.RenderIncludes()?.ToString())
                     .Replace("${Header}", string.Format(HtmlTitleFormat, requestName, now))
                     .Replace("${ServiceUrl}", url)
                     .Replace("${Humanize}", Humanize.ToString().ToLower());
