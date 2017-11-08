@@ -80,15 +80,15 @@ namespace ServiceStack.Auth
             if (AuthProviderCatageries.LogoutAction.EqualsIgnoreCase(request.Provider))
                 return authProvider.Logout(this, request);
 
-            //var authWithRequest = authProvider as IAuthWithRequest;
-            //if (authWithRequest != null && !Request.IsInProcessRequest())
-            //{
-            //    //IAuthWithRequest normally doesn't call Authenticate directly, but they can to return Auth Info
-            //    //But as AuthenticateService doesn't have [Authenticate] we need to call it manually
-            //    new AuthenticateAttribute().ExecuteAsync(base.Request, base.Response, request).Wait();
-            //    if (base.Response.IsClosed)
-            //        return null;
-            //}
+            var authWithRequest = authProvider as IAuthWithRequest;
+            if (authWithRequest != null && !Request.IsInProcessRequest())
+            {
+                //IAuthWithRequest normally doesn't call Authenticate directly, but they can to return Auth Info
+                //But as AuthenticateService doesn't have [Authenticate] we need to call it manually
+                new AuthenticateAttribute().ExecuteAsync(base.Request, base.Response, request).Wait();
+                if (base.Response.IsClosed)
+                    return null;
+            }
 
             var session = this.GetSession();
 

@@ -83,13 +83,13 @@ namespace ServiceStack
             }
         }
 
-        internal static void PreAuthenticate(IRequest req, IEnumerable<IAuthProvider> authProviders)
+        private static void PreAuthenticate(IRequest req, IEnumerable<IAuthProvider> authProviders)
         {
             if (!req.Items.ContainsKey(Keywords.HasPreAuthenticated))
             {
                 req.Items[Keywords.HasPreAuthenticated] = true;
                 authProviders.OfType<IAuthWithRequest>()
-                    .Each(x => { try { x.PreAuthenticate(req, req.Response); } catch { } });
+                    .Each(x => x.PreAuthenticate(req, req.Response));
             }
         }
 

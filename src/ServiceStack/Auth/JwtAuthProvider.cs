@@ -21,7 +21,7 @@ namespace ServiceStack.Auth
         /// </summary>
         public bool SetBearerTokenOnAuthenticateResponse { get; set; }
 
-        public JwtAuthProvider() {}
+        public JwtAuthProvider() { }
 
         public JwtAuthProvider(IAppSettings appSettings) : base(appSettings) { }
 

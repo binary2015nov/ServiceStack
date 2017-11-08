@@ -26,8 +26,8 @@ namespace ServiceStack.AuthWeb.Tests
         {
             var client = new JsonServiceClient(BaseUri)
             {
-                //Credentials = CredentialCache.DefaultCredentials,
-                Credentials = new NetworkCredential("mythz", "test", "macbook")
+                Credentials = CredentialCache.DefaultCredentials,
+                //Credentials = new NetworkCredential("mythz", "test", "macbook")
             };
 
             var response = client.Get(new RequiresAuth { Name = "Haz Access!" });
@@ -39,20 +39,14 @@ namespace ServiceStack.AuthWeb.Tests
         public void Can_Authenticate_with_Metadata()
         {
             var client = new JsonServiceClient(BaseUri);
-            try
+
+            var response = client.Send(new Authenticate
             {
-                var response = client.Send(new Authenticate
-                {
-                    UserName = "demis.bellot@gmail.com",
-                    Password = "test",
-                    //Meta = new Dictionary<string, string> { { "custom", "metadata" } }
-                });
-            }
-            catch (Exception ex)
-            {
-                ex.PrintDump();
-                throw;
-            }
+                UserName = "demis.bellot@gmail.com",
+                Password = "test",
+                Meta = new Dictionary<string, string> { { "custom", "metadata" } }
+            });
+       
         }
     }
 }
