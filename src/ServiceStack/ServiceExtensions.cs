@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using ServiceStack.Auth;
 using ServiceStack.Caching;
@@ -132,6 +133,60 @@ namespace ServiceStack
 
             return SessionFeature.GetOrCreateSession<TUserSession>(req.GetCacheClient(), req, req.Response);
         }
+
+        public static bool IsAuthenticated(this IRequest req)
+        {
+            //Sync with [Authenticate] impl
+            if (HostContext.HasValidAuthSecret(req))
+                return true;
+            
+            var authProviders = AuthenticateService.GetAuthProviders();
+            AuthenticateAttribute.PreAuthenticate(req, authProviders);
+            
+            var session = req.GetSession();
+            return session != null && authProviders.Any(x => session.IsAuthorized(x.Provider));
+        }
+
+        public static IAuthSession GetSession(this IRequest httpReq, bool reload = false)
+        {
+            if (httpReq == null)
+                return null;
+
+            if (HostContext.TestMode)
+            {
+                var mockSession = httpReq.TryResolve<IAuthSession>(); //testing
+                if (mockSession != null)
+                    return mockSession;
+            }
+
+            object oSession = null;
+            if (!reload)
+                httpReq.Items.TryGetValue(Keywords.Session, out oSession);
+
+            if (oSession == null && !httpReq.Items.ContainsKey(Keywords.HasPreAuthenticated))
+            {
+                try
+                {
+                    HostContext.AppHost.ApplyPreAuthenticateFilters(httpReq, httpReq.Response);
+                    httpReq.Items.TryGetValue(Keywords.Session, out oSession);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Error in GetSession() when ApplyPreAuthenticateFilters", ex);
+                    /*treat errors as non-existing session*/
+                }
+            }
+
+            var sessionId = httpReq.GetSessionId();
+            var session = oSession as IAuthSession;
+            if (session != null)
+                session = HostContext.AppHost.OnSessionFilter(session, sessionId);
+            if (session != null)
+                return session;
+
+            var sessionKey = SessionFeature.GetSessionKey(sessionId);
+            if (sessionKey != null)
+            
 
         public static TimeSpan? GetSessionTimeToLive(this ICacheClient cache, string sessionId)
         {

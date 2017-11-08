@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
@@ -63,22 +64,26 @@ namespace ServiceStack
 
             if (matchingOAuthConfigs.Count() == 0)
             {
-                await res.WriteError(req, requestDto, $"No OAuth Configs found matching {this.Provider ?? "any"} provider");
+                await res.WriteError(req, requestDto, $"No registered Auth Providers found matching {this.Provider ?? "any"} provider");
                 res.EndRequest();
                 return;
             }
-
+            
             req.PopulateFromRequestIfHasSessionId(requestDto);
 
             //Call before GetSession so Exceptions can bubble
-            req.Items[Keywords.HasPreAuthenticated] = true;
-            matchingOAuthConfigs.OfType<IAuthWithRequest>()
-                .Each(x => x.PreAuthenticate(req, res));
+            if (!req.Items.ContainsKey(Keywords.HasPreAuthenticated))
+            {
+                req.Items[Keywords.HasPreAuthenticated] = true;
+                matchingOAuthConfigs.OfType<IAuthWithRequest>()
+                    .Each(x => x.PreAuthenticate(req, res));
+            }
 
             var session = req.GetSession();
-            if (session == null || !matchingOAuthConfigs.Any(x => session.IsAuthorized(x.Provider)))
+            if (session == null || !authProviders.Any(x => session.IsAuthorized(x.Provider)))
             {
-                if (this.DoHtmlRedirectIfConfigured(req, res, true)) return;
+                if (this.DoHtmlRedirectIfConfigured(req, res, true))
+                    return;
 
                 await AuthProvider.HandleFailedAuth(matchingOAuthConfigs.First(), session, req, res);
             }
@@ -115,24 +120,24 @@ namespace ServiceStack
             return "?" + queryStringCollection.ToFormUrlEncoded();
         }
 
-        public bool Equals(AuthenticateAttribute other)
+        protected bool Equals(AuthenticateAttribute other)
         {
-            if (other == null)
-                return false;
-
-            return string.Equals(Provider, other.Provider) && string.Equals(HtmlRedirect, other.HtmlRedirect);
+            return base.Equals(other) && string.Equals(Provider, other.Provider) && string.Equals(HtmlRedirect, other.HtmlRedirect);
         }
 
         public override bool Equals(object other)
         {
-            return Equals(other as AuthenticateAttribute);
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((AuthenticateAttribute)obj);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                var hashCode = GetType().Name.GetHashCode();
+                var hashCode = base.GetHashCode();
                 hashCode = (hashCode * 397) ^ (Provider?.GetHashCode() ?? 0);
                 hashCode = (hashCode * 397) ^ (HtmlRedirect?.GetHashCode() ?? 0);
                 return hashCode;
