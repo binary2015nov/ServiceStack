@@ -59,10 +59,10 @@ namespace ServiceStack
                 throw new InvalidOperationException(
                     "The AuthenticateService must be initialized by calling AuthenticateService.Init to use an authenticate attribute");
 
-            var matchingOAuthConfigs = AuthenticateService.AuthProviders.Where(
+            var authProviders = AuthenticateService.AuthProviders.Where(
                 x => Provider.IsNullOrEmpty() || x.Provider == Provider);
 
-            if (matchingOAuthConfigs.Count() == 0)
+            if (authProviders.Count() == 0)
             {
                 await res.WriteError(req, requestDto, $"No registered Auth Providers found matching {this.Provider ?? "any"} provider");
                 res.EndRequest();
@@ -75,8 +75,8 @@ namespace ServiceStack
             if (!req.Items.ContainsKey(Keywords.HasPreAuthenticated))
             {
                 req.Items[Keywords.HasPreAuthenticated] = true;
-                matchingOAuthConfigs.OfType<IAuthWithRequest>()
-                    .Each(x => x.PreAuthenticate(req, res));
+                authProviders.OfType<IAuthWithRequest>()
+                    .Each(x => { try { x.PreAuthenticate(req, res); } catch { } });
             }
 
             var session = req.GetSession();
@@ -85,7 +85,7 @@ namespace ServiceStack
                 if (this.DoHtmlRedirectIfConfigured(req, res, true))
                     return;
 
-                await AuthProvider.HandleFailedAuth(matchingOAuthConfigs.First(), session, req, res);
+                await AuthProvider.HandleFailedAuth(authProviders.First(), session, req, res);
             }
         }
 
@@ -127,10 +127,10 @@ namespace ServiceStack
 
         public override bool Equals(object other)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((AuthenticateAttribute)obj);
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (other.GetType() != this.GetType()) return false;
+            return Equals((AuthenticateAttribute)other);
         }
 
         public override int GetHashCode()

@@ -119,10 +119,10 @@ namespace ServiceStack.AuthWeb.Tests
             Plugins.Add(new AuthFeature(
                 () => new CustomUserSession(), //Use your own typed Custom UserSession type
                 new IAuthProvider[] {
-                    //new AspNetWindowsAuthProvider(this) {
+                    //new AspNetWindowsAuthProvider() {
                     //    LoadUserAuthFilter = LoadUserAuthInfo,
                     //    AllowAllWindowsAuthUsers = true
-                    //}, 
+                    //},
                     new CredentialsAuthProvider {  //HTML Form post of UserName/Password credentials
                         SkipPasswordVerificationForInProcessRequests = true,
                         //CustomValidationFilter = authCtx => 

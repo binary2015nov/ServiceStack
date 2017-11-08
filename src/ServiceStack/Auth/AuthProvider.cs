@@ -25,8 +25,6 @@ namespace ServiceStack.Auth
 
     public abstract class AuthProvider : IAuthProvider
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(AuthProvider));
-
         public TimeSpan? SessionExpiry { get; set; }
         public string AuthRealm { get; set; }
         public string Provider { get; set; }

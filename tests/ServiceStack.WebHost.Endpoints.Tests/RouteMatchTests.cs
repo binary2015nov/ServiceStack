@@ -166,7 +166,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             public override void Configure(Container container)
             {
-                Routes.Add(typeof(MatchesCsv), "/matches/csv", null, null, null, matchRule:"AcceptsCsv");
+                Routes.Add(typeof(MatchesCsv), "/matches/csv", null, null, null, matches:"AcceptsCsv");
             }
         }
 

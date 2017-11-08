@@ -33,6 +33,9 @@ namespace ServiceStack.Auth
 
         public static IAuthProvider GetAuthProvider(string provider)
         {
+            if (provider.IsNullOrEmpty())
+                throw new ArgumentException(nameof(provider));
+
             if (AuthProviders.Length == 0)
                 return null;
             if (provider == AuthProviderCatageries.LogoutAction)

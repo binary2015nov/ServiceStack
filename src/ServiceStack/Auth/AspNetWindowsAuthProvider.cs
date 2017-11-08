@@ -15,7 +15,7 @@ namespace ServiceStack.Auth
         public static string Name = AuthProviderCatageries.WindowsAuthProvider;
         public static string Realm = "/auth/" + AuthProviderCatageries.WindowsAuthProvider;
 
-        public AspNetWindowsAuthProvider(IAppHost appHost)
+        public AspNetWindowsAuthProvider()
         {
             Provider = Name;
             AuthRealm = Realm;
@@ -23,7 +23,7 @@ namespace ServiceStack.Auth
             AllRoles = new List<string>();
             LimitAccessToRoles = new List<string>();
 
-            if (!(appHost is AppHostBase))
+            if (!HostContext.IsAspNetHost)
             {
                 throw new NotSupportedException(
                     "AspNetWindowsAuthProvider is only supported on ASP.NET hosts");
@@ -32,7 +32,7 @@ namespace ServiceStack.Auth
             PopulateUserRoles = PopulateUserSessionWithIsInRole;
 
             //Add all pre-defined Roles used to in App to 'AllRoles'
-            appHost.AfterInitCallbacks.Add(host =>
+            HostContext.AppHost.AfterInitCallbacks.Add(host =>
             {
                 var requiredRoles = host.Metadata.OperationsMap
                     .SelectMany(x => x.Key.AllAttributes<RequiredRoleAttribute>()
@@ -177,7 +177,8 @@ namespace ServiceStack.Auth
                 using (var authService = HostContext.ResolveService<AuthenticateService>(req))
                 {
                     var session = req.GetSession();
-                    if (LoginMatchesSession(session, user.Identity.Name)) return;
+                    if (LoginMatchesSession(session, user.Identity.Name))
+                        return;
 
                     var response = authService.Post(new Authenticate
                     {

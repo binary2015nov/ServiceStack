@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using NUnit.Framework;
+using ServiceStack.Text;
 
 namespace ServiceStack.AuthWeb.Tests
 {
@@ -19,7 +21,7 @@ namespace ServiceStack.AuthWeb.Tests
             Assert.That(response.Name, Is.EqualTo("Haz Access!"));
         }
 
-        [Test, Ignore("")]
+        [Test]
         public void Can_authenticate_with_ASPNET_Windows_Authentication()
         {
             var client = new JsonServiceClient(BaseUri)
@@ -37,13 +39,20 @@ namespace ServiceStack.AuthWeb.Tests
         public void Can_Authenticate_with_Metadata()
         {
             var client = new JsonServiceClient(BaseUri);
-
-            var response = client.Send(new Authenticate
+            try
             {
-                UserName = "demis.bellot@gmail.com",
-                Password = "test",
-                Meta = new Dictionary<string, string> { { "custom", "metadata" } }
-            });
+                var response = client.Send(new Authenticate
+                {
+                    UserName = "demis.bellot@gmail.com",
+                    Password = "test",
+                    Meta = new Dictionary<string, string> { { "custom", "metadata" } }
+                });
+            }
+            catch (Exception ex)
+            {
+                ex.PrintDump();
+                throw;
+            }
         }
     }
 }
