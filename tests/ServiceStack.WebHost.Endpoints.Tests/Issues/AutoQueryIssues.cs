@@ -55,7 +55,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Issues
 
         class AppHost : AppSelfHostBase
         {
-            public AppHost() : base(typeof(ClientMemoryLeak).Name, typeof(AutoQueryJoinReferenceId).GetAssembly())
+            public AppHost() : base(typeof(ClientMemoryLeak).Name, typeof(AutoQueryJoinReferenceId).Assembly)
             {
                 Config.UseCamelCase = true;
             }

@@ -330,8 +330,7 @@ namespace ServiceStack.Server.Tests.Auth
 
         class JwtAuthProviderReaderAppHost : AppHostHttpListenerBase
         {
-            public JwtAuthProviderReaderAppHost()
-                : base(typeof(FallbackAuthKeyTests).Name, typeof(AppHost).GetAssembly()) { }
+            public JwtAuthProviderReaderAppHost() : base(typeof(FallbackAuthKeyTests).Name, typeof(AppHost).Assembly) { }
 
             public override void Configure(Container container)
             {
@@ -406,7 +405,7 @@ namespace ServiceStack.Server.Tests.Auth
 
         class JwtAuthProviderReaderAppHost : AppHostHttpListenerBase
         {
-            public JwtAuthProviderReaderAppHost() : base("Test Razor", typeof(AppHost).GetAssembly()) { }
+            public JwtAuthProviderReaderAppHost() : base("Test Razor", typeof(AppHost).Assembly) { }
 
             public override void Configure(Container container)
             {

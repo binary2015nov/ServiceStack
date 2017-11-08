@@ -64,7 +64,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         class AppHost : AppSelfHostBase
         {
-            public AppHost() : base(nameof(CompressResponseTests), typeof(CompressedServices).GetAssembly())
+            public AppHost() : base(nameof(CompressResponseTests), typeof(CompressedServices).Assembly)
             {
                 Config.CompressFilesWithExtensions = new HashSet<string> { "html", "css" };
             }

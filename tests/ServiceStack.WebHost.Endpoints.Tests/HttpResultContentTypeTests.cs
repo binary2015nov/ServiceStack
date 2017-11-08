@@ -12,9 +12,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         #region setup for example plaintext service
         public class SimpleAppHostHttpListener : AppHostHttpListenerBase {
             //Tell Service Stack the name of your application and where to find your web services
-            public SimpleAppHostHttpListener() : base("Test Services", typeof(SimpleAppHostHttpListener).GetAssembly()) {
-                LogManager.LogFactory = new TestLogFactory();
-            }
+            public SimpleAppHostHttpListener() : base("Test Services", typeof(SimpleAppHostHttpListener).Assembly) { }
 
             /// <summary>
             /// AppHostHttpListenerBase method.
@@ -60,24 +58,20 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		private static string ListeningOn = Config.ListeningOn;
 		SimpleAppHostHttpListener appHost;
 
-        public HttpResultContentTypeTests()
-		{
-            
-		}
-
 		[OneTimeSetUp]
-		public void OnTestFixtureStartUp() 
+		public void TestFixtureStartUp() 
 		{
-			appHost = new SimpleAppHostHttpListener();
+            LogManager.LogFactory = new TestLogFactory();
+            appHost = new SimpleAppHostHttpListener();
 			appHost.Init();
 			appHost.Start(ListeningOn);
 
 			System.Console.WriteLine("ExampleAppHost Created at {0}, listening on {1}",
-			                         DateTime.Now, ListeningOn);
+			                         appHost.CreatedAt, ListeningOn);
 		}
 
 		[OneTimeTearDown]
-		public void OnTestFixtureTearDown()
+		public void TestFixtureTearDown()
 		{
 			appHost.Dispose();
 

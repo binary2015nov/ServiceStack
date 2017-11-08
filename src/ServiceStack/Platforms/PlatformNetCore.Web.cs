@@ -270,7 +270,7 @@ namespace System.Web.UI
 #if !NETSTANDARD2_0
             PropertyDescriptor prop = TypeDescriptor.GetProperties(container).Find(propName, true);
 #else
-            PropertyInfo prop = container.GetType().GetPropertyInfo(propName);            
+            PropertyInfo prop = container.GetType().GetProperty(propName);            
 #endif
             if (prop == null)
             {

@@ -17,7 +17,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		public class HeadersAppHostHttpListener : AppHostHttpListenerBase
 		{
 			public HeadersAppHostHttpListener() 
-                : base("Request Filters Tests", typeof(HeadersService).GetAssembly())
+                : base("Request Filters Tests", typeof(HeadersService).Assembly)
             {
                 //Signal advanced web browsers what HTTP Methods you accept
                 Config.GlobalResponseHeaders = new Dictionary<string, string> {

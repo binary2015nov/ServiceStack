@@ -77,7 +77,7 @@ namespace ServiceStack.Host
 
             //Only count non-core ServiceStack Services, i.e. defined outside of ServiceStack.dll or Swagger
             var nonCoreServicesCount = OperationsMap.Values
-                .Count(x => x.ServiceType.GetAssembly() != typeof(Service).GetAssembly()
+                .Count(x => x.ServiceType.Assembly != typeof(Service).Assembly
                 && x.ServiceType.FullName != "ServiceStack.Api.Swagger.SwaggerApiService"
                 && x.ServiceType.FullName != "ServiceStack.Api.Swagger.SwaggerResourcesService"
                 && x.ServiceType.FullName != "ServiceStack.Api.OpenApi.OpenApiService"
@@ -88,11 +88,11 @@ namespace ServiceStack.Host
 
         readonly HashSet<Assembly> excludeAssemblies = new HashSet<Assembly>
         {
-            typeof(string).GetAssembly(),            //mscorelib
-            typeof(Uri).GetAssembly(),               //System
-            typeof(ServiceStackHost).GetAssembly(),  //ServiceStack
-            typeof(UrnId).GetAssembly(),             //ServiceStack.Common
-            typeof(ErrorResponse).GetAssembly(),     //ServiceStack.Interfaces
+            typeof(string).Assembly,            //mscorelib
+            typeof(Uri).Assembly,               //System
+            typeof(ServiceStackHost).Assembly,  //ServiceStack
+            typeof(UrnId).Assembly,             //ServiceStack.Common
+            typeof(ErrorResponse).Assembly,     //ServiceStack.Interfaces
         };
 
         public List<Assembly> GetOperationAssemblies()
@@ -355,12 +355,12 @@ namespace ServiceStack.Host
 
             to.Add(type);
 
-            var baseType = type.BaseType();
+            var baseType = type.BaseType;
             if (baseType != null && IsDtoType(baseType) && !to.Contains(baseType))
             {
                 AddReferencedTypes(to, baseType);
 
-                var genericArgs = type.IsGenericType()
+                var genericArgs = type.IsGenericType
                     ? type.GetGenericArguments()
                     : Type.EmptyTypes;
 
@@ -378,7 +378,7 @@ namespace ServiceStack.Host
                 if (IsDtoType(pi.PropertyType))
                     to.Add(pi.PropertyType);
 
-                var genericArgs = pi.PropertyType.IsGenericType()
+                var genericArgs = pi.PropertyType.IsGenericType
                     ? pi.PropertyType.GetGenericArguments()
                     : Type.EmptyTypes;
 
@@ -389,7 +389,7 @@ namespace ServiceStack.Host
                         AddReferencedTypes(to, arg);
                     }
                 }
-                else if (pi.PropertyType.IsArray())
+                else if (pi.PropertyType.IsArray)
                 {
                     var elType = pi.PropertyType.HasElementType ? pi.PropertyType.GetElementType() : null;
                     AddReferencedTypes(to, elType);
@@ -399,8 +399,8 @@ namespace ServiceStack.Host
 
         private bool IsDtoType(Type type) => type != null &&
              type.Namespace?.StartsWith("System") == false &&
-             type.IsClass() && type != typeof(string) &&
-             !type.IsGenericType() &&
+             type.IsClass && type != typeof(string) &&
+             !type.IsGenericType &&
              !type.IsArray &&
              !type.HasInterface(typeof(IService));
 
@@ -631,7 +631,7 @@ namespace ServiceStack.Host
                 if (baseType.GetOperationName() == type.GetOperationName())
                     typesWithSameName.Push(baseType);
             }
-            while ((baseType = baseType.BaseType()) != null);
+            while ((baseType = baseType.BaseType) != null);
 
             return typesWithSameName.Pop();
         }
@@ -676,11 +676,11 @@ namespace ServiceStack.Host
 
         public static List<Assembly> GetAssemblies(this Operation operation)
         {
-            var ret = new List<Assembly> { operation.RequestType.GetAssembly() };
+            var ret = new List<Assembly> { operation.RequestType.Assembly };
             if (operation.ResponseType != null
-                && operation.ResponseType.GetAssembly() != operation.RequestType.GetAssembly())
+                && operation.ResponseType.Assembly != operation.RequestType.Assembly)
             {
-                ret.Add(operation.ResponseType.GetAssembly());
+                ret.Add(operation.ResponseType.Assembly);
             }
             return ret;
         }

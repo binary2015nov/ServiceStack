@@ -150,7 +150,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             public static int CancelledAt = -1;
 
-            public AppHost() : base(nameof(AsyncFiltersTests), typeof(TestAsyncFilterService).GetAssembly()) { }
+            public AppHost() : base(nameof(AsyncFiltersTests), typeof(TestAsyncFilterService).Assembly) { }
 
             public override void Configure(Container container)
             {
@@ -159,7 +159,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 GlobalRequestFiltersAsync.Add(CreateAsyncFilter(2));
 
                 Plugins.Add(new ValidationFeature());
-                container.RegisterValidators(typeof(MyTestAsyncValidator).GetAssembly());
+                container.RegisterValidators(typeof(MyTestAsyncValidator).Assembly);
             }
 
             private static Func<IRequest, IResponse, object, Task> CreateAsyncFilter(int pos)

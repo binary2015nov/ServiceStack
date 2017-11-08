@@ -29,7 +29,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         public class AppHost : AppHostHttpListenerBase
         {
-            public AppHost() : base(typeof(CustomFormatTests).Name, typeof(CustomFormatTests).GetAssembly())
+            public AppHost() : base(typeof(CustomFormatTests).Name, typeof(CustomFormatTests).Assembly)
             {
                 Config.DefaultContentType = MimeTypes.Json;
                 Config.EnableFeatures = Feature.All.Remove(Feature.Html);

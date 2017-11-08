@@ -34,7 +34,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         class SharedDtoAppHost : AppHostHttpListenerBase
         {
 
-            public SharedDtoAppHost() : base("Shared dto tests", typeof(Service1).GetAssembly()) { }
+            public SharedDtoAppHost() : base("Shared dto tests", typeof(Service1).Assembly) { }
 
             public override void Configure(Container container) { }
 

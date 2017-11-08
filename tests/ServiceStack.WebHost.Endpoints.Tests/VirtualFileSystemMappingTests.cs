@@ -64,13 +64,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             appHost = new AppHost();
             var dirPath = ClearFolders();
 
-            Directory.CreateDirectory(dirPath.AppendPaths("mount1", "dir1"));
-            File.WriteAllText(dirPath.AppendPaths("mount1", "file.txt"), "MOUNT1");
-            File.WriteAllText(dirPath.AppendPaths("mount1", "dir1", "nested-file.txt"), "NESTED MOUNT1");
+            Directory.CreateDirectory(dirPath.CombineWith("mount1", "dir1"));
+            File.WriteAllText(dirPath.CombineWith("mount1", "file.txt"), "MOUNT1");
+            File.WriteAllText(dirPath.CombineWith("mount1", "dir1", "nested-file.txt"), "NESTED MOUNT1");
 
-            Directory.CreateDirectory(dirPath.AppendPaths("mount2", "dir2"));
-            File.WriteAllText(dirPath.AppendPaths("mount2", "file.txt"), "MOUNT2");
-            File.WriteAllText(dirPath.AppendPaths("mount2", "dir2", "nested-file.txt"), "NESTED MOUNT2");
+            Directory.CreateDirectory(dirPath.CombineWith("mount2", "dir2"));
+            File.WriteAllText(dirPath.CombineWith("mount2", "file.txt"), "MOUNT2");
+            File.WriteAllText(dirPath.CombineWith("mount2", "dir2", "nested-file.txt"), "NESTED MOUNT2");
 
             appHost
                 .Init()

@@ -70,7 +70,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             public override void Configure(Container container)
             {
                 Plugins.Add(new ValidationFeature());
-                container.RegisterValidators(typeof(UserValidator).GetAssembly());
+                container.RegisterValidators(typeof(UserValidator).Assembly);
             }
         }
 

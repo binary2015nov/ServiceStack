@@ -131,7 +131,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
     public class AppHost : AppHostHttpListenerBase
     {
-        public AppHost() : base("Test ErrorHandling", typeof(ReqstarsService).GetAssembly()) { }
+        public AppHost() : base("Test ErrorHandling", typeof(ReqstarsService).Assembly) { }
 
         public override void Configure(Funq.Container container)
         {

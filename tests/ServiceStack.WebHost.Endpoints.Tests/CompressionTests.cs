@@ -58,9 +58,9 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		[Test]
 		public void Test_response_with_CompressedResult()
 		{
-			using (new BasicAppHost(typeof(CompressionTests).GetAssembly()).Init())
-			{
-				var mockResponse = new MockHttpResponse();
+            using (new BasicAppHost(typeof(CompressionTests).Assembly).Init())
+		    {
+                var mockResponse = new MockHttpResponse();
 
 				var simpleDto = new TestCompress(1, "name");
 

@@ -137,13 +137,13 @@ namespace ServiceStack.Support.Markdown
 
 			var sw = Stopwatch.StartNew();
 
-			try
-			{
-				if (!typeof(MarkdownViewBase).IsAssignableFromType(this.Markdown.MarkdownBaseType))
-				{
-					throw new ConfigurationErrorsException(
-						"Config.MarkdownBaseType must inherit from MarkdownViewBase");
-				}
+            try
+            {
+                if (!typeof(MarkdownViewBase).IsAssignableFrom(this.Markdown.MarkdownBaseType))
+                {
+                    throw new ConfigurationErrorsException(
+                        "Config.MarkdownBaseType must inherit from MarkdownViewBase");
+                }
 
 				if (this.Contents.IsNullOrEmpty()) return;
 

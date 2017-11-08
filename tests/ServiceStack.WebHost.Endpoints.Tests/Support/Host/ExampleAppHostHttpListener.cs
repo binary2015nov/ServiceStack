@@ -439,7 +439,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 
 	public class ExampleAppHostHttpListener : AppHostHttpListenerBase
 	{
-		public ExampleAppHostHttpListener() : base("ServiceStack Examples", typeof(GetFactorialService).GetAssembly())
+		public ExampleAppHostHttpListener() : base("ServiceStack Examples", typeof(GetFactorialService).Assembly)
 		{
 			//Signal advanced web browsers what HTTP Methods you accept
 			Config.GlobalResponseHeaders = new Dictionary<string, string> {
@@ -494,7 +494,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 
 	public class ExampleAppHostHttpListenerPool : AppHostHttpListenerPoolBase
 	{
-		public ExampleAppHostHttpListenerPool() : base("ServiceStack Examples", 500, typeof(GetFactorialService).GetAssembly())
+		public ExampleAppHostHttpListenerPool() : base("ServiceStack Examples", 500, typeof(GetFactorialService).Assembly)
 		{
 			//Signal advanced web browsers what HTTP Methods you accept
 			Config.GlobalResponseHeaders = new Dictionary<string, string> {

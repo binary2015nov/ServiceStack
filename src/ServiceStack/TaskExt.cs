@@ -33,7 +33,7 @@ namespace ServiceStack
                 task.Wait();
 
                 var taskType = task.GetType();
-                if (!taskType.IsGenericType() || taskType.FullName.Contains("VoidTaskResult"))
+                if (!taskType.IsGenericType || taskType.FullName.Contains("VoidTaskResult"))
                     return null;
 
                 var fn = TypeProperties.Get(taskType).GetPublicGetter("Result");

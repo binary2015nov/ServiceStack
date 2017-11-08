@@ -91,9 +91,9 @@ namespace ServiceStack.Validation
                 return;
 
             var type = validator;
-            while (!type.IsGenericType() && type.BaseType() != null)
+            while (!type.IsGenericType && type.BaseType != null)
             {
-                type = type.BaseType();
+                type = type.BaseType;
             }
 
             var dtoType = type.GetGenericArguments()[0];

@@ -36,7 +36,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.IntegrationTests
 
 		public class IntegrationTestAppHost : AppHostHttpListenerBase 
 		{
-			public IntegrationTestAppHost() : base("ServiceStack Examples", typeof(RestMovieService).GetAssembly()) { }
+			public IntegrationTestAppHost() : base("ServiceStack Examples", typeof(RestMovieService).Assembly) { }
 
             public override void Configure(Container container)
             {

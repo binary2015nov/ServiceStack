@@ -40,7 +40,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
     public class AppHostSmartPool : AppHostHttpListenerSmartPoolBase
     {
-        public AppHostSmartPool() : base("SmartPool Test", typeof(PerfServices).GetAssembly()) { }
+        public AppHostSmartPool() : base("SmartPool Test", typeof(PerfServices).Assembly) { }
 
         public override void Configure(Funq.Container container) { }
     }

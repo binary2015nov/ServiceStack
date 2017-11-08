@@ -293,8 +293,8 @@ namespace ServiceStack.Host.Handlers
             var response = new RequestInfoResponse
             {
                 Usage = "append '?debug=requestinfo' to any querystring. Optional params: virtualPathCount",
-                Host = HostContext.AppHost.GetType().Name + "_" + HostContext.AppHost.Config.DebugHttpListenerHostEnvironment + "_" + Env.ServerUserAgent,
-                HostType = "{0} ({1})".Fmt(HostContext.IsAspNetHost ? "ASP.NET" : "SelfHost", hostType.BaseType()?.Name ?? hostType.Name),
+                Host = HostContext.AppHost.ServiceName + "_" + HostContext.Config.DebugHttpListenerHostEnvironment + "_" + Env.ServerUserAgent,
+                HostType = "{0} ({1})".Fmt(HostContext.IsAspNetHost ? "ASP.NET" : "SelfHost", hostType.BaseType?.Name ?? hostType.Name),
                 StartedAt = HostContext.AppHost.ReadyAt.ToString("yyyy-MM-dd HH:mm:ss"),
                 Date = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
                 ServiceName = HostContext.AppHost.ServiceName,

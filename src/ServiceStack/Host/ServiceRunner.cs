@@ -104,7 +104,7 @@ namespace ServiceStack.Host
 
                 if (HostContext.Config.StrictMode.GetValueOrDefault())
                 {
-                    if (response != null && response.GetType().IsValueType())
+                    if (response != null && response.GetType().IsValueType)
                         throw new StrictModeException(
                             $"'{requestDto.GetType().Name}' Service cannot return Value Types for its Service Responses. " +
                             $"You can embed its '{response.GetType().Name}' return value in a Response DTO or return as raw data in a string or byte[]",

@@ -17,7 +17,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         class AppHost : AppSelfHostBase
         {
-            public AppHost() : base(nameof(StrictModeTests), typeof(BadService).GetAssembly())
+            public AppHost() : base(nameof(StrictModeTests), typeof(BadService).Assembly)
             {
                 Config.StrictMode = true;
             }
@@ -59,7 +59,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         class BadUserSessionAppHost : AppSelfHostBase
         {
-            public BadUserSessionAppHost() : base(nameof(StrictModeTests), typeof(BadService).GetAssembly())
+            public BadUserSessionAppHost() : base(nameof(StrictModeTests), typeof(BadService).Assembly)
             {
                 Config.StrictMode = true;
             }

@@ -108,7 +108,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         class AppHost : AppSelfHostBase
         {
-            public AppHost() : base(nameof(CustomOrmLiteAuthRepositoryTests), typeof(CustomOrmLiteAuthRepositoryTests).GetAssembly())
+            public AppHost() : base(nameof(CustomOrmLiteAuthRepositoryTests), typeof(CustomOrmLiteAuthRepositoryTests).Assembly)
             {
                 Config.DebugMode = true;
             }

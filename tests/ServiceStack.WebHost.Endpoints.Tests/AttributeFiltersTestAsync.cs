@@ -227,7 +227,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 	{		
 		public class AppHost : AppHostHttpListenerBase
 		{
-			public AppHost() : base("Attribute Filters Tests", typeof(AttributeAttributeFilteredService).GetAssembly())
+			public AppHost() : base("Attribute Filters Tests", typeof(AttributeAttributeFilteredService).Assembly)
 			{
 				Config.DebugMode = true;
 			}
