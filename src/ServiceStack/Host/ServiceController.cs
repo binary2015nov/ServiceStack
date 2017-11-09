@@ -11,6 +11,7 @@ using ServiceStack.Configuration;
 using ServiceStack.Host.Handlers;
 using ServiceStack.Logging;
 using ServiceStack.Messaging;
+using ServiceStack.NativeTypes;
 using ServiceStack.Serialization;
 using ServiceStack.Text;
 using ServiceStack.Web;
@@ -463,12 +464,6 @@ namespace ServiceStack.Host
             }
         }
 
-        [Obsolete("Use Execute(IRequest, applyFilters:true)")]
-        public object Execute(IRequest req)
-        {
-            return Execute(req, applyFilters:true);
-        }
-
         public object Execute(IRequest req, bool applyFilters)
         {
             try
@@ -553,8 +548,7 @@ namespace ServiceStack.Host
 
         public virtual ServiceExecFn GetService(Type requestType)
         {
-            ServiceExecFn handlerFn;
-            if (!requestExecMap.TryGetValue(requestType, out handlerFn))
+            if (!requestExecMap.TryGetValue(requestType, out var handlerFn))
             {
                 if (requestType.IsArray)
                 {
@@ -588,10 +582,8 @@ namespace ServiceStack.Host
                     return firstResponse;
                 }
 
-                var asyncResponse = firstResponse as Task;
-
                 //sync
-                if (asyncResponse == null) 
+                if (!(firstResponse is Task asyncResponse)) 
                 {
                     var ret = firstResponse != null
                         ? (object[])Array.CreateInstance(firstResponse.GetType(), dtosList.Count)
@@ -638,13 +630,15 @@ namespace ServiceStack.Host
                     }
                     return asyncResponses[i];
                 });
-                return HostContext.Async.ContinueWith(req, task, x => {
+                var batchResponse = HostContext.Async.ContinueWith(req, task, x => {
                     if (firstAsyncError != null)
                         return (object)firstAsyncError;
 
                     req.SetAutoBatchCompletedHeader(dtosList.Count);
                     return (object) asyncResponses;
                 }); //return error or completed responses
+
+                return batchResponse;
             };
         }
 
@@ -653,14 +647,11 @@ namespace ServiceStack.Host
             if (!appHost.Config.EnableAccessRestrictions) return;
             if ((RequestAttributes.InProcess & actualAttributes) == RequestAttributes.InProcess) return;
 
-            RestrictAttribute restrictAttr;
-            var hasNoAccessRestrictions = !requestServiceAttrs.TryGetValue(requestType, out restrictAttr)
+            var hasNoAccessRestrictions = !requestServiceAttrs.TryGetValue(requestType, out var restrictAttr)
                 || restrictAttr.HasNoAccessRestrictions;
 
             if (hasNoAccessRestrictions)
-            {
                 return;
-            }
 
             var failedScenarios = StringBuilderCache.Allocate();
             foreach (var requiredScenario in restrictAttr.AccessibleToAny)
@@ -686,4 +677,5 @@ namespace ServiceStack.Host
                 $"'{StringBuilderCache.Retrieve(failedScenarios)}'{internalDebugMsg}");
         }
     }
+
 }

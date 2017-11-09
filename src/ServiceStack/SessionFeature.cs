@@ -1,5 +1,4 @@
 using System;
-using System.Web;
 using ServiceStack.Auth;
 using ServiceStack.Caching;
 using ServiceStack.Web;
@@ -17,9 +16,6 @@ namespace ServiceStack
             get { return sessionFn ?? (() => new AuthUserSession()); }
             set { sessionFn = value; }
         }
-
-        [Obsolete("Removing rarely used feature, if needed override OnSessionFilter() and return null if invalid session")]
-        public static bool VerifyCachedSessionId = false;
 
         public TimeSpan? SessionExpiry { get; set; }
         public TimeSpan? SessionBagExpiry { get; set; }

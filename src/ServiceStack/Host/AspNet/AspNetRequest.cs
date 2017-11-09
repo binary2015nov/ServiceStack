@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Web;
-using Funq;
 using ServiceStack.Configuration;
 using ServiceStack.IO;
 using ServiceStack.Logging;
@@ -20,6 +19,13 @@ namespace ServiceStack.Host.AspNet
     public class AspNetRequest : IHttpRequest, IHasResolver, IHasVirtualFiles
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(AspNetRequest));
+
+        private IResolver resolver;
+        public IResolver Resolver
+        {
+            get => resolver ?? Service.GlobalResolver;
+            set => resolver = value;
+        }
 
         private readonly HttpRequestBase request;
         private readonly IHttpResponse response;
@@ -51,16 +57,6 @@ namespace ServiceStack.Host.AspNet
             this.IsDirectory = isDirectory;
             this.IsFile = !isDirectory && GetFile() != null;
             httpContext.Items[Keywords.IRequest] = this;
-        }
-
-        [Obsolete("Use Resolver")]
-        public Container Container { get { throw new NotSupportedException("Use Resolver"); } }
-
-        private IResolver resolver;
-        public IResolver Resolver
-        {
-            get { return resolver ?? Service.GlobalResolver; }
-            set { resolver = value; }
         }
 
         public HttpRequestBase HttpRequest => request;

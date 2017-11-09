@@ -18,7 +18,6 @@ namespace ServiceStack.Testing
 #endif
             })
         {
-            ExcludeAutoRegisteringServiceTypes.Clear();
             TestMode = true;
             Plugins.Clear();
         }

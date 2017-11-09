@@ -32,11 +32,17 @@ namespace ServiceStack
 
                 foreach (var pluginType in pluginTypes)
                 {
-                    var plugin = pluginType.CreateInstance() as IPlugin;
-                    if (plugin != null)
+                    try
                     {
-                        ssHost.LoadPlugin(plugin);
-                    } 
+                        if (pluginType.CreateInstance() is IPlugin plugin)
+                        {
+                            ssHost.LoadPlugin(plugin);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        log.Error("Error adding new Plugin " + pluginType.GetOperationName(), ex);
+                    }
                 }
             }
         }
