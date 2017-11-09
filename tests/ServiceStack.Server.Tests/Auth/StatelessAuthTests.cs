@@ -167,7 +167,6 @@ namespace ServiceStack.Server.Tests.Auth
     }
 
 #if !NETCORE_SUPPORT
-    [Ignore("Requires MongoDB Dependency, please start it")]
     public class MongoDbAuthRepoStatelessAuthTests : StatelessAuthTests
     {
         protected override ServiceStackHost CreateAppHost()
@@ -724,14 +723,6 @@ namespace ServiceStack.Server.Tests.Auth
             appHost.Dispose();
         }
 
-        //[Ignore("Debug Run")]
-        //[Test]
-        //public void RunFor10Mins()
-        //{
-        //    Process.Start(ListeningOn);
-        //    Thread.Sleep(TimeSpan.FromMinutes(10));
-        //}
-
         public const string Username = "user";
         public const string Password = "p@55word";
 
@@ -912,11 +903,12 @@ namespace ServiceStack.Server.Tests.Auth
                 var response = client.Send(request);
                 Assert.Fail("Should throw");
             }
-            catch (WebServiceException ex)
+            catch (WebServiceException webEx)
             {
-                Assert.That(ex.ResponseStatus.ErrorCode, Is.EqualTo("NotFound"));
-                Assert.That(ex.ResponseStatus.Message, Is.EqualTo("ApiKey does not exist"));
-                Assert.That(ex.ResponseStatus.StackTrace, Is.Not.Null);
+                Assert.That(webEx.StatusCode, Is.EqualTo((int)HttpStatusCode.Unauthorized));
+                Assert.That(webEx.ResponseStatus.ErrorCode, Is.EqualTo("NotFound"));
+                Assert.That(webEx.ResponseStatus.Message, Is.EqualTo("ApiKey does not exist"));
+                Assert.That(webEx.ResponseStatus.StackTrace, Is.Not.Null);
             }
         }
 

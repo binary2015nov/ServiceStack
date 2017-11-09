@@ -32,17 +32,10 @@ namespace ServiceStack
 
                 foreach (var pluginType in pluginTypes)
                 {
-                    try
+                    if (pluginType.CreateInstance() is IPlugin plugin)
                     {
-                        if (pluginType.CreateInstance() is IPlugin plugin)
-                        {
-                            ssHost.LoadPlugin(plugin);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        log.Error("Error adding new Plugin " + pluginType.GetOperationName(), ex);
-                    }
+                        ssHost.LoadPlugin(plugin);
+                    }             
                 }
             }
         }
@@ -78,15 +71,6 @@ namespace ServiceStack
         public static string Localize(this string text, IRequest request)
         {
             return HostContext.AppHost.ResolveLocalizedString(text, request);
-        }
-
-        public static IAppHost Start(this IAppHost appHost, IEnumerable<string> urlBases)
-        {
-#if !NETSTANDARD2_0
-            var listener = (ServiceStack.Host.HttpListener.HttpListenerBase)appHost;
-            listener.Start(urlBases);
-#endif
-            return appHost;
         }
 
         public static List<IPlugin> AddIfNotExists<TPlugin>(this List<IPlugin> plugins, TPlugin plugin) where TPlugin : class, IPlugin

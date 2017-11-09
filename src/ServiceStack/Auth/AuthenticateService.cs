@@ -195,7 +195,7 @@ namespace ServiceStack.Auth
                 if (request.Provider == AuthProviderCatageries.LogoutAction)
                     return authProvider.Logout(this, request) as AuthenticateResponse;
 
-                var result = Authenticate(request, provider, this.GetSession(), oAuthConfig);
+                var result = Authenticate(request, provider, this.GetSession(), authProvider);
                 if (result is HttpError httpError)
                     throw httpError;
 

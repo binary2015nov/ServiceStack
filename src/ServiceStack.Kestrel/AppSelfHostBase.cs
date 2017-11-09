@@ -44,7 +44,6 @@ namespace ServiceStack
                 //Set VirtualFiles to point to ContentRootPath (Project Folder)
                 VirtualFiles = new FileSystemVirtualFiles(env.ContentRootPath);
                 AppHostBase.RegisterLicenseFromAppSettings(AppSettings);
-                Config.MetadataRedirectPath = "metadata";
             }
         }
 
