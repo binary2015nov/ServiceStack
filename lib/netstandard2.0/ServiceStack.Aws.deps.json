@@ -15,11 +15,11 @@
           "AWSSDK.SQS": "3.3.2.7",
           "NETStandard.Library": "2.0.0",
           "System.ServiceModel.Primitives": "4.3.0",
-          "ServiceStack.Client": "4.5.0.0",
-          "ServiceStack.Common": "4.5.0.0",
-          "ServiceStack": "4.5.0.0",
-          "ServiceStack.Interfaces": "4.0.0.0",
-          "ServiceStack.Text": "4.5.9.0"
+          "ServiceStack.Client": "5.0.0.0",
+          "ServiceStack.Common": "5.0.0.0",
+          "ServiceStack": "5.0.0.0",
+          "ServiceStack.Interfaces": "5.0.0.0",
+          "ServiceStack.Text": "5.0.0.0"
         },
         "runtime": {
           "ServiceStack.Aws.dll": {}
@@ -934,6 +934,9 @@
           "System.Security.Cryptography.Primitives": "4.3.0",
           "System.Text.Encoding": "4.3.0",
           "runtime.native.System.Security.Cryptography.OpenSsl": "4.3.0"
+        },
+        "runtime": {
+          "lib/netstandard1.6/System.Security.Cryptography.OpenSsl.dll": {}
         }
       },
       "System.Security.Cryptography.Primitives/4.3.0": {
@@ -1188,27 +1191,27 @@
           "lib/netstandard1.3/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "ServiceStack.Client/4.5.0.0": {
+      "ServiceStack.Client/5.0.0.0": {
         "runtime": {
           "ServiceStack.Client.dll": {}
         }
       },
-      "ServiceStack.Common/4.5.0.0": {
+      "ServiceStack.Common/5.0.0.0": {
         "runtime": {
           "ServiceStack.Common.dll": {}
         }
       },
-      "ServiceStack/4.5.0.0": {
+      "ServiceStack/5.0.0.0": {
         "runtime": {
           "ServiceStack.dll": {}
         }
       },
-      "ServiceStack.Interfaces/4.0.0.0": {
+      "ServiceStack.Interfaces/5.0.0.0": {
         "runtime": {
           "ServiceStack.Interfaces.dll": {}
         }
       },
-      "ServiceStack.Text/4.5.9.0": {
+      "ServiceStack.Text/5.0.0.0": {
         "runtime": {
           "ServiceStack.Text.dll": {}
         }
@@ -1917,31 +1920,31 @@
     "System.Xml.XmlSerializer/4.3.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-MYoTCP7EZ98RrANESW05J5ZwskKDoN0AuZ06ZflnowE50LTpbR5yRg3tHckTVm5j/m47stuGgCrCHWePyHS70Q==",
+      "sha512": "sha512-ZHKYxQIWOh7OtWGCTY+aztU2uSfjUN+P2GyUU+ZwvHzHQOYhLmyuvwmmR1EzmhcnrTFtF3pEM3XXI2KUaboz1Q==",
       "path": "system.xml.xmlserializer/4.3.0",
       "hashPath": "system.xml.xmlserializer.4.3.0.nupkg.sha512"
     },
-    "ServiceStack.Client/4.5.0.0": {
+    "ServiceStack.Client/5.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
     },
-    "ServiceStack.Common/4.5.0.0": {
+    "ServiceStack.Common/5.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
     },
-    "ServiceStack/4.5.0.0": {
+    "ServiceStack/5.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
     },
-    "ServiceStack.Interfaces/4.0.0.0": {
+    "ServiceStack.Interfaces/5.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
     },
-    "ServiceStack.Text/4.5.9.0": {
+    "ServiceStack.Text/5.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

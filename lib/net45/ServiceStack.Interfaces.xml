@@ -517,7 +517,7 @@
             Used to annotate an Entity with its DB schema
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "T:ServiceStack.DataAnnotations.SequenceAttribute" -->
+        <!-- 对于成员“T:ServiceStack.DataAnnotations.SequenceAttribute”忽略有格式错误的 XML 注释 -->
         <member name="T:ServiceStack.Data.IEntityStore`1">
             <summary>
             For providers that want a cleaner API with a little more perf
@@ -2355,7 +2355,7 @@
             <param name="notes">
                 The longer text to explain the behaviour of the REST. 
             </param>
-            <param name="matchRule">
+            <param name="matches">
                 Must match rule defined in Config.RequestRules or Regex expression with format: 
                 "{IHttpRequest.Field} =~ {pattern}", e.g "PathInfo =~ \/[0-9]+$"
             </param>
