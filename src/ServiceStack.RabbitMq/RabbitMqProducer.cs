@@ -173,7 +173,7 @@ namespace ServiceStack.RabbitMq
                     Queues = new HashSet<string>(Queues) { queueName };
                 }
 
-                var basicMsg = Channel.BasicGet(queueName, noAck: noAck);
+                var basicMsg = Channel.BasicGet(queueName, autoAck: noAck);
 
                 GetMessageFilter?.Invoke(queueName, basicMsg);
 
@@ -185,7 +185,7 @@ namespace ServiceStack.RabbitMq
                 {
                     Channel.RegisterQueueByName(queueName);
 
-                    return Channel.BasicGet(queueName, noAck: noAck);
+                    return Channel.BasicGet(queueName, autoAck: noAck);
                 }
                 throw;
             }

@@ -161,7 +161,6 @@ namespace ServiceStack.Auth
         where TUserAuth : class, IUserAuth
         where TUserAuthDetails : class, IUserAuthDetails
     {
-        private readonly IDbConnectionFactory dbFactory;
         public bool HasInitSchema { get; protected set; }
 
         public bool UseDistinctRoleTables { get; set; }

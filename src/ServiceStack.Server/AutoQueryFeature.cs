@@ -636,7 +636,6 @@ namespace ServiceStack
         public IQueryResponse Execute(IQueryDb request, ISqlExpression q)
         {
             var requestDtoType = request.GetType();
-            ITypedQueryData typedQuery;
             
             Type fromType;
             Type intoType;

@@ -35,6 +35,8 @@
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <DefineConstants>$(DefineConstants);</DefineConstants>
     <SignAssembly>True</SignAssembly>
+    <DefineConstants>$(DefineConstants);NET45</DefineConstants>
+    <SignAssembly>False</SignAssembly>
     <DelaySign>False</DelaySign>
     <AssemblyOriginatorKeyFile>../servicestack.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
@@ -50,6 +52,9 @@
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <PackageReference Include="MongoDB.Bson" Version="2.4.4" />
+    <PackageReference Include="MongoDB.Driver" Version="2.4.4" />
+    <PackageReference Include="MongoDB.Driver.Core" Version="2.4.4" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
 

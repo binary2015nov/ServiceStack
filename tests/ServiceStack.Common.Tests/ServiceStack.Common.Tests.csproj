@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>net46;netcoreapp2.0</TargetFrameworks>
     <!--<TargetFrameworks>net45</TargetFrameworks>-->
     <DebugType>portable</DebugType>
     <AssemblyName>ServiceStack.Common.Tests</AssemblyName>
@@ -24,6 +24,8 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="NUnit" Version="3.8.1" />
     <PackageReference Include="Moq" Version="4.7.99" />
+    <PackageReference Include="NUnit" Version="3.8.1" />
+    <PackageReference Include="Moq" Version="4.7.145" />
     <PackageReference Include="Wire" Version="0.8.2" />
     <PackageReference Include="AWSSDK.Core" Version="3.3.4.1" />
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.0.2" />
@@ -38,11 +40,11 @@
     <ProjectReference Include="..\..\src\ServiceStack.RabbitMq\ServiceStack.RabbitMq.csproj" />
   </ItemGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <DefineConstants>$(DefineConstants);NET45</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.105.2" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Data" />
@@ -69,7 +71,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(NUNITLITE)' != '' ">
-    <PackageReference Include="NUnitLite" Version="3.6.1" />
+    <PackageReference Include="NUnitLite" Version="3.8.1" />
   </ItemGroup>
 
 

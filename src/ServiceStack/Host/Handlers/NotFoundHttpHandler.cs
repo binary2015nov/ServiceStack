@@ -11,7 +11,6 @@ namespace ServiceStack.Host.Handlers
     {
         public NotFoundHttpHandler() => this.RequestName = nameof(NotFoundHttpHandler);
 
-        public bool? IsIntegratedPipeline { get; set; }
         public string WebHostPhysicalPath { get; set; }
         public string WebHostUrl { get; set; }
         public string DefaultRootFileName { get; set; }

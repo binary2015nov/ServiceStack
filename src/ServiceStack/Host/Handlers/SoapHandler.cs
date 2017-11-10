@@ -102,7 +102,7 @@ namespace ServiceStack.Host.Handlers
             {
                 var useXmlSerializerRequest = requestType.HasAttribute<XmlSerializerFormatAttribute>();
 
-                var request = appHost.ApplyRequestConvertersAsync(httpReq, 
+                var request = appHost.ApplyRequestConvertersAsync(httpReq,
                     useXmlSerializerRequest
                         ? XmlSerializableSerializer.Instance.DeserializeFromString(requestXml, requestType)
                         : Serialization.DataContractSerializer.Instance.DeserializeFromString(requestXml, requestType)

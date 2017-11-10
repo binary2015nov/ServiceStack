@@ -979,9 +979,9 @@ namespace ServiceStack
             this.context = context;
         }
 
-        public virtual IDataQuery From<TFrom>()
+        public virtual IDataQuery From<TSource>()
         {
-            return new DataQuery<TFrom>(context);
+            return new DataQuery<TSource>(context);
         }
 
         public abstract IEnumerable<T> GetDataSource(IDataQuery q);

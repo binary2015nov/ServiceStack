@@ -87,7 +87,7 @@ namespace ServiceStack.Validation
 
         public static void RegisterValidator(this Container container, Type validator, ReuseScope scope = ReuseScope.None)
         {
-            if (validator.IsInterface())
+            if (validator.IsInterface)
                 return;
 
             var type = validator;

@@ -292,7 +292,7 @@ namespace ServiceStack.Common.Tests
             var tcs = new TaskCompletionSource<string>();
             var task = tcs.Task;
             tcs.SetResult("foo");
-
+            
             var fn = TypeProperties.Get(task.GetType()).GetPublicGetter("Result");
             var value = fn(task);
             Assert.That(value, Is.EqualTo("foo"));

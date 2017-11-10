@@ -42,7 +42,7 @@ namespace ServiceStack.RabbitMq
 
             if (connectionString.StartsWith("amqp://"))
             {
-                ConnectionFactory.Uri = connectionString;
+                ConnectionFactory.Uri = new Uri(connectionString);
             }
             else
             {
