@@ -157,7 +157,8 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         }
     }
 
-    [TestFixture, Ignore("stand alone")]
+    [TestFixture]
+    //[Ignore("stand alone")]
     public class AsyncLoadTests
     {
         const int NoOfTimes = 1000;
@@ -178,7 +179,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         }
 
         [Test]
-        public Task Load_test_GetFactorialSync_async()
+        public async Task Load_test_GetFactorialSync_async()
         {
             var client = new JsonServiceClient(Constants.ServiceStackBaseHost);
 
@@ -194,7 +195,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
                     }
                 }));
 
-            return Task.WhenAll(fetchTasks);
+            await Task.WhenAll(fetchTasks);
         }
 
         [Test]
@@ -213,7 +214,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         }
 
         [Test]
-        public Task Load_test_GetFactorialGenericAsync_async()
+        public async Task Load_test_GetFactorialGenericAsync_async()
         {
             var client = new JsonServiceClient(Constants.ServiceStackBaseHost);
 
@@ -229,7 +230,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
                     }
                 }));
 
-            return Task.WhenAll(fetchTasks);
+            await Task.WhenAll(fetchTasks);
         }
     }
 }

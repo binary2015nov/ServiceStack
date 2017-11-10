@@ -11,7 +11,7 @@ namespace ServiceStack.Common.Tests.Messaging
         private readonly Func<IMessageService> createMqServerFn;
 
         public MqTestsAppHost(Func<IMessageService> createMqServerFn)
-            : base(typeof(MqTestsAppHost).Name, typeof(AnyTestMq).GetAssembly())
+            : base(typeof(MqTestsAppHost).Name, typeof(AnyTestMq).Assembly)
         {
             this.createMqServerFn = createMqServerFn;
         }
@@ -19,7 +19,7 @@ namespace ServiceStack.Common.Tests.Messaging
         public override void Configure(Container container)
         {
             Plugins.Add(new ValidationFeature());
-            container.RegisterValidators(typeof(ValidateTestMqValidator).GetAssembly());
+            container.RegisterValidators(typeof(ValidateTestMqValidator).Assembly);
 
             container.Register(c => createMqServerFn());
 

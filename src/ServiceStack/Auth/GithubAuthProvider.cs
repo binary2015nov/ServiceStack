@@ -87,7 +87,7 @@ namespace ServiceStack.Auth
             try
             {
                 string accessTokenUrl = $"{AccessTokenUrl}?client_id={ClientId}&redirect_uri={CallbackUrl.UrlEncode()}&client_secret={ClientSecret}&code={code}";
-                var contents = HttpUtils.GetStringFromUrl(AccessTokenUrlFilter(this, accessTokenUrl));
+                var contents = AccessTokenUrlFilter(this, accessTokenUrl).GetStringFromUrl();
                 var authInfo = PclExportClient.Instance.ParseQueryString(contents);
 
                 //GitHub does not throw exception, but just return error with descriptions

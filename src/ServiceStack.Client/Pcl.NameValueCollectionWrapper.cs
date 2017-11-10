@@ -53,18 +53,14 @@ namespace ServiceStack.Pcl
         {
             public override string ToString()
             {
-                int count = Count;
-                if (count == 0)
-                    return "";
-                var sb = StringBuilderCache.Allocate();
-                string[] keys = AllKeys;
-                for (int i = 0; i < count; i++)
+                var sb = new StringBuilder();
+                for (int i = 0; i < Count; i++)
                 {
-                    sb.AppendFormat("{0}={1}&", keys[i], this[keys[i]]);
+                    sb.AppendFormat("{0}={1}&", Keys[i], this[Keys[i]]);
                 }
                 if (sb.Length > 0)
                     sb.Length--;
-                return StringBuilderCache.ReturnAndFree(sb);
+                return sb.ToString();
             }
         }
 
@@ -189,14 +185,14 @@ namespace ServiceStack
 
         public static string ToFormUrlEncoded(this NameValueCollection queryParams)
         {
-            var sb = StringBuilderCache.Allocate();
+            var sb = new StringBuilder();
             foreach (string key in queryParams)
             {
                 var values = queryParams.GetValues(key);
                 AppendKeyValue(sb, key, values);
             }
 
-            return StringBuilderCache.ReturnAndFree(sb);
+            return sb.ToString();
         }
 
         private static void AppendKeyValue(StringBuilder sb, string key, string[] values)

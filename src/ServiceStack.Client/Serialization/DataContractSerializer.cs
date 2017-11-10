@@ -32,7 +32,7 @@ namespace ServiceStack.Serialization
                 if (Equals(xmlDto, default(XmlDto))) return null;
                 using (var ms = MemoryStreamFactory.GetStream())
                 {
-                    var serializer = new System.Runtime.Serialization.DataContractSerializer(from.GetType());
+                    var serializer = new System.Runtime.Serialization.DataContractSerializer(xmlDto.GetType());
                     var xw = new XmlTextWriter(ms, Encoding);
                     if (indentXml)
                     {

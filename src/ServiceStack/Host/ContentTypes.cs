@@ -15,14 +15,14 @@ namespace ServiceStack.Host
 
         public static readonly ContentTypes Default = new ContentTypes();
 
-        public Dictionary<string, StreamSerializerDelegate> ContentTypeSerializers
+        public readonly Dictionary<string, StreamSerializerDelegate> ContentTypeSerializers
             = new Dictionary<string, StreamSerializerDelegate> {
                 { MimeTypes.Json, (r, o, s) => JsonDataContractSerializer.Instance.SerializeToStream(o, s) },
                 { MimeTypes.Jsv, (r, o, s) => TypeSerializer.SerializeToStream(o, s) },
                 { MimeTypes.Xml, (r, o, s) => XmlSerializer.Serialize(o, s) }
             };
 
-        public Dictionary<string, StreamDeserializerDelegate> ContentTypeDeserializers
+        public readonly Dictionary<string, StreamDeserializerDelegate> ContentTypeDeserializers
             = new Dictionary<string, StreamDeserializerDelegate> {
                 { MimeTypes.Json, JsonDataContractSerializer.Instance.DeserializeFromStream },
                 { MimeTypes.Jsv, TypeSerializer.DeserializeFromStream },
@@ -31,20 +31,20 @@ namespace ServiceStack.Host
 
             };
 
-        public Dictionary<string, StreamSerializerDelegateAsync> ContentTypeSerializersAsync
+        public readonly Dictionary<string, StreamSerializerDelegateAsync> ContentTypeSerializersAsync
             = new Dictionary<string, StreamSerializerDelegateAsync>();
 
         public Dictionary<string, StreamDeserializerDelegateAsync> ContentTypeDeserializersAsync
             = new Dictionary<string, StreamDeserializerDelegateAsync>();
 
-        public Dictionary<string, StringSerializerDelegate> ContentTypeStringSerializers
+        public readonly Dictionary<string, StringSerializerDelegate> ContentTypeStringSerializers
             = new Dictionary<string, StringSerializerDelegate> {
                 { MimeTypes.Json, (r, o) => JsonDataContractSerializer.Instance.SerializeToString(o) },
                 { MimeTypes.Jsv, (r, o) => TypeSerializer.SerializeToString(o) },
                 { MimeTypes.Xml, (r, o) => XmlSerializer.Serialize(o) },
             };
 
-        public Dictionary<string, StringDeserializerDelegate> ContentTypeStringDeserializers
+        public readonly Dictionary<string, StringDeserializerDelegate> ContentTypeStringDeserializers
             = new Dictionary<string, StringDeserializerDelegate> {
                 { MimeTypes.Json, JsonDataContractSerializer.Instance.DeserializeFromString },
                 { MimeTypes.Jsv, TypeSerializer.DeserializeFromString },

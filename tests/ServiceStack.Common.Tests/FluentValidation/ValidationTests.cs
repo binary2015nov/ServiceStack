@@ -20,7 +20,7 @@ namespace ServiceStack.Common.Tests.FluentValidation
                 },
                 ConfigureContainer = c => {
                     c.RegisterAs<DtoBValidator, IDtoBValidator>();
-                    c.RegisterValidators(typeof(DtoARequestValidator).GetAssembly());
+                    c.RegisterValidators(typeof(DtoARequestValidator).Assembly);
                 }
             }.Init())
             {
