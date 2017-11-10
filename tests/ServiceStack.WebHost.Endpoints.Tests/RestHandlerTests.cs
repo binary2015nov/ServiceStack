@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using Moq;
 using NUnit.Framework;
 using ServiceStack.Host;
@@ -72,12 +73,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 			}
 		}
 
-		private IHttpRequest ConfigureRequest(string path)
-		{
-			var request = new Mock<IHttpRequest>();
-			request.Setup(x => x.Items).Returns(new Dictionary<string, object>());
-			request.Setup(x => x.QueryString).Returns(PclExportClient.Instance.NewNameValueCollection());
-			request.Setup(x => x.PathInfo).Returns(path);
+        private IHttpRequest ConfigureRequest(string path)
+        {
+            var request = new Mock<IHttpRequest>();
+            request.Setup(x => x.Items).Returns(new Dictionary<string, object>());
+            request.Setup(x => x.QueryString).Returns(new NameValueCollection());
+            request.Setup(x => x.PathInfo).Returns(path);
 
 			return request.Object;
 		}

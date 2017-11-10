@@ -1,4 +1,3 @@
-#if !(SL5 || __IOS__ || XBOX || ANDROID || PCL)
 using System;
 using System.IO;
 using System.Text;
@@ -15,28 +14,22 @@ namespace ServiceStack.Serialization
 			return (To)DeserializeFromString(xml, type);
 		}
 
-		public object DeserializeFromString(string xml, Type type)
-		{
-			try
-			{
-				var bytes = Encoding.UTF8.GetBytes(xml);
-				using (var reader = XmlDictionaryReader.CreateTextReader(bytes,
-#if !NETSTANDARD1_1
-			new XmlDictionaryReaderQuotas()
-#else
-			XmlDictionaryReaderQuotas.Max
-#endif
-		))
-				{
-					var serializer = new System.Xml.Serialization.XmlSerializer(type);
-					return serializer.Deserialize(reader);
-				}
-			}
-			catch (Exception ex)
-			{
-				throw new SerializationException($"Error serializing object of type {type.FullName}", ex);
-			}
-		}
+        public object DeserializeFromString(string xml, Type type)
+        {
+            try
+            {
+                var bytes = Encoding.UTF8.GetBytes(xml);
+                using (var reader = XmlDictionaryReader.CreateTextReader(bytes, new XmlDictionaryReaderQuotas()))
+                {
+                    var serializer = new System.Xml.Serialization.XmlSerializer(type);
+                    return serializer.Deserialize(reader);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new SerializationException($"Error serializing object of type {type.FullName}", ex);
+            }
+        }
 
 		public To Parse<To>(TextReader from)
 		{
@@ -55,28 +48,21 @@ namespace ServiceStack.Serialization
 			}
 		}
 
-		public To Parse<To>(Stream from)
-		{
-			var type = typeof(To);
-			try
-			{
-				using (var reader = XmlDictionaryReader.CreateTextReader(from,
-#if !NETSTANDARD1_1
-			new XmlDictionaryReaderQuotas()
-#else
-			XmlDictionaryReaderQuotas.Max
-#endif
-))
-				{
-					var serializer = new System.Xml.Serialization.XmlSerializer(type);
-					return (To)serializer.Deserialize(reader);
-				}
-			}
-			catch (Exception ex)
-			{
-				throw new SerializationException($"Error serializing object of type {type.FullName}", ex);
-			}
-		}
-	}
+        public To Parse<To>(Stream from)
+        {
+            var type = typeof(To);
+            try
+            {
+                using (var reader = XmlDictionaryReader.CreateTextReader(from, new XmlDictionaryReaderQuotas()))
+                {
+                    var serializer = new System.Xml.Serialization.XmlSerializer(type);
+                    return (To)serializer.Deserialize(reader);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new SerializationException($"Error serializing object of type {type.FullName}", ex);
+            }
+        }
+    }
 }
-#endif

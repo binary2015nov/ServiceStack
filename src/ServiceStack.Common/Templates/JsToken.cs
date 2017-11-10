@@ -11,7 +11,7 @@ using ServiceStack.Text;
 using Microsoft.Extensions.Primitives;
 #endif
 
-namespace ServiceStack.Templates //TODO move to ServiceStack.Text when baked
+namespace ServiceStack.Templates
 {
     public abstract class JsToken : IRawString
     {

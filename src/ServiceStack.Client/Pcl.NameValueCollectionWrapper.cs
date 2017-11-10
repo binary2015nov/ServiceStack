@@ -36,16 +36,17 @@ using ServiceStack.Text;
 using ServiceStack.Web;
 using System.Text;
 
-#if (PCL || SL5 || NETSTANDARD1_1) && !NET45
-using ServiceStack.Pcl;
-#else
 using System.Collections.Specialized;
-#endif
 
-#if NETFX_CORE || ANDROID || __IOS__ || __MAC__ || PCL || SL5 || NETSTANDARD1_1 || NETSTANDARD2_0
+#if NETSTANDARD2_0
 //namespace System.Collections.Specialized
 namespace ServiceStack.Pcl
 {
+    using System;
+    using System.Net;
+    using System.Text;
+    using ServiceStack.Text;
+
     public class HttpUtility
     {
         private sealed class HttpQSCollection : NameValueCollection
@@ -63,21 +64,18 @@ namespace ServiceStack.Pcl
                 }
                 if (sb.Length > 0)
                     sb.Length--;
-                return StringBuilderCache.Retrieve(sb);
+                return StringBuilderCache.ReturnAndFree(sb);
             }
         }
 
-        public static NameValueCollection ParseQueryString(string query)
-        {
-            return ParseQueryString(query, Encoding.UTF8);
-        }
+        public static NameValueCollection ParseQueryString(string query) => ParseQueryString(query, Encoding.UTF8);
 
         public static NameValueCollection ParseQueryString(string query, Encoding encoding)
         {
             if (query == null)
-                throw new ArgumentNullException(nameof(query));
+                throw new ArgumentNullException("query");
             if (encoding == null)
-                throw new ArgumentNullException(nameof(encoding));
+                throw new ArgumentNullException("encoding");
             if (query.Length == 0 || (query.Length == 1 && query[0] == '?'))
                 return new HttpQSCollection();
             if (query[0] == '?')
@@ -152,141 +150,8 @@ namespace ServiceStack.Pcl
 
 namespace ServiceStack
 {
-    public class NameValueCollectionWrapper : INameValueCollection
-    {
-        private readonly NameValueCollection data;
-
-        public NameValueCollectionWrapper(NameValueCollection data)
-        {
-            this.data = data ?? new NameValueCollection();
-        }
-
-        public IEnumerator GetEnumerator()
-        {
-            return data.GetEnumerator();
-        }
-
-        public object Original
-        {
-            get { return data; }
-        }
-
-        public void Add(string name, string value)
-        {
-            data.Add(name, value);
-        }
-
-        public void Clear()
-        {
-            data.Clear();
-        }
-
-        public void CopyTo(Array dest, int index)
-        {
-            data.CopyTo(dest, index);
-        }
-
-        public string Get(int index)
-        {
-            return data.Get(index);
-        }
-
-        public string Get(string name)
-        {
-            return data.Get(name);
-        }
-
-        public string GetKey(int index)
-        {
-            return data.GetKey(index);
-        }
-
-        public string[] GetValues(string name)
-        {
-            return data.GetValues(name);
-        }
-
-        public bool HasKeys()
-        {
-            return data.HasKeys();
-        }
-
-        public void Remove(string name)
-        {
-            data.Remove(name);
-        }
-
-        public void Set(string name, string value)
-        {
-            data.Set(name, value);
-        }
-
-        public string this[int index]
-        {
-            get { return data[index]; }
-        }
-
-        public string this[string name]
-        {
-            get { return data[name]; }
-            set { data[name] = value; }
-        }
-
-        public string[] AllKeys
-        {
-            get { return data.AllKeys; }
-        }
-
-        public int Count
-        {
-            get { return data.Count; }
-        }
-
-        public bool IsReadOnly { get; set; }
-
-        public object SyncRoot
-        {
-            get { return data; }
-        }
-
-        public bool IsSynchronized
-        {
-            get { return false; }
-        }
-
-        public override string ToString()
-        {
-            return data.ToString();
-        }
-    }
-
     public static class NameValueCollectionWrapperExtensions
     {
-        public static NameValueCollectionWrapper InWrapper(this NameValueCollection nvc)
-        {
-            return new NameValueCollectionWrapper(nvc ?? new NameValueCollection());
-        }
-
-        public static NameValueCollection ToNameValueCollection(this INameValueCollection nvc)
-        {
-            return (NameValueCollection)nvc.Original;
-        }
-
-        public static Dictionary<string, string> ToDictionary(this INameValueCollection nameValues)
-        {
-            var map = new Dictionary<string, string>(nameValues.Count);
-
-            foreach(var key in nameValues.AllKeys)
-            {
-                if (key != null)
-                {
-                    map[key] = nameValues[key];
-                }
-            }
-
-            return map;
-        }
-
         public static Dictionary<string, string> ToDictionary(this NameValueCollection nameValues)
         {
             if (nameValues == null) return new Dictionary<string, string>();
@@ -322,18 +187,6 @@ namespace ServiceStack
             return nameValues;
         }
 
-        public static string ToFormUrlEncoded(this INameValueCollection queryParams)
-        {
-            var sb = StringBuilderCache.Allocate();
-            foreach (string key in queryParams)
-            {
-                var values = queryParams.GetValues(key);
-                AppendKeyValue(sb, key, values);
-            }
-
-            return StringBuilderCache.Retrieve(sb);
-        }
-
         public static string ToFormUrlEncoded(this NameValueCollection queryParams)
         {
             var sb = StringBuilderCache.Allocate();
@@ -343,7 +196,7 @@ namespace ServiceStack
                 AppendKeyValue(sb, key, values);
             }
 
-            return StringBuilderCache.Retrieve(sb);
+            return StringBuilderCache.ReturnAndFree(sb);
         }
 
         private static void AppendKeyValue(StringBuilder sb, string key, string[] values)

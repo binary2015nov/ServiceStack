@@ -10,10 +10,9 @@ using ServiceStack.Text;
 
 namespace ServiceStack
 {
-#if !(NETFX_CORE || WP || SL5 || PCL || NETSTANDARD1_1 || NETSTANDARD2_0)
     [Serializable]
-#endif
-    public class WebServiceException : Exception, IHasStatusCode, IHasStatusDescription, IResponseStatusConvertible
+    public class WebServiceException
+        : Exception, IHasStatusCode, IHasStatusDescription, IResponseStatusConvertible
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(WebServiceException));
 

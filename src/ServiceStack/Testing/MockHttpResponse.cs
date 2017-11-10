@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -14,7 +15,7 @@ namespace ServiceStack.Testing
         public MockHttpResponse(IRequest request = null)
         {
             this.Request = request;
-            this.Headers = PclExportClient.Instance.NewNameValueCollection();
+            this.Headers = new NameValueCollection();
             this.OutputStream = new MemoryStream();
             this.TextWritten = new StringBuilder();
             this.Cookies = HostContext.AssertAppHost().GetCookies(this);
@@ -29,7 +30,7 @@ namespace ServiceStack.Testing
 
         public StringBuilder TextWritten { get; set; }
 
-        public INameValueCollection Headers { get; set; }
+        public NameValueCollection Headers { get; set; }
 
         public ICookies Cookies { get; set; }
 

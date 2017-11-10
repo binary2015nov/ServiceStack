@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.ServiceModel.Channels;
 
 namespace ServiceStack
 {
@@ -27,14 +28,10 @@ namespace ServiceStack
         {
 #if !MONO
             var prop = context.IncomingMessageProperties;
-            if (context.IncomingMessageProperties.ContainsKey(System.ServiceModel.Channels.RemoteEndpointMessageProperty.Name))
+            if (context.IncomingMessageProperties.ContainsKey(RemoteEndpointMessageProperty.Name))
             {
-                var endpoint = prop[System.ServiceModel.Channels.RemoteEndpointMessageProperty.Name]
-                    as System.ServiceModel.Channels.RemoteEndpointMessageProperty;
-                if (endpoint != null)
-                {
+                if (prop[RemoteEndpointMessageProperty.Name] is RemoteEndpointMessageProperty endpoint)
                     return IPAddress.Parse(endpoint.Address);
-                }
             }
 #endif
             return null;

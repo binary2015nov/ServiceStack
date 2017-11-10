@@ -2,6 +2,7 @@
 // License: https://raw.github.com/ServiceStack/ServiceStack/master/license.txt
 
 using System;
+using System.Collections.Specialized;
 using System.IO;
 using System.Net;
 using System.Threading;
@@ -61,7 +62,7 @@ namespace ServiceStack
 
         public bool StoreCookies { get; set; }
 
-        public INameValueCollection Headers { get; set; }
+        public NameValueCollection Headers { get; set; }
 
         public CookieContainer CookieContainer { get; set; }
 
@@ -344,7 +345,7 @@ namespace ServiceStack
                 }
 
                 // Read the response into a Stream object.
-#if NETSTANDARD1_1 || NETSTANDARD2_0
+#if NETSTANDARD2_0
                 var responseStream = requestState.WebResponse.GetResponseStream()
                     .Decompress(requestState.WebResponse.Headers[HttpHeaders.ContentEncoding]);
 #else
