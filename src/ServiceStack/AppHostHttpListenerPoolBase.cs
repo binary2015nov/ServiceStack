@@ -161,26 +161,12 @@ namespace ServiceStack
             }).Start();
         }
 
-        private bool disposed = false;
-
         protected override void Dispose(bool disposing)
         {
-            if (disposed) return;
-
-            lock (this)
-            {
-                if (disposed) return;
-
-                if (disposing)
-                {
-                    threadPoolManager.Dispose();
-                }
-
-                // new shared cleanup logic
-                disposed = true;
-
-                base.Dispose(disposing);
-            }
+            if (disposing)           
+                threadPoolManager.Dispose();
+            
+            base.Dispose(disposing);
         }
     }
 }

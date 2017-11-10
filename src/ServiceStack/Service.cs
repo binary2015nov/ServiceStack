@@ -24,7 +24,7 @@ namespace ServiceStack
         public static bool IsServiceType(Type type)
         {
             return typeof(IService).IsAssignableFrom(type) 
-                && !type.IsAbstract() && !type.IsGenericTypeDefinition() && !type.ContainsGenericParameters();
+                && !type.IsAbstract && !type.IsGenericTypeDefinition && !type.ContainsGenericParameters;
         }
 
         public static IEnumerable<MethodInfo> GetActions(Type type)
@@ -35,7 +35,7 @@ namespace ServiceStack
                     continue;
 
                 var paramType = methodInfo.GetParameters()[0].ParameterType;
-                if (paramType.IsValueType() || paramType == typeof(string))
+                if (paramType.IsValueType || paramType == typeof(string))
                     continue;
 
                 string actionName = methodInfo.Name.ToUpper();

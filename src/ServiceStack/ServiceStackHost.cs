@@ -922,26 +922,25 @@ namespace ServiceStack
                 : null;
         }
 
+        private bool disposed;
         protected virtual void Dispose(bool disposing)
         {
+            if (disposed)
+                return;
+
             if (disposing)
             {
                 //clear managed resources here
-                foreach (var callback in OnDisposeCallbacks)
-                {
-                    callback(this);
-                }
+                OnDisposeCallbacks.Each(s => s(this));
 
-                if (Container != null)
-                {
-                    Container.Dispose();
-                    Container = null;
-                }
+                Container?.Dispose();
+                Container = null;              
             }
             //clear unmanaged resources here
             Platform.Reset();
             if (Ready)
                 HostContext.AppHost = null;
+            disposed = true;
         }
 
         public void Dispose()

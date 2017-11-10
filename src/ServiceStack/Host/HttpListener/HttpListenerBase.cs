@@ -455,24 +455,12 @@ namespace ServiceStack.Host.HttpListener
             }
         }
 
-        private bool disposed;
         protected override void Dispose(bool disposing)
         {
-            if (disposed) return;
-
-            lock (this)
-            {
-                if (disposed) return;
-
-                if (disposing)
-                {
-                    this.Stop();
-                }
-                //release unmanaged resources here...
-                
-                disposed = true;
-            }
-
+            if (disposing)
+                Stop();          
+            //release unmanaged resources here...
+            
             base.Dispose(disposing);
         }
     }

@@ -38,8 +38,8 @@ namespace ServiceStack
                 Container.Adapter = new NetCoreContainerAdapter(app.ApplicationServices);
                 Init();
             }
-
             app.Use(ProcessRequest);
+            this.app = app;
         }
 
         /// <summary>

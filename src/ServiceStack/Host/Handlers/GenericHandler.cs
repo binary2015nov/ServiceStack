@@ -75,6 +75,7 @@ namespace ServiceStack.Host.Handlers
             }
             catch (Exception ex)
             {
+                ex = ex.InnerException ?? ex;
                 if (!HostContext.Config.WriteErrorsToResponse)
                 {
                     await HostContext.AppHost.ApplyResponseConvertersAsync(httpReq, ex);

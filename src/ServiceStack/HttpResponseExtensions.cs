@@ -256,7 +256,6 @@ namespace ServiceStack
                 : url.AddHashParam(key, val);
         }
 
-        [Obsolete("Use WriteAsync")]
         public static void Write(this IResponse response, string s)
         {
 #if !NETSTANDARD2_0

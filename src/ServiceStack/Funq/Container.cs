@@ -480,47 +480,58 @@ namespace Funq
             GetEntry<TService, TFunc>(name, true);
         }
 
-        private bool hasDisposed = false;
-
         /// <summary>
         /// Disposes the container and all instances owned by it (<see cref="Owner.Container"/>), as well as all child containers 
         /// created through <see cref="CreateChildContainer"/>.
         /// </summary>
-        public virtual void Dispose()
+        public void Dispose()
         {
-            if (hasDisposed)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private bool disponsed = false;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disponsed)
                 return;
-
-            hasDisposed = true;
-
-            lock (disposables)
+            if (disposing)
             {
-                while (disposables.Count > 0)
+                lock (disposables)
                 {
-                    var wr = disposables.Pop();
-                    var disposable = (IDisposable)wr.Target;
-                    if (wr.IsAlive)
+                    while (disposables.Count > 0)
+                    {
+                        var wr = disposables.Pop();
+                        var disposable = (IDisposable)wr.Target;
+                        if (wr.IsAlive)
+                            disposable.Dispose();
+                    }
+                }
+
+                lock (childContainers)
+                {
+                    while (childContainers.Count > 0)
+                    {
+                        childContainers.Pop().Dispose();
+                    }
+                }
+
+                foreach (var serviceEntry in services.Values)
+                {
+                    if (serviceEntry.GetInstance() is IDisposable disposable && !(disposable is Container))
+                    {
                         disposable.Dispose();
+                    }
                 }
-            }
 
-            lock (childContainers)
-            {
-                while (childContainers.Count > 0)
-                {
-                    childContainers.Pop().Dispose();
-                }
+                using (Adapter as IDisposable) { }
             }
+            disponsed = true;
+        }
 
-            foreach (var serviceEntry in services.Values)
-            {
-                if (serviceEntry.GetInstance() is IDisposable disposable && !(disposable is Container))
-                {
-                    disposable.Dispose();
-                }
-            }
-
-            using (Adapter as IDisposable) { }
+        ~Container()
+        {
+            Dispose(false);
         }
     }
 

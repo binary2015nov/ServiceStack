@@ -67,10 +67,11 @@ namespace ServiceStack.Host
             return response;
         }
 
-        [Obsolete("Override ExecuteAsync instead")]
         public virtual object Execute(IRequest req, object instance, TRequest requestDto)
         {
-            return ExecuteAsync(req, instance, requestDto);
+            var task = ExecuteAsync(req, instance, requestDto);
+            task.Wait();
+            return task.Result;
         }
 
         public virtual async Task<object> ExecuteAsync(IRequest req, object instance, TRequest requestDto)

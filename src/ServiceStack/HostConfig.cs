@@ -22,7 +22,7 @@ namespace ServiceStack
         {
             WsdlServiceNamespace = DefaultWsdlNamespace;
             ApiVersion = "1.0.0";
-            EmbeddedResourceSources = new HashSet<Assembly> { GetType().GetAssembly() };
+            EmbeddedResourceSources = new HashSet<Assembly> { GetType().Assembly };
             EnableAccessRestrictions = true;
             MetadataRedirectPath = null;
             DefaultContentType = MimeTypes.Json;

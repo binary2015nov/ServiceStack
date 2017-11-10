@@ -93,7 +93,6 @@ namespace ServiceStack
 
             ForbiddenHttpHandler = appHost.GetCustomErrorHttpHandler(HttpStatusCode.Forbidden) ?? new ForbiddenHttpHandler
             {
-                IsIntegratedPipeline = Platform.IsIntegratedPipeline,
                 WebHostPhysicalPath = WebHostPhysicalPath,
                 WebHostUrl = appHost.Config.WebHostUrl,
                 DefaultRootFileName = DefaultRootFileName,
@@ -102,7 +101,6 @@ namespace ServiceStack
             
             NotFoundHttpHandler = appHost.GetCustomErrorHttpHandler(HttpStatusCode.NotFound) ?? new NotFoundHttpHandler
             {
-                IsIntegratedPipeline = Platform.IsIntegratedPipeline,
                 WebHostPhysicalPath = WebHostPhysicalPath,
                 WebHostUrl = appHost.Config.WebHostUrl,
                 DefaultRootFileName = DefaultRootFileName,

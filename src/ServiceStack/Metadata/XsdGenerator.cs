@@ -40,7 +40,7 @@ namespace ServiceStack.Metadata
                             Logger.WarnFormat("Skipping duplicate type with existing name '{0}'", baseTypeWithSameName.GetOperationName());
                         }
 
-                        if (!baseTypeWithSameName.IsGenericTypeDefinition() && !baseTypeWithSameName.AllAttributes<ExcludeAttribute>().
+                        if (!baseTypeWithSameName.IsGenericTypeDefinition && !baseTypeWithSameName.AllAttributes<ExcludeAttribute>().
                             Any(attr => attr.Feature.Has(Feature.Soap)))
                         {
                             uniqueTypes.Add(baseTypeWithSameName);

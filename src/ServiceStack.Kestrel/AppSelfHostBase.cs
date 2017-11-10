@@ -17,14 +17,12 @@ namespace ServiceStack
 {
     public abstract class AppSelfHostBase : ServiceStackHost
     {
-        protected AppSelfHostBase(string serviceName, params Assembly[] assembliesWithServices)
-            : base(serviceName, assembliesWithServices)
+        protected AppSelfHostBase(string serviceName, params Assembly[] assembliesWithServices) : base(serviceName, assembliesWithServices)
         {
             Startup.HostInstance = this;
         }
 
         IApplicationBuilder app;
-
         public virtual void Bind(IApplicationBuilder app)
         {
             this.app = app;
@@ -51,12 +49,10 @@ namespace ServiceStack
         {
             //Keep in sync with AppHostBase.NetCore.cs
             var operationName = context.Request.GetOperationName().UrlDecode() ?? "Home";
-            var pathInfo = context.Request.Path.HasValue
-                ? context.Request.Path.Value
-                : "/";
+            var pathInfo = context.Request.Path.HasValue ? context.Request.Path.Value : "/";
 
             var mode = Config.HandlerFactoryPath;
-            if (!string.IsNullOrEmpty(mode))
+            if (!mode.IsNullOrEmpty())
             {
                 if (pathInfo.IndexOf(mode, StringComparison.Ordinal) != 1)
                 {

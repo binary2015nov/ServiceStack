@@ -33,7 +33,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 
     public class TestConfigAppHostHttpListener : AppHostHttpListenerBase
     {
-        public TestConfigAppHostHttpListener() : base("TestConfigAppHost Service", typeof(BclDtoService).GetAssembly())
+        public TestConfigAppHostHttpListener() : base("TestConfigAppHost Service", typeof(BclDtoService).Assembly)
         {
             Config.UseBclJsonSerializers = true;
         }

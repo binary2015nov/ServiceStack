@@ -17,10 +17,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		}
 
 		[OneTimeTearDown]
-		public void TestFixtureTearDown()
-		{
-			appHost.Dispose();
-		}
+		public void TestFixtureTearDown() => appHost.Dispose();
 		
 		[Test]
 		public void Actually_uses_the_BclJsonSerializers()
