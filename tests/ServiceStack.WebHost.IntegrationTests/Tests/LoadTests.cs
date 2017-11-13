@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace ServiceStack.WebHost.IntegrationTests.Tests
 {
-    [Ignore("Load Test"), TestFixture]
+    [TestFixture]
     public class LoadTests
     {
         private int BytesSize = 333930;

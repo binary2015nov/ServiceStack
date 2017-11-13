@@ -13,18 +13,15 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         protected class AppHost : AppSelfHostBase
         {
-            public AppHost() 
-                : base(nameof(PasswordHasherTestsBase), typeof(PasswordHasherTestsBase).Assembly) {}
+            public AppHost() : base(nameof(PasswordHasherTestsBase), typeof(PasswordHasherTestsBase).Assembly)
+            {
+                Config.DebugMode = true;
+            }
 
             public bool UsePasswordHasher { get; set; }
 
             public override void Configure(Container container)
             {
-                SetConfig(new HostConfig
-                {
-                    DebugMode = true
-                });
-
                 Plugins.Add(new AuthFeature(() => new AuthUserSession(),
                     new IAuthProvider[] {
                         new CredentialsAuthProvider(AppSettings),
@@ -126,7 +123,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             var response = client.Post(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = "oldUser",
                 Password = "oldpass",
             });
@@ -139,7 +136,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             //Can re-auth after password hash upgrade
             response = client.Post(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = "oldUser",
                 Password = "oldpass",
             });
@@ -155,7 +152,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             var response = client.Post(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = "newUser",
                 Password = "newpass",
             });
@@ -186,7 +183,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             client.Post(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = "newUser2",
                 Password = "newpass2",
             });
@@ -221,7 +218,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             var response = client.Post(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = "oldUser",
                 Password = "oldpass",
             });
@@ -234,7 +231,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             //Can re-auth after password hash downgrade
             response = client.Post(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = "oldUser",
                 Password = "oldpass",
             });
@@ -263,7 +260,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             client.Post(new Authenticate
             {
-                provider = "credentials",
+                Provider = "credentials",
                 UserName = "newUser2",
                 Password = "newpass2",
             });

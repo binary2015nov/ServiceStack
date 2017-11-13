@@ -185,7 +185,7 @@ namespace ServiceStack.Host.Handlers
         {
             try
             {
-                if (!string.IsNullOrEmpty(contentType))
+                if (!contentType.IsNullOrEmpty())
                 {
                     //.NET Core HttpClient Zip Content-Length omission is reported as 0
                     var hasContentBody = httpReq.ContentLength > 0

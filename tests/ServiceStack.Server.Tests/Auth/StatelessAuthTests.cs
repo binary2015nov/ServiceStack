@@ -167,7 +167,6 @@ namespace ServiceStack.Server.Tests.Auth
     }
 
 #if !NETCORE_SUPPORT
-    [Ignore("Requires MongoDB Dependency")]
     public class MongoDbAuthRepoStatelessAuthTests : StatelessAuthTests
     {
         protected override ServiceStackHost CreateAppHost()
@@ -212,7 +211,7 @@ namespace ServiceStack.Server.Tests.Auth
         }
     }
 
-    [Ignore("Dirty")]
+    [TestFixture]
     public class OrmLiteMultitenancyStatelessAuthTests : StatelessAuthTests
     {
         protected override ServiceStackHost CreateAppHost()

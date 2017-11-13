@@ -142,6 +142,7 @@ namespace ServiceStack
 
             Container.Register<IAppSettings>(AppSettings);
             Container.Register<IHashProvider>(c => new SaltedHash()).ReusedWithin(ReuseScope.None);
+            Container.Register<IPasswordHasher>(c => new PasswordHasher());
             if (Config.DebugMode)           
                 Plugins.Add(new RequestInfoFeature());
 

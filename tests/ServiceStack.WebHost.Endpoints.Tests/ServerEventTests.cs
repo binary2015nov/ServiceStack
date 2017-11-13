@@ -1256,21 +1256,21 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                     ThreadPool.QueueUserWorkItem(_ => client.Start());
                 });
 
-                Thread.Sleep(500);
+                Thread.Sleep(200);
                 Assert.That(client.TimesStarted, Is.EqualTo(1));
 
                 10.Times(i =>
                 {
                     ThreadPool.QueueUserWorkItem(_ => client.Restart());
                 });
-                Thread.Sleep(100);
+                Thread.Sleep(200);
                 Assert.That(client.TimesStarted, Is.EqualTo(2));
 
                 10.Times(i =>
                 {
                     ThreadPool.QueueUserWorkItem(_ => client.Stop());
                 });
-                Thread.Sleep(100);
+                Thread.Sleep(200);
                 Assert.That(client.TimesStarted, Is.EqualTo(2));
 
                 // A stopped client doesn't get restarted
@@ -1278,7 +1278,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 {
                     ThreadPool.QueueUserWorkItem(_ => client.Restart());
                 });
-                Thread.Sleep(100);
+                Thread.Sleep(200);
                 Assert.That(client.TimesStarted, Is.EqualTo(2));
 
                 // Can restart a stopped client
@@ -1286,7 +1286,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 {
                     ThreadPool.QueueUserWorkItem(_ => client.Start());
                 });
-                Thread.Sleep(100);
+                Thread.Sleep(500);
                 Assert.That(client.TimesStarted, Is.EqualTo(3));
             }
         }

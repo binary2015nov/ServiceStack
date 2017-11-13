@@ -210,7 +210,7 @@ namespace ServiceStack
             }
 
             PclExportClient.Instance.AddHeader(webReq, Headers);
-            webReq.Headers[HttpRequestHeader.UserAgent] = UserAgent;
+            webReq.UserAgent = UserAgent;
 
             if (this.authInfo != null && !string.IsNullOrEmpty(this.UserName))
                 webReq.AddAuthInfo(this.UserName, this.Password, authInfo);
@@ -241,8 +241,8 @@ namespace ServiceStack
             }
             catch (Exception ex)
             {
-                if (Log.IsDebugEnabled)
-                    Log.Debug($"Error Sending Request: {ex.Message}", ex);
+                if (Logger.IsDebugEnabled)
+                    Logger.Debug($"Error Sending Request: {ex.Message}", ex);
 
                 throw HandleResponseError<T>(ResolveException(ex), requestUri, request);
             }
@@ -308,8 +308,8 @@ namespace ServiceStack
                     }
                     catch (Exception ex)
                     {
-                        if (Log.IsDebugEnabled)
-                            Log.Debug($"Error Reading Response Error: {ex.Message}", ex);
+                        if (Logger.IsDebugEnabled)
+                            Logger.Debug($"Error Reading Response Error: {ex.Message}", ex);
 
                         throw;
                     }
@@ -466,7 +466,7 @@ namespace ServiceStack
                 catch (Exception innerEx)
                 {
                     // Oh, well, we tried
-                    Log.Debug($"WebException Reading Response Error: {innerEx.Message}", innerEx);
+                    Logger.Debug($"WebException Reading Response Error: {innerEx.Message}", innerEx);
                     return new WebServiceException(errorResponse.StatusDescription, innerEx)
                     {
                         StatusCode = (int)errorResponse.StatusCode,
@@ -480,11 +480,11 @@ namespace ServiceStack
             {
                 var customEx = WebRequestUtils.CreateCustomException(url, authEx);
 
-                Log.Debug($"AuthenticationException: {customEx.Message}", customEx);
+                Logger.Debug($"AuthenticationException: {customEx.Message}", customEx);
                 return authEx;
             }
 
-            Log.Debug($"Exception Reading Response Error: {exception.Message}", exception);
+            Logger.Debug($"Exception Reading Response Error: {exception.Message}", exception);
             return exception;
         }
 

@@ -1263,7 +1263,7 @@ namespace ServiceStack
             return asyncClient.SendAsync<byte[]>(httpVerb, ResolveTypedUrl(httpVerb, requestDto), requestBody);
         }
 
-        public virtual TResponse Send<TResponse>(string httpMethod, string relativeOrAbsoluteUrl, object request)
+        public virtual TResponse Send<TResponse>(string httpMethod, string relativeOrAbsoluteUrl, object requestDto)
         {
             var requestUri = ToAbsoluteUrl(relativeOrAbsoluteUrl);
 

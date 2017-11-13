@@ -34,7 +34,7 @@ namespace ServiceStack.Host
         public readonly Dictionary<string, StreamSerializerDelegateAsync> ContentTypeSerializersAsync
             = new Dictionary<string, StreamSerializerDelegateAsync>();
 
-        public Dictionary<string, StreamDeserializerDelegateAsync> ContentTypeDeserializersAsync
+        public readonly Dictionary<string, StreamDeserializerDelegateAsync> ContentTypeDeserializersAsync
             = new Dictionary<string, StreamDeserializerDelegateAsync>();
 
         public readonly Dictionary<string, StringSerializerDelegate> ContentTypeStringSerializers

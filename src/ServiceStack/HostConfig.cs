@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using ServiceStack.Auth;
 using ServiceStack.Host;
 using ServiceStack.Serialization;
 using ServiceStack.Text;
@@ -94,6 +95,8 @@ namespace ServiceStack
             AppendUtf8CharsetOnContentTypes = new HashSet<string> { MimeTypes.Json, };
             RouteNamingConventions = RouteNamingConvention.Default.ToList();
             MapExceptionToStatusCode = new Dictionary<Type, int>();
+            UseSaltedHash = false;
+            FallbackPasswordHashers = new List<IPasswordHasher>();
             OnlySendSessionCookiesSecurely = false;
             AllowSessionIdsInHttpParams = false;
             AllowSessionCookies = true;
@@ -205,6 +208,22 @@ namespace ServiceStack
         public List<RouteNamingConventionDelegate> RouteNamingConventions { get; private set; }
 
         public Dictionary<Type, int> MapExceptionToStatusCode { get; private set; }
+
+        /// <summary>
+        /// If enabled reverts to persist password hashes using the original SHA256 SaltedHash implementation. 
+        /// By default ServiceStack uses the more secure ASP.NET Identity v3 PBKDF2 with HMAC-SHA256 implementation.
+        /// 
+        /// New Users will have their passwords persisted with the specified implementation, likewise existing users will have their passwords re-hased
+        /// to use the current registered IPasswordHasher.
+        /// </summary>
+        public bool UseSaltedHash { get; set; }
+
+        /// <summary>
+        /// Older Password Hashers that were previously used to hash passwords. Failed password matches check to see if the password was hashed with 
+        /// any of the registered FallbackPasswordHashers, if true the password attempt will succeed and password will get re-hashed with 
+        /// the current registered IPasswordHasher.
+        /// </summary>
+        public List<IPasswordHasher> FallbackPasswordHashers { get; private set; }
 
         public bool OnlySendSessionCookiesSecurely { get; set; }
         public bool AllowSessionIdsInHttpParams { get; set; }
