@@ -233,7 +233,7 @@ namespace ServiceStack.Server.Tests.Shared
 
             Cache.Remove(key);
 
-            Cache.Set(key, new Item { Id = 1, Name = "Foo" }, DateTime.UtcNow.AddMilliseconds(200));
+            Cache.Set(key, new Item { Id = 1, Name = "Foo" }, TimeSpan.FromMilliseconds(200));
             entry = Cache.Get<Item>(key);
             Assert.That(entry, Is.Not.Null);
             Thread.Sleep(300);
@@ -263,7 +263,7 @@ namespace ServiceStack.Server.Tests.Shared
             Assert.That(value, Is.EqualTo(1));
             Assert.That(ttl.Value.TotalMilliseconds, Is.GreaterThan(0));
 
-            Thread.Sleep(1000);
+            Thread.Sleep(2000);
             value = Cache.Get<int>(key);
             ttl = Cache.GetTimeToLive(key);
 

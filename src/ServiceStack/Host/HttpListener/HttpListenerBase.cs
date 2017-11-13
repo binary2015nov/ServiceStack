@@ -84,7 +84,7 @@ namespace ServiceStack.Host.HttpListener
         public virtual ListenerRequest CreateRequest(HttpListenerContext httpContext, string operationName)
         {
             var req = new ListenerRequest(httpContext, operationName, RequestAttributes.None);
-            req.RequestAttributes = req.GetAttributes();
+            req.RequestAttributes = req.GetAttributes();           
             return req;
         }
 
@@ -233,7 +233,7 @@ namespace ServiceStack.Host.HttpListener
         {
             try
             {
-                var task = this.ProcessRequestAsync(context);
+                var task = ProcessRequestAsync(context);
                 task = HostContext.Async.ContinueWith(task, x => HandleError(x.Exception, context), TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.AttachedToParent);
 
                 if (task.Status == TaskStatus.Created)

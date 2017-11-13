@@ -44,7 +44,6 @@ namespace ServiceStack.ServiceHost.Tests.UseCase
             NativeFunq_Perf();
         }
 
-
         [Test]
         public void NativeFunq_Perf()
         {

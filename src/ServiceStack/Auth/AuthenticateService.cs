@@ -13,7 +13,7 @@ namespace ServiceStack.Auth
         public static string DefaultOAuthRealm { get; private set; }
         public static string HtmlRedirect { get; internal set; }
         public static Func<AuthFilterContext, object> AuthResponseDecorator { get; internal set; }
-        public static IAuthProvider[] AuthProviders { get; private set; }
+        public static IAuthProvider[] AuthProviders { get; private set; } = TypeConstants<IAuthProvider>.EmptyArray;
         internal static IAuthWithRequest[] AuthWithRequestProviders = TypeConstants<IAuthWithRequest>.EmptyArray;
         internal static IAuthResponseFilter[] AuthResponseFilters = TypeConstants<IAuthResponseFilter>.EmptyArray;
 
