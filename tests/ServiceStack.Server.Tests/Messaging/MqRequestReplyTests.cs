@@ -12,7 +12,7 @@ using ServiceStack.Redis;
 
 namespace ServiceStack.Server.Tests.Messaging
 {
-    [Explicit("Integration Tests")]
+    [Ignore("Integration Tests")]
     public class RabbitMqRequestReplyTests : MqRequestReplyTests
     {
         public override IMessageService CreateMqServer(int retryCount = 1)
@@ -21,7 +21,7 @@ namespace ServiceStack.Server.Tests.Messaging
         }
     }
 
-    [Explicit("Integration Tests")]
+    [Ignore("Integration Tests")]
     public class RedisMqRequestReplyTests : MqRequestReplyTests
     {
         public override IMessageService CreateMqServer(int retryCount = 1)
@@ -153,7 +153,7 @@ namespace ServiceStack.Server.Tests.Messaging
             public long Result { get; set; }
         }
 
-        [Explicit("Takes too long")]
+        [Ignore("Takes too long")]
         [Test]
         public void Can_handle_multiple_rpc_clients()
         {

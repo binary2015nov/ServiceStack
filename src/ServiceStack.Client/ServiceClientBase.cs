@@ -103,7 +103,6 @@ namespace ServiceStack
             this.StoreCookies = true; //leave
             this.UserAgent = DefaultUserAgent;
 
-            asyncClient.HandleCallbackOnUiThread = this.HandleCallbackOnUiThread = true;
             asyncClient.ShareCookiesWithBrowser = this.ShareCookiesWithBrowser = true;
         }
 
@@ -261,21 +260,6 @@ namespace ServiceStack
         public abstract string ContentType { get; }
 
         public string HttpMethod { get; set; }
-
-        /// <summary>
-        /// Whether to execute async callbacks on the same Synchronization Context it was called from.
-        /// </summary>
-        public bool CaptureSynchronizationContext
-        {
-            get => asyncClient.CaptureSynchronizationContext;
-            set => asyncClient.CaptureSynchronizationContext = value;
-        }
-
-        public bool HandleCallbackOnUiThread
-        {
-            get => asyncClient.HandleCallbackOnUiThread;
-            set => asyncClient.HandleCallbackOnUiThread = value;
-        }
 
         public bool EmulateHttpViaPost
         {
@@ -1279,13 +1263,7 @@ namespace ServiceStack
             return asyncClient.SendAsync<byte[]>(httpVerb, ResolveTypedUrl(httpVerb, requestDto), requestBody);
         }
 
-
-        public virtual void CancelAsync()
-        {
-            asyncClient.CancelAsync();
-        }
-
-        public virtual TResponse Send<TResponse>(string httpMethod, string relativeOrAbsoluteUrl, object requestDto)
+        public virtual TResponse Send<TResponse>(string httpMethod, string relativeOrAbsoluteUrl, object request)
         {
             var requestUri = ToAbsoluteUrl(relativeOrAbsoluteUrl);
 

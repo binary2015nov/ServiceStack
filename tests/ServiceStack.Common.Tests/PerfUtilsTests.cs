@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace ServiceStack.Common.Tests
 {
-    [TestFixture]
+    [TestFixture, Ignore("Benchmark")]
     public class PerfUtilsTests
     {
         [Test]

@@ -68,10 +68,7 @@ namespace CheckWeb
             //nativeTypes.MetadataTypesConfig.GlobalNamespace = "Check.ServiceInterface";
 
             container.Register<IServiceClient>(c =>
-                new JsonServiceClient("http://localhost:55799/")
-                {
-                    CaptureSynchronizationContext = true,
-                });
+                new JsonServiceClient("http://localhost:55799/"));
 
             Plugins.Add(new TemplatePagesFeature
             {

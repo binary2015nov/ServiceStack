@@ -37,13 +37,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             appHost.Dispose();
         }
 
-        //[Test]
-        //[Explicit("Helps debugging when you need to find out WTF is going on")]
-        //public void Run_for_30secs()
-        //{
-        //    Thread.Sleep(30000);
-        //}
-
         public void AssertResponse<T>(HttpWebResponse response, Action<T> customAssert)
         {
             var contentType = response.ContentType;

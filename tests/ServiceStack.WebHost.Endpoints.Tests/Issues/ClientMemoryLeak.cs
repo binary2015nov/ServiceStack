@@ -6,7 +6,7 @@ using System.Net;
 
 namespace ServiceStack.WebHost.Endpoints.Tests.Issues
 {
-    [Explicit, Ignore("Regression Test")]
+    [Ignore("Regression Test")]
     [TestFixture]
     public class ClientMemoryLeak
     {

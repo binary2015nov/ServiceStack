@@ -32,13 +32,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             appHost.Dispose();
         }
 
-        //[Test]
-        //[Explicit("Helps debugging when you need to find out WTF is going on")]
-        //public void Run_for_30secs()
-        //{
-        //    Thread.Sleep(30000);
-        //}
-
         private static void FailOnAsyncError<T>(T response, Exception ex)
         {
             Assert.Fail(ex.Message);

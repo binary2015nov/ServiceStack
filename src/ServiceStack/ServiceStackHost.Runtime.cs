@@ -673,6 +673,8 @@ namespace ServiceStack
                 && Config.CompressFilesWithExtensions.Contains(file.Extension)
                 && (file.Length > Config.CompressFilesLargerThanBytes);
         }
+
+        public virtual T GetRuntimeConfig<T>(IRequest req, string name, T defaultValue) => defaultValue;
     }
 
 }

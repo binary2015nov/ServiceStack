@@ -26,7 +26,6 @@ namespace ServiceStack
         {
             var webRequest = PclExport.Instance.CreateWebRequest(requestUri);
 
-            client.CancelAsyncFn = webRequest.Abort;
             if (client.StoreCookies)
             {
                 PclExportClient.Instance.SetCookieContainer(webRequest, client);

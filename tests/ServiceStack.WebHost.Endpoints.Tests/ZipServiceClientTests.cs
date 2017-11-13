@@ -159,5 +159,16 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var response = client.Post(new HelloZip { Name = "Deflate" });
             Assert.That(response.Result, Is.EqualTo("Hello, Deflate"));
         }
+
+        [Ignore("Integration Test"), Test]
+        public void Can_send_gzip_client_request_ASPNET()
+        {
+            var client = new JsonServiceClient(Config.AspNetServiceStackBaseUri)
+            {
+                RequestCompressionType = CompressionTypes.GZip,
+            };
+            var response = client.Post(new HelloZip { Name = "GZIP" });
+            Assert.That(response.Result, Is.EqualTo("Hello, GZIP"));
+        }
     }
 }

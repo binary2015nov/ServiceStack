@@ -501,11 +501,11 @@ namespace RazorRockstars.Console.Files
 		}
 
 
-		[Explicit("Concurrent Run")]
-		[Test]
-		public void Concurrent_GetReqstar_Razor()
-		{
-			const int NoOfThreads = 100;
+        [Ignore("Concurrent Run")]
+        [Test]
+        public void Concurrent_GetReqstar_Razor()
+        {
+            const int NoOfThreads = 100;
 
 			int completed = 0;
 			Exception lastEx = null;

@@ -351,12 +351,5 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             Assert.That(mockResponse.Headers["Accept-Ranges"], Is.EqualTo("bytes"));
             Assert.That(mockResponse.StatusCode, Is.EqualTo(206));
         }
-
-        //[Test]
-        //[Explicit("Helps debugging when you need to find out WTF is going on")]
-        //public void Run_for_30secs()
-        //{
-        //    Thread.Sleep(30000);
-        //}
     }
 }

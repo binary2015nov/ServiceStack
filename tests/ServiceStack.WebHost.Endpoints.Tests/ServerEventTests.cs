@@ -190,7 +190,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
     
-    [Explicit("Unnecessary suite of tests")]
+    [Ignore("Unnecessary suite of tests")]
     [TestFixture]
     public class MemoryServerEventsWithNewlineOnPublishTests : ServerEventsTests
     {
@@ -221,7 +221,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
-    [Explicit("Hangs in new build server")]
+    [Ignore("Hangs in new build server")]
     [TestFixture]
     public class RedisServerEventsTests : ServerEventsTests
     {

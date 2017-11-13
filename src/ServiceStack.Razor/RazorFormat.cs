@@ -213,9 +213,9 @@ namespace ServiceStack.Razor
             return new FileSystemWatcherLiveReload(viewManager);
         }
 
-        public void ProcessRazorPage(IRequest httpReq, RazorPage contentPage, object model, IResponse httpRes)
+        public IRazorView ProcessRazorPage(IRequest httpReq, RazorPage contentPage, object model, IResponse httpRes)
         {
-            using (PageResolver.ExecuteRazorPage(httpReq, httpRes.OutputStream, model, contentPage)) {}
+            return PageResolver.ExecuteRazorPage(httpReq, httpRes.OutputStream, model, contentPage);
         }
 
         public void ProcessRequest(IRequest httpReq, IResponse httpRes, object dto) //only used in tests
@@ -317,4 +317,5 @@ namespace ServiceStack.Razor
         bool? PrecompilePages { get; set; }
         bool? WaitForPrecompilationOnStartup { get; set; }
     }
+
 }

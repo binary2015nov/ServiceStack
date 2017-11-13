@@ -157,8 +157,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         }
     }
 
-    [TestFixture]
-    [Ignore("stand alone")]
+    [Ignore("Load Test"), TestFixture]
     public class AsyncLoadTests
     {
         const int NoOfTimes = 1000;
