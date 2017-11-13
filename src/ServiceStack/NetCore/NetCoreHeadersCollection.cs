@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Specialized;
 using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 
 namespace ServiceStack.NetCore
 {
@@ -14,8 +15,7 @@ namespace ServiceStack.NetCore
 
         public override int Count => original.Count;
         public bool IsSynchronized => false;
-        public object SyncRoot => original;
-        public override IEnumerator GetEnumerator() => original.GetEnumerator();
+        public object SyncRoot => original;    
 
         public object Original => original;
 
@@ -30,6 +30,14 @@ namespace ServiceStack.NetCore
         public override void Clear() => throw new NotSupportedException();
         public override void Remove(string name) => throw new NotSupportedException();
         public override void Set(string key, string value) => throw new NotSupportedException();
+
+        public override IEnumerator GetEnumerator()
+        {
+            foreach (var item in original)
+            {
+                yield return new KeyValuePair<string, string>(item.Key, item.Value.ToString());
+            }
+        }
     }
 }
 

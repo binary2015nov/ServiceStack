@@ -311,15 +311,15 @@ namespace ServiceStack.Mvc
                 {
                     viewData[cookie.Key] = cookie.Value.Value;
                 }
-                foreach (string header in req.Headers)
+                foreach (KeyValuePair<string, string> header in req.Headers)
                 {
-                    viewData[header] = req.Headers[header];
+                    viewData[header.Key] = req.Headers[header.Value];
                 }
-                foreach (string key in req.QueryString)
+                foreach (KeyValuePair<string, string> pair in req.QueryString)
                 {
-                    viewData[key] = req.QueryString[key];
+                    viewData[pair.Key] = req.QueryString[pair.Value];
                 }
-                foreach (string key in req.FormData)
+                foreach (string key in req.FormData.AllKeys)
                 {
                     viewData[key] = req.QueryString[key];
                 }

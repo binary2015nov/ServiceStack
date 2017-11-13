@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
@@ -17,7 +18,6 @@ namespace ServiceStack.NetCore
         public bool IsSynchronized => false;
         public object SyncRoot => originalQuery;
         
-        public override IEnumerator GetEnumerator() => originalQuery.GetEnumerator();
         public object Original => originalQuery;
         
         public override string[] AllKeys => originalQuery.Keys.ToArray();
@@ -33,6 +33,14 @@ namespace ServiceStack.NetCore
         public override void Clear() => throw new NotSupportedException();
         public override void Remove(string name) => throw new NotSupportedException();
         public override void Set(string key, string value) => throw new NotSupportedException();
+
+        public override IEnumerator GetEnumerator()
+        {
+            foreach (var item in originalQuery)
+            {
+                yield return new KeyValuePair<string, string>(item.Key, item.Value.ToString());
+            }
+        }
     } 
 }
 
