@@ -176,17 +176,18 @@ namespace ServiceStack.Caching
         private long UpdateCounter(string key, long value)
         {
             CacheEntry cacheEntry;
-            if (this.memory.TryGetValue(key, out cacheEntry))
+            while (!TryGetValue(key, out cacheEntry))
+            {
+                memory.TryAdd(key, new CacheEntry(0, null));
+            }
+            lock (cacheEntry)
             {
                 try
-                {
-                    lock (cacheEntry)
-                    {
-                        var int64 = Convert.ToInt64(cacheEntry.Value);
-                        int64 += value;
-                        cacheEntry.Value = int64;
-                        return int64;
-                    }
+                {             
+                    var int64 = Convert.ToInt64(cacheEntry.Value);
+                    int64 += value;
+                    cacheEntry.Value = int64;
+                    return int64;              
                 }
                 catch (Exception)
                 {
@@ -194,9 +195,6 @@ namespace ServiceStack.Caching
                     return value;
                 }
             }
-
-            Set(key, value);
-            return value;
         }
 
         public long Increment(string key, uint amount)
