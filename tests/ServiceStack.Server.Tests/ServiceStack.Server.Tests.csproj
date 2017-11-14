@@ -26,7 +26,7 @@
     <PackageReference Include="MongoDB.Bson.Signed" Version="2.4.4" />
     <PackageReference Include="MongoDB.Driver.Signed" Version="2.4.4" />
     <PackageReference Include="MongoDB.Driver.Core.Signed" Version="2.4.4" />
-    <PackageReference Include="NUnit" Version="3.8.1" />
+    <PackageReference Include="NUnit" Version="3.9.0" />
     <ProjectReference Include="..\..\src\ServiceStack.Interfaces\ServiceStack.Interfaces.csproj" />
     <ProjectReference Include="..\..\src\ServiceStack.Client\ServiceStack.Client.csproj" />
     <ProjectReference Include="..\..\src\ServiceStack.Common\ServiceStack.Common.csproj" />
