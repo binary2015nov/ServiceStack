@@ -11,6 +11,7 @@ namespace ServiceStack.Common.Tests
 #if NETCORE_SUPPORT
     using Microsoft.Extensions.Configuration;
 
+    [TestFixture]
     public class NetCoreAppSettingsMemoryCollectionTest : AppSettingsTest
     {
         public override IAppSettings GetAppSettings()

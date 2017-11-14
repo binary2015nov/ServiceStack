@@ -153,28 +153,4 @@ namespace ServiceStack.Configuration
                 : originalSetting;
         }
     }
-
-    public static class AppSettingsUtils
-    {
-        public static string GetRequiredString(this IAppSettings settings, string name)
-        {
-            if (settings is AppSettingsBase appSettings)
-                return appSettings.GetRequiredString(name);
-
-            var value = settings.GetString(name);
-            if (value == null)
-                throw new ConfigurationErrorsException(string.Format(ErrorMessages.AppsettingNotFound, name));
-
-            return value;
-        }
-
-        public static string GetNullableString(this IAppSettings settings, string name)
-        {
-            if (settings is AppSettingsBase appSettings)
-                return appSettings.GetNullableString(name);
-
-            var value = settings.GetString(name);
-            return value;
-        }
-    }
 }

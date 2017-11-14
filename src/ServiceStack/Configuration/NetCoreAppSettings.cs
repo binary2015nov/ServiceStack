@@ -3,15 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using ServiceStack.Text;
-
 using Microsoft.Extensions.Configuration;
+using ServiceStack.Text;
 
 namespace ServiceStack.Configuration
 {
     public class NetCoreAppSettings : IAppSettings
     {
         public IConfiguration Configuration { get; }
+
         public NetCoreAppSettings(IConfiguration configuration) => Configuration = configuration;
 
         private static T Bind<T>(IConfigurationSection config)
@@ -63,13 +63,13 @@ namespace ServiceStack.Configuration
             return to;
         }
 
-        public List<string> GetAllKeys() => Configuration.GetChildren().Select(child => child.Path).ToList();
+        public IEnumerable<string> GetAllKeys() => Configuration.GetChildren().Select(child => child.Path);
 
         public bool Exists(string key) => Configuration.GetChildren().Any(x => x.Key == key);
 
         public void Set<T>(string key, T value) => Configuration[key] = TypeSerializer.SerializeToString(value);
 
-        public string GetString(string name) => Configuration[name];
+        public string Get(string key) => Configuration[key];
 
         public IList<string> GetList(string key)
         {

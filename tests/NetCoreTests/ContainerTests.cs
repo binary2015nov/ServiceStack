@@ -4,6 +4,7 @@ using ServiceStack;
 
 namespace NetCoreTests
 {
+    [TestFixture]
     public class ContainerTests
     {
         class AppHost : AppSelfHostBase
