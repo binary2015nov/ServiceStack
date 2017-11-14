@@ -11,8 +11,7 @@ namespace ServiceStack
     public partial class PlatformNetCore : Platform
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(PlatformNetCore));
-        
-        const string ErrorAppsettingNotFound = "Unable to find App Setting: {0}";
+
         public const string ConfigNullValue = "{null}";
         
         public static readonly List<string> AppConfigPaths = new List<string> {
@@ -79,7 +78,7 @@ namespace ServiceStack
             string value = GetNullableAppSetting(key);
 
             if (value == null)
-                throw new System.Configuration.ConfigurationErrorsException(string.Format(ErrorAppsettingNotFound, key));
+                throw new System.Configuration.ConfigurationErrorsException(string.Format(ErrorMessages.AppsettingNotFound, key));
 
             return value;
         }
@@ -106,6 +105,7 @@ namespace ServiceStack
             }
             return defaultValue;
         }
+
     }
 }
 

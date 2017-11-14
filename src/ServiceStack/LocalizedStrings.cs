@@ -103,6 +103,10 @@
                
         //Requeconst
         public const string ContentTypeNotSupported = "ContentType not supported '{0}'";
+
+        //Configuration
+        public const string AppsettingNotFound = "Unable to find App Setting: {0}";
+        public const string ConnectionStringNotFound = "Unable to find Connection String: {0}";
     }
 
     public static class HelpMessages

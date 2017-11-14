@@ -8,6 +8,45 @@ using ServiceStack.OrmLite;
 
 namespace ServiceStack.Common.Tests
 {
+#if NETCORE_SUPPORT
+    using Microsoft.Extensions.Configuration;
+
+    public class NetCoreAppSettingsMemoryCollectionTest : AppSettingsTest
+    {
+        public override IAppSettings GetAppSettings()
+        {
+            var input = new Dictionary<string, string>
+            {
+                {"NullableKey", null},
+                {"EmptyKey", string.Empty},
+                {"RealKey", "This is a real value"},
+                //{"ListKey", "A,B,C,D,E"},
+                {"ListKey:0", "A"},
+                {"ListKey:1", "B"},
+                {"ListKey:2", "C"},
+                {"ListKey:3", "D"},
+                {"ListKey:4", "E"},
+                {"IntKey", "42"},
+                {"BadIntegerKey", "This is not an integer"},
+                {"DictionaryKey:A", "1"},
+                {"DictionaryKey:B", "2"},
+                {"DictionaryKey:C", "3"},
+                {"DictionaryKey:D", "4"},
+                {"DictionaryKey:E", "5"},
+                {"BadDictionaryKey", "A1,B:"},
+                {"ObjectNoLineFeed", "{SomeSetting:Test,SomeOtherSetting:12,FinalSetting:Final}"},
+                {"ObjectWithLineFeed", "{SomeSetting:Test,\r\nSomeOtherSetting:12,\r\nFinalSetting:Final}"},
+            };
+
+            var configurationBuilder = new ConfigurationBuilder();
+            configurationBuilder.AddInMemoryCollection(input);
+            var config = configurationBuilder.Build();
+            var appSettings = new NetCoreAppSettings(config);
+            return appSettings;
+        }
+    }
+#endif
+
     [TestFixture]
     public class EnvironmentAppSettingsTests
     {
@@ -29,7 +68,7 @@ namespace ServiceStack.Common.Tests
     [TestFixture]
     public class MultiAppSettingsTest : AppSettingsTest
     {
-        public override AppSettingsBase GetAppSettings()
+        public override IAppSettings GetAppSettings()
         {
             return new MultiAppSettings(
                 new DictionarySettings(GetConfigDictionary()),
@@ -47,7 +86,7 @@ namespace ServiceStack.Common.Tests
     [TestFixture]
     public class AppConfigAppSettingsTest : AppSettingsTest
     {
-        public override AppSettingsBase GetAppSettings()
+        public override IAppSettings GetAppSettings()
         {
             return AppSettings.Default;
         }
@@ -74,7 +113,7 @@ namespace ServiceStack.Common.Tests
             settings.InitSchema();
         }
 
-        public override AppSettingsBase GetAppSettings()
+        public override IAppSettings GetAppSettings()
         {
             var testConfig = (DictionarySettings)base.GetAppSettings();
 
@@ -204,7 +243,7 @@ ObjectKey {SomeSetting:Test,SomeOtherSetting:12,FinalSetting:Final}";
 
     public abstract class AppSettingsTest
     {
-        public virtual AppSettingsBase GetAppSettings()
+        public virtual IAppSettings GetAppSettings()
         {
             return new DictionarySettings(GetConfigDictionary())
             {
@@ -337,7 +376,8 @@ ObjectKey {SomeSetting:Test,SomeOtherSetting:12,FinalSetting:Final}";
         [Test]
         public void Get_Returns_ObjectNoLineFeed()
         {
-            var appSettings = GetAppSettings();
+            if (!(GetAppSettings() is AppSettingsBase appSettings)) return;
+            
             appSettings.ParsingStrategy = AppSettingsStrategy.CollapseNewLines;
             var value = appSettings.Get("ObjectNoLineFeed", new SimpleAppSettings());
             Assert.That(value, Is.Not.Null);
@@ -355,7 +395,8 @@ ObjectKey {SomeSetting:Test,SomeOtherSetting:12,FinalSetting:Final}";
         [Test]
         public void Get_Returns_ObjectWithLineFeed()
         {
-            var appSettings = GetAppSettings();
+            if (!(GetAppSettings() is AppSettingsBase appSettings)) return;
+
             appSettings.ParsingStrategy = AppSettingsStrategy.CollapseNewLines;
             var value = appSettings.Get("ObjectWithLineFeed", new SimpleAppSettings());
             Assert.That(value, Is.Not.Null);
