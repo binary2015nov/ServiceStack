@@ -147,7 +147,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
     public class ServerEventsAppHost : AppSelfHostBase
     {
-        public ServerEventsAppHost() : base(typeof(ServerEventsAppHost).Name, typeof(ServerEventsAppHost).Assembly) { }
+        public ServerEventsAppHost() : base(typeof(ServerEventsAppHost).Name, typeof(ServerEventsAppHost).Assembly)
+        {
+            Config.StrictMode = true;
+        }
 
         public bool UseRedisServerEvents { get; set; }
         public bool LimitToAuthenticatedUsers { get; set; }

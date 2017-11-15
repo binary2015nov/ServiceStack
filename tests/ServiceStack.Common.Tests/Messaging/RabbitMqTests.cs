@@ -15,14 +15,14 @@ namespace ServiceStack.Common.Tests.Messaging
     [TestFixture, Explicit]
     public class RabbitMqTests
     {
-        private readonly ConnectionFactory mqFactory = new ConnectionFactory { HostName = "localhost" };
+        public readonly ConnectionFactory mqFactory = new ConnectionFactory { HostName = "localhost" };
         private const string Exchange = "mq:tests";
         private const string ExchangeDlq = "mq:tests.dlq";
         private const string ExchangeTopic = "mq:tests.topic";
         private const string ExchangeFanout = "mq:tests.fanout";
 
-        [OneTimeSetUp]
-        public void TestFixtureSetUp()
+        [SetUp]
+        public void BeforeEachMethodSetUp()
         {
             using (IConnection connection = mqFactory.CreateConnection())
             using (IModel channel = connection.CreateModel())

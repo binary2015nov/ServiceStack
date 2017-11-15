@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Web;
 using ServiceStack.Host.Handlers;
 using ServiceStack.Metadata;
@@ -33,14 +34,17 @@ namespace ServiceStack
 
         public virtual IHttpHandler ProcessRequest(string httpMethod, string pathInfo, string filePath)
         {
-            if (pathInfo.IsNullOrEmpty())
-                return null;
-
             string metadata = HostContext.Config.MetadataRedirectPath.IsNullOrEmpty()
                 ? "/metadata"
-                : "/" + HostContext.Config.MetadataRedirectPath.TrimStart('/');
-            if (pathInfo.Equals(metadata, StringComparison.OrdinalIgnoreCase))
-                return new IndexMetadataHandler();
+                : HostContext.Config.MetadataRedirectPath;
+
+            if (pathInfo.TrimEnd('/').Equals(metadata, StringComparison.OrdinalIgnoreCase))
+            {
+                if (pathInfo.Length == metadata.Length)
+                    return new IndexMetadataHandler();
+                else
+                    return new RedirectHttpHandler { RelativeUrl = metadata };
+            }
 
             var pathArray = pathInfo.ToLower().Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries);
             if (pathArray.Length != 2)

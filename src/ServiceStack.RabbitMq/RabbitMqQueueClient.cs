@@ -7,8 +7,7 @@ namespace ServiceStack.RabbitMq
 {
     public class RabbitMqQueueClient : RabbitMqProducer, IMessageQueueClient
     {
-        public RabbitMqQueueClient(RabbitMqMessageFactory msgFactory)
-            : base(msgFactory) {}
+        public RabbitMqQueueClient(RabbitMqMessageFactory msgFactory) : base(msgFactory) { }
 
         public virtual void Notify(string queueName, IMessage message)
         {

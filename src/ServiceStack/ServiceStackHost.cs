@@ -891,13 +891,13 @@ namespace ServiceStack
             var pathInfo = NormalizePathInfo(originalPathInfo, Config.HandlerFactoryPath);
             isDirectory = VirtualFileSources.DirectoryExists(pathInfo);
 
-            if (!isDirectory && pathInfo.Length > 1 && pathInfo[pathInfo.Length - 1] == '/')
-                pathInfo = pathInfo.TrimEnd('/');
+            //if (!isDirectory && pathInfo.Length > 1 && pathInfo[pathInfo.Length - 1] == '/')
+            //    pathInfo = pathInfo.TrimEnd('/');
 
             return pathInfo;
         }
 
-        public static string NormalizePathInfo(string pathInfo, string mode)
+        private static string NormalizePathInfo(string pathInfo, string mode)
         {
             if (string.IsNullOrEmpty(mode))
                 return pathInfo;
@@ -917,7 +917,7 @@ namespace ServiceStack
 
         public virtual IHttpHandler ReturnRedirectHandler(IHttpRequest httpReq)
         {
-            var pathInfo = NormalizePathInfo(httpReq.OriginalPathInfo, Config.HandlerFactoryPath);
+            var pathInfo = httpReq.PathInfo;
             return Config.RedirectPaths.TryGetValue(pathInfo, out string redirectPath)
                 ? new RedirectHttpHandler { RelativeUrl = redirectPath }
                 : null;

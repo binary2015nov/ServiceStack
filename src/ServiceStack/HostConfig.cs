@@ -122,9 +122,7 @@ namespace ServiceStack
                 "wwwroot/", //Need to allow VirtualFiles access from ContentRoot Folder
 #endif
             };
-            RedirectPaths = new Dictionary<string, string> {
-                {"/metadata/", "/metadata"},
-            };
+            RedirectPaths = new Dictionary<string, string>();
             IgnoreWarningsOnPropertyNames = new List<string> {
                 Keywords.Format, Keywords.Callback, Keywords.Debug, Keywords.AuthSecret, Keywords.JsConfig,
                 Keywords.IgnorePlaceHolder, Keywords.Version, Keywords.VersionAbbr, Keywords.Version.ToPascalCase(),
@@ -182,10 +180,12 @@ namespace ServiceStack
         public string WebHostUrl { get; set; }
 
         private string handlerFactoryPath;
-        public string HandlerFactoryPath { get { return handlerFactoryPath; } set { handlerFactoryPath = value.TrimPrefixes("/"); } }
+        public string HandlerFactoryPath { get { return handlerFactoryPath; } set { handlerFactoryPath = value?.TrimPrefixes("/"); } }
 
         public string DefaultRedirectPath { get; set; }
-        public string MetadataRedirectPath { get; set; }
+
+        private string metadataRedirectPath;
+        public string MetadataRedirectPath { get { return metadataRedirectPath; } set { if (!value.IsNullOrEmpty()) metadataRedirectPath = "".AppendPath(value); } }
         public string SoapServiceName { get; set; }
         public XmlWriterSettings XmlWriterSettings { get; set; }
         public bool EnableAccessRestrictions { get; set; }
