@@ -7,6 +7,7 @@ using ServiceStack.Auth;
 using ServiceStack.DataAnnotations;
 using ServiceStack.NativeTypes;
 using ServiceStack.NativeTypes.CSharp;
+using ServiceStack.Text;
 using ServiceStack.Web;
 using ServiceStack.Metadata;
 
@@ -47,7 +48,7 @@ namespace ServiceStack.Host
             var reqFilterAttrs = new[] { requestType, serviceType }
                 .SelectMany(x => x.AllAttributes().OfType<IRequestFilterBase>()).ToList();
             var resFilterAttrs = (responseType != null ? new[] { responseType, serviceType } : new[] { serviceType })
-                    .SelectMany(x => x.AllAttributes().OfType<IResponseFilterBase>()).ToList();
+                .SelectMany(x => x.AllAttributes().OfType<IResponseFilterBase>()).ToList();
 
             var authAttrs = reqFilterAttrs.OfType<AuthenticateAttribute>().ToList();
             var actions = GetImplementedActions(serviceType, requestType);
