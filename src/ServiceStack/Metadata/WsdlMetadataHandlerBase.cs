@@ -1,5 +1,4 @@
 #if !NETSTANDARD2_0
-
 using System;
 using System.Threading.Tasks;
 using ServiceStack.Host;
@@ -16,7 +15,7 @@ namespace ServiceStack.Metadata
 
         protected abstract WsdlTemplateBase GetWsdlTemplate();
 
-        public Task Execute(IRequest httpReq, IResponse httpRes)
+        public override Task ProcessRequestAsync(IRequest httpReq, IResponse httpRes, string operationName)
         {
             HostContext.AppHost.AssertFeatures(Feature.Metadata);
 

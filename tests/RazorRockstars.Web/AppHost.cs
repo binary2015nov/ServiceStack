@@ -38,7 +38,7 @@ namespace RazorRockstars.Web
             Plugins.Add(new SwaggerFeature { UseBootstrapTheme = true });
 
             var metadata = (MetadataFeature)Plugins.First(x => x is MetadataFeature);
-            metadata.IndexPageFilter = page => {
+            metadata.FormatPageFilter = page => {
                 page.OperationNames.Sort((x,y) => y.CompareTo(x));
             };
 

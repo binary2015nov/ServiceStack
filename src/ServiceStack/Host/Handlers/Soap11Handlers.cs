@@ -25,7 +25,7 @@ namespace ServiceStack.Host.Handlers
             if (httpReq.Verb == HttpMethods.Get)
             {
                 var wsdl = new Soap11WsdlMetadataHandler();
-                return wsdl.Execute(httpReq, httpRes);
+                return wsdl.ProcessRequestAsync(httpReq, httpRes, operationName);
             }
 
             var responseMessage = Send(null, httpReq, httpRes);

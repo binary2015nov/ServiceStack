@@ -9,13 +9,14 @@ namespace ServiceStack
 {
     public class MetadataFeature : IPlugin
     {
+        public const string Operations = "Operations";
         public const string PluginLinks = "Plugin Links";
         public const string DebugInfo = "Debug Info";
         public const string AvailableFeatures = "Available Features";
 
         public Dictionary<string, Dictionary<string, string>> Sections { get; private set; }
 
-        public Action<IndexOperationsControl> IndexPageFilter { get; set; }
+        public Action<MetadataControl> FormatPageFilter { get; set; }
         public Action<OperationControl> DetailPageFilter { get; set; }
 
         public bool ShowResponseStatusInMetadataPages { get; set; }

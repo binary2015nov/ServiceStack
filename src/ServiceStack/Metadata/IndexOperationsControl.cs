@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Web.UI;
 using ServiceStack.Host;
 using ServiceStack.Templates;
 using ServiceStack.Text;
@@ -7,19 +6,37 @@ using ServiceStack.Web;
 
 namespace ServiceStack.Metadata
 {
-    public class IndexOperationsControl : System.Web.UI.Control
+    public abstract class MetadataControl : System.Web.UI.Control
     {
         public IRequest Request { get; set; }
         public string Title { get; set; }
         public List<string> OperationNames { get; set; }
+        public MetadataPagesConfig MetadataPagesConfig { get; set; }
+
+        protected virtual Dictionary<string, string> ToAbsoluteUrls(Dictionary<string, string> linksMap)
+        {
+            var to = new Dictionary<string, string>();
+            var baseUrl = Request.GetBaseUrl();
+
+            foreach (var entry in linksMap)
+            {
+                var url = entry.Key.StartsWith("#") ? entry.Key : baseUrl.AppendPath(entry.Key);
+                to[url] = entry.Value;
+            }
+
+            return to;
+        }
+    }
+
+    public class IndexOperationsControl : MetadataControl
+    {
         public IDictionary<int, string> Xsds { get; set; }
         public int XsdServiceTypesIndex { get; set; }
-        public MetadataPagesConfig MetadataConfig { get; set; }
 
         public string RenderRow(string operationName)
         {
             var show = HostContext.Config.DebugMode //Show in DebugMode
-                && !MetadataConfig.AlwaysHideInMetadata(operationName); //Hide When [Restrict(VisibilityTo = None)]
+                && !MetadataPagesConfig.AlwaysHideInMetadata(operationName); //Hide When [Restrict(VisibilityTo = None)]
 
             // use a fully qualified path if WebHostUrl is set
             string baseUrl = Request.GetBaseUrl();
@@ -31,10 +48,10 @@ namespace ServiceStack.Metadata
 
             var opTemplate = StringBuilderCache.Allocate();
             opTemplate.Append("<tr><th>" + icons + "{0}</th>");
-            foreach (var config in MetadataConfig.AvailableFormatConfigs)
+            foreach (var config in MetadataPagesConfig.AvailableFormatConfigs)
             {
-                var uri = baseUrl.CombineWith(config.DefaultMetadataUri);
-                if (MetadataConfig.IsVisible(Request, config.Format.ToFormat(), operationName))
+                var uri = baseUrl.AppendPath(config.DefaultMetadataUri);
+                if (MetadataPagesConfig.IsVisible(Request, config.Format.ToFormat(), operationName))
                 {
                     show = true;
                     opTemplate.Append($@"<td><a href=""{uri}?op={{0}}"">{config.Name.UrlEncode()}</a></td>");
@@ -118,29 +135,28 @@ namespace ServiceStack.Metadata
             return icons;
         }
 
-        protected override void Render(HtmlTextWriter output)
+        protected override void Render(System.Web.UI.HtmlTextWriter output)
         {
             var operationsPart = new TableTemplate
             {
-                Title = "Operations",
+                Title = MetadataFeature.Operations,
                 Items = this.OperationNames,
                 ForEachItem = RenderRow
             }.ToString();
 
+            var xsdsPart = "";
 #if !NETSTANDARD2_0
-            var xsdsPart = new ListTemplate
+            xsdsPart = new ListTemplate
             {
                 Title = "XSDS:",
                 ListItemsIntMap = this.Xsds,
                 ListItemTemplate = @"<li><a href=""?xsd={0}"">{1}</a></li>"
             }.ToString();
-#else
-            var xsdsPart = "";
 #endif
 
             var wsdlTemplate = StringBuilderCache.Allocate();
-            var soap11Config = MetadataConfig.GetMetadataConfig("soap11") as SoapMetadataConfig;
-            var soap12Config = MetadataConfig.GetMetadataConfig("soap12") as SoapMetadataConfig;
+            var soap11Config = MetadataPagesConfig.GetMetadataConfig("soap11") as SoapMetadataConfig;
+            var soap12Config = MetadataPagesConfig.GetMetadataConfig("soap12") as SoapMetadataConfig;
             if (soap11Config != null || soap12Config != null)
             {
                 wsdlTemplate.AppendLine("<h3>WSDLS:</h3>");
@@ -159,7 +175,7 @@ namespace ServiceStack.Metadata
             }
 
             var metadata = HostContext.GetPlugin<MetadataFeature>();
-            var pluginLinks = metadata != null && metadata.Sections[MetadataFeature.PluginLinks].Count > 0
+            var pluginLinks = metadata?.Sections[MetadataFeature.PluginLinks].Count > 0
                  ? new ListTemplate
                  {
                      Title = MetadataFeature.PluginLinks,
@@ -168,7 +184,7 @@ namespace ServiceStack.Metadata
                  }.ToString()
                  : "";
 
-            var debugOnlyInfo = metadata != null && metadata.Sections[MetadataFeature.DebugInfo].Count > 0
+            var debugOnlyInfo = metadata?.Sections[MetadataFeature.DebugInfo].Count > 0
                 ? new ListTemplate
                 {
                     Title = MetadataFeature.DebugInfo,
@@ -176,7 +192,7 @@ namespace ServiceStack.Metadata
                     ListItemTemplate = @"<li><a href=""{0}"">{1}</a></li>"
                 }.ToString()
                 : "";
-            var features = metadata != null && metadata.Sections[MetadataFeature.AvailableFeatures].Count > 0
+            var features = metadata?.Sections[MetadataFeature.AvailableFeatures].Count > 0
               ? new ListTemplate
               {
                   Title = MetadataFeature.AvailableFeatures,
@@ -205,20 +221,6 @@ namespace ServiceStack.Metadata
                 features);
 
             output.Write(renderedTemplate);
-        }
-
-        public Dictionary<string, string> ToAbsoluteUrls(Dictionary<string, string> linksMap)
-        {
-            var to = new Dictionary<string,string>();
-            var baseUrl = Request.GetBaseUrl();
-
-            foreach (var entry in linksMap)
-            {
-                var url = entry.Key.StartsWith("#") ? entry.Key : baseUrl.AppendPath(entry.Key);
-                to[url] = entry.Value;
-            }
-
-            return to;
         }
     }
 }

@@ -891,9 +891,6 @@ namespace ServiceStack
             var pathInfo = NormalizePathInfo(originalPathInfo, Config.HandlerFactoryPath);
             isDirectory = VirtualFileSources.DirectoryExists(pathInfo);
 
-            //if (!isDirectory && pathInfo.Length > 1 && pathInfo[pathInfo.Length - 1] == '/')
-            //    pathInfo = pathInfo.TrimEnd('/');
-
             return pathInfo;
         }
 

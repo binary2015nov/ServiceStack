@@ -181,7 +181,7 @@ namespace ServiceStack.Host
 
         public List<string> GetAllOperationNames()
         {
-            return Operations.Select(x => x.RequestType.GetOperationName()).OrderBy(operation => operation).ToList();
+            return Operations.Select(x => x.RequestType.GetOperationName()).OrderBy(p => p).ToList();
         }
 
         public List<string> GetOperationNamesForMetadata(IRequest httpReq)
@@ -191,7 +191,7 @@ namespace ServiceStack.Host
 
         public List<string> GetOperationNamesForMetadata(IRequest httpReq, Format format)
         {
-            return GetAllOperationNames();
+            return GetAllOperationNames().Where(p => IsVisible(httpReq, format, p)).ToList();
         }
 
         public bool IsAuthorized(Operation operation, IRequest req, IAuthSession session)

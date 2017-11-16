@@ -16,6 +16,11 @@ namespace ServiceStack.Templates
             return LoadTemplate("IndexOperations.html");
         }
 
+        public static string GetFormatOperationsTemplate()
+        {
+            return LoadTemplate("FormatOperations.html");
+        }
+
         public static string GetOperationControlTemplate()
         {
             return LoadTemplate("OperationControl.html");

@@ -214,22 +214,21 @@ namespace ServiceStack.Metadata
             sb.Append("</table>");
         }
 
-        protected void RenderOperations(HtmlTextWriter writer, IRequest httpReq, ServiceMetadata metadata)
+        protected virtual void RenderOperations(HtmlTextWriter writer, IRequest httpReq, ServiceMetadata metadata)
         {
-            var defaultPage = new IndexOperationsControl
+            var metadataPage = new FormatOperationsControl
             {
                 Request = httpReq,
-                MetadataConfig = HostContext.MetadataPagesConfig,
+                MetadataPagesConfig = HostContext.MetadataPagesConfig,
                 Title = HostContext.AppHost.ServiceName + " " + HostContext.AppHost.Config.ApiVersion,
-                Xsds = XsdTypes.Xsds,
-                XsdServiceTypesIndex = 1,
-                OperationNames = metadata.GetOperationNamesForMetadata(httpReq),
+                Format = ContentFormat,
+                OperationNames = metadata.GetOperationNamesForMetadata(httpReq, this.Format)
             };
 
             var metadataFeature = HostContext.GetPlugin<MetadataFeature>();
-            metadataFeature?.IndexPageFilter?.Invoke(defaultPage);
+            metadataFeature?.FormatPageFilter?.Invoke(metadataPage);
 
-            defaultPage.RenderControl(writer);
+            metadataPage.RenderControl(writer);
         }
 
         private string ConvertToHtml(string text)

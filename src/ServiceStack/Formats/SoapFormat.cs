@@ -19,7 +19,7 @@ namespace ServiceStack
         
         public void Register(IAppHost appHost)
         {
-            var contentTypes = (ContentTypes)appHost.ContentTypes;
+            var contentTypes = appHost.ContentTypes;
             var predefinedRoutes = appHost.GetPlugin<PredefinedRoutesFeature>();
             if (predefinedRoutes == null)
                 throw new NotSupportedException("SoapFormat requires the PredefinedRoutesFeature Plugin");
