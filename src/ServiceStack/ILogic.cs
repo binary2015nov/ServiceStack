@@ -55,10 +55,7 @@ namespace ServiceStack
         private ICacheClient cache;
         public virtual ICacheClient Cache
         {
-            get
-            {
-                return cache ?? (cache = RedisManager != null ? RedisManager.GetCacheClient() : MemoryCacheClient.Default);
-            }
+            get { return cache ?? (cache = RedisManager != null ? RedisManager.GetCacheClient() : MemoryCacheClient.Default); }
             set { cache = value; }
         }
 
@@ -67,8 +64,8 @@ namespace ServiceStack
         private IMessageProducer messageProducer;
         public virtual IMessageProducer MessageProducer
         {
-            get { return messageProducer ?? (messageProducer = MessageFactory.CreateMessageProducer()); }
-            set { messageProducer = value; }
+            get => messageProducer ?? (messageProducer = MessageFactory.CreateMessageProducer());
+            set => messageProducer = value;
         }
 
         public virtual void PublishMessage<T>(T message)

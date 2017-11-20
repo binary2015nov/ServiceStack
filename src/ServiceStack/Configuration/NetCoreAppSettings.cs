@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using Microsoft.Extensions.Configuration;
 using ServiceStack.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace ServiceStack.Configuration
 {
@@ -57,13 +57,13 @@ namespace ServiceStack.Configuration
                 if (child.Value == null)
                     continue;
 
-                var key = child.Path;
+                var key = child.Key;
                 to[key] = child.Value;
             }
             return to;
         }
 
-        public IEnumerable<string> GetAllKeys() => Configuration.GetChildren().Select(child => child.Path);
+        public IEnumerable<string> GetAllKeys() => Configuration.GetChildren().Select(child => child.Key);
 
         public bool Exists(string key) => Configuration.GetChildren().Any(x => x.Key == key);
 

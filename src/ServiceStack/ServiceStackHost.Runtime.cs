@@ -530,7 +530,7 @@ namespace ServiceStack
 
             var sessionKey = SessionFeature.GetSessionKey(session.Id ?? httpReq.GetOrCreateSessionId());
             session.LastModified = DateTime.UtcNow;
-            this.GetCacheClient().CacheSet(sessionKey, session, expiresIn ?? GetDefaultSessionExpiry(httpReq));
+            this.GetCacheClient(httpReq).CacheSet(sessionKey, session, expiresIn ?? GetDefaultSessionExpiry(httpReq));
 
             httpReq.Items[Keywords.Session] = session;
         }
@@ -626,7 +626,16 @@ namespace ServiceStack
         /// <returns></returns>
         public virtual ICacheClient GetCacheClient(IRequest req)
         {
-            return ((IResolver)req).GetCacheClient();
+            var resolver = req ?? (IResolver)this;
+            var cache = resolver.TryResolve<ICacheClient>();
+            if (cache != null)
+                return cache;
+
+            var redisManager = resolver.TryResolve<IRedisClientsManager>();
+            if (redisManager != null)
+                return redisManager.GetCacheClient();
+
+            return MemoryCacheClient.Default;
         }
 
         /// <summary>
