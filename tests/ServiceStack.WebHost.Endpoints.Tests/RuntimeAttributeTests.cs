@@ -83,7 +83,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [Test]
         public void Does_add_CustomAttributes_to_when_added_in_AppHost_constructor()
         {
-            var restPath = HostContext.ServiceController.GetRestPathForRequest("GET", "/custom-register");
+            var restPath = HostContext.ServiceController.GetRestPathForRequest("GET", "/custom-register", null);
 
             Assert.That(restPath, Is.Not.Null);
             Assert.That(restPath.RequestType, Is.EqualTo(typeof(Register)));

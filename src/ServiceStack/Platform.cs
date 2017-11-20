@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using ServiceStack.Caching;
 using ServiceStack.Configuration;
 using ServiceStack.Text;
 using ServiceStack.Web;
@@ -142,11 +143,12 @@ namespace ServiceStack
             return new FileInfo(assembly.Location).LastWriteTime;           
         }
 
-        public static void Reset()
+        public static void ClearRuntime()
         {
             JsConfig.Reset();
             PlatformExtensions.ClearRuntimeAttributes(); //Clears Runtime Attributes
-            ReflectionExtensions.Reset(); 
+            ReflectionExtensions.Reset();
+            MemoryCacheClient.Default.Dispose();
         }
     }
 }

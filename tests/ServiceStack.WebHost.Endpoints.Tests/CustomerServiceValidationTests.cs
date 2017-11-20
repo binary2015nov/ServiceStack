@@ -158,11 +158,9 @@ namespace ServiceStack.WebHost.IntegrationTests.Services
     {
         private const string ListeningOn = "http://localhost:20000/";
 
-        public class ValidationAppHostHttpListener
-            : AppHostHttpListenerBase
+        public class ValidationAppHostHttpListener : AppHostHttpListenerBase
         {
-            public ValidationAppHostHttpListener()
-                : base("Validation Tests", typeof(CustomerService).Assembly) { }
+            public ValidationAppHostHttpListener() : base("Validation Tests", typeof(CustomerService).Assembly) { }
 
             public override void Configure(Container container)
             {

@@ -50,16 +50,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         private const string ListeningOn = "http://localhost:8023/";
         private const string ServiceClientBaseUri = "http://localhost:8023/";
 
-        public class OneWayServiceAppHostHttpListener
-            : AppHostHttpListenerBase
+        public class OneWayServiceAppHostHttpListener : AppHostHttpListenerBase
         {
+            public OneWayServiceAppHostHttpListener() : base("", typeof(OneWayService).Assembly) { }
 
-            public OneWayServiceAppHostHttpListener()
-                : base("", typeof(OneWayService).Assembly) { }
-
-            public override void Configure(Funq.Container container)
-            {
-            }
+            public override void Configure(Funq.Container container) { }
         }
 
         OneWayServiceAppHostHttpListener appHost;
@@ -82,13 +77,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             appHost.Dispose();
         }
 
-
         [Test]
         public void Delete()
         {
             client.Delete(new DeleteOneWayRequest() { Prefix = "Delete" });
             Assert.That(OneWayService.LastResult, Is.EqualTo("Delete DELETE"));
-
         }
 
         [Test]

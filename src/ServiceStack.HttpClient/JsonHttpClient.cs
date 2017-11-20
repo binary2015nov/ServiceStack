@@ -583,12 +583,6 @@ namespace ServiceStack
                 stream => JsonSerializer.DeserializeFromStream<TResponse>(stream));
 
             throw webEx;
-
-            //var authEx = ex as AuthenticationException;
-            //if (authEx != null)
-            //{
-            //    throw WebRequestUtils.CreateCustomException(requestUri, authEx);
-            //}
         }
 
         public virtual TResponse Send<TResponse>(object request)

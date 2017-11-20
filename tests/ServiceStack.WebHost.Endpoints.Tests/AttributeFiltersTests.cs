@@ -39,10 +39,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 	//Only executed for the provided HTTP methods (GET, POST) 
 	public class ContextualFilterTestAttribute : RequestFilterAttribute
 	{
-		public ContextualFilterTestAttribute(ApplyTo applyTo)
-			: base(applyTo)
-		{
-		}
+		public ContextualFilterTestAttribute(ApplyTo applyTo) : base(applyTo) { }
 
 		public override void Execute(IRequest req, IResponse res, object requestDto)
 		{
@@ -230,7 +227,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
 		public class AttributeFiltersAppHostHttpListener : AppHostHttpListenerBase
 		{
-			public AttributeFiltersAppHostHttpListener() : base("Attribute Filters Tests", typeof(AttributeAttributeFilteredService).GetAssembly())
+			public AttributeFiltersAppHostHttpListener() : base("Attribute Filters Tests", typeof(AttributeAttributeFilteredService).Assembly)
 			{
 				Config.DebugMode = true;
 			}

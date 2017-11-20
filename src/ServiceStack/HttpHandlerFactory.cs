@@ -199,8 +199,7 @@ namespace ServiceStack
             var pathParts = pathInfo.TrimStart('/').Split('/');
             if (pathParts.Length == 0) return NotFoundHttpHandler;
 
-            string contentType = null;
-            var restPath = RestHandler.FindMatchingRestPath(httpReq, out contentType);
+            var restPath = RestHandler.FindMatchingRestPath(httpReq, out string contentType);
             if (restPath != null)
                 return new RestHandler { RequestName = restPath.RequestType.GetOperationName() };
 
@@ -226,7 +225,7 @@ namespace ServiceStack
             if (restPath != null)
             {
                 httpReq.SetRoute(restPath);
-                return new RestHandler { RequestName = restPath.RequestType.GetOperationName(), ResponseContentType = contentType };
+                return new RestHandler { RequestName = restPath.RequestType.GetOperationName() };
             }
             
             return null;

@@ -46,7 +46,7 @@ namespace ServiceStack
             ServiceName = serviceName;
             ServiceAssemblies = assembliesWithServices;
             Container = new Container { DefaultOwner = Owner.External };
-            ContentTypes = ServiceStack.Host.ContentTypes.Default;
+            ContentTypes = new ServiceStack.Host.ContentTypes();
             Routes = new ServiceRoutes();
             WebHostPhysicalPath = GetWebRootPath();
             PreRequestFilters = new List<Action<IRequest, IResponse>>();
@@ -307,11 +307,11 @@ namespace ServiceStack
                 if (Container.Exists<IRedisClientsManager>())
                     Container.Register(c => c.Resolve<IRedisClientsManager>().GetCacheClient());
                 else
-                    Container.Register<ICacheClient>(MemoryCacheClient.Default);
+                    Container.Register<ICacheClient>(new MemoryCacheClient());
             }
 
             if (!Container.Exists<MemoryCacheClient>())
-                Container.Register(MemoryCacheClient.Default);
+                Container.Register(new MemoryCacheClient());
 
             if (Container.Exists<IMessageService>()
                 && !Container.Exists<IMessageFactory>())
@@ -935,7 +935,7 @@ namespace ServiceStack
                 Container = null;              
             }
             //clear unmanaged resources here
-            Platform.Reset();
+            Platform.ClearRuntime();
             if (Ready)
                 HostContext.AppHost = null;
             disposed = true;

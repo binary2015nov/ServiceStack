@@ -113,6 +113,8 @@ namespace NewApi.Customers
         [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
+            ServiceStack.Logging.LogManager.LogFactory = new ServiceStack.Logging.DebugLogFactory();
+
             appHost = new AppHost()
                 .Init()
                 .Start(BaseUri);

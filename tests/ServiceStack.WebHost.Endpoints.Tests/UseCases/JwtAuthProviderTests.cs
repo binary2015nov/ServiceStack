@@ -145,8 +145,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.UseCases
 
         class AppHost : AppSelfHostBase
         {
-            public AppHost()
-                : base(nameof(JwtAuthProviderTests), typeof(JwtServices).Assembly) { }
+            public AppHost() : base(nameof(JwtAuthProviderTests), typeof(JwtServices).Assembly) { }
 
             public virtual JwtAuthProvider JwtAuthProvider { get; set; }
 

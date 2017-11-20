@@ -957,14 +957,15 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             try
             {
                 client.Send<HttpWebResponse>(request);
-            } catch (WebServiceException ex)
+            }
+            catch (WebServiceException ex)
             {
 #if NETCORE
                 //AllowAutoRedirect=false is not implemented in .NET Core and throws NotFound exception
                 if (ex.StatusCode == (int)HttpStatusCode.NotFound)
                     return;
 #endif
-                throw;
+                throw ex;
             } 
 
             var locationUri = new Uri(lastResponseLocationHeader);

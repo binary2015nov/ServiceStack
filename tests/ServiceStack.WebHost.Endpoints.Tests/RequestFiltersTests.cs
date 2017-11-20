@@ -126,8 +126,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             private Guid currentSessionGuid;
 
-            public RequestFiltersAppHostHttpListener()
-                : base("Request Filters Tests", typeof(GetFactorialService).Assembly) { }
+            public RequestFiltersAppHostHttpListener() : base("Request Filters Tests", typeof(GetFactorialService).Assembly) { }
 
             public override void Configure(Container container)
             {
@@ -182,7 +181,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         string ServiceClientBaseUri = Config.ListeningOn;
 
         [OneTimeSetUp]
-        public void OnTestFixtureSetUp()
+        public void TestFixtureSetUp()
         {
             appHost = new RequestFiltersAppHostHttpListener();
             appHost.Init();
@@ -190,7 +189,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [OneTimeTearDown]
-        public void OnTestFixtureTearDown()
+        public void TestFixtureTearDown()
         {
             appHost.Dispose();
         }

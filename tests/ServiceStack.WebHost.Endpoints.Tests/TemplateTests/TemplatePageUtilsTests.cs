@@ -609,7 +609,6 @@ products
         {
             object value;
             JsBinding binding;
-            JsExpression fn;
             
             "fn()".ToStringSegment().ParseNextToken(out value, out binding);
             Assert.That(((JsExpression)binding).Name, Is.EqualTo("fn"));

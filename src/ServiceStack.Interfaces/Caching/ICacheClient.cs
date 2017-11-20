@@ -6,8 +6,7 @@ namespace ServiceStack.Caching
     /// <summary>
     /// A common interface implementation that is implemented by most cache providers
     /// </summary>
-    public interface ICacheClient
-        : IDisposable
+    public interface ICacheClient : IDisposable
     {
         /// <summary>
         /// Removes the specified item from the cache.

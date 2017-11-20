@@ -428,13 +428,13 @@ namespace ServiceStack.Mvc
     }
 
     //Workaround base-class to fix R# intelli-sense issue
-    public abstract class ResharperViewPage<T> : ViewPage<object>
+    public abstract class ResharperViewPage<TModel> : ViewPage<object>
     {
-        public T Dto => (T) Model;
+        public TModel Dto => (TModel)Model;
     }
 
     //Razor Pages still only work when base class is RazorPage<object>
-    public abstract class ViewPage<T> : RazorPage<T>, IDisposable
+    public abstract class ViewPage<TModel> : RazorPage<TModel>, IDisposable
     {
         public IHttpRequest Request
         {
@@ -482,7 +482,7 @@ namespace ServiceStack.Mvc
             return new HtmlString(RazorViewExtensions.GetErrorHtml(GetErrorStatus()) ?? "");
         }
 
-        public virtual T GetPlugin<T>() where T : class, IPlugin => HostContext.AppHost.GetPlugin<T>();
+        public virtual TPlugin GetPlugin<TPlugin>() where TPlugin : class, IPlugin => HostContext.AppHost.GetPlugin<TPlugin>();
 
         private IServiceStackProvider provider;
         public virtual IServiceStackProvider ServiceStackProvider => provider ?? (provider = new ServiceStackProvider(Request));

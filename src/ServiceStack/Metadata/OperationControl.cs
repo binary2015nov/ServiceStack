@@ -46,7 +46,7 @@ namespace ServiceStack.Metadata
                         ? postRoute.Path 
                         : Operation.Routes[0].Path;
                     return HostContext.Config.HandlerFactoryPath != null
-                        ? "/" + HostContext.Config.HandlerFactoryPath.CombineWith(path)
+                        ? "/" + HostContext.Config.HandlerFactoryPath.AppendPath(path)
                         : path;
                 }
 
@@ -62,7 +62,7 @@ namespace ServiceStack.Metadata
             var baseUrl = HttpRequest.GetBaseUrl();
             var renderedTemplate = HtmlTemplates.Format(HtmlTemplates.GetOperationControlTemplate(),
                 Title,
-                baseUrl.CombineWith(MetadataConfig.DefaultMetadataUri),
+                baseUrl.AppendPath(MetadataConfig.DefaultMetadataUri),
                 ContentFormat.ToUpper(),
                 OperationName,
                 GetHttpRequestTemplate(),

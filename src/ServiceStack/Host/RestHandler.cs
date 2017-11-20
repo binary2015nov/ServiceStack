@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using ServiceStack.Host.Handlers;
+using ServiceStack.Logging;
 using ServiceStack.MiniProfiler;
 using ServiceStack.Web;
+using ServiceStack.Text;
 
 namespace ServiceStack.Host
 {
     public class RestHandler : ServiceStackHandlerBase, IRequestHttpHandler
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(RestHandler));
+
         public RestHandler()
         {
             this.HandlerAttributes = RequestAttributes.Reply;
@@ -45,9 +49,6 @@ namespace ServiceStack.Host
             return pathInfo;
         }
 
-        // Set from SSHHF.GetHandlerForPathInfo()
-        public string ResponseContentType { get; set; }
-
         public override bool RunAsAsync() => true;
 
         public override async Task ProcessRequestAsync(IRequest httpReq, IResponse httpRes, string operationName)
@@ -62,9 +63,6 @@ namespace ServiceStack.Host
 
                 if (appHost.ApplyPreRequestFilters(httpReq, httpRes))
                     return;
-
-                if (ResponseContentType != null)
-                    httpReq.ResponseContentType = ResponseContentType;
 
                 appHost.AssertContentType(httpReq.ResponseContentType);
 
@@ -91,9 +89,11 @@ namespace ServiceStack.Host
             }
             catch (Exception ex)
             {
+                Logger.Error(ex);
                 if (!appHost.Config.WriteErrorsToResponse)
                 {
                     await appHost.ApplyResponseConvertersAsync(httpReq, ex);
+                    httpRes.EndRequest();
                 }
                 else
                 {
@@ -103,7 +103,7 @@ namespace ServiceStack.Host
             }
         }
 
-        public static Task<object> CreateRequestAsync(IRequest httpReq, IRestPath restPath)
+        public static async Task<object> CreateRequestAsync(IRequest httpReq, IRestPath restPath)
         {
             if (restPath == null)
                 throw new ArgumentNullException(nameof(restPath));
@@ -112,18 +112,17 @@ namespace ServiceStack.Host
             {
                 var dtoFromBinder = GetCustomRequestFromBinder(httpReq, restPath.RequestType);
                 if (dtoFromBinder != null)
-                    return HostContext.AppHost.ApplyRequestConvertersAsync(httpReq, dtoFromBinder);
+                    return await HostContext.AppHost.ApplyRequestConvertersAsync(httpReq, dtoFromBinder);
 
                 var requestParams = httpReq.GetFlattenedRequestParams();
-                var taskResponse = HostContext.AppHost.ApplyRequestConvertersAsync(httpReq,
+                return await HostContext.AppHost.ApplyRequestConvertersAsync(httpReq,
                     CreateRequest(httpReq, restPath, requestParams));
-
-                return taskResponse;
             }
         }
 
         public static object CreateRequest(IRequest httpReq, IRestPath restPath, Dictionary<string, string> requestParams)
         {
+            Logger.Info(httpReq.ContentType);
             var requestDto = CreateContentTypeRequest(httpReq, restPath.RequestType, httpReq.ContentType);
 
             return CreateRequest(httpReq, restPath, requestParams, requestDto);

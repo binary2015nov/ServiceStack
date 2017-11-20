@@ -45,7 +45,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         class AppHost : AppSelfHostBase
         {
-            public AppHost() : base(nameof(VirtualFileSystemMappingTests), typeof(FileSystemMappingService).GetAssembly()) { }
+            public AppHost() : base(nameof(VirtualFileSystemMappingTests), typeof(FileSystemMappingService).Assembly) { }
 
             public override void Configure(Container container) { }
 

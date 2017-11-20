@@ -11,7 +11,6 @@ using MySql.Data.MySqlClient.Memcached;
 using NUnit.Framework;
 using ServiceStack.Auth;
 using ServiceStack.Configuration;
-using ServiceStack.Logging;
 using ServiceStack.Redis;
 using ServiceStack.Text;
 
@@ -255,7 +254,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public void TestFixtureTearDown()
         {
 
-            var redisEvents = appHost.Resolve<IServerEvents>() as RedisServerEvents;
+            var redisEvents = appHost.Resolve<IServerEvents>();
             if (redisEvents != null)
                 redisEvents.Dispose();
 
@@ -826,7 +825,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        [Test, Ignore("weired fail")]
+        [Test]
         public async Task Does_receive_messages_on_to_clients_subscribed_on_multiple_channels()
         {
             using (var clientA = CreateServerEventsClient("A"))
@@ -1125,7 +1124,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        [Test, Ignore("weird")]
+        [Test]
         public async Task Can_unsubscribe_from_channels_whilst_connected()
         {
             var msgs1 = new List<ServerEventMessage>();
@@ -1257,42 +1256,31 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         {
             using (var client = CreateServerEventsClient())
             {
-                10.Times(i =>
-                {
-                    ThreadPool.QueueUserWorkItem(_ => client.Start());
-                });
-
+                Parallel.For(0, 10, _ => client.Start());
+              
                 Thread.Sleep(200);
                 Assert.That(client.TimesStarted, Is.EqualTo(1));
 
-                10.Times(i =>
-                {
-                    ThreadPool.QueueUserWorkItem(_ => client.Restart());
-                });
+                Parallel.For(0, 10, _ => client.Restart());
+
                 Thread.Sleep(200);
                 Assert.That(client.TimesStarted, Is.EqualTo(2));
 
-                10.Times(i =>
-                {
-                    ThreadPool.QueueUserWorkItem(_ => client.Stop());
-                });
+                Parallel.For(0, 10, _ => client.Stop());
+
                 Thread.Sleep(200);
                 Assert.That(client.TimesStarted, Is.EqualTo(2));
 
                 // A stopped client doesn't get restarted
-                10.Times(i =>
-                {
-                    ThreadPool.QueueUserWorkItem(_ => client.Restart());
-                });
+                Parallel.For(0, 10, _ => client.Restart());
+
                 Thread.Sleep(200);
                 Assert.That(client.TimesStarted, Is.EqualTo(2));
 
-                // Can restart a stopped client
-                10.Times(i =>
-                {
-                    ThreadPool.QueueUserWorkItem(_ => client.Start());
-                });
-                Thread.Sleep(500);
+                // Can start a stopped client
+                Parallel.For(0, 10, _ => client.Start());
+
+                Thread.Sleep(200);
                 Assert.That(client.TimesStarted, Is.EqualTo(3));
             }
         }
@@ -1611,7 +1599,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             if (task != await Task.WhenAny(task, Task.Delay(timeMs)))
                 throw new TimeoutException();
 
-            return await task;
+            return task.Result;
         }
     }
 }

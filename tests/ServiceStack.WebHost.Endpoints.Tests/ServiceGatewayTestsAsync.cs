@@ -375,7 +375,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
-
     public abstract class ServiceGatewayAsyncTests
     {
         public class MessageFactory : IMessageFactory
@@ -410,6 +409,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
+            ServiceStack.Logging.LogManager.LogFactory = new ServiceStack.Logging.DebugLogFactory();
+
             appHost = CreateAppHost()
                 .Init()
                 .Start(Config.ListeningOn);

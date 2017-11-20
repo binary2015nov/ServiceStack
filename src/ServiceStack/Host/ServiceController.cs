@@ -346,10 +346,11 @@ namespace ServiceStack.Host
             }
         }
 
-        [Obsolete("Use ApplyResponseFiltersAsync")]
         public object ApplyResponseFilters(object response, IRequest req)
         {
-            return ApplyResponseFiltersAsync(response, req).Result;
+            var task = ApplyResponseFiltersAsync(response, req);
+            task.Wait();
+            return task.Result;
         }
 
         private async Task<object> ApplyResponseFiltersAsync(object response, IRequest req)
@@ -445,7 +446,9 @@ namespace ServiceStack.Host
 
                 if (applyFilters)
                 {
-                    requestDto = appHost.ApplyRequestConvertersAsync(req, requestDto).Result;
+                    var task = appHost.ApplyRequestConvertersAsync(req, requestDto);
+                    task.Wait();
+                    requestDto = task.Result;
 
                     appHost.ApplyRequestFiltersAsync(req, req.Response, requestDto).Wait();
                     if (req.Response.IsClosed)
@@ -455,7 +458,7 @@ namespace ServiceStack.Host
                 var response = Execute(requestDto, req);
 
                 return applyFilters
-                    ? ApplyResponseFiltersAsync(response, req).Result
+                    ? ApplyResponseFilters(response, req)
                     : response;
             }
             finally
@@ -473,12 +476,14 @@ namespace ServiceStack.Host
                 var restPath = HostContext.ServiceController.GetRestPathForRequest(req.Verb, req.PathInfo, req as IHttpRequest);
 
                 req.OperationName = restPath.RequestType.GetOperationName();
-                var requestDto = RestHandler.CreateRequestAsync(req, restPath).Result;
+                var task = RestHandler.CreateRequestAsync(req, restPath);
+                task.Wait();
+                var requestDto = task.Result;
                 req.Dto = requestDto;
 
                 if (applyFilters)
                 {
-                    requestDto = appHost.ApplyRequestConvertersAsync(req, requestDto).Result;
+                    requestDto = appHost.ApplyRequestConverters(req, requestDto);
 
                     appHost.ApplyRequestFiltersAsync(req, req.Response, requestDto).Wait();
                     if (req.Response.IsClosed)
@@ -488,7 +493,7 @@ namespace ServiceStack.Host
                 var response = Execute(requestDto, req);
 
                 return applyFilters
-                    ? ApplyResponseFiltersAsync(response, req).Result
+                    ? ApplyResponseFilters(response, req)
                     : response;
             }
             finally

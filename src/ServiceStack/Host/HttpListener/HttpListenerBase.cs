@@ -99,7 +99,7 @@ namespace ServiceStack.Host.HttpListener
         /// </param>
         protected void Start(string baseUrl, WaitCallback listenCallback)
         {
-            Start(new[] {baseUrl}, listenCallback);
+            Start(new[] { baseUrl }, listenCallback);
         }
 
         protected void Start(IEnumerable<string> baseUrls, WaitCallback listenCallback)
@@ -243,6 +243,9 @@ namespace ServiceStack.Host.HttpListener
             }
             catch (Exception ex)
             {
+                if (ex is ObjectDisposedException)
+                    return;
+
                 HandleError(ex, context);
             }
         }
@@ -350,10 +353,10 @@ namespace ServiceStack.Host.HttpListener
         /// </summary>
         /// <param name="context"></param>
 
-        protected virtual async Task ProcessRequestAsync(HttpListenerContext context)
+        protected virtual Task ProcessRequestAsync(HttpListenerContext context)
         {
             if (string.IsNullOrEmpty(context.Request.RawUrl))
-                return;
+                return TypeConstants.EmptyTask;
 
             RequestContext.Instance.StartRequestContext();
 
@@ -369,7 +372,7 @@ namespace ServiceStack.Host.HttpListener
                 throw new NotImplementedException($"Cannot execute handler: {handler} at PathInfo: {httpReq.PathInfo}");
 
             var task = serviceStackHandler.ProcessRequestAsync(httpReq, httpRes, operationName);
-            await HostContext.Async.ContinueWith(httpReq, task, x => httpRes.Close(), TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.AttachedToParent);
+            return HostContext.Async.ContinueWith(httpReq, task, x => httpRes.Close(), TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.AttachedToParent);
             //Matches Exceptions handled in HttpListenerBase.InitTask() 
         }
 

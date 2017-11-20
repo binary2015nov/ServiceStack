@@ -185,6 +185,7 @@ namespace ServiceStack.Host.Handlers
         {
             try
             {
+                Logger.Info(ContentTypes.Default.ContentTypeDeserializers.Count);
                 if (!contentType.IsNullOrEmpty())
                 {
                     //.NET Core HttpClient Zip Content-Length omission is reported as 0
@@ -210,9 +211,8 @@ namespace ServiceStack.Host.Handlers
 
         protected static object GetCustomRequestFromBinder(IRequest httpReq, Type requestType)
         {
-            Func<IRequest, object> requestFactoryFn;
             HostContext.ServiceController.RequestTypeFactoryMap.TryGetValue(
-                requestType, out requestFactoryFn);
+                requestType, out Func<IRequest, object> requestFactoryFn);
 
             return requestFactoryFn?.Invoke(httpReq);
         }

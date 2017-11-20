@@ -51,9 +51,7 @@ namespace ServiceStack.ServiceHost.Tests.Formats_Razor
             }.Init();
         }
 
-        protected virtual void InitializeFileSystem(MemoryVirtualFiles fileSystem)
-        {
-        }
+        protected virtual void InitializeFileSystem(MemoryVirtualFiles fileSystem) { }
 
         [Test]
         public void Can_compile_simple_template()

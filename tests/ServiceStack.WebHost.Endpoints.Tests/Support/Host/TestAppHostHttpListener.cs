@@ -4,7 +4,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests.Support.Host
 {
 	public class TestAppHostHttpListener : AppHostHttpListenerBase
 	{
-		public TestAppHostHttpListener() : base("Example Service", typeof(TestService).GetAssembly()) { }
+		public TestAppHostHttpListener() : base("Example Service", typeof(TestService).Assembly) { }
 
 		public override void Configure(Funq.Container container)
 		{

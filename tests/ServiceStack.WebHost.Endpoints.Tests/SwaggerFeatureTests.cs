@@ -291,7 +291,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
 		public class SwaggerFeatureAppHostHttpListener : AppHostHttpListenerBase
 		{
-			public SwaggerFeatureAppHostHttpListener() : base("Swagger Feature Tests", typeof(SwaggerFeatureServiceTests).GetAssembly())
+			public SwaggerFeatureAppHostHttpListener() : base("Swagger Feature Tests", typeof(SwaggerFeatureServiceTests).Assembly)
 			{
 				Config.DebugMode = true; //Show StackTraces for easier debugging
 

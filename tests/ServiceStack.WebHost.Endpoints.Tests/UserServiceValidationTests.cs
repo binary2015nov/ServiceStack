@@ -65,7 +65,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         public class UserAppHostHttpListener : AppHostHttpListenerBase
         {
-            public UserAppHostHttpListener() : base("Validation Tests", typeof(UserValidationService).GetAssembly()) { }
+            public UserAppHostHttpListener() : base("Validation Tests", typeof(UserValidationService).Assembly) { }
 
             public override void Configure(Container container)
             {

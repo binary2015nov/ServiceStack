@@ -80,7 +80,7 @@ namespace ServiceStack
 
         public bool IsStopped => Interlocked.CompareExchange(ref status, 0, 0) == WorkerStatus.Stopped;
         public string Status => WorkerStatus.ToString(Interlocked.CompareExchange(ref status, 0, 0));
-        public int TimesStarted => Interlocked.CompareExchange(ref timesStarted, 0, 0);
+        public int TimesStarted => timesStarted;
 
         byte[] buffer;
         readonly Encoding encoding = Encoding.UTF8;
@@ -302,7 +302,7 @@ namespace ServiceStack
 
             EnsureSynchronizationContext();
 
-            HttpUtils.GetStringFromUrlAsync(ConnectionInfo.HeartbeatUrl, requestFilter: req => {
+            ConnectionInfo.HeartbeatUrl.GetStringFromUrlAsync(requestFilter: req => {
                     var hold = httpReq;
                     if (hold != null)
                         req.CookieContainer = hold.CookieContainer;
@@ -734,7 +734,7 @@ namespace ServiceStack
             {
                 EnsureSynchronizationContext();
                 try {
-                    HttpUtils.GetStringFromUrl(ConnectionInfo.UnRegisterUrl, requestFilter: req =>
+                    ConnectionInfo.UnRegisterUrl.GetStringFromUrl(requestFilter: req =>
                     {
                         var hold = httpReq;
                         if (hold != null)
@@ -834,7 +834,7 @@ namespace ServiceStack
                 sb.AppendLine("===============");
                 sb.AppendLine("Current Status: " + Status);
                 sb.AppendLine("Listening On: " + EventStreamUri);
-                sb.AppendLine("Times Started: " + Interlocked.CompareExchange(ref timesStarted, 0, 0));
+                sb.AppendLine("Times Started: " + TimesStarted);
                 sb.AppendLine("Num of Errors: " + Interlocked.CompareExchange(ref noOfErrors, 0, 0));
                 sb.AppendLine("Num of Continuous Errors: " + Interlocked.CompareExchange(ref noOfContinuousErrors, 0, 0));
                 sb.AppendLine("Last ErrorMsg: " + lastExMsg);

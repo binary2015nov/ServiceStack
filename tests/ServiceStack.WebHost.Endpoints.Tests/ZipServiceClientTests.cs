@@ -51,7 +51,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         class ZipAppHost : AppSelfHostBase
         {
-            public ZipAppHost() : base(nameof(ZipServiceClientTests), typeof(HelloZipService).GetAssembly()) { }
+            public ZipAppHost() : base(nameof(ZipServiceClientTests), typeof(HelloZipService).Assembly) { }
 
             public override void Configure(Funq.Container container) { }
         }

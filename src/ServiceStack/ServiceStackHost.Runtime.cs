@@ -36,6 +36,20 @@ namespace ServiceStack
 {
     public abstract partial class ServiceStackHost
     {
+        public virtual object ApplyRequestConverters(IRequest req, object requestDto)
+        {
+            foreach (var converter in RequestConverters)
+            {
+                var task = converter(req, requestDto);
+                task.Wait();
+                requestDto = task.Result ?? requestDto;
+                if (req.Response.IsClosed)
+                    return requestDto;
+            }
+
+            return requestDto;
+        }
+
         public virtual async Task<object> ApplyRequestConvertersAsync(IRequest req, object requestDto)
         {
             foreach (var converter in RequestConverters)

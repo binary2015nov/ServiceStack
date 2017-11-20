@@ -1,8 +1,8 @@
 /* Options:
-Date: 2017-11-07 22:43:17
+Date: 2017-11-17 15:47:53
 Version: 5.00
 Tip: To override a DTO option, remove "//" prefix before updating
-BaseUrl: http://localhost:55799
+BaseUrl: http://localhost:55799/
 
 //GlobalNamespace: 
 //MakePartial: True
