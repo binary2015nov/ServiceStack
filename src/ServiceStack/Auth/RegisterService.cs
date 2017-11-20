@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
 using ServiceStack.FluentValidation;
@@ -94,13 +95,12 @@ namespace ServiceStack.Auth
             {
                 var existingUser = session.IsAuthenticated ? AuthRepository.GetUserAuth(session, null) : null;
                 registerNewUser = existingUser == null;
-                if (!HostContext.HasPlugin<ValidationFeature>() && RegistrationValidator != null)
-                {
-                    if (RegistrationValidator is IRequiresRequest)
-                        ((IRequiresRequest)RegistrationValidator).Request = base.Request;
 
-                    RegistrationValidator.ValidateAndThrow(request, registerNewUser ? ApplyTo.Post : ApplyTo.Put);
+                if (!HostContext.AppHost.GlobalRequestFiltersArray.Contains(ValidationFilters.RequestFilter)) //Already gets run
+                {
+                    RegistrationValidator?.ValidateAndThrow(request, registerNewUser ? ApplyTo.Post : ApplyTo.Put);
                 }
+                
                 if (!registerNewUser && DisableUpdates)
                     throw new NotSupportedException(ErrorMessages.RegisterUpdatesDisabled);
 
@@ -129,22 +129,24 @@ namespace ServiceStack.Auth
                 if (authResponse is Exception)
                     throw (Exception)authResponse;
 
-                var typedAuthResponse = authResponse as AuthenticateResponse;
-                if (typedAuthResponse != null)
-                {
-                    responseDto = new RegisterResponse
+                    if (authResponse is AuthenticateResponse typedResponse)
                     {
-                        SessionId = typedAuthResponse.SessionId,
-                        UserName = typedAuthResponse.UserName,
-                        ReferrerUrl = typedAuthResponse.ReferrerUrl,
-                        UserId = user.Id.ToString(CultureInfo.InvariantCulture),
-                        BearerToken = typedAuthResponse.BearerToken,
-                        RefreshToken = typedAuthResponse.RefreshToken,
-                    };
+                        response = new RegisterResponse
+                        {
+                            SessionId = typedResponse.SessionId,
+                            UserName = typedResponse.UserName,
+                            ReferrerUrl = typedResponse.ReferrerUrl,
+                            UserId = user.Id.ToString(CultureInfo.InvariantCulture),
+                            BearerToken = typedResponse.BearerToken,
+                            RefreshToken = typedResponse.RefreshToken,
+                        };
+                    }
                 }
             }
+
             if (registerNewUser)
             {
+                session = this.GetSession();
                 if (!request.AutoLogin)
                     session.PopulateSession(user, new List<IAuthTokens>());
 

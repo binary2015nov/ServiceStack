@@ -53,11 +53,9 @@ namespace ServiceStack.Host.AspNet
                         Items[(string)key] = httpContext.Items[key];
                 }
             }
-            this.OriginalPathInfo = GetPathInfo();
-            this.PathInfo = HostContext.AppHost.ResolvePathInfo(this, OriginalPathInfo, out bool isDirectory);
-            this.IsDirectory = isDirectory;
-            this.IsFile = !isDirectory && GetFile() != null;
-            httpContext.Items[Keywords.IRequest] = this;
+
+            this.PathInfo = this.OriginalPathInfo = GetPathInfo();
+            this.PathInfo = HostContext.AppHost.ResolvePathInfo(this, OriginalPathInfo);
         }
 
         public HttpRequestBase HttpRequest => request;
@@ -244,7 +242,7 @@ namespace ServiceStack.Host.AspNet
 
         public string[] AcceptTypes => request.AcceptTypes;
 
-        public string PathInfo { get; private set; }
+        public string PathInfo { get; }
 
         public string OriginalPathInfo { get; }
 
@@ -307,16 +305,43 @@ namespace ServiceStack.Host.AspNet
         }
 
         public Uri UrlReferrer => request.UrlReferrer;
+        
+        
+        private IVirtualFile file;
+        public IVirtualFile GetFile() => file ?? (file = HostContext.VirtualFileSources.GetFile(PathInfo));
 
-        private IVirtualFile virtualFile;
-        public IVirtualFile GetFile() => virtualFile ?? (virtualFile = HostContext.VirtualFileSources.GetFile(PathInfo));
+        private IVirtualDirectory dir;
+        public IVirtualDirectory GetDirectory() => dir ?? (dir = HostContext.VirtualFileSources.GetDirectory(PathInfo));
 
-        private IVirtualDirectory virtualDirectory;
-        public IVirtualDirectory GetDirectory() => virtualDirectory ?? (virtualDirectory = HostContext.VirtualFileSources.GetDirectory(PathInfo));
+        private bool? isDirectory;
+        public bool IsDirectory
+        {
+            get
+            {
+                if (isDirectory == null)
+                {
+                    isDirectory = dir != null || HostContext.VirtualFileSources.DirectoryExists(PathInfo);
+                    if (isDirectory == true)
+                        isFile = false;
+                }
+                return isDirectory.Value;
+            }
+        }
 
-        public bool IsDirectory { get; private set; }
-
-        public bool IsFile { get; private set; }
+        private bool? isFile;
+        public bool IsFile
+        {
+            get
+            {
+                if (isFile == null)
+                {
+                    isFile = GetFile() != null;
+                    if (isFile == true)
+                        isDirectory = false;                    
+                }
+                return isFile.Value;
+            }
+        }
 
         public string PhysicalPath { get; set; }
     }

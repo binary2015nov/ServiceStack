@@ -104,8 +104,7 @@ namespace ServiceStack.Validation
 
         public static bool HasAsyncValidators(this IValidator validator, string ruleSet = null)
         {
-            var rules = validator as IEnumerable<IValidationRule>;
-            if (rules != null)
+            if (validator is IEnumerable<IValidationRule> rules)
             {
                 foreach (var rule in rules)
                 {

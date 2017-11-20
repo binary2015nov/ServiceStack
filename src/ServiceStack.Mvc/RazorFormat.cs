@@ -319,9 +319,9 @@ namespace ServiceStack.Mvc
                 {
                     viewData[pair.Key] = req.QueryString[pair.Value];
                 }
-                foreach (string key in req.FormData.AllKeys)
+                foreach (var key in req.FormData.AllKeys)
                 {
-                    viewData[key] = req.QueryString[key];
+                    viewData[key] = req.FormData[key];
                 }
                 foreach (var entry in req.Items)
                 {
@@ -517,9 +517,9 @@ namespace ServiceStack.Mvc
 
         protected virtual void ClearSession() => ServiceStackProvider.ClearSession();
 
-        protected virtual T TryResolve<T>() => ServiceStackProvider.TryResolve<T>();
+        protected virtual TDependency TryResolve<TDependency>() => ServiceStackProvider.TryResolve<TDependency>();
 
-        protected virtual T ResolveService<T>() => ServiceStackProvider.ResolveService<T>();
+        protected virtual TService ResolveService<TService>() => ServiceStackProvider.ResolveService<TService>();
 
         protected virtual object ForwardRequestToServiceStack(IRequest request = null) => ServiceStackProvider.Execute(request ?? ServiceStackProvider.Request);
 

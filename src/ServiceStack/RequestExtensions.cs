@@ -221,8 +221,7 @@ namespace ServiceStack
         {
             if (httpReq == null) return null;
 
-            object value;
-            httpReq.Items.TryGetValue(key, out value);
+            httpReq.Items.TryGetValue(key, out var value);
             return value;
         }
 
