@@ -36,7 +36,7 @@ namespace ServiceStack
 {
     public abstract partial class ServiceStackHost
     {
-        public virtual object ApplyRequestConverters(IRequest req, object requestDto)
+        public object ApplyRequestConverters(IRequest req, object requestDto)
         {
             foreach (var converter in RequestConverters)
             {
@@ -50,7 +50,7 @@ namespace ServiceStack
             return requestDto;
         }
 
-        public virtual async Task<object> ApplyRequestConvertersAsync(IRequest req, object requestDto)
+        public async Task<object> ApplyRequestConvertersAsync(IRequest req, object requestDto)
         {
             foreach (var converter in RequestConverters)
             {
@@ -62,7 +62,7 @@ namespace ServiceStack
             return requestDto;
         }
 
-        public virtual async Task<object> ApplyResponseConvertersAsync(IRequest req, object responseDto)
+        public async Task<object> ApplyResponseConvertersAsync(IRequest req, object responseDto)
         {
             foreach (var converter in ResponseConverters)
             {
@@ -77,7 +77,7 @@ namespace ServiceStack
         /// <summary>
         /// Apply PreRequest Filters for participating Custom Handlers, e.g. RazorFormat, MarkdownFormat, etc
         /// </summary>
-        public virtual bool ApplyCustomHandlerRequestFilters(IRequest httpReq, IResponse httpRes)
+        public bool ApplyCustomHandlerRequestFilters(IRequest httpReq, IResponse httpRes)
         {
             return ApplyPreRequestFilters(httpReq, httpRes);
         }
@@ -87,7 +87,7 @@ namespace ServiceStack
         /// and no more processing should be done.
         /// </summary>
         /// <returns></returns>
-        public virtual bool ApplyPreRequestFilters(IRequest httpReq, IResponse httpRes)
+        public bool ApplyPreRequestFilters(IRequest httpReq, IResponse httpRes)
         {
             if (PreRequestFilters.Count == 0)
                 return false;
@@ -105,7 +105,7 @@ namespace ServiceStack
         }
 
         [Obsolete("Use ApplyRequestFiltersAsync")]
-        public virtual bool ApplyRequestFilters(IRequest req, IResponse res, object requestDto)
+        public bool ApplyRequestFilters(IRequest req, IResponse res, object requestDto)
         {
             ApplyRequestFiltersAsync(req, res, requestDto).Wait();
             return res.IsClosed;
@@ -116,7 +116,7 @@ namespace ServiceStack
         /// and no more processing should be done.
         /// </summary>
         /// <returns></returns>
-        public virtual async Task ApplyRequestFiltersAsync(IRequest req, IResponse res, object requestDto)
+        public async Task ApplyRequestFiltersAsync(IRequest req, IResponse res, object requestDto)
         {
             if (req == null) throw new ArgumentNullException(nameof(req));
             if (res == null) throw new ArgumentNullException(nameof(res));
@@ -142,7 +142,7 @@ namespace ServiceStack
             }
         }
 
-        protected virtual async Task ApplyRequestFiltersSingleAsync(IRequest req, IResponse res, object requestDto)
+        protected async Task ApplyRequestFiltersSingleAsync(IRequest req, IResponse res, object requestDto)
         {
             //Exec all RequestFilter attributes with Priority < 0
             var attributes = FilterAttributeCache.GetRequestFilterAttributes(requestDto.GetType());
@@ -198,7 +198,7 @@ namespace ServiceStack
         }
 
         [Obsolete("Use ApplyResponseFiltersAsync")]
-        public virtual bool ApplyResponseFilters(IRequest req, IResponse res, object response)
+        public bool ApplyResponseFilters(IRequest req, IResponse res, object response)
         {
             ApplyResponseFiltersAsync(req, res, response).Wait();
             return res.IsClosed;
@@ -209,7 +209,7 @@ namespace ServiceStack
         /// and no more processing should be done.
         /// </summary>
         /// <returns></returns>
-        public virtual async Task ApplyResponseFiltersAsync(IRequest req, IResponse res, object response)
+        public async Task ApplyResponseFiltersAsync(IRequest req, IResponse res, object response)
         {
             if (req == null) throw new ArgumentNullException(nameof(req));
             if (res == null) throw new ArgumentNullException(nameof(res));
@@ -235,7 +235,7 @@ namespace ServiceStack
             }
         }
 
-        protected virtual async Task ApplyResponseFiltersSingleAsync(IRequest req, IResponse res, object response)
+        protected async Task ApplyResponseFiltersSingleAsync(IRequest req, IResponse res, object response)
         {
             var attributes = req.Dto != null
                 ? FilterAttributeCache.GetResponseFilterAttributes(req.Dto.GetType())
@@ -303,7 +303,7 @@ namespace ServiceStack
             }
         }
 
-        public virtual bool ApplyMessageRequestFilters(IRequest req, IResponse res, object requestDto)
+        public bool ApplyMessageRequestFilters(IRequest req, IResponse res, object requestDto)
         {
             ExecTypedFilters(GlobalTypedMessageRequestFilters, req, res, requestDto);
             if (res.IsClosed) return res.IsClosed;
@@ -324,7 +324,7 @@ namespace ServiceStack
             return res.IsClosed;
         }
 
-        public virtual bool ApplyMessageResponseFilters(IRequest req, IResponse res, object response)
+        public bool ApplyMessageResponseFilters(IRequest req, IResponse res, object response)
         {
             ExecTypedFilters(GlobalTypedMessageResponseFilters, req, res, response);
             if (res.IsClosed) return res.IsClosed;
@@ -339,7 +339,7 @@ namespace ServiceStack
             return res.IsClosed;
         }
 
-        public virtual void ExecTypedFilters(Dictionary<Type, ITypedFilter> typedFilters,
+        public void ExecTypedFilters(Dictionary<Type, ITypedFilter> typedFilters,
             IRequest req, IResponse res, object dto)
         {
             if (typedFilters.Count == 0) return;
@@ -366,7 +366,7 @@ namespace ServiceStack
 
         public MetadataPagesConfig MetadataPagesConfig => new MetadataPagesConfig(Metadata, ContentTypes.ContentTypeFormats.Keys);
 
-        public virtual TimeSpan GetDefaultSessionExpiry(IRequest req)
+        public TimeSpan GetDefaultSessionExpiry(IRequest req)
         {
             var sessionFeature = this.GetPlugin<SessionFeature>();
             if (sessionFeature != null)

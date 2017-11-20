@@ -672,7 +672,6 @@ namespace ServiceStack.Server.Tests.Auth
 
         public StatelessAuthTests()
         {
-            //LogManager.LogFactory = new ConsoleLogFactory();
             appHost = CreateAppHost()
                .Init()
                .Start("http://*:2337/");
@@ -708,7 +707,7 @@ namespace ServiceStack.Server.Tests.Auth
             var user2Client = GetClientWithUserPassword(alwaysSend: true, userName: "user2");
             ApiKeyWithRole = user2Client.Get(new GetApiKeys { Environment = "live" }).Results[0].Key;
 
-            ListeningOn.CombineWith("/assignroles").AddQueryParam("authsecret", "secret")
+            ListeningOn.AppendPath("/assignroles").AddQueryParam("authsecret", "secret")
                 .PostJsonToUrl(new AssignRoles
                 {
                     UserName = "user2",
@@ -758,8 +757,8 @@ namespace ServiceStack.Server.Tests.Auth
         [Test]
         public void Does_create_multiple_ApiKeys()
         {
-            if (GetType() == typeof(OrmLiteMultitenancyStatelessAuthTests))
-                return;
+            //if (GetType() == typeof(OrmLiteMultitenancyStatelessAuthTests))
+            //    return;
 
             var apiKeys = apiRepo.GetUserApiKeys(userId);
             Assert.That(apiKeys.Count, Is.EqualTo(
@@ -834,8 +833,8 @@ namespace ServiceStack.Server.Tests.Auth
         [Test]
         public void Doesnt_allow_using_expired_keys()
         {
-            if (GetType() == typeof(OrmLiteMultitenancyStatelessAuthTests))
-                return;
+            //if (GetType() == typeof(OrmLiteMultitenancyStatelessAuthTests))
+            //    return;
 
             var client = new JsonServiceClient(ListeningOn)
             {

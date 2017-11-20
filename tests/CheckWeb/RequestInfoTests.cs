@@ -14,7 +14,7 @@ namespace CheckWeb
 
         private RequestInfoResponse GetRequestInfoForPath(string path)
         {
-            var url = BaseUrl.CombineWith(path).AddQueryParam("debug", "requestinfo");
+            var url = BaseUrl.AppendPath(path).AddQueryParam("debug", "requestinfo");
             var json = url.GetJsonFromUrl();
             var info = json.FromJson<RequestInfoResponse>();
             return info;
@@ -54,7 +54,7 @@ namespace CheckWeb
     {
         private void DoesRedirectToRemoveTrailingSlash(string dirWIthoutSlash)
         {
-            BaseUrl.CombineWith(dirWIthoutSlash)
+            BaseUrl.AppendPath(dirWIthoutSlash)
                 .GetStringFromUrl(accept: MimeTypes.Html,
                     requestFilter: req => req.AllowAutoRedirect = false,
                     responseFilter: res =>
@@ -67,7 +67,7 @@ namespace CheckWeb
 
         private void DoesRedirectToAddTrailingSlash(string dirWithoutSlash)
         {
-            BaseUrl.CombineWith(dirWithoutSlash)
+            BaseUrl.AppendPath(dirWithoutSlash)
                 .GetStringFromUrl(accept: MimeTypes.Html,
                     requestFilter: req => req.AllowAutoRedirect = false,
                     responseFilter: res =>

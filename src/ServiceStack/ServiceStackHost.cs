@@ -416,7 +416,7 @@ namespace ServiceStack
         public virtual List<IVirtualPathProvider> GetVirtualFileSources()
         {
             var pathProviders = new List<IVirtualPathProvider> {
-                new FileSystemVirtualFiles(WebHostPhysicalPath)
+                new FileSystemVirtualFiles(GetWebRootPath())
             };
 
             pathProviders.AddRange(Config.EmbeddedResourceSources
@@ -886,12 +886,9 @@ namespace ServiceStack
             return relativePath.MapProjectPath();
         }
 
-        public virtual string ResolvePathInfo(IRequest request, string originalPathInfo, out bool isDirectory)
+        public virtual string ResolvePathInfo(IRequest request, string originalPathInfo)
         {
-            var pathInfo = NormalizePathInfo(originalPathInfo, Config.HandlerFactoryPath);
-            isDirectory = VirtualFileSources.DirectoryExists(pathInfo);
-
-            return pathInfo;
+            return NormalizePathInfo(originalPathInfo, Config.HandlerFactoryPath);     
         }
 
         private static string NormalizePathInfo(string pathInfo, string mode)

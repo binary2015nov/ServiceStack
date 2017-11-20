@@ -37,7 +37,6 @@ using Check.ServiceModel.Operations;
 using Check.ServiceModel.Types;
 using CheckWeb;
 
-
 namespace Check.ServiceInterface
 {
 

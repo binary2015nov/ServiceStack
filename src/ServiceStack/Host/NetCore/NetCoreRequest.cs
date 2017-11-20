@@ -44,6 +44,7 @@ namespace ServiceStack.Host.NetCore
             //Kestrel does not decode '+' into space
             this.PathInfo = this.OriginalPathInfo = (pathInfo ?? request.Path.Value).Replace("+", " ");  
             this.PathInfo = HostContext.AppHost.ResolvePathInfo(this, PathInfo);
+            this.PhysicalPath = this.GetPhysicalPath();
         }
 
         public T TryResolve<T>()

@@ -115,7 +115,7 @@ namespace ServiceStack
         {
             var httpContext = context.Request.RequestContext.HttpContext;
             var opeationName = HostContext.AppHost.Config.StripApplicationVirtualPath? url.TrimPrefixes(context.Request.ApplicationPath) : url;
-            var httpReq = new ServiceStack.Host.AspNet.AspNetRequest(httpContext, opeationName) { PhysicalPath = pathTranslated };
+            var httpReq = new ServiceStack.Host.AspNet.AspNetRequest(httpContext, opeationName);
             return GetHandler(httpReq);
         }
 #endif
@@ -188,12 +188,6 @@ namespace ServiceStack
             var appHost = HostContext.AppHost;
 
             var pathInfo = httpReq.PathInfo;
-            var isFile = httpReq.IsFile();
-            var isDirectory = httpReq.IsDirectory();
-
-            if (!isFile && !isDirectory && Env.IsMono)
-                isDirectory = StaticFileHandler.MonoDirectoryExists(filePath, filePath.Substring(0, filePath.Length - pathInfo.Length));
-
             var httpMethod = httpReq.Verb;
 
             var pathParts = pathInfo.TrimStart('/').Split('/');
@@ -203,23 +197,26 @@ namespace ServiceStack
             if (restPath != null)
                 return new RestHandler { RequestName = restPath.RequestType.GetOperationName() };
 
+            var catchAllHandler = GetCatchAllHandlerIfAny(httpMethod, pathInfo, filePath);
+            if (catchAllHandler != null)
+                return catchAllHandler;
+
+            var isFile = httpReq.IsFile();
+            var isDirectory = httpReq.IsDirectory();
+
+            if (!isFile && !isDirectory && Env.IsMono)
+                isDirectory = StaticFileHandler.MonoDirectoryExists(filePath, filePath.Substring(0, filePath.Length - pathInfo.Length));
+
             if (isFile || isDirectory)
             {
                 //If pathInfo is for Directory try again with redirect including '/' suffix
                 if (appHost.Config.RedirectDirectoriesToTrailingSlashes && isDirectory && !httpReq.OriginalPathInfo.EndsWith("/"))
                     return new RedirectHttpHandler { RelativeUrl = pathInfo + "/" };
-
-                var catchAllHandler = GetCatchAllHandlerIfAny(httpMethod, pathInfo, filePath);
-                if (catchAllHandler != null)
-                    return catchAllHandler;
-
+      
                 return isDirectory || ShouldAllow(pathInfo)
                     ? StaticFilesHandler
                     : ForbiddenHttpHandler;
             }
-
-            var handler = GetCatchAllHandlerIfAny(httpMethod, pathInfo, filePath);
-            if (handler != null) return handler;
 
             restPath = appHost.Config.FallbackRestPath?.Invoke(httpReq);
             if (restPath != null)
@@ -233,7 +230,7 @@ namespace ServiceStack
 
         private static IHttpHandler GetCatchAllHandlerIfAny(string httpMethod, string pathInfo, string filePath)
         {
-            foreach (var httpHandlerResolver in HostContext.CatchAllHandlers)
+            foreach (var httpHandlerResolver in HostContext.AppHost.CatchAllHandlers)
             {
                 var httpHandler = httpHandlerResolver(httpMethod, pathInfo, filePath);
                 if (httpHandler != null)

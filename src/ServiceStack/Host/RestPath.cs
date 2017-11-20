@@ -15,7 +15,7 @@ namespace ServiceStack.Host
         private const char WildCardChar = '*';
         private const string PathSeparator = "/";
         private const char PathSeparatorChar = '/';
-        private static readonly char[] PathSeparatorCharArray = {'/'};
+        private static readonly char[] PathSeparatorChars = {'/'};
         private const char ComponentSeparator = '.';
         private const string VariablePrefix = "{";
 
@@ -79,7 +79,7 @@ namespace ServiceStack.Host
         public static string[] GetPathPartsForMatching(string pathInfo)
         {
             var parts = pathInfo.ToLowerInvariant()
-                .Split(PathSeparatorCharArray, StringSplitOptions.RemoveEmptyEntries);
+                .Split(PathSeparatorChars, StringSplitOptions.RemoveEmptyEntries);
 
             return parts;
         }
@@ -142,7 +142,7 @@ namespace ServiceStack.Host
 
             //We only split on '.' if the restPath has them. Allows for /{action}.{type}
             var hasSeparators = new List<bool>();
-            foreach (var component in this.Path.Split(PathSeparatorCharArray, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var component in this.Path.Split(PathSeparatorChars, StringSplitOptions.RemoveEmptyEntries))
             {
                 if (component.Contains(VariablePrefix)
                     && component.Contains(ComponentSeparator))
@@ -447,7 +447,7 @@ namespace ServiceStack.Host
 
         public object CreateRequest(string pathInfo, Dictionary<string, string> queryStringAndFormData, object fromInstance)
         {
-            var requestComponents = pathInfo.Split(PathSeparatorCharArray, StringSplitOptions.RemoveEmptyEntries);
+            var requestComponents = pathInfo.Split(PathSeparatorChars, StringSplitOptions.RemoveEmptyEntries);
 
             ExplodeComponents(ref requestComponents);
 

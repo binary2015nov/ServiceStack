@@ -18,11 +18,6 @@ namespace ServiceStack
             Config.HandlerFactoryPath = PlatformNet.InferHttpHandlerPath();
         }
 
-        public override string ResolvePhysicalPath(string virtualPath, IRequest request)
-        {
-            return ((HttpRequestBase)request.OriginalRequest).PhysicalPath;
-        }
-
         public override IRequest TryGetCurrentRequest()
         {
             try

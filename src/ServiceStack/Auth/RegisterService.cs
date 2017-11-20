@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
+using ServiceStack.Auth;
 using ServiceStack.FluentValidation;
 using ServiceStack.Validation;
 using ServiceStack.Web;
@@ -96,8 +97,11 @@ namespace ServiceStack.Auth
                 var existingUser = session.IsAuthenticated ? AuthRepository.GetUserAuth(session, null) : null;
                 registerNewUser = existingUser == null;
 
-                if (!HostContext.AppHost.GlobalRequestFiltersArray.Contains(ValidationFilters.RequestFilter)) //Already gets run
+                if (!HostContext.AppHost.GlobalRequestFilters.Contains(ValidationFilters.RequestFilter)) //Already gets run
                 {
+                    if (RegistrationValidator is IRequiresRequest)
+                        ((IRequiresRequest)RegistrationValidator).Request = base.Request;
+
                     RegistrationValidator?.ValidateAndThrow(request, registerNewUser ? ApplyTo.Post : ApplyTo.Put);
                 }
                 
@@ -129,21 +133,20 @@ namespace ServiceStack.Auth
                 if (authResponse is Exception)
                     throw (Exception)authResponse;
 
-                    if (authResponse is AuthenticateResponse typedResponse)
+                if (authResponse is AuthenticateResponse typedResponse)
+                {
+                    responseDto = new RegisterResponse
                     {
-                        response = new RegisterResponse
-                        {
-                            SessionId = typedResponse.SessionId,
-                            UserName = typedResponse.UserName,
-                            ReferrerUrl = typedResponse.ReferrerUrl,
-                            UserId = user.Id.ToString(CultureInfo.InvariantCulture),
-                            BearerToken = typedResponse.BearerToken,
-                            RefreshToken = typedResponse.RefreshToken,
-                        };
-                    }
+                        SessionId = typedResponse.SessionId,
+                        UserName = typedResponse.UserName,
+                        ReferrerUrl = typedResponse.ReferrerUrl,
+                        UserId = user.Id.ToString(CultureInfo.InvariantCulture),
+                        BearerToken = typedResponse.BearerToken,
+                        RefreshToken = typedResponse.RefreshToken,
+                    };
                 }
             }
-
+            
             if (registerNewUser)
             {
                 session = this.GetSession();

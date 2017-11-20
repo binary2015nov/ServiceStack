@@ -52,13 +52,13 @@ namespace ServiceStack
 
         private TResponse ExecSync<TResponse>(object request)
         {
-            foreach (var filter in HostContext.AppHost.GatewayRequestFiltersArray)
+            foreach (var filter in HostContext.AppHost.GatewayRequestFilters)
             {
                 filter(req, request);
                 if (req.Response.IsClosed)
                     return default(TResponse);
             }
-            foreach (var filter in HostContext.AppHost.GatewayRequestFiltersAsyncArray)
+            foreach (var filter in HostContext.AppHost.GatewayRequestFiltersAsync)
             {
                 filter(req, request).Wait();
                 if (req.Response.IsClosed)
@@ -84,13 +84,13 @@ namespace ServiceStack
 
             var responseDto = ConvertToResponse<TResponse>(response);
 
-            foreach (var filter in HostContext.AppHost.GatewayResponseFiltersArray)
+            foreach (var filter in HostContext.AppHost.GatewayResponseFilters)
             {
                 filter(req, responseDto);
                 if (req.Response.IsClosed)
                     return default(TResponse);
             }
-            foreach (var filter in HostContext.AppHost.GatewayResponseFiltersAsyncArray)
+            foreach (var filter in HostContext.AppHost.GatewayResponseFiltersAsync)
             {
                 filter(req, responseDto).Wait();
                 if (req.Response.IsClosed)
@@ -102,13 +102,13 @@ namespace ServiceStack
 
         private async Task<TResponse> ExecAsync<TResponse>(object request)
         {
-            foreach (var filter in HostContext.AppHost.GatewayRequestFiltersArray)
+            foreach (var filter in HostContext.AppHost.GatewayRequestFilters)
             {
                 filter(req, request);
                 if (req.Response.IsClosed)
                     return default(TResponse);
             }
-            foreach (var filter in HostContext.AppHost.GatewayRequestFiltersAsyncArray)
+            foreach (var filter in HostContext.AppHost.GatewayRequestFiltersAsync)
             {
                 await filter(req, request);
                 if (req.Response.IsClosed)
@@ -121,13 +121,13 @@ namespace ServiceStack
 
             var responseDto = ConvertToResponse<TResponse>(response);
 
-            foreach (var filter in HostContext.AppHost.GatewayResponseFiltersArray)
+            foreach (var filter in HostContext.AppHost.GatewayResponseFilters)
             {
                 filter(req, responseDto);
                 if (req.Response.IsClosed)
                     return default(TResponse);
             }
-            foreach (var filter in HostContext.AppHost.GatewayResponseFiltersAsyncArray)
+            foreach (var filter in HostContext.AppHost.GatewayResponseFiltersAsync)
             {
                 await filter(req, responseDto);
                 if (req.Response.IsClosed)

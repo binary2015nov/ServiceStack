@@ -362,7 +362,7 @@ namespace CheckWeb
     }
     
     [Route("/query/alltypes")]
-    public class QueryAllTypes : QueryDb<AllTypes> {}
+    public class QueryAllTypes : QueryDb<AllTypes> { }
 
     [Route("/test/html")]
     public class TestHtml : IReturn<TestHtml>

@@ -38,6 +38,7 @@ namespace ServiceStack.Host.HttpListener
             this.RequestPreferences = new RequestPreferences(this);
             this.PathInfo = this.OriginalPathInfo = GetPathInfo();
             this.PathInfo = HostContext.AppHost.ResolvePathInfo(this, OriginalPathInfo);
+            this.PhysicalPath = this.GetPhysicalPath();
         }
 
         private string GetPathInfo()

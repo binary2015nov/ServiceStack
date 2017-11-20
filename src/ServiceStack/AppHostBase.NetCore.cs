@@ -208,11 +208,6 @@ namespace ServiceStack
             }
             return null;
         }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-        }
     }
 
     public static class NetCoreAppHostExtensions
