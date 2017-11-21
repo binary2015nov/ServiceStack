@@ -89,7 +89,7 @@ namespace ServiceStack
             }
 
             var defaultRedirectHanlder = DefaultHttpHandler as RedirectHttpHandler;
-            var debugDefaultHandler = defaultRedirectHanlder != null ? defaultRedirectHanlder.RelativeUrl : null;
+            var debugDefaultHandler = defaultRedirectHanlder?.RelativeUrl;
 
             ForbiddenHttpHandler = appHost.GetCustomErrorHttpHandler(HttpStatusCode.Forbidden) ?? new ForbiddenHttpHandler
             {

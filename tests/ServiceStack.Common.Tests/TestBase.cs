@@ -22,6 +22,8 @@ namespace ServiceStack.Common.Tests
 
         protected bool HasConfigured { get; set; }
 
+        public TestBase() : this("") { }
+
         protected TestBase(string serviceClientBaseUri, params Assembly[] serviceAssemblies)
         {
             if (serviceAssemblies.Length == 0)
@@ -658,13 +660,12 @@ namespace ServiceStack.Common.Tests
                 response = DtoUtils.CreateErrorResponse(request, ex);
             }
 
-            var httpRes = response as IHttpResult;
-            if (httpRes != null)
+            if (response is IHttpResult httpRes)
             {
-                var httpError = httpRes as IHttpError;
-                if (httpError != null)
+                if (httpRes is IHttpError httpError)
                 {
-                    throw new WebServiceException(httpError.Message) {
+                    throw new WebServiceException(httpError.Message)
+                    {
                         StatusCode = httpError.Status,
                         ResponseDto = httpError.Response
                     };
@@ -673,7 +674,8 @@ namespace ServiceStack.Common.Tests
                 var status = hasResponseStatus?.ResponseStatus;
                 if (status != null && !status.ErrorCode.IsNullOrEmpty())
                 {
-                    throw new WebServiceException(status.Message) {
+                    throw new WebServiceException(status.Message)
+                    {
                         StatusCode = (int)HttpStatusCode.InternalServerError,
                         ResponseDto = httpRes.Response,
                     };
