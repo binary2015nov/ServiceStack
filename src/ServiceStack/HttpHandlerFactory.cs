@@ -115,7 +115,7 @@ namespace ServiceStack
         {
             var httpContext = context.Request.RequestContext.HttpContext;
             var opeationName = HostContext.AppHost.Config.StripApplicationVirtualPath? url.TrimPrefixes(context.Request.ApplicationPath) : url;
-            var httpReq = new ServiceStack.Host.AspNet.AspNetRequest(httpContext, opeationName);
+            var httpReq = new ServiceStack.Host.AspNet.AspNetRequest(httpContext, opeationName) { PhysicalPath = pathTranslated };
             return GetHandler(httpReq);
         }
 #endif

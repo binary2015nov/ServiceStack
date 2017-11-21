@@ -193,7 +193,6 @@ namespace ServiceStack.WebHost.IntegrationTests
 
         protected void Application_Start(object sender, EventArgs e)
         {
-            LogManager.LogFactory = new DebugLogFactory();
             new AppHost().Init();
         }
 

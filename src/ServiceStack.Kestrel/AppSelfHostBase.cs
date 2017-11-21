@@ -26,23 +26,14 @@ namespace ServiceStack
         public virtual void Bind(IApplicationBuilder app)
         {
             this.app = app;
-            Container.Adapter = new NetCoreContainerAdapter(app.ApplicationServices);
+
+            var env = app.ApplicationServices.GetService<IHostingEnvironment>();
+            WebHostPhysicalPath = env.WebRootPath ?? env.ContentRootPath;
+            Config.DebugMode = env.IsDevelopment();
+
+            AppHostBase.RegisterLicenseFromAppSettings(AppSettings);
+            Container.Adapter = new NetCoreContainerAdapter(app.ApplicationServices);           
             app.Use(ProcessRequest);
-        }
-
-        protected override void OnBeforeInit()
-        {
-            if (app != null)
-            {
-                //Initialize VFS
-                var env = app.ApplicationServices.GetService<IHostingEnvironment>();
-                WebHostPhysicalPath = env.WebRootPath ?? env.ContentRootPath;
-                Config.DebugMode = env.IsDevelopment();
-
-                //Set VirtualFiles to point to ContentRootPath (Project Folder)
-                VirtualFiles = new FileSystemVirtualFiles(env.ContentRootPath);
-                AppHostBase.RegisterLicenseFromAppSettings(AppSettings);
-            }
         }
 
         public virtual async Task ProcessRequest(HttpContext context, Func<Task> next)

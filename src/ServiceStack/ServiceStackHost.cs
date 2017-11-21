@@ -169,8 +169,7 @@ namespace ServiceStack
             }
 
             if (VirtualFiles == null)
-                VirtualFiles = pathProviders?.FirstOrDefault(x => x is FileSystemVirtualFiles) as IVirtualFiles
-                    ?? GetVirtualFileSources().FirstOrDefault(x => x is FileSystemVirtualFiles) as IVirtualFiles;
+                VirtualFiles = pathProviders?.FirstOrDefault(x => x is FileSystemVirtualFiles) as IVirtualFiles;
             try
             {
                 InitFinal();
@@ -416,7 +415,7 @@ namespace ServiceStack
         public virtual List<IVirtualPathProvider> GetVirtualFileSources()
         {
             var pathProviders = new List<IVirtualPathProvider> {
-                new FileSystemVirtualFiles(GetWebRootPath())
+                new FileSystemVirtualFiles(WebHostPhysicalPath)
             };
 
             pathProviders.AddRange(Config.EmbeddedResourceSources

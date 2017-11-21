@@ -4,7 +4,6 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using ServiceStack.Web;
-using ServiceStack.Logging;
 using ServiceStack.NetCore;
 using ServiceStack.Host;
 using ServiceStack.Host.NetCore;
@@ -14,6 +13,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using ServiceStack.Configuration;
 using ServiceStack.IO;
 
@@ -21,25 +21,25 @@ namespace ServiceStack
 {
     public abstract class AppHostBase : ServiceStackHost
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(AppHostBase));
-
         protected AppHostBase(string serviceName, params Assembly[] assembliesWithServices) 
             : base(serviceName, assembliesWithServices) { }
 
         IApplicationBuilder app;
-
         public virtual void Bind(IApplicationBuilder app)
         {
-            if (this.app == app)
-                return;
+            this.app = app;
+            var env = app.ApplicationServices.GetService<IHostingEnvironment>();
 
+            WebHostPhysicalPath = GetWebRootPath();
+            Config.DebugMode = env.IsDevelopment();
+
+            RegisterLicenseFromAppSettings(AppSettings);
             if (!Ready)
             {
                 Container.Adapter = new NetCoreContainerAdapter(app.ApplicationServices);
                 Init();
             }
             app.Use(ProcessRequest);
-            this.app = app;
         }
 
         /// <summary>
@@ -52,21 +52,6 @@ namespace ServiceStack
 
             var env = app.ApplicationServices.GetService<IHostingEnvironment>();
             return env.WebRootPath ?? env.ContentRootPath;
-        }
-
-        protected override void OnBeforeInit()
-        {
-            if (app != null)
-            {
-                //Initialize VFS
-                var env = app.ApplicationServices.GetService<IHostingEnvironment>();
-                WebHostPhysicalPath = env.ContentRootPath;
-                Config.DebugMode = env.IsDevelopment();
-
-                //Set VirtualFiles to point to ContentRootPath (Project Folder)
-                VirtualFiles = new FileSystemVirtualFiles(env.ContentRootPath);
-                RegisterLicenseFromAppSettings(AppSettings);
-            }
         }
 
         public static void RegisterLicenseFromAppSettings(IAppSettings settings)
@@ -124,13 +109,12 @@ namespace ServiceStack
             } 
             catch (Exception ex) //Request Initialization error
             {
-                //var logFactory = context.Features.Get<ILoggerFactory>();
-                //if (logFactory != null)
-                //{
-                //    var log = logFactory.CreateLogger(GetType());
-                //    log.LogError(default(EventId), ex, ex.Message);
-                //}
-                Logger.Error(ex.Message, ex);
+                var logFactory = context.Features.Get<ILoggerFactory>();
+                if (logFactory != null)
+                {
+                    var log = logFactory.CreateLogger(GetType());
+                    log.LogError(default(EventId), ex, ex.Message);
+                }
 
                 context.Response.ContentType = MimeTypes.PlainText;
                 await context.Response.WriteAsync($"{ex.GetType().Name}: {ex.Message}");
@@ -156,13 +140,12 @@ namespace ServiceStack
                 }
                 catch (Exception ex)
                 {
-                    //var logFactory = context.Features.Get<ILoggerFactory>();
-                    //if (logFactory != null)
-                    //{
-                    //    var log = logFactory.CreateLogger(GetType());
-                    //    log.LogError(default(EventId), ex, ex.Message);
-                    //}
-                    Logger.Error(ex.Message, ex);
+                    var logFactory = context.Features.Get<ILoggerFactory>();
+                    if (logFactory != null)
+                    {
+                        var log = logFactory.CreateLogger(GetType());
+                        log.LogError(default(EventId), ex, ex.Message);
+                    }
                 }
                 finally
                 {

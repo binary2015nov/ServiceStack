@@ -57,7 +57,6 @@ namespace ServiceStack.Host.AspNet
             this.PathInfo = this.OriginalPathInfo = GetPathInfo();
             this.PathInfo = HostContext.AppHost.ResolvePathInfo(this, OriginalPathInfo);
             httpContext.Items[Keywords.IRequest] = this;
-            this.PhysicalPath = request.PhysicalPath;
         }
 
         public HttpRequestBase HttpRequest => request;
@@ -338,7 +337,7 @@ namespace ServiceStack.Host.AspNet
                 if (isFile == null)
                 {
                     isFile = GetFile() != null;
-                    if (isFile == true)
+                    if (isFile.Value)
                         isDirectory = false;                    
                 }
                 return isFile.Value;

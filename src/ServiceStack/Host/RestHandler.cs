@@ -12,8 +12,6 @@ namespace ServiceStack.Host
 {
     public class RestHandler : ServiceStackHandlerBase, IRequestHttpHandler
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(RestHandler));
-
         public RestHandler()
         {
             this.HandlerAttributes = RequestAttributes.Reply;
@@ -89,7 +87,6 @@ namespace ServiceStack.Host
             }
             catch (Exception ex)
             {
-                Logger.Error(ex);
                 if (!appHost.Config.WriteErrorsToResponse)
                 {
                     await appHost.ApplyResponseConvertersAsync(httpReq, ex);
@@ -122,7 +119,6 @@ namespace ServiceStack.Host
 
         public static object CreateRequest(IRequest httpReq, IRestPath restPath, Dictionary<string, string> requestParams)
         {
-            Logger.Info(httpReq.ContentType);
             var requestDto = CreateContentTypeRequest(httpReq, restPath.RequestType, httpReq.ContentType);
 
             return CreateRequest(httpReq, restPath, requestParams, requestDto);

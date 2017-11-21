@@ -24,7 +24,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             using (new BasicAppHost().Init())
             {
                 HttpContext.Current = new HttpContext(
-                    new HttpRequest(null, "http://example.com", null),
+                    new HttpRequest("", "http://example.com", null),
                     new HttpResponse(new StringWriter()));
 
                 HttpContext.Current.Items[Keywords.Session] =

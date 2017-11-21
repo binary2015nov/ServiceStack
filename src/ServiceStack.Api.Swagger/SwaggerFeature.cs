@@ -83,6 +83,8 @@ namespace ServiceStack.Api.Swagger
                 switch (pathInfo)
                 {
                     case "/swagger-ui":
+                        return new RedirectHttpHandler { RelativeUrl = "swagger-ui/" };
+
                     case "/swagger-ui/":
                     case "/swagger-ui/default.html":
                         indexFile = appHost.VirtualFileSources.GetFile("/swagger-ui/index.html");

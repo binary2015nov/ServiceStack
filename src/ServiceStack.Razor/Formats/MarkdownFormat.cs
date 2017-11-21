@@ -131,7 +131,7 @@ namespace ServiceStack.Formats
 						return new RedirectHttpHandler {
 							AbsoluteUrl = webHostUrl.IsNullOrEmpty()
 								? null
-								: webHostUrl.CombineWith(pathInfo),
+								: webHostUrl.AppendPath(pathInfo),
 							RelativeUrl = webHostUrl.IsNullOrEmpty()
 								? pathInfo
 								: null

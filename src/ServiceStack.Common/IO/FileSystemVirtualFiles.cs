@@ -5,8 +5,7 @@ using ServiceStack.VirtualPath;
 
 namespace ServiceStack.IO
 {
-    public class FileSystemVirtualFiles
-        : AbstractVirtualPathProviderBase, IVirtualFiles
+    public class FileSystemVirtualFiles : AbstractVirtualPathProviderBase, IVirtualFiles
     {
         protected DirectoryInfo RootDirInfo;
         protected FileSystemVirtualDirectory RootDir;

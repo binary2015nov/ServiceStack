@@ -22,9 +22,6 @@ namespace ServiceStack.Common.Tests
 
         protected bool HasConfigured { get; set; }
 
-        protected TestBase(params Assembly[] serviceAssemblies)
-            : this(null, serviceAssemblies) { }
-
         protected TestBase(string serviceClientBaseUri, params Assembly[] serviceAssemblies)
         {
             if (serviceAssemblies.Length == 0)
@@ -32,7 +29,14 @@ namespace ServiceStack.Common.Tests
 
             ServiceClientBaseUri = serviceClientBaseUri;
             ServiceAssemblies = serviceAssemblies;
-            this.AppHost = new BasicAppHost(ServiceAssemblies).Init();
+            this.AppHost = new BasicAppHost(ServiceAssemblies)
+            {
+                ConfigureAppHost = p =>
+                {
+                    p.Plugins.Add(new PredefinedRoutesFeature());
+                    p.Plugins.Add(new MetadataFeature());
+                }
+            }.Init();
         }
 
         [OneTimeTearDown]
