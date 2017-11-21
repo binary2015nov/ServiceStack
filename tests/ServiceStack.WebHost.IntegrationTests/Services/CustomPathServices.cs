@@ -1,9 +1,7 @@
 ﻿namespace ServiceStack.WebHost.IntegrationTests.Services
 {
     [Route("/gettestapi")]
-    public class GetTestapi
-    {
-    }
+    public class GetTestapi { }
 
     public class CustomPathServices : Service
     {

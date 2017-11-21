@@ -13,7 +13,7 @@ namespace ServiceStack.Common.Tests.FluentValidation
         public ValidationResult Result { get; set; }
 
         [OneTimeSetUp]
-        public void SetUp()
+        public void TestFixtureSetUp()
         {
             var person = new Person
             {

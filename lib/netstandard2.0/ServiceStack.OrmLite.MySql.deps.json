@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETStandard,Version=v2.0/",
-    "signature": "a61677171d5569bb0f9fcc7762cc7d502b55470b"
+    "signature": "76f3527a423ba4ac744165729c394b3e9f1c2533"
   },
   "compilationOptions": {},
   "targets": {
@@ -9,7 +9,7 @@
     ".NETStandard,Version=v2.0/": {
       "ServiceStack.OrmLite.MySql/1.0.0": {
         "dependencies": {
-          "MySql.Data": "8.0.8-dmr",
+          "MySql.Data": "8.0.9-dmr",
           "NETStandard.Library": "2.0.0",
           "ServiceStack.OrmLite": "1.0.0",
           "ServiceStack.Common": "5.0.0.0",
@@ -161,7 +161,7 @@
           "lib/netstandard2.0/Microsoft.Win32.Registry.dll": {}
         }
       },
-      "MySql.Data/8.0.8-dmr": {
+      "MySql.Data/8.0.9-dmr": {
         "dependencies": {
           "Google.Protobuf": "3.3.0",
           "Microsoft.Extensions.Configuration.Json": "1.1.2",
@@ -1425,12 +1425,12 @@
       "path": "microsoft.win32.registry/4.4.0",
       "hashPath": "microsoft.win32.registry.4.4.0.nupkg.sha512"
     },
-    "MySql.Data/8.0.8-dmr": {
+    "MySql.Data/8.0.9-dmr": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-9ur96IO10ntp53nrLSJTcHxhwaFKp05XWZO1YPKF2cLZc23hwMVl++AAPrPr1/KYNlWUQHEP6jZQWXzSS4NMJQ==",
-      "path": "mysql.data/8.0.8-dmr",
-      "hashPath": "mysql.data.8.0.8-dmr.nupkg.sha512"
+      "sha512": "sha512-SpVb+r2fAU5r/suAKuHrrXvQEawlxQQ2hkRJgw3BETPpI5OLYfKmF7/SxYke2AKSxkBkd8I/fn8jkZarrGYWlQ==",
+      "path": "mysql.data/8.0.9-dmr",
+      "hashPath": "mysql.data.8.0.9-dmr.nupkg.sha512"
     },
     "NETStandard.Library/2.0.0": {
       "type": "package",

@@ -757,8 +757,8 @@ namespace ServiceStack.Server.Tests.Auth
         [Test]
         public void Does_create_multiple_ApiKeys()
         {
-            //if (GetType() == typeof(OrmLiteMultitenancyStatelessAuthTests))
-            //    return;
+            if (GetType() == typeof(OrmLiteMultitenancyStatelessAuthTests))
+                return;
 
             var apiKeys = apiRepo.GetUserApiKeys(userId);
             Assert.That(apiKeys.Count, Is.EqualTo(
@@ -833,8 +833,8 @@ namespace ServiceStack.Server.Tests.Auth
         [Test]
         public void Doesnt_allow_using_expired_keys()
         {
-            //if (GetType() == typeof(OrmLiteMultitenancyStatelessAuthTests))
-            //    return;
+            if (GetType() == typeof(OrmLiteMultitenancyStatelessAuthTests))
+                return;
 
             var client = new JsonServiceClient(ListeningOn)
             {
