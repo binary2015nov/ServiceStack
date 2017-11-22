@@ -18,6 +18,19 @@ namespace ServiceStack
             Config.HandlerFactoryPath = PlatformNet.InferHttpHandlerPath();
         }
 
+        public override string GetBaseUrl(IRequest httpReq)
+        {
+            if (!Config.WebHostUrl.IsNullOrEmpty())
+                return Config.WebHostUrl;
+
+            var aspReq = (HttpRequestBase)httpReq.OriginalRequest;
+            var absoluteUri = aspReq.Url.Scheme + "://" + aspReq.Url.Authority +
+                      aspReq.ApplicationPath;
+
+            var baseUrl = absoluteUri.AppendPath(Config.HandlerFactoryPath);
+            return Config.WebHostUrl = baseUrl.WithTrailingSlash();
+        }
+
         public override IRequest TryGetCurrentRequest()
         {
             try

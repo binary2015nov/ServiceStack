@@ -48,7 +48,7 @@ namespace ServiceStack.Host.Handlers
                     throw new ArgumentException($"'{RelativeUrl}' is not a RelativeUrl, use AbsoluteUrl instead");
 
                 var absoluteUrl = this.RelativeUrl.StartsWith("/")
-                    ? request.GetApplicationUrl().CombineWith(this.RelativeUrl) //preserve compat
+                    ? request.GetBaseUrl().AppendPath(this.RelativeUrl) //preserve compat
                     : request.ResolveAbsoluteUrl(MakeRelative(this.RelativeUrl));
 
                 response.StatusCode = (int)StatusCode;

@@ -40,7 +40,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             Assert.That(reqInfoResponse.ResolveAbsoluteUrl, Is.EqualTo(url.AppendPath("resolve")));
 
             var response = url.AppendPath("/routeinfo").GetJsonFromUrl().FromJson<GetRouteInfoResponse>();
-            Assert.That(response.BaseUrl.TrimEnd('/'), Is.EqualTo(url.TrimEnd('/')));
+            Assert.That(response.BaseUrl, Is.EqualTo(url));
             Assert.That(response.ResolvedUrl, Is.EqualTo(url.AppendPath("resolved")));
 
             response = url.AppendPath("/routeinfo/dir").GetJsonFromUrl().FromJson<GetRouteInfoResponse>();

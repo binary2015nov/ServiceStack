@@ -368,12 +368,11 @@ namespace ServiceStack
             feature?.AddSection(MetadataFeature.AvailableFeatures);
             foreach (var plugin in Plugins)
             {
+                var title = plugin.GetType().Name;
+                feature?.AddLink(MetadataFeature.AvailableFeatures, "#" + title, title);
                 try
-                {
-                    string title = plugin.GetType().Name;
-                    feature?.AddLink(MetadataFeature.AvailableFeatures, "#" + title, title);
-                    var preInitPlugin = plugin as IPostInitPlugin;
-                    if (preInitPlugin != null)
+                {             
+                    if (plugin is IPostInitPlugin preInitPlugin)
                     {
                         preInitPlugin.AfterPluginsLoaded(this);
                     }
@@ -433,7 +432,7 @@ namespace ServiceStack
         /// <param name="urlBase">Url to listen to</param>
         public virtual ServiceStackHost Start(string urlBase)
         {
-            throw new NotSupportedException($"The current method is not supported by this AppHost - {GetType().FullName}.");
+            throw new NotImplementedException($"The current method is not supported by this AppHost - {GetType().FullName}.");
         }
 
         // Rare for a user to auto register all avaialable services in ServiceStack.dll
@@ -713,10 +712,8 @@ namespace ServiceStack
                 return httpReq.AbsoluteUri;
 
             var baseUrl = GetBaseUrl(httpReq);
-            if (virtualPath.StartsWith("~"))
-                return baseUrl.AppendPath(virtualPath.TrimStart('~'));
 
-            return baseUrl.AppendPath(virtualPath);              
+            return baseUrl.AppendPath(virtualPath.TrimStart('~'));              
         }
 
         public virtual string GetBaseUrl(IRequest httpReq)
@@ -724,13 +721,13 @@ namespace ServiceStack
             if (!Config.WebHostUrl.IsNullOrEmpty())
                 return Config.WebHostUrl;
 
-            var absoluteUri = httpReq.AbsoluteUri;
-            var index = httpReq.PathInfo.IsNullOrEmpty() || httpReq.PathInfo == "/"
-                ? absoluteUri.IndexOf("?", StringComparison.Ordinal)
-                : absoluteUri.IndexOf(httpReq.PathInfo.TrimEnd('/'), StringComparison.Ordinal) + 1;
+            var handlerPath = Config.HandlerFactoryPath ?? "";
 
-            var hostUrl = index > 0 ? absoluteUri.Substring(0, index) : absoluteUri;
-            return Config.WebHostUrl = hostUrl.WithTrailingSlash();
+            var url = new Uri(httpReq.AbsoluteUri);
+            var absoluteUrl = url.GetLeftAuthority();
+            var baseUrl = absoluteUrl.AppendPath(handlerPath);
+
+            return Config.WebHostUrl = baseUrl.WithTrailingSlash();       
         }
 
         public virtual string ResolvePhysicalPath(string virtualPath, IRequest httpReq)

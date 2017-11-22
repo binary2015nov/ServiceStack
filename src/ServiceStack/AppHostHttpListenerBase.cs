@@ -31,7 +31,6 @@ namespace ServiceStack
             : base(serviceName, assembliesWithServices)
         {
             HandlerPath = handlerPath;
-            Config.MetadataRedirectPath = HandlerPath.IsNullOrEmpty() ? "metadata" : handlerPath.AppendPath("metadata");
         }
     }
 }

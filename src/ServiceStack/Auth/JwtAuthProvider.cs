@@ -396,7 +396,7 @@ namespace ServiceStack.Auth
             IEnumerable<string> roles = null, perms = null;
 
             var userSessionSource = TryResolve<IUserSessionSource>() 
-                ?? AuthenticateService.GetAuthProviders().FirstOrDefault(x => x is IUserSessionSource) as IUserSessionSource;
+                ?? AuthenticateService.AuthProviders.FirstOrDefault(x => x is IUserSessionSource) as IUserSessionSource;
 
             if (userSessionSource != null)
             {
