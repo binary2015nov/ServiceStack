@@ -31,6 +31,29 @@ namespace ServiceStack.Auth
             AuthResponseFilters = authProviders.OfType<IAuthResponseFilter>().ToArray();
         }
 
+        public static IUserSessionSource GetUserSessionSource()
+        {
+            var userSessionSource = HostContext.TryResolve<IUserSessionSource>();
+            if (userSessionSource != null)
+                return userSessionSource;
+
+            if (AuthProviders != null)
+            {
+                foreach (var authProvider in AuthProviders)
+                {
+                    if (authProvider is IUserSessionSource sessionSource)
+                        return sessionSource;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Get specific AuthProvider
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <returns></returns>
         public static IAuthProvider GetAuthProvider(string provider)
         {
             if (provider.IsNullOrEmpty())
