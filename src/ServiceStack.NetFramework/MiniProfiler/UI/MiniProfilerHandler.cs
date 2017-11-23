@@ -245,9 +245,8 @@ namespace ServiceStack.MiniProfiler.UI
 		private static string GetResource(string filename)
 		{
 			filename = filename.ToLower();
-			string result;
 
-			if (!_ResourceCache.TryGetValue(filename, out result))
+			if (!resourceCache.TryGetValue(filename, out string result))
 			{
 				using (var stream = typeof(MiniProfilerHandler).Assembly.GetManifestResourceStream("ServiceStack.MiniProfiler.UI." + filename))
 				using (var reader = new StreamReader(stream))
@@ -255,7 +254,7 @@ namespace ServiceStack.MiniProfiler.UI
 					result = reader.ReadToEnd();
 				}
 
-				_ResourceCache[filename] = result;
+				resourceCache[filename] = result;
 			}
 
 			return result;
@@ -264,7 +263,7 @@ namespace ServiceStack.MiniProfiler.UI
 		/// <summary>
 		/// Embedded resource contents keyed by filename.
 		/// </summary>
-		private static readonly Dictionary<string, string> _ResourceCache = new Dictionary<string, string>();
+		private static readonly Dictionary<string, string> resourceCache = new Dictionary<string, string>();
 
 		/// <summary>
 		/// Helper method that sets a proper 404 response code.

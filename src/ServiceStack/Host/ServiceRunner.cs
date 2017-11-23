@@ -69,9 +69,7 @@ namespace ServiceStack.Host
 
         public virtual object Execute(IRequest req, object instance, TRequest requestDto)
         {
-            var task = ExecuteAsync(req, instance, requestDto);
-            task.Wait();
-            return task.Result;
+            return ExecuteAsync(req, instance, requestDto);
         }
 
         public virtual async Task<object> ExecuteAsync(IRequest req, object instance, TRequest requestDto)
@@ -185,8 +183,7 @@ namespace ServiceStack.Host
 
         public virtual object Execute(IRequest req, object instance, IMessage<TRequest> request)
         {
-            var task = ExecuteAsync(req, instance, request.GetBody());
-            return task.Result;
+            return ExecuteAsync(req, instance, request.GetBody()).Result;
         }
 
         public virtual object HandleException(IRequest request, TRequest requestDto, Exception ex)

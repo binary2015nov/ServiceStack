@@ -21,7 +21,7 @@ namespace ServiceStack.MiniProfiler
         /// </summary>
         public SqlTiming[] GetInProgressCommands()
         {
-            return SqlProfiler == null ? null : SqlProfiler.GetInProgressCommands();
+            return SqlProfiler?.GetInProgressCommands();
         }
 
         /// <summary>
@@ -93,9 +93,8 @@ namespace ServiceStack.MiniProfiler
             if (Head == null)
                 return;
 
-            int count;
 
-            stats.IsDuplicate = _sqlExecutionCounts.TryGetValue(stats.CommandString, out count);
+            stats.IsDuplicate = _sqlExecutionCounts.TryGetValue(stats.CommandString, out int count);
             _sqlExecutionCounts[stats.CommandString] = count + 1;
 
             HasSqlTimings = true;

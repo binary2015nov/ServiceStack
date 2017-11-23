@@ -139,14 +139,13 @@ namespace ServiceStack.Host
         {
             var actionName = request.Verb ?? HttpMethods.Post; //MQ Services
 
-            var overrideVerb = request.GetItem(Keywords.InvokeVerb) as string;
-            if (overrideVerb != null)
+            if (request.GetItem(Keywords.InvokeVerb) is string overrideVerb)
                 actionName = overrideVerb;
 
             var operationName = request.OperationName = requestDto.GetType().GetOperationName();
             string format = request.ResponseContentType.ToContentFormat()?.ToUpper();
-            InstanceExecFn action;
-            if (execMap.TryGetValue(ActionContext.Key(actionName + format, operationName), out action) ||
+
+            if (execMap.TryGetValue(ActionContext.Key(actionName + format, operationName), out InstanceExecFn action) ||
             execMap.TryGetValue(ActionContext.AnyFormatKey(format, operationName), out action) ||
             execMap.TryGetValue(ActionContext.Key(actionName, operationName), out action) ||
             execMap.TryGetValue(ActionContext.AnyKey(operationName), out action))

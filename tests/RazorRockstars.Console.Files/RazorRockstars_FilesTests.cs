@@ -156,7 +156,7 @@ namespace RazorRockstars.Console.Files
         static string ViewRockstarsMark = "<!--view:RockstarsMark.md-->";
         static string ViewNoModelNoController = "<!--view:NoModelNoController.cshtml-->";
         static string ViewTypedModelNoController = "<!--view:TypedModelNoController.cshtml-->";
-        static string ViewCachedAllReqstars = "<!--view:CachedAllReqstars.cshtml-->";
+        //static string ViewCachedAllReqstars = "<!--view:CachedAllReqstars.cshtml-->";
         static string ViewIList = "<!--view:IList.cshtml-->";
         static string ViewList = "<!--view:List.cshtml-->";
         static string ViewPage1 = "<!--view:Page1.cshtml-->";
@@ -167,7 +167,7 @@ namespace RazorRockstars.Console.Files
         static string ViewMPage1 = "<!--view:MPage1.md-->";
         static string ViewMPage2 = "<!--view:MPage2.md-->";
         static string ViewMPage3 = "<!--view:MPage3.md-->";
-        static string ViewMPage4 = "<!--view:MPage4.md-->";
+        //static string ViewMPage4 = "<!--view:MPage4.md-->";
         static string ViewRazorPartial = "<!--view:RazorPartial.cshtml-->";
         static string ViewMarkdownPartial = "<!--view:MarkdownPartial.md-->";
         static string ViewRazorPartialModel = "<!--view:RazorPartialModel.cshtml-->";

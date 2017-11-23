@@ -320,10 +320,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             userRep = new InMemoryAuthRepository();
             container.Register<IAuthRepository>(userRep);
 
-            if (configureFn != null)
-            {
-                configureFn(container);
-            }
+            configureFn?.Invoke(container);
 
             CreateUser(1, AuthTests.UserName, null, AuthTests.Password, new List<string> { "TheRole" }, new List<string> { "ThePermission" });
             CreateUser(2, AuthTests.UserNameWithSessionRedirect, null, AuthTests.PasswordForSessionRedirect);
@@ -341,9 +338,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         private void CreateUser(int id, string username, string email, string password, List<string> roles = null, List<string> permissions = null)
         {
-            string hash;
-            string salt;
-            new SaltedHash().GetHashAndSaltString(password, out hash, out salt);
+            new SaltedHash().GetHashAndSaltString(password, out string hash, out string salt);
 
             userRep.CreateUserAuth(new UserAuth
             {
@@ -991,14 +986,15 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             try
             {
                 client.Send<HttpWebResponse>(request);
-            } catch (WebServiceException ex)
+            }
+            catch (WebServiceException ex)
             {
 #if NETCORE
                 //AllowAutoRedirect=false is not implemented in .NET Core and throws NotFound exception
                 if (ex.StatusCode == (int)HttpStatusCode.NotFound)
                     return;
 #endif
-                throw;
+                throw ex;
             }
 
             var locationUri = new Uri(lastResponseLocationHeader);
@@ -1035,14 +1031,15 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             try
             {
                 client.Get<string>(request);
-            } catch (WebServiceException ex)
+            }
+            catch (WebServiceException ex)
             {
 #if NETCORE
                 //AllowAutoRedirect=false is not implemented in .NET Core and throws NotFound exception
                 if (ex.StatusCode == (int)HttpStatusCode.NotFound)
                     return;
 #endif
-                throw;
+                throw ex;
             }
 
             var locationUri = new Uri(lastResponseLocationHeader);

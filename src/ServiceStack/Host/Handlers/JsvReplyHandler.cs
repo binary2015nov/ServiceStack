@@ -11,8 +11,7 @@ namespace ServiceStack.Host.Handlers
 
     public class JsvReplyHandler : GenericHandler
     {
-        public JsvReplyHandler()
-            : base(MimeTypes.JsvText, RequestAttributes.Reply | RequestAttributes.Jsv, Feature.Jsv) { }
+        public JsvReplyHandler() : base(MimeTypes.JsvText, RequestAttributes.Reply | RequestAttributes.Jsv, Feature.Jsv) { }
 
         public override async Task ProcessRequestAsync(IRequest httpReq, IResponse httpRes, string operationName)
         {

@@ -17,20 +17,6 @@ namespace ServiceStack.Auth
         internal static IAuthWithRequest[] AuthWithRequestProviders = TypeConstants<IAuthWithRequest>.EmptyArray;
         internal static IAuthResponseFilter[] AuthResponseFilters = TypeConstants<IAuthResponseFilter>.EmptyArray;
 
-        public static void Init(params IAuthProvider[] authProviders)
-        {
-            var oauthProvider = authProviders.FirstOrDefault(p => p is IOAuthProvider);
-            if (oauthProvider != null)
-            {
-                DefaultOAuthProvider = oauthProvider.Provider;
-                DefaultOAuthRealm = oauthProvider.AuthRealm;
-            }
-
-            AuthProviders = authProviders;
-            AuthWithRequestProviders = authProviders.OfType<IAuthWithRequest>().ToArray();
-            AuthResponseFilters = authProviders.OfType<IAuthResponseFilter>().ToArray();
-        }
-
         public static IUserSessionSource GetUserSessionSource()
         {
             var userSessionSource = HostContext.TryResolve<IUserSessionSource>();
@@ -71,6 +57,20 @@ namespace ServiceStack.Auth
             }
 
             return null;
+        }
+
+        public static void Init(params IAuthProvider[] authProviders)
+        {
+            var oauthProvider = authProviders.FirstOrDefault(p => p is IOAuthProvider);
+            if (oauthProvider != null)
+            {
+                DefaultOAuthProvider = oauthProvider.Provider;
+                DefaultOAuthRealm = oauthProvider.AuthRealm;
+            }
+
+            AuthProviders = authProviders;
+            AuthWithRequestProviders = authProviders.OfType<IAuthWithRequest>().ToArray();
+            AuthResponseFilters = authProviders.OfType<IAuthResponseFilter>().ToArray();
         }
 
         public void Options(Authenticate request) { }

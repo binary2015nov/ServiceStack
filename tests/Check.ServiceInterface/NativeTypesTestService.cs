@@ -298,7 +298,7 @@ namespace Check.ServiceInterface
         [Authenticate]
         public object Any(HelloAuthenticated request)
         {
-            var session = GetSession();
+            var session = this.GetSession();
 
             return new HelloAuthenticatedResponse
             {

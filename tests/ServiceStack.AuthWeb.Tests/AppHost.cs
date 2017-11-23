@@ -192,8 +192,7 @@ namespace ServiceStack.AuthWeb.Tests
 
             this.GlobalResponseFilters.Add((req, res, responseDto) =>
             {
-                var authResponse = responseDto as AuthenticateResponse;
-                if (authResponse != null)
+                if (responseDto is AuthenticateResponse authResponse)
                 {
                     authResponse.Meta = new Dictionary<string, string> {
                         {"foo", "bar"}

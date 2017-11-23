@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using ServiceStack.Host.Handlers;
-using ServiceStack.Logging;
 using ServiceStack.MiniProfiler;
 using ServiceStack.Web;
 using ServiceStack.Text;

@@ -93,8 +93,7 @@ namespace ServiceStack.Host
             if (!Service.IsServiceType(serviceType))
                 throw new ArgumentException($"{serviceType.FullName} is not a service type that implements IService");
 
-            Dictionary<Type, List<ActionContext>> actionMap;
-            if (!serviceActionMap.TryGetValue(serviceType, out actionMap))
+            if (!serviceActionMap.TryGetValue(serviceType, out Dictionary<Type, List<ActionContext>> actionMap))
             {
                 var serviceExecDef = typeof(ServiceExec<>).MakeGenericType(serviceType);
                 serviceExecDef.GetMethod("Reset", BindingFlags.Public | BindingFlags.Static).Invoke(null, new object[] { appHost });
@@ -186,9 +185,8 @@ namespace ServiceStack.Host
                 RestPathMap[restPath.FirstMatchHashKey] = pathsAtFirstMatch;
             }
             pathsAtFirstMatch.Add(restPath);
-            
-            Operation operation;
-            if (!appHost.Metadata.OperationsMap.TryGetValue(restPath.RequestType, out operation))
+
+            if (!appHost.Metadata.OperationsMap.TryGetValue(restPath.RequestType, out Operation operation))
                 return;
 
             operation.Routes.Add(restPath);
