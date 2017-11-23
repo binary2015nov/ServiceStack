@@ -482,9 +482,9 @@ namespace ServiceStack.Mvc
             return new HtmlString(RazorViewExtensions.GetErrorHtml(GetErrorStatus()) ?? "");
         }
 
-        public IAppHost AppHost => ServiceStackHost.Instance;
+        public IAppHost AppHost => HostContext.AppHost;
 
-        public bool DebugMode => HostContext.DebugMode;
+        public bool DebugMode => HostContext.Config.DebugMode;
 
         public virtual TPlugin GetPlugin<TPlugin>() where TPlugin : class, IPlugin => HostContext.AppHost.GetPlugin<TPlugin>();
 

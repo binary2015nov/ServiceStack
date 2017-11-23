@@ -891,7 +891,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             }
         }
 
-        [Test, Ignore("weired timeout fail")]
+        [Test]
         public async Task Does_receive_all_join_and_leave_messages()
         {
             var joinA = new List<ServerEventJoin>();

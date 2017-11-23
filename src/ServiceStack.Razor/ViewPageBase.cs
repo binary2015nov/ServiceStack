@@ -189,7 +189,7 @@ namespace ServiceStack.Razor
             var renderAttribute = writtenAttribute || values.Length == 0;
 
             if (renderAttribute)
-                return StringBuilderCache.ReturnAndFree(attributeBuilder);
+                return StringBuilderCache.Retrieve(attributeBuilder);
 
             StringBuilderCache.Free(attributeBuilder);
 
@@ -366,11 +366,11 @@ namespace ServiceStack.Razor
         private IAppHost appHost;
         public IAppHost AppHost
         {
-            get => appHost ?? ServiceStackHost.Instance;
+            get => appHost ?? HostContext.AppHost;
             set => appHost = value;
         }
 
-        public bool DebugMode => HostContext.DebugMode;
+        public bool DebugMode => HostContext.Config.DebugMode;
 
         public IAppSettings AppSettings => AppHost.AppSettings;
 
@@ -440,7 +440,7 @@ namespace ServiceStack.Razor
         {
             var req = this.Request;
             if (req.GetSessionId() == null)
-                req.Response.CreateSessionIds(req);
+                req.CreateSessionIds(req.Response);
             return req.GetSession(reload);
         }
 
@@ -451,7 +451,7 @@ namespace ServiceStack.Razor
 
         public bool IsAuthenticated => this.GetSession().IsAuthenticated;
 
-        public string SessionKey => SessionFeature.GetSessionKey();
+        public string SessionKey => SessionFeature.GetSessionKey(Request);
 
         public void ClearSession()
         {
