@@ -34,17 +34,20 @@ namespace ServiceStack.Host.Handlers
         protected virtual Task CreateProcessRequestTask(IRequest httpReq, IResponse httpRes, string operationName)
         {
 #if !NETSTANDARD2_0
-            //var currentCulture = Thread.CurrentThread.CurrentCulture;
-            //var currentUiCulture = Thread.CurrentThread.CurrentUICulture;
+            var currentCulture = Thread.CurrentThread.CurrentCulture;
+            var currentUiCulture = Thread.CurrentThread.CurrentUICulture;
+            var ctx = HttpContext.Current;
 #endif
 
             //preserve Current Culture:
             return new Task(() =>
             {
-//#if !NETSTANDARD2_0
-//                Thread.CurrentThread.CurrentCulture = currentCulture;
-//                Thread.CurrentThread.CurrentUICulture = currentUiCulture;
-//#endif
+#if !NETSTANDARD2_0
+                Thread.CurrentThread.CurrentCulture = currentCulture;
+                Thread.CurrentThread.CurrentUICulture = currentUiCulture;
+                //HttpContext is not preserved in ThreadPool threads: http://stackoverflow.com/a/13558065/85785
+                HttpContext.Current = ctx;
+#endif
 
                 ProcessRequest(httpReq, httpRes, operationName);
             });

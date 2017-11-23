@@ -432,9 +432,22 @@ namespace ServiceStack.Host
         /// <summary>
         /// Execute a Service with a Request DTO.
         /// </summary>
-        public virtual Task<object> ExecuteAsync(object requestDto, IRequest req) //Used by HTTP handlers to Execute Services
+        public virtual async Task<object> ExecuteAsync(object requestDto, IRequest req) //Used by HTTP handlers to Execute Services
         {
-            return Task.Run(() => Execute(requestDto, req));
+            req.Dto = requestDto;
+            var requestType = requestDto.GetType();
+
+            if (appHost.Config.EnableAccessRestrictions)
+                AssertServiceRestrictions(requestType, req.RequestAttributes);
+
+            var handlerFn = GetService(requestType);
+            var response = handlerFn(req, requestDto);
+            if (response is Task responseTask)
+            {
+                await responseTask;
+                response = responseTask.GetResult();
+            }
+            return appHost.OnAfterExecute(req, requestDto, response);
         }
 
         // Only Used internally by TypedFilterTests 

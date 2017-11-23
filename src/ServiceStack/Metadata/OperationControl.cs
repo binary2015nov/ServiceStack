@@ -45,7 +45,7 @@ namespace ServiceStack.Metadata
                     var path = postRoute != null 
                         ? postRoute.Path 
                         : Operation.Routes[0].Path;
-                    return HostContext.Config.HandlerFactoryPath != null
+                    return !HostContext.Config.HandlerFactoryPath.IsNullOrEmpty()
                         ? "/" + HostContext.Config.HandlerFactoryPath.AppendPath(path)
                         : path;
                 }

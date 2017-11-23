@@ -95,9 +95,6 @@ namespace ServiceStack.Formats
                 // Serialize then escape any potential script tags to avoid XSS when displaying as HTML
                 var json = JsonDataContractSerializer.Instance.SerializeToString(dto) ?? "null";
                 json = json.Replace("<", "&lt;").Replace(">", "&gt;");
-                var url = req.ResolveAbsoluteUrl();
-                //var index = absoluteUrl.IndexOf('?');
-                //var url = index != -1 ? absoluteUrl.Substring(0, index) : absoluteUrl;
 
                 var now = DateTime.Now;
                 var requestName = req.OperationName ?? dto.GetType().GetOperationName();
@@ -107,7 +104,7 @@ namespace ServiceStack.Formats
                     .Replace("${Title}", string.Format(TitleFormat, requestName, now))
                     .Replace("${MvcIncludes}", MiniProfiler.Profiler.RenderIncludes()?.ToString())
                     .Replace("${Header}", string.Format(HtmlTitleFormat, requestName, now))
-                    .Replace("${ServiceUrl}", url)
+                    .Replace("${ServiceUrl}", req.AbsoluteUri)
                     .Replace("${Humanize}", Humanize.ToString().ToLower());
             }
 

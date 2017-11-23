@@ -51,7 +51,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public void Can_download_File_Template_OperationControl()
         {
             var contents = "{0}/json/metadata?op=Hello".Fmt(Config.AbsoluteBaseUri).GetStringFromUrl();
-            Assert.That(contents, Does.Contain("/hello/{Name}"));
+            Assert.That(contents, Does.Contain(@"append  the <b>.json</b> suffix or  <b>?format=json</b></p><p>To embed the response in a <b>jsonp</b> callback"));
         }
     }
 }

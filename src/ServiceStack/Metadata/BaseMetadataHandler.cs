@@ -134,7 +134,7 @@ namespace ServiceStack.Metadata
 
                         if (!isSoap)
                         {
-                            var path = HostContext.Config.HandlerFactoryPath.AppendPath(route.Path);
+                            var path = "/".AppendPaths(HostContext.Config.HandlerFactoryPath, route.Path);
 
                             sb.Append($"<th>{verbs}</th>");
                             sb.Append($"<th>{path}</th>");
