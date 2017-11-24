@@ -98,6 +98,7 @@ namespace ServiceStack.Formats
 
                 var now = DateTime.Now;
                 var requestName = req.OperationName ?? dto.GetType().GetOperationName();
+                var formatUrl = req.AbsoluteUri + (req.AbsoluteUri.IndexOf("?") != -1 ? "&" : "?");
 
                 html = HtmlTemplates.GetHtmlFormatTemplate()
                     .Replace("${Dto}", json)
@@ -105,6 +106,7 @@ namespace ServiceStack.Formats
                     .Replace("${MvcIncludes}", MiniProfiler.Profiler.RenderIncludes()?.ToString())
                     .Replace("${Header}", string.Format(HtmlTitleFormat, requestName, now))
                     .Replace("${ServiceUrl}", req.AbsoluteUri)
+                    .Replace("${FormatUrl}", formatUrl)
                     .Replace("${Humanize}", Humanize.ToString().ToLower());
             }
 

@@ -95,7 +95,7 @@ namespace ServiceStack
             if (DebugMode || EnableDebugTemplate || EnableDebugTemplateToAll)
             {
                 appHost.RegisterService(typeof(TemplateMetadataDebugService), TemplateMetadataDebugService.Route);
-                appHost.GetPlugin<MetadataFeature>().AddDebugLink(TemplateMetadataDebugService.Route, "Debug Templates");
+                appHost.GetPlugin<MetadataFeature>()?.AddLink(MetadataFeature.DebugInfo, TemplateMetadataDebugService.Route, "Debug Templates");
             }
 
             Init();
@@ -455,11 +455,11 @@ Plugins: {{ plugins | select: \n  - { it | typeName } }}
                 return null;
 
             var feature = HostContext.GetPlugin<TemplatePagesFeature>();
-            if (!HostContext.DebugMode && !feature.EnableDebugTemplateToAll)
+            if (!HostContext.Config.DebugMode && !feature.EnableDebugTemplateToAll)
             {
                 if (HostContext.Config.AdminAuthSecret == null || HostContext.Config.AdminAuthSecret != request.AuthSecret)
                 {
-                    RequiredRoleAttribute.AssertRequiredRoles(Request, RoleNames.Admin);
+                    RequiredRoleAttribute.AssertRequiredRoles(Request, AuthRepository, RoleNames.Admin);
                 }
             }
             
@@ -487,8 +487,8 @@ Plugins: {{ plugins | select: \n  - { it | typeName } }}
         public object GetHtml(TemplateMetadataDebug request)
         {
             var feature = HostContext.GetPlugin<TemplatePagesFeature>();
-            if (!HostContext.DebugMode && !feature.EnableDebugTemplateToAll)
-                RequiredRoleAttribute.AssertRequiredRoles(Request, RoleNames.Admin);
+            if (!HostContext.Config.DebugMode && !feature.EnableDebugTemplateToAll)
+                RequiredRoleAttribute.AssertRequiredRoles(Request, AuthRepository, RoleNames.Admin);
             
             if (request.Template != null)
                 return Any(request);
@@ -664,7 +664,7 @@ Plugins: {{ plugins | select: \n  - { it | typeName } }}
         {
             var req = this.Request;
             if (req.GetSessionId() == null)
-                req.Response.CreateSessionIds(req);
+                req.CreateSessionIds(req.Response);
             return req.GetSession(reload);
         }
 
@@ -744,6 +744,6 @@ Plugins: {{ plugins | select: \n  - { it | typeName } }}
 
     public interface IAutoQueryDbFilters
     {
-        object sendToAutoQuery(TemplateScopeContext scope, object dto, string requestName, object options);
+        object SendToAutoQuery(TemplateScopeContext scope, object dto, string requestName, object options);
     }
 }

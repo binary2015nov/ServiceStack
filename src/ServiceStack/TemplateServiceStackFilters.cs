@@ -97,7 +97,7 @@ namespace ServiceStack
                     if (ssFillter == null)
                         throw new NotImplementedException("sendToAutoQuery RDBMS requires TemplateAutoQueryFilters");
 
-                    return ssFillter.sendToAutoQuery(scope, dto, requestName, options);
+                    return ssFillter.SendToAutoQuery(scope, dto, requestName, options);
                 }
                 
                 var autoQuery = appHost.TryResolve<IAutoQueryData>();
