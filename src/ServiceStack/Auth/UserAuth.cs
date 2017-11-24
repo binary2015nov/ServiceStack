@@ -41,7 +41,7 @@ namespace ServiceStack.Auth
         public virtual string DigestHa1Hash { get; set; }
         public virtual List<string> Roles { get; set; } = new List<string>();
         public virtual List<string> Permissions { get; set; } = new List<string>();
-        public virtual DateTime CreatedDate { get; set; }
+        public virtual DateTime CreatedDate { get; set; } = DateTime.Now;
         public virtual DateTime ModifiedDate { get; set; }
         public virtual int InvalidLoginAttempts { get; set; }
         public virtual DateTime? LastLoginAttempt { get; set; }
@@ -93,7 +93,7 @@ namespace ServiceStack.Auth
         public virtual Dictionary<string, string> Items { get; set; } = new Dictionary<string, string>();
         public virtual string AccessToken { get; set; }
         public virtual string AccessTokenSecret { get; set; }
-        public virtual DateTime CreatedDate { get; set; }
+        public virtual DateTime CreatedDate { get; set; } = DateTime.Now;
         public virtual DateTime ModifiedDate { get; set; }
 
         //Custom Reference Data
@@ -257,8 +257,7 @@ namespace ServiceStack.Auth
             if (instance.Meta == null)
                 return default(T);
 
-            string str;
-            instance.Meta.TryGetValue(typeof(T).GetOperationName(), out str);
+            instance.Meta.TryGetValue(typeof(T).GetOperationName(), out string str);
             return str == null ? default(T) : TypeSerializer.DeserializeFromString<T>(str);
         }
 
@@ -268,8 +267,7 @@ namespace ServiceStack.Auth
             if (instance == null)
                 throw new ArgumentNullException(nameof(instance));
 
-            string str;
-            if (!instance.Meta.TryGetValue(typeof(T).GetOperationName(), out str))
+            if (!instance.Meta.TryGetValue(typeof(T).GetOperationName(), out string str))
                 return false;
 
             value = TypeSerializer.DeserializeFromString<T>(str);

@@ -1288,7 +1288,7 @@
             Handles rendering a previous MiniProfiler session, identified by its "?id=GUID" on the query.
             </summary>
         </member>
-        <member name="F:ServiceStack.MiniProfiler.UI.MiniProfilerHandler._ResourceCache">
+        <member name="F:ServiceStack.MiniProfiler.UI.MiniProfilerHandler.resourceCache">
             <summary>
             Embedded resource contents keyed by filename.
             </summary>

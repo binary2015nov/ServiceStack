@@ -160,6 +160,13 @@
             Only allow access to users in specified roles
             </summary>
         </member>
+        <member name="M:ServiceStack.Auth.AuthenticateService.GetAuthProvider(System.String)">
+            <summary>
+            Get specific AuthProvider
+            </summary>
+            <param name="provider"></param>
+            <returns></returns>
+        </member>
         <member name="M:ServiceStack.Auth.AuthenticateService.Authenticate(ServiceStack.Authenticate)">
             <summary>
             Public API entry point to authenticate via code

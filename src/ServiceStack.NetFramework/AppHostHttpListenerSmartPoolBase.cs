@@ -41,7 +41,9 @@ namespace ServiceStack
 
         protected AppHostHttpListenerSmartPoolBase(string serviceName, int poolSize, params Assembly[] assembliesWithServices)
             : base(serviceName, assembliesWithServices)
-        { threadPoolManager = new Amib.Threading.SmartThreadPool(IdleTimeout, poolSize); }
+        {
+            threadPoolManager = new Amib.Threading.SmartThreadPool(IdleTimeout, poolSize);
+        }
 
         protected AppHostHttpListenerSmartPoolBase(string serviceName, string handlerPath, params Assembly[] assembliesWithServices)
             : this(serviceName, handlerPath, CalculatePoolSize(), assembliesWithServices)
@@ -122,24 +124,12 @@ namespace ServiceStack
             threadPoolManager.QueueWorkItem(ProcessRequestContext, context);
         }
 
-        private bool disposed = false;
-
         protected override void Dispose(bool disposing)
         {
-            if (disposed) return;
+            if (disposing)
+                threadPoolManager.Dispose();
 
-            lock (this)
-            {
-                if (disposed) return;
-
-                if (disposing)
-                    threadPoolManager.Dispose();
-
-                // new shared cleanup logic
-                disposed = true;
-
-                base.Dispose(disposing);
-            }
+            base.Dispose(disposing);
         }
     }
 

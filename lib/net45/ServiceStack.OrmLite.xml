@@ -2199,6 +2199,11 @@
             Clear InsertFields list ( all fields will be inserted)
             </summary>
         </member>
+        <member name="M:ServiceStack.OrmLite.SqlExpression`1.ToMergedParamsSelectStatement">
+            <summary>
+            Merge params into an encapsulated SQL Statement with embedded param values
+            </summary>
+        </member>
         <member name="M:ServiceStack.OrmLite.SqlExpression`1.IsBooleanComparison(System.Linq.Expressions.Expression)">
             <summary>
             Determines whether the expression is the parameter inside MemberExpression which should be compared with TrueExpression.
