@@ -100,7 +100,7 @@ namespace ServiceStack
                 typeof(NativeTypesService),
                 typeof(PostmanService),
                 typeof(TemplateHotReloadService),
-                typeof(TemplateHotReloadFilesService),
+                typeof(HotReloadFilesService),
                 typeof(TemplateApiPagesService),
                 typeof(TemplateMetadataDebugService),
             };

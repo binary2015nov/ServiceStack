@@ -101,10 +101,10 @@ namespace ServiceStack.Html
 
 		public void Init(IHttpRequest httpReq, IHttpResponse httpRes, IViewEngine viewEngine, ViewDataDictionary viewData, HtmlHelper htmlHelper)
 		{
-			this.RenderHtml = true;
-			this.HttpRequest = httpReq ?? (htmlHelper != null ? htmlHelper.HttpRequest : null);
-			this.HttpResponse = httpRes ?? (htmlHelper != null ? htmlHelper.HttpResponse : null);
-			this.ViewEngine = viewEngine;
+            this.RenderHtml = true;
+            this.HttpRequest = httpReq ?? htmlHelper?.HttpRequest;
+            this.HttpResponse = httpRes ?? htmlHelper?.HttpResponse;
+            this.ViewEngine = viewEngine;
 			this.ViewData = viewData;
 			this.ViewData.PopulateModelState();
 		}
@@ -156,29 +156,24 @@ namespace ServiceStack.Html
 			return MvcHtmlString.Create(html);
 		}
 
-		public string Debug(object model)
-		{
-			if (model != null)
-			{
-				return model.Dump();
-			}
+        public string Debug(object model)
+        {
+            return model?.Dump();
+        }
 
-			return null;
-		}
-
-		public static bool ClientValidationEnabled
-		{
-			get { return ViewContext.GetClientValidationEnabled(); }
-			set { ViewContext.SetClientValidationEnabled(value); }
-		}
+        public static bool ClientValidationEnabled
+        {
+            get => ViewContext.GetClientValidationEnabled();
+            set => ViewContext.SetClientValidationEnabled(value);
+        }
 
 		internal Func<string, ModelMetadata, IEnumerable<ModelClientValidationRule>> ClientValidationRuleFactory { get; set; }
 
-		public static bool UnobtrusiveJavaScriptEnabled
-		{
-			get { return ViewContext.GetUnobtrusiveJavaScriptEnabled(); }
-			set { ViewContext.SetUnobtrusiveJavaScriptEnabled(value); }
-		}
+        public static bool UnobtrusiveJavaScriptEnabled
+        {
+            get => ViewContext.GetUnobtrusiveJavaScriptEnabled();
+            set => ViewContext.SetUnobtrusiveJavaScriptEnabled(value);
+        }
 
 		public dynamic ViewBag
 		{
@@ -187,11 +182,11 @@ namespace ServiceStack.Html
 
 		public ViewContext ViewContext { get; private set; }
 
-		public ViewDataDictionary ViewData
-		{
-			get { return viewData ?? (viewData = new ViewDataDictionary()); }
-			protected set { viewData = value; }
-		}
+	    public ViewDataDictionary ViewData
+	    {
+	        get => viewData ?? (viewData = new ViewDataDictionary());
+	        protected set => viewData = value;
+	    }
 
 		public void SetModel(object model)
 		{
@@ -321,15 +316,15 @@ namespace ServiceStack.Html
 			return GenerateIdFromName(name, TagBuilder.IdAttributeDotReplacement);
 		}
 
-		public static string GenerateIdFromName(string name, string idAttributeDotReplacement)
-		{
-			if (name == null) {
-				throw new ArgumentNullException("name");
-			}
+        public static string GenerateIdFromName(string name, string idAttributeDotReplacement)
+        {
+            if (name == null) {
+                throw new ArgumentNullException(nameof(name));
+            }
 
-			if (idAttributeDotReplacement == null) {
-				throw new ArgumentNullException("idAttributeDotReplacement");
-			}
+            if (idAttributeDotReplacement == null) {
+                throw new ArgumentNullException(nameof(idAttributeDotReplacement));
+            }
 
 			// TagBuilder.CreateSanitizedId returns null for empty strings, return String.Empty instead to avoid breaking change
 			if (name.Length == 0) {
@@ -422,28 +417,28 @@ namespace ServiceStack.Html
 			return results;
 		}
 
-		public MvcHtmlString HttpMethodOverride(HttpVerbs httpVerb)
-		{
-			string httpMethod;
-			switch (httpVerb) {
-				case HttpVerbs.Delete:
-					httpMethod = "DELETE";
-					break;
-				case HttpVerbs.Head:
-					httpMethod = "HEAD";
-					break;
-				case HttpVerbs.Put:
-					httpMethod = "PUT";
-					break;
-				case HttpVerbs.Patch:
-					httpMethod = "PATCH";
-					break;
-				case HttpVerbs.Options:
-					httpMethod = "OPTIONS";
-					break;
-				default:
-					throw new ArgumentException(MvcResources.HtmlHelper_InvalidHttpVerb, "httpVerb");
-			}
+        public MvcHtmlString HttpMethodOverride(HttpVerbs httpVerb)
+        {
+            string httpMethod;
+            switch (httpVerb) {
+                case HttpVerbs.Delete:
+                    httpMethod = "DELETE";
+                    break;
+                case HttpVerbs.Head:
+                    httpMethod = "HEAD";
+                    break;
+                case HttpVerbs.Put:
+                    httpMethod = "PUT";
+                    break;
+                case HttpVerbs.Patch:
+                    httpMethod = "PATCH";
+                    break;
+                case HttpVerbs.Options:
+                    httpMethod = "OPTIONS";
+                    break;
+                default:
+                    throw new ArgumentException(MvcResources.HtmlHelper_InvalidHttpVerb, nameof(httpVerb));
+            }
 
 			return HttpMethodOverride(httpMethod);
 		}
@@ -452,12 +447,12 @@ namespace ServiceStack.Html
 		{
 			if (String.IsNullOrEmpty(httpMethod))
 			{
-				throw new ArgumentException(MvcResources.Common_NullOrEmpty, "httpMethod");
+				throw new ArgumentException(MvcResources.Common_NullOrEmpty, nameof(httpMethod));
 			}
 			if (String.Equals(httpMethod, "GET", StringComparison.OrdinalIgnoreCase) ||
 				String.Equals(httpMethod, "POST", StringComparison.OrdinalIgnoreCase))
 			{
-				throw new ArgumentException(MvcResources.HtmlHelper_InvalidHttpMethod, "httpMethod");
+				throw new ArgumentException(MvcResources.HtmlHelper_InvalidHttpMethod, nameof(httpMethod));
 			}
 
 			TagBuilder tagBuilder = new TagBuilder("input");
@@ -507,6 +502,14 @@ namespace ServiceStack.Html
             return feature != null
                 ? MvcHtmlString.Create(feature.Transform(markdown))
                 : new MvcHtmlString(MarkdownConfig.Transform(markdown));
+        }
+
+        public static MvcHtmlString IncludeFile(string virtualPath)
+        {
+            var file = HostContext.VirtualFileSources.GetFile(virtualPath);
+            return file != null
+                ? new MvcHtmlString(file.ReadAllText())
+                : MvcHtmlString.Empty;
         }
     }
 }
