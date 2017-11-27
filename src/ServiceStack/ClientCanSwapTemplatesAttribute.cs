@@ -8,8 +8,8 @@ namespace ServiceStack
     {
         public override void Execute(IRequest req, IResponse res, object requestDto)
         {
-            req.Items["View"] = req.GetParam("View");
-            req.Items["Template"] = req.GetParam("Template");
+            req.SetView(req.GetParam("View"));
+            req.SetTemplate(req.GetParam("Template"));
         }
     }
 }

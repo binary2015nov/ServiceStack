@@ -38,12 +38,12 @@ namespace ServiceStack.Formats
             ViewEngines = appHost.ViewEngines;
         }
 
-        public Task SerializeToStreamAsync(IRequest req, object response, Stream outputStream)
+        public async Task SerializeToStreamAsync(IRequest req, object response, Stream outputStream)
         {
             var res = req.Response;
             if (req.GetItem("HttpResult") is IHttpResult httpResult && httpResult.Headers.ContainsKey(HttpHeaders.Location)
                 && httpResult.StatusCode != System.Net.HttpStatusCode.Created)
-                return TypeConstants.EmptyTask;
+                return;
 
             try
             {
@@ -63,10 +63,9 @@ namespace ServiceStack.Formats
 
                 foreach (var viewEngine in ViewEngines)
                 {
-                    var task = viewEngine.ProcessRequestAsync(req, response, outputStream);
-                    task.Wait();
-                    if (task.Result)
-                        return task;
+                   var handled = await viewEngine.ProcessRequestAsync(req, response, outputStream);
+                    if (handled)
+                        return;
                 }
             }
             catch (Exception ex)
@@ -87,7 +86,7 @@ namespace ServiceStack.Formats
             }
 
             if (req.ResponseContentType != MimeTypes.Html && req.ResponseContentType != MimeTypes.JsonReport)
-                return TypeConstants.EmptyTask;
+                return;
 
             var dto = response.GetDto();
             if (!(dto is string html))
@@ -98,7 +97,20 @@ namespace ServiceStack.Formats
 
                 var now = DateTime.Now;
                 var requestName = req.OperationName ?? dto.GetType().GetOperationName();
-                var formatUrl = req.AbsoluteUri + (req.AbsoluteUri.IndexOf("?") != -1 ? "&" : "?");
+
+                string formatUrl = req.AbsoluteUri + "?";
+                var index = req.AbsoluteUri.IndexOf("?");
+                if (index > 0)
+                {
+                    formatUrl = req.AbsoluteUri.Substring(0, index + 1);
+                    foreach (var key in req.QueryString.AllKeys)
+                    {
+                        if (key == Keywords.Format)
+                            continue;
+
+                        formatUrl += key + "=" + req.QueryString[key] + "&";
+                    }                    
+                }
 
                 html = HtmlTemplates.GetHtmlFormatTemplate()
                     .Replace("${Dto}", json)
@@ -111,7 +123,7 @@ namespace ServiceStack.Formats
             }
 
             var utf8Bytes = html.ToUtf8Bytes();
-            return outputStream.WriteAsync(utf8Bytes, 0, utf8Bytes.Length);
+            await outputStream.WriteAsync(utf8Bytes, 0, utf8Bytes.Length);
         }
     }
 }

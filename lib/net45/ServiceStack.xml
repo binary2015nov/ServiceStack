@@ -4751,6 +4751,11 @@
             <param name="type">The type.</param>
             <returns></returns>
         </member>
+        <member name="T:ServiceStack.HotReloadFeature">
+            <summary>
+            Back-end Service used by /js/hot-fileloader.js to detect file changes in /wwwroot and auto reload page.
+            </summary>
+        </member>
         <!-- Badly formed XML comment ignored for member "T:ServiceStack.Html.HtmlCompressor" -->
         <member name="F:ServiceStack.Html.HtmlCompressor.PHP_TAG_PATTERN">
             Predefined pattern that matches <code>&lt;?php ... ?></code> tags. 

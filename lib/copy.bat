@@ -6,8 +6,6 @@ COPY ..\..\ServiceStack\src\ServiceStack.Interfaces\bin\%BUILD%\netstandard2.0\S
 
 COPY ..\..\ServiceStack.Text\src\ServiceStack.Text\bin\%BUILD%\net45\ServiceStack.Text.* net45
 COPY ..\..\ServiceStack.Text\src\ServiceStack.Text\bin\%BUILD%\netstandard2.0\ServiceStack.Text.* netstandard2.0
-COPY ..\..\ServiceStack.Text\src\ServiceStack.Text\bin\Signed\net45\ServiceStack.Text.* signed
-COPY ..\..\ServiceStack.Text\src\ServiceStack.Text\bin\%BUILD%\net45\ServiceStack.Text.* net45
 
 COPY ..\..\ServiceStack\src\ServiceStack.Client\bin\%BUILD%\net45\ServiceStack.Client.* net45
 COPY ..\..\ServiceStack\src\ServiceStack.Client\bin\%BUILD%\netstandard2.0\ServiceStack.Client.* netstandard2.0
@@ -44,10 +42,12 @@ COPY ..\..\ServiceStack.OrmLite\src\ServiceStack.OrmLite.PostgreSQL\bin\%BUILD%\
 COPY ..\..\ServiceStack.OrmLite\src\ServiceStack.OrmLite.MySql\bin\%BUILD%\net45\ServiceStack.OrmLite.MySql.* net45
 COPY ..\..\ServiceStack.OrmLite\src\ServiceStack.OrmLite.MySql\bin\%BUILD%\netstandard2.0\ServiceStack.OrmLite.MySql.* netstandard2.0
 
-COPY ..\..\ServiceStack.Aws\src\ServiceStack.Aws\bin\%BUILD%\net45\ServiceStack.Aws.* net45
-COPY ..\..\ServiceStack.Aws\src\ServiceStack.Aws\bin\%BUILD%\netstandard2.0\ServiceStack.Aws.* netstandard2.0
+COPY ..\..\ServiceStack.Aws\src\ServiceStack.Aws\bin\%BUILD%\net45\ServiceStack.Aws.dll net45
+COPY ..\..\ServiceStack.Aws\src\ServiceStack.Aws\bin\%BUILD%\net45\ServiceStack.Aws.xml net45
+COPY ..\..\ServiceStack.Aws\src\ServiceStack.Aws\bin\%BUILD%\netstandard2.0\ServiceStack.Aws.dll netstandard2.0
+COPY ..\..\ServiceStack.Aws\src\ServiceStack.Aws\bin\%BUILD%\netstandard2.0\ServiceStack.Aws.xml netstandard2.0
 
-COPY ..\..\ServiceStack.Admin\src\ServiceStack.Admin\bin\%BUILD%\net45\ServiceStack.Admin.* net45
-COPY ..\..\ServiceStack.Admin\src\ServiceStack.Admin\bin\%BUILD%\netstandard2.0\ServiceStack.Admin.* netstandard2.0
-
-
+COPY ..\..\Admin\src\ServiceStack.Admin\bin\%BUILD%\net45\ServiceStack.Admin.dll net45
+COPY ..\..\Admin\src\ServiceStack.Admin\bin\%BUILD%\net45\ServiceStack.Admin.xml net45
+COPY ..\..\Admin\src\ServiceStack.Admin\bin\%BUILD%\netstandard2.0\ServiceStack.Admin.dll netstandard2.0
+COPY ..\..\Admin\src\ServiceStack.Admin\bin\%BUILD%\netstandard2.0\ServiceStack.Admin.xml netstandard2.0

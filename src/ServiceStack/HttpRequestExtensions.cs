@@ -745,6 +745,9 @@ namespace ServiceStack
 
         public static void SetView(this IRequest httpReq, string viewName)
         {
+            if (viewName.IsNullOrEmpty())
+                return;
+
             httpReq.SetItem("View", viewName);
         }
 
@@ -755,6 +758,9 @@ namespace ServiceStack
 
         public static void SetTemplate(this IRequest httpReq, string templateName)
         {
+            if (templateName.IsNullOrEmpty())
+                return;
+
             httpReq.SetItem("Template", templateName);
         }
 
