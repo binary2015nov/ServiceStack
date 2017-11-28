@@ -37,6 +37,8 @@ namespace ServiceStack.Mvc
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(RazorFormat));
 
+        public static string DefaultLayout { get; set; } = "_Layout";
+
         public IVirtualPathProvider VirtualFileSources { get; set; }
 
         public List<string> ViewLocations { get; set; }
@@ -204,15 +206,16 @@ namespace ServiceStack.Mvc
                     if (viewData == null)
                         viewData = CreateViewData((object)null);
 
-                    if (layout == null)
-                        layout = "_Layout";
-
+                    // Use "_Layout" if unspecified
                     if (razorView != null)
-                        razorView.RazorPage.Layout = layout;
+                        razorView.RazorPage.Layout = layout ?? DefaultLayout;
 
-                    viewData["Layout"] = layout;
+                    // Allows Layout from being overridden in page with: Layout = Html.ResolveLayout("LayoutUnlessOverridden")
+                    if (layout != null)
+                        viewData["Layout"] = layout;
 
                     viewData[Keywords.IRequest] = req;
+
                     var viewContext = new ViewContext(
                         actionContext,
                         view,
