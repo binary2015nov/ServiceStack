@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using NUnit.Framework;
+using ServiceStack.Text;
 using ServiceStack.WebHost.IntegrationTests.Services;
 
 namespace ServiceStack.WebHost.IntegrationTests.Tests
@@ -91,16 +92,17 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
             }
             catch (WebServiceException ex)
             {
+                ex.PrintDump();
                 var response = (CustomersResponse)ex.ResponseDto;
 
                 var errorFields = response.ResponseStatus.Errors;
                 Assert.That(ex.StatusCode, Is.EqualTo((int)HttpStatusCode.BadRequest));
-                //Assert.That(ex.StatusDescription, Is.EqualTo("NotEqual")); //BadRequest
-                Assert.That(response.ResponseStatus.Message, Is.EqualTo("'Id' should not be equal to '0'."));
+                Assert.That(ex.StatusDescription, Is.EqualTo("NotEqual")); //BadRequest
+                //Assert.That(response.ResponseStatus.Message, Is.EqualTo("'Id' should not be equal to '0'."));
                 Assert.That(errorFields.Count, Is.EqualTo(1));
                 Assert.That(errorFields[0].ErrorCode, Is.EqualTo("NotEqual"));
                 Assert.That(errorFields[0].FieldName, Is.EqualTo("Id"));
-                Assert.That(errorFields[0].Message, Is.EqualTo("'Id' should not be equal to '0'."));
+                //Assert.That(errorFields[0].Message, Is.EqualTo("'Id' should not be equal to '0'."));
             }
         }
 
