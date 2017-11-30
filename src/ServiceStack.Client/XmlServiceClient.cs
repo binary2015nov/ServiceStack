@@ -39,7 +39,7 @@ namespace ServiceStack
             }
             catch (XmlException ex)
             {
-                if (xmlException.LineNumber == 0 && xmlException.LinePosition == 0)
+                if (ex.LineNumber == 0 && ex.LinePosition == 0)
                 {
                     //if (ex.Message == "Unexpected end of file.") //Empty responses
                     return default(T);

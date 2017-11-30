@@ -65,7 +65,7 @@ namespace ServiceStack.WebHost.IntegrationTests.Tests
         public void Can_download_File_Template_OperationControl()
         {
             var contents = "{0}/json/metadata?op=Hello".Fmt(ServiceStackBaseUri).GetStringFromUrl();
-            Assert.That(contents, Does.Contain("The following routes are available for this service"));
+            Assert.That(contents, Does.Contain("(File Resource)"));
         }
 
         [Test]

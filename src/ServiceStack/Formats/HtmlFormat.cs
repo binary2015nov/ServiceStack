@@ -95,22 +95,19 @@ namespace ServiceStack.Formats
                 var json = JsonDataContractSerializer.Instance.SerializeToString(dto) ?? "null";
                 json = json.Replace("<", "&lt;").Replace(">", "&gt;");
 
+                var url = req.ResolveAbsoluteUrl();
+                var index = url.IndexOf("?");
+                var formatUrl = index != -1 ? url.Substring(0, index + 1) : url + "?";
+                foreach (var key in req.QueryString.AllKeys)
+                {
+                    if (key == Keywords.Format)
+                        continue;
+
+                    formatUrl += (key.IsNullOrEmpty() ? "" : key + "=") + req.QueryString[key] + "&";
+                }
+
                 var now = DateTime.Now;
                 var requestName = req.OperationName ?? dto.GetType().GetOperationName();
-
-                string formatUrl = req.AbsoluteUri + "?";
-                var index = req.AbsoluteUri.IndexOf("?");
-                if (index > 0)
-                {
-                    formatUrl = req.AbsoluteUri.Substring(0, index + 1);
-                    foreach (var key in req.QueryString.AllKeys)
-                    {
-                        if (key == Keywords.Format)
-                            continue;
-
-                        formatUrl += key + "=" + req.QueryString[key] + "&";
-                    }                    
-                }
 
                 html = HtmlTemplates.GetHtmlFormatTemplate()
                     .Replace("${Dto}", json)
