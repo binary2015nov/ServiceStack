@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
-    <id>ServiceStack.Client</id>
-    <title>Service Clients for ServiceStack</title>
+    <id>ServiceStack.Client.Core</id>
+    <title>ServiceStack.Client .NET Standard 2.0</title>
     <version>5.0.0</version>
     <authors>ServiceStack</authors>
     <owners>ServiceStack</owners>
-    <summary>Opensource .NET and Mono REST Web Services framework</summary>
+    <summary>.NET's Standard 2.0 version of ServiceStack.Client</summary>
     <description>
       JSON, XML, JSV, SOAP and MQ Generic Service Clients.
     </description>
@@ -18,18 +18,14 @@
     <language>en-US</language>
     <copyright>ServiceStack and contributors</copyright>
     <dependencies>
-      <group targetFramework="net45">
-        <dependency id="ServiceStack.Interfaces" version="5.0.0" />
-        <dependency id="ServiceStack.Text" version="5.0.0" />
-      </group>
       <group targetFramework=".netstandard2.0">
         <dependency id="Microsoft.Extensions.Primitives" version="[2.0.0, )" />
         <dependency id="System.Net.Requests" version="[4.3.0, )" />
         <dependency id="System.ServiceModel.Primitives" version="[4.3.0, )" />
         <dependency id="System.Collections.Specialized" version="[4.3.0, )" />
         <dependency id="System.Xml.XmlSerializer" version="[4.3.0, )" />
-        <dependency id="ServiceStack.Interfaces" version="5.0.0" />
-        <dependency id="ServiceStack.Text" version="5.0.0" />
+        <dependency id="ServiceStack.Interfaces.Core" version="5.0.0" />
+        <dependency id="ServiceStack.Text.Core" version="5.0.0" />
       </group>
     </dependencies>
   </metadata>
