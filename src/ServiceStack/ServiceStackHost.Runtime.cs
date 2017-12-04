@@ -336,7 +336,7 @@ namespace ServiceStack
                 if (res.IsClosed) return res.IsClosed;
             }
 
-            foreach (var requestFilter in GlobalMessageResponseFiltersAsyncArray)
+            foreach (var requestFilter in GlobalMessageResponseFiltersAsync)
             {
                 requestFilter(req, res, response).Wait();
                 if (res.IsClosed) return res.IsClosed;

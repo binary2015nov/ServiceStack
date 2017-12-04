@@ -905,17 +905,17 @@ namespace ServiceStack
             if (httpCtx == null)
                 throw new NotImplementedException(ErrorMessages.OnlyAllowedInAspNetHosts);
 
-            return new AspNetRequest(httpCtx.ToHttpContextBase(), operationName);
+            return httpCtx.ToHttpContextBase().ToRequest(operationName);
         }
 
         public static IHttpRequest ToRequest(this HttpContextBase httpCtx, string operationName = null)
         {
-            return new AspNetRequest(httpCtx, operationName);
+            return httpCtx.Items[Keywords.IRequest] as AspNetRequest ?? new AspNetRequest(httpCtx, operationName);
         }
 
         public static IHttpRequest ToRequest(this HttpRequestBase httpCtx, string operationName = null)
         {
-            return new AspNetRequest(httpCtx.ToHttpContextBase(), operationName);
+            return httpCtx.ToHttpContextBase().ToRequest(operationName);
         }
 
         public static IHttpRequest ToRequest(this HttpListenerContext httpCtxReq, string operationName = null)

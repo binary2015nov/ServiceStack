@@ -171,8 +171,10 @@ namespace ServiceStack.WebHost.IntegrationTests
                         new DigestAuthProvider(AppSettings),
                         new BasicAuthProvider(AppSettings),
                     })
-                { IncludeRegistrationService = true });
-
+                {
+                    IncludeRegistrationService = true
+                });
+                ServiceStack.Auth.RegisterService.AllowUpdates = true;
                 container.Register<IAuthRepository>(c =>
                     new OrmLiteAuthRepository(c.Resolve<IDbConnectionFactory>()));
 
