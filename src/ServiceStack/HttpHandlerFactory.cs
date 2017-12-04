@@ -13,29 +13,22 @@ namespace ServiceStack
 {
     public class HttpHandlerFactory : IHttpHandlerFactory
     {
-        [ThreadStatic] private static string lastHandlerArgs;
-        public static string LastHandlerArgs => lastHandlerArgs;
-
+        private static string WebHostPhysicalPath;
         public static string DefaultRootFileName { get; private set; }
 
-        public static HashSet<string> WebHostRootFileNames { get; private set; }
-        private static string WebHostPhysicalPath;
         private static IHttpHandler DefaultHttpHandler;
         private static IHttpHandler ForbiddenHttpHandler;
         private static IHttpHandler NotFoundHttpHandler;
         private static readonly IHttpHandler StaticFilesHandler = new StaticFileHandler();
-        private static bool HostAutoRedirectsDirs;
+
+        [ThreadStatic]
+        public static string LastHandlerArgs;
 
         internal static void Init()
         {
             var appHost = HostContext.AppHost;
 
-            WebHostRootFileNames = Env.IsWindows
-                ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-                : new HashSet<string>();
-
             WebHostPhysicalPath = appHost.VirtualFileSources.RootDirectory.RealPath;
-            HostAutoRedirectsDirs = HostContext.IsAspNetHost && !Env.IsMono;
 
             //Apache+mod_mono treats path="servicestack*" as path="*" so takes over root path, so we need to serve matching resources
             var hostedAtRootPath = appHost.Config.HandlerFactoryPath.IsNullOrEmpty();
@@ -62,12 +55,6 @@ namespace ServiceStack
                             DefaultHttpHandler = new StaticFileHandler(file);
                     }
                 }
-                WebHostRootFileNames.Add(file.Name);
-            }
-
-            foreach (var dir in appHost.VirtualFileSources.GetRootDirectories())
-            {
-                WebHostRootFileNames.Add(dir.Name);
             }
 
             if (!appHost.Config.DefaultRedirectPath.IsNullOrEmpty())
@@ -134,7 +121,7 @@ namespace ServiceStack
             string location = appHost.Config.HandlerFactoryPath;
             var pathInfo = httpReq.PathInfo;
             string physicalPath = httpReq.PhysicalPath;
-            lastHandlerArgs = httpReq.Verb + "|" + httpReq.RawUrl + "|" + physicalPath;
+            LastHandlerArgs = httpReq.Verb + "|" + httpReq.RawUrl + "|" + physicalPath;
 
             //Default Request /
             if (pathInfo.IsNullOrEmpty() || pathInfo == "/")
