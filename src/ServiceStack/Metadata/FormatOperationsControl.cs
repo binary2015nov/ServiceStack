@@ -14,17 +14,13 @@ namespace ServiceStack.Metadata
     {
         public string Format { get; set; }
 
-        protected MetadataConfig MetadataConfig => MetadataPagesConfig.GetMetadataConfig(Format);
-
         protected override void Render(HtmlTextWriter output)
         {
-            var config = MetadataConfig;
-            var linksMap = OperationNames?.ToDictionary(p => new KeyValuePair<string, string>(config.DefaultMetadataUri + "?op=" + p, p));
-
+            var links = OperationNames?.ToDictionary(p => new KeyValuePair<string, string>("?op=" + p, p));
             var operationsPart = new ListTemplate
             {
                 Title = MetadataFeature.Operations,
-                ListItemsMap = ToAbsoluteUrls(linksMap),
+                ListItemsMap = links,
                 ListItemTemplate = @"<li><a href=""{0}"">{1}</a></li>"
             }.ToString();
 

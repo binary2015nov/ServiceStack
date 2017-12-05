@@ -12,20 +12,6 @@ namespace ServiceStack.Metadata
         public string Title { get; set; }
         public List<string> OperationNames { get; set; }
         public MetadataPagesConfig MetadataPagesConfig { get; set; }
-
-        protected virtual Dictionary<string, string> ToAbsoluteUrls(Dictionary<string, string> linksMap)
-        {
-            var to = new Dictionary<string, string>();
-            var baseUrl = Request.GetBaseUrl();
-
-            foreach (var entry in linksMap)
-            {
-                var url = entry.Key.StartsWith("#") ? entry.Key : baseUrl.AppendPath(entry.Key);
-                to[url] = entry.Value;
-            }
-
-            return to;
-        }
     }
 
     public class IndexOperationsControl : MetadataControl
@@ -179,7 +165,7 @@ namespace ServiceStack.Metadata
                  ? new ListTemplate
                  {
                      Title = MetadataFeature.PluginLinks,
-                     ListItemsMap = ToAbsoluteUrls(metadata.Sections[MetadataFeature.PluginLinks]),
+                     ListItemsMap = metadata.Sections[MetadataFeature.PluginLinks],
                      ListItemTemplate = @"<li><a href=""{0}"">{1}</a></li>"
                  }.ToString()
                  : "";
@@ -188,7 +174,7 @@ namespace ServiceStack.Metadata
                 ? new ListTemplate
                 {
                     Title = MetadataFeature.DebugInfo,
-                    ListItemsMap = ToAbsoluteUrls(metadata.Sections[MetadataFeature.DebugInfo]),
+                    ListItemsMap = metadata.Sections[MetadataFeature.DebugInfo],
                     ListItemTemplate = @"<li><a href=""{0}"">{1}</a></li>"
                 }.ToString()
                 : "";
@@ -196,7 +182,7 @@ namespace ServiceStack.Metadata
               ? new ListTemplate
               {
                   Title = MetadataFeature.AvailableFeatures,
-                  ListItemsMap = ToAbsoluteUrls(metadata.Sections[MetadataFeature.AvailableFeatures]),
+                  ListItemsMap = metadata.Sections[MetadataFeature.AvailableFeatures],
                   ListItemTemplate = @"<li><a href=""{0}"">{1}</a></li>"
               }.ToString()
               : "";
