@@ -37,8 +37,8 @@ namespace ServiceStack.Formats
 
             ViewEngines = appHost.ViewEngines;
 
-            appHost.GetPlugin<MetadataFeature>()?.AddLink(MetadataFeature.AvailableFeatures,
-                "http://docs.servicestack.net/html5reportformat", nameof(HtmlFormat));
+            appHost.GetPlugin<MetadataFeature>()
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/html5reportformat", "HTML5 Report Format");
         }
 
         public async Task SerializeToStreamAsync(IRequest req, object response, Stream outputStream)

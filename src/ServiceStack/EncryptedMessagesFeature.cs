@@ -206,6 +206,9 @@ namespace ServiceStack
                 };
                 return encResponse;
             });
+
+            appHost.GetPlugin<MetadataFeature>()
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/encrypted-messaging", "Encrypted Messaging");
         }
 
         private RSAParameters GetPrivateKey(string useKey)

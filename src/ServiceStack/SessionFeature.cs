@@ -27,7 +27,7 @@ namespace ServiceStack
             appHost.GlobalRequestFilters.Add(AddSessionIdToRequestFilter);
 
             appHost.GetPlugin<MetadataFeature>()
-                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/sessions", nameof(SessionFeature));
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/sessions", "Sessions");
         }
 
         public static void AddSessionIdToRequestFilter(IRequest req, IResponse res, object requestDto)

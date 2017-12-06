@@ -158,8 +158,8 @@ namespace ServiceStack.Formats
 			appHost.Config.IgnoreFormatsInMetadata.Add(MimeTypes.MarkdownText.ToContentFormat());
 			appHost.Config.IgnoreFormatsInMetadata.Add(MimeTypes.PlainText.ToContentFormat());
 
-            appHost.GetPlugin<MetadataFeature>()?
-               .AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/markdown-razor", nameof(MarkdownFormat));
+            appHost.GetPlugin<MetadataFeature>()
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/markdown-razor", nameof(MarkdownFormat));
         }
 
 		public MarkdownPage FindByPathInfo(string pathInfo)

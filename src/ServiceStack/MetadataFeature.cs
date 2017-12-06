@@ -31,7 +31,7 @@ namespace ServiceStack
             appHost.CatchAllHandlers.Add(ProcessRequest);
 
             AddLink(DebugInfo, "operations/metadata", "Operations Metadata");
-            AddLink(AvailableFeatures, "http://docs.servicestack.net/metadata-page", nameof(MetadataFeature));
+            AddLink(AvailableFeatures, "http://docs.servicestack.net/metadata-page", "Metadata Page");
         }
 
         public virtual IHttpHandler ProcessRequest(string httpMethod, string pathInfo, string filePath)

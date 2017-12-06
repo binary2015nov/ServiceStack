@@ -68,8 +68,8 @@ namespace ServiceStack.MsgPack
                 Serialize,
                 Deserialize);
 
-            appHost.GetPlugin<MetadataFeature>()?
-                .AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/messagepack-format", nameof(MsgPackFormat));
+            appHost.GetPlugin<MetadataFeature>()
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/messagepack-format", nameof(MsgPackFormat));
         }
 
         private static Dictionary<Type, IMsgPackType> msgPackTypeCache = new Dictionary<Type, IMsgPackType>();

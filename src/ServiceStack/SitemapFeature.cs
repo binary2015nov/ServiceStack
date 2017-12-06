@@ -108,7 +108,7 @@ namespace ServiceStack
             });
 
             appHost.GetPlugin<MetadataFeature>()
-                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/sitemaps", nameof(SitemapFeature));
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/sitemaps", "Sitemaps");
         }
 
         public class SitemapIndexHandler : HttpAsyncTaskHandler

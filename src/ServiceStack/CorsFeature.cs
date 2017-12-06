@@ -104,7 +104,7 @@ namespace ServiceStack
             }
 
             appHost.GetPlugin<MetadataFeature>()
-                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/corsfeature", nameof(CorsFeature));
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/corsfeature", "CORS Feature");
         }
     }
 }

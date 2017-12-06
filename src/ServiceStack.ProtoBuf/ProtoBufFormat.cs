@@ -11,8 +11,8 @@ namespace ServiceStack.ProtoBuf
         {
             appHost.ContentTypes.Register(MimeTypes.ProtoBuf, Serialize, Deserialize);
 
-            appHost.GetPlugin<MetadataFeature>()?
-                .AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/protobuf-format", nameof(ProtoBufFormat));
+            appHost.GetPlugin<MetadataFeature>()
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/protobuf-format", "ProtoBuf Format");
         }
 
         private static RuntimeTypeModel model;

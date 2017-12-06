@@ -21,10 +21,10 @@ namespace ServiceStack.Formats
                 }
             });
 
-            appHost.GetPlugin<MetadataFeature>()?.AddLink(MetadataFeature.AvailableFeatures,
-                "http://docs.servicestack.net/csv-format", nameof(CsvFormat));
-            appHost.GetPlugin<MetadataFeature>()?.AddLink(MetadataFeature.AvailableFeatures,
-                "http://docs.servicestack.net/jsv-format", "JsvFormat");
+            appHost.GetPlugin<MetadataFeature>()
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/csv-format", nameof(CsvFormat));
+            appHost.GetPlugin<MetadataFeature>()
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/jsv-format", "JsvFormat");
         }
 
         public void SerializeToStream(IRequest request, object requestDto, Stream stream)

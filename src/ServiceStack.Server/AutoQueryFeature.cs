@@ -181,8 +181,8 @@ namespace ServiceStack
             if (EnableAutoQueryViewer && appHost.GetPlugin<AutoQueryMetadataFeature>() == null)
                 appHost.LoadPlugin(new AutoQueryMetadataFeature { MaxLimit = MaxLimit });
 
-            appHost.GetPlugin<MetadataFeature>()?
-                .AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/autoquery", nameof(AutoQueryFeature));
+            appHost.GetPlugin<MetadataFeature>()
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/autoquery", nameof(AutoQueryFeature));
         }
 
         public void AfterPluginsLoaded(IAppHost appHost)

@@ -49,7 +49,7 @@ namespace ServiceStack
             appHost.GetPlugin<MetadataFeature>()
                 ?.AddLink(MetadataFeature.PluginLinks, AtRestPath.TrimStart('/'), "Postman Metadata");
             appHost.GetPlugin<MetadataFeature>()
-                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/postman", nameof(PostmanFeature));
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/postman", "Postman");
         }
     }
 

@@ -244,7 +244,7 @@ namespace ServiceStack
                 appHost.LoadPlugin(new AutoQueryMetadataFeature { MaxLimit = MaxLimit });
 
             appHost.GetPlugin<MetadataFeature>()
-                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/autoquery-data#autoquery-data-sources", nameof(AutoQueryDataFeature));
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/autoquery-data#autoquery-data-sources", "AutoQuery Data Sources");
         }
 
         public void AfterPluginsLoaded(IAppHost appHost)

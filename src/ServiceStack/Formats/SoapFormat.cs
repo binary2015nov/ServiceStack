@@ -45,7 +45,7 @@ namespace ServiceStack
             }
 
             appHost.GetPlugin<MetadataFeature>()
-                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/soap-support", nameof(SoapFormat));
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/soap-support", "SOAP support");
         }
     }
 
