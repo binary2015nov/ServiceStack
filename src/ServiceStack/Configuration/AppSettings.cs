@@ -23,8 +23,7 @@ namespace ServiceStack.Configuration
 #if !NETSTANDARD2_0
                 return ConfigurationManager.AppSettings[key];
 #else
-                string value;
-                return AppSettings.TryGetValue(key, out value)
+                return AppSettings.TryGetValue(key, out var value)
                     ? value
                     : null;
 #endif

@@ -25,15 +25,12 @@ namespace ServiceStack
         {
             var host = HostInstance;
 
-            if (host == null) 
-                return null;
-            
             var appConfigPaths = new List<string>(AppConfigPaths);
 
             try
             {
                 //dll App.config
-                var location = host.GetType().Assembly.Location;
+                var location = host?.GetType().Assembly.Location;
                 if (!string.IsNullOrEmpty(location))
                 {
                     var appHostDll = new FileInfo(location).Name;
@@ -49,9 +46,14 @@ namespace ServiceStack
             {
                 try
                 {
-                    var resolvedPath = host.MapProjectPath(configPath);
-                    if (File.Exists(resolvedPath))
-                        return resolvedPath;
+                    string resolvedPath;
+
+                    if (host != null)
+                    {
+                        resolvedPath = host.MapProjectPath(configPath);
+                        if (File.Exists(resolvedPath))
+                            return resolvedPath;
+                    }
 
                     resolvedPath = configPath.MapAbsolutePath();
                     if (File.Exists(resolvedPath))
