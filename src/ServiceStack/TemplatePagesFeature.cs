@@ -99,6 +99,9 @@ namespace ServiceStack
             }
 
             Init();
+
+            appHost.GetPlugin<MetadataFeature>()
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://templates.servicestack.net/", nameof(TemplatePagesFeature));
         }
 
         private readonly ConcurrentDictionary<string, byte> catchAllPathsNotFound =

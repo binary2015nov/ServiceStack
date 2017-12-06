@@ -112,6 +112,8 @@ namespace ServiceStack.WebHost.IntegrationTests
 
                 container.Register<IRedisClientsManager>(c => new RedisManagerPool());
 
+                Plugins.Add(new TemplatePagesFeature());
+
                 Plugins.Add(new ValidationFeature());
                 Plugins.Add(new SessionFeature());
                 Plugins.Add(new ProtoBufFormat());

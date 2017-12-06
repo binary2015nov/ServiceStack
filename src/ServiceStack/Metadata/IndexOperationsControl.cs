@@ -161,7 +161,7 @@ namespace ServiceStack.Metadata
             }
 
             var metadata = HostContext.GetPlugin<MetadataFeature>();
-            var pluginLinks = metadata?.Sections[MetadataFeature.PluginLinks].Count > 0
+            var pluginLinks = metadata.Sections.ContainsKey(MetadataFeature.PluginLinks)
                  ? new ListTemplate
                  {
                      Title = MetadataFeature.PluginLinks,
@@ -170,7 +170,7 @@ namespace ServiceStack.Metadata
                  }.ToString()
                  : "";
 
-            var debugOnlyInfo = metadata?.Sections[MetadataFeature.DebugInfo].Count > 0
+            var debugOnlyInfo = metadata.Sections.ContainsKey(MetadataFeature.DebugInfo)
                 ? new ListTemplate
                 {
                     Title = MetadataFeature.DebugInfo,
@@ -178,7 +178,7 @@ namespace ServiceStack.Metadata
                     ListItemTemplate = @"<li><a href=""{0}"">{1}</a></li>"
                 }.ToString()
                 : "";
-            var features = metadata?.Sections[MetadataFeature.AvailableFeatures].Count > 0
+            var features = metadata.Sections.ContainsKey(MetadataFeature.AvailableFeatures)
               ? new ListTemplate
               {
                   Title = MetadataFeature.AvailableFeatures,

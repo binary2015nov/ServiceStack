@@ -91,14 +91,6 @@ namespace ServiceStack
             }
         }
 
-        //public void AddSection(string sectionName)
-        //{
-        //    if (!Sections.ContainsKey(sectionName))
-        //    {
-        //        Sections[sectionName] = new Dictionary<string, string>();               
-        //    }           
-        //}
-
         public void AddLink(string sectionName, string href, string title)
         {
             if (!Sections.ContainsKey(sectionName))        
