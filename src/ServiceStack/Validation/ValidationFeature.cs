@@ -38,6 +38,9 @@ namespace ServiceStack.Validation
             {
                 appHost.GetContainer().RegisterValidators(appHost.ServiceAssemblies);
             }
+
+            appHost.GetPlugin<MetadataFeature>()?.AddLink(MetadataFeature.AvailableFeatures,
+                "http://docs.servicestack.net/validation", nameof(ValidationFeature));
         }
        
         /// <summary>

@@ -36,6 +36,9 @@ namespace ServiceStack.Formats
             appHost.Config.IgnoreFormatsInMetadata.Add(MimeTypes.JsonReport.ToContentFormat());
 
             ViewEngines = appHost.ViewEngines;
+
+            appHost.GetPlugin<MetadataFeature>()?.AddLink(MetadataFeature.AvailableFeatures,
+                "http://docs.servicestack.net/html5reportformat", nameof(HtmlFormat));
         }
 
         public async Task SerializeToStreamAsync(IRequest req, object response, Stream outputStream)

@@ -43,6 +43,9 @@ namespace ServiceStack
                 var soap12 = ContentFormat.GetContentFormat(Format.Soap12);
                 predefinedRoutes.HandlerMappings[soap12] = () => new Soap12MessageReplyHttpHandler();
             }
+
+            appHost.GetPlugin<MetadataFeature>()?.AddLink(MetadataFeature.AvailableFeatures,
+                "http://docs.servicestack.net/soap-support", nameof(SoapFormat));
         }
     }
 

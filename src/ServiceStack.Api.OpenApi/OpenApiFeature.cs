@@ -68,6 +68,9 @@ namespace ServiceStack.Api.OpenApi
 
             appHost.RegisterService(typeof(OpenApiService), "/openapi");
 
+            appHost.GetPlugin<MetadataFeature>()?
+                .AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/openapi", nameof(OpenApiFeature));
+
             if (!DisableSwaggerUI)
             {
                 var swaggerUrl = "swagger-ui/";

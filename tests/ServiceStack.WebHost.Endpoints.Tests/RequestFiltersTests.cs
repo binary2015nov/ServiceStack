@@ -641,7 +641,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             public void Does_return_Custom_SoapFault()
             {
                 var responseSoap = ServiceClientBaseUri.CombineWith("/Soap12")
-                    .SendStringToUrl(method: "POST", 
+                    .GetStringFromUrl(method: "POST", 
                         requestBody: @"<s:Envelope xmlns:s=""http://www.w3.org/2003/05/soap-envelope"" xmlns:a=""http://www.w3.org/2005/08/addressing"">
                             <s:Header>
                                 <a:Action s:mustUnderstand=""1"">SoapFaultTest</a:Action>
@@ -656,7 +656,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                         </s:Envelope>", 
                         contentType: "application/soap+xml; charset=utf-8",
                         responseFilter: res => { });
-
+                
                 Assert.That(responseSoap, Is.EqualTo(
                     @"<?xml version=""1.0"" encoding=""utf-8""?><s:Envelope xmlns:s=""http://www.w3.org/2003/05/soap-envelope""><s:Body><s:Fault><s:Code><s:Value>s:Receiver</s:Value></s:Code><s:Reason><s:Text xml:lang=""en-US"">Test SOAP Fault</s:Text></s:Reason></s:Fault></s:Body></s:Envelope>"));
             }

@@ -102,6 +102,9 @@ namespace ServiceStack
                         ? emitGlobalHeadersHandler
                         : null);
             }
+
+            appHost.GetPlugin<MetadataFeature>()
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/corsfeature", nameof(CorsFeature));
         }
     }
 }

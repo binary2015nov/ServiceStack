@@ -95,7 +95,7 @@ namespace ServiceStack
             if (DebugMode || EnableDebugTemplate || EnableDebugTemplateToAll)
             {
                 appHost.RegisterService(typeof(TemplateMetadataDebugService), TemplateMetadataDebugService.Route);
-                appHost.GetPlugin<MetadataFeature>()?.AddLink(MetadataFeature.DebugInfo, TemplateMetadataDebugService.Route, "Debug Templates");
+                appHost.GetPlugin<MetadataFeature>()?.AddLink(MetadataFeature.DebugInfo, TemplateMetadataDebugService.Route.TrimStart('/'), "Debug Templates");
             }
 
             Init();

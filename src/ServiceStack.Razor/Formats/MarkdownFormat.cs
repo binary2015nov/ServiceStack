@@ -157,7 +157,10 @@ namespace ServiceStack.Formats
 			appHost.ContentTypes.RegisterAsync(MimeTypes.PlainText, SerializeToStreamAsync, null);
 			appHost.Config.IgnoreFormatsInMetadata.Add(MimeTypes.MarkdownText.ToContentFormat());
 			appHost.Config.IgnoreFormatsInMetadata.Add(MimeTypes.PlainText.ToContentFormat());
-		}
+
+            appHost.GetPlugin<MetadataFeature>()?
+               .AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/markdown-razor", nameof(MarkdownFormat));
+        }
 
 		public MarkdownPage FindByPathInfo(string pathInfo)
 		{

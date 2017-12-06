@@ -139,6 +139,8 @@ namespace ServiceStack.Razor
 
             BindToAppHost(appHost);
 
+            appHost.GetPlugin<MetadataFeature>()?
+               .AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/razor-notes", nameof(RazorFormat));
         }
 
         private void BindToAppHost(IAppHost appHost)

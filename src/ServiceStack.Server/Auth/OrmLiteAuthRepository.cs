@@ -202,7 +202,7 @@ namespace ServiceStack.Auth
                 AssertNoExistingUser(db, newUser);
 
                 newUser.PopulatePasswordHashes(password);
-                newUser.CreatedDate = DateTime.UtcNow;
+                newUser.CreatedDate = DateTime.Now;
                 newUser.ModifiedDate = newUser.CreatedDate;
 
                 db.Save((TUserAuth)newUser);

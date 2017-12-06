@@ -29,6 +29,9 @@ namespace ServiceStack
 
             var authFeature = appHost.GetPlugin<AuthFeature>();
             authFeature.AuthEvents.Add(this);
+
+            //appHost.GetPlugin<MetadataFeature>()
+            //    ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/swagger-api", nameof(WebSudoFeature));
         }
 
         private void OnRequestStart(IRequest request, IResponse response, object dto)

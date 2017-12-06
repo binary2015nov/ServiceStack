@@ -41,7 +41,7 @@ namespace ServiceStack.Auth
         public virtual string DigestHa1Hash { get; set; }
         public virtual List<string> Roles { get; set; } = new List<string>();
         public virtual List<string> Permissions { get; set; } = new List<string>();
-        public virtual DateTime CreatedDate { get; set; } = DateTime.Now;
+        public virtual DateTime CreatedDate { get; set; }
         public virtual DateTime ModifiedDate { get; set; }
         public virtual int InvalidLoginAttempts { get; set; }
         public virtual DateTime? LastLoginAttempt { get; set; }

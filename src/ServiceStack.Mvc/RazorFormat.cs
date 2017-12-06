@@ -73,6 +73,9 @@ namespace ServiceStack.Mvc
 
             if (viewEngine == null || tempDataProvider == null)
                 throw new Exception("MVC Services have not been configured, Please add `services.AddMvc()` to StartUp.ConfigureServices()");
+
+            appHost.GetPlugin<MetadataFeature>()?
+                .AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/razor-notes", nameof(RazorFormat));
         }
 
         public System.Web.IHttpHandler CatchAllHandler(string httpmethod, string pathInfo, string filepath)

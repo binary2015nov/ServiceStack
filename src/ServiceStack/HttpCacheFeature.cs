@@ -28,6 +28,9 @@ namespace ServiceStack
         public void Register(IAppHost appHost)
         {
             appHost.GlobalResponseFiltersAsync.Add(HandleCacheResponses);
+
+            appHost.GetPlugin<MetadataFeature>()
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/http-caching", nameof(HttpCacheFeature));          
         }
 
         public async Task HandleCacheResponses(IRequest req, IResponse res, object response)

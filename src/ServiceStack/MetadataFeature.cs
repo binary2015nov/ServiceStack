@@ -24,13 +24,14 @@ namespace ServiceStack
         public MetadataFeature()
         {
             Sections = new Dictionary<string, Dictionary<string, string>>();
-            AddSection(PluginLinks);
-            AddLink(DebugInfo, "operations/metadata", "Operations Metadata");
         }
 
         public void Register(IAppHost appHost)
         {
             appHost.CatchAllHandlers.Add(ProcessRequest);
+
+            AddLink(DebugInfo, "operations/metadata", "Operations Metadata");
+            AddLink(AvailableFeatures, "http://docs.servicestack.net/metadata-page", nameof(MetadataFeature));
         }
 
         public virtual IHttpHandler ProcessRequest(string httpMethod, string pathInfo, string filePath)
@@ -90,17 +91,19 @@ namespace ServiceStack
             }
         }
 
-        public void AddSection(string sectionName)
-        {
-            if (!Sections.ContainsKey(sectionName))
-            {
-                Sections[sectionName] = new Dictionary<string, string>();               
-            }           
-        }
+        //public void AddSection(string sectionName)
+        //{
+        //    if (!Sections.ContainsKey(sectionName))
+        //    {
+        //        Sections[sectionName] = new Dictionary<string, string>();               
+        //    }           
+        //}
 
         public void AddLink(string sectionName, string href, string title)
         {
-            AddSection(sectionName);
+            if (!Sections.ContainsKey(sectionName))        
+                Sections[sectionName] = new Dictionary<string, string>();
+            
             Sections[sectionName][href] = title;
         }
     }

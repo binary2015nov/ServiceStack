@@ -13,7 +13,7 @@ namespace ServiceStack
     {
         public static bool IsIntegratedPipeline { get; protected set; }
 
-        public static ServiceStackHost HostInstance { get; set; }
+        internal static ServiceStackHost HostInstance { get; set; }
 
         public static Platform Instance = 
 #if NETSTANDARD2_0

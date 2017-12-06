@@ -25,6 +25,9 @@ namespace ServiceStack
         {
             //Add permanent and session cookies if not already set.
             appHost.GlobalRequestFilters.Add(AddSessionIdToRequestFilter);
+
+            appHost.GetPlugin<MetadataFeature>()
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/sessions", nameof(SessionFeature));
         }
 
         public static void AddSessionIdToRequestFilter(IRequest req, IResponse res, object requestDto)

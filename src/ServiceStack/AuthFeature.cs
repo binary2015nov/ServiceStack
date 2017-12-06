@@ -153,6 +153,9 @@ namespace ServiceStack
 
             AuthenticateService.HtmlRedirect = HtmlRedirect;
             AuthenticateService.AuthResponseDecorator = AuthResponseDecorator;
+
+            appHost.GetPlugin<MetadataFeature>()?
+                .AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/authentication-and-authorization", nameof(AuthFeature));
         }
 
         public void AfterPluginsLoaded(IAppHost appHost)

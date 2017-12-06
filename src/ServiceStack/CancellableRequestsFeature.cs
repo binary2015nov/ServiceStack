@@ -28,6 +28,9 @@ namespace ServiceStack
         public void Register(IAppHost appHost)
         {
             appHost.RegisterService(typeof(CancellableRequestService), AtPath);
+
+            appHost.GetPlugin<MetadataFeature>()
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/cancellable-requests", nameof(CancellableRequestsFeature));
         }
     }
 

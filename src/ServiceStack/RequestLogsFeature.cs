@@ -114,6 +114,8 @@ namespace ServiceStack
 
             appHost.GetPlugin<MetadataFeature>()
                 ?.AddLink(MetadataFeature.DebugInfo, AtRestPath.TrimStart('/'), "Request Logs");
+            appHost.GetPlugin<MetadataFeature>()
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/request-logger", nameof(RequestLogsFeature));
         }
     }
 }

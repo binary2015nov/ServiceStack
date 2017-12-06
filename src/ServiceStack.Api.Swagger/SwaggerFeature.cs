@@ -75,6 +75,8 @@ namespace ServiceStack.Api.Swagger
 
             appHost.GetPlugin<MetadataFeature>()
                 ?.AddLink(MetadataFeature.DebugInfo, swaggerUrl, "Swagger UI");
+            appHost.GetPlugin<MetadataFeature>()
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/swagger-api", nameof(SwaggerFeature));
 
             appHost.CatchAllHandlers.Add((httpMethod, pathInfo, filePath) =>
             {

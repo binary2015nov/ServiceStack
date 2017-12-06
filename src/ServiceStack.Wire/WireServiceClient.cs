@@ -64,6 +64,9 @@ namespace ServiceStack.Wire
             appHost.ContentTypes.Register(MimeTypes.Wire,
                 Serialize,
                 Deserialize);
+
+            appHost.GetPlugin<MetadataFeature>()?
+                .AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/wire-format", nameof(WireFormat));
         }
 
         public static void Serialize(IRequest requestContext, object dto, Stream outputStream)

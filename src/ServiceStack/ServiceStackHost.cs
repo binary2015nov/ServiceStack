@@ -365,12 +365,8 @@ namespace ServiceStack
 
         private void AfterPluginsLoaded()
         {
-            MetadataFeature feature = GetPlugin<MetadataFeature>();
-            feature?.AddSection(MetadataFeature.AvailableFeatures);
             foreach (var plugin in Plugins)
             {
-                var title = plugin.GetType().Name;
-                feature?.AddLink(MetadataFeature.AvailableFeatures, "#" + title, title);
                 try
                 {             
                     if (plugin is IPostInitPlugin preInitPlugin)

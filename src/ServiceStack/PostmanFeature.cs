@@ -43,11 +43,13 @@ namespace ServiceStack
         {
             appHost.RegisterService<PostmanService>(AtRestPath);
 
-            appHost.GetPlugin<MetadataFeature>()
-                   ?.AddLink(MetadataFeature.PluginLinks, AtRestPath.TrimStart('/'), "Postman Metadata");
-
             if (EnableSessionExport == null)
                 EnableSessionExport = appHost.Config.DebugMode;
+
+            appHost.GetPlugin<MetadataFeature>()
+                ?.AddLink(MetadataFeature.PluginLinks, AtRestPath.TrimStart('/'), "Postman Metadata");
+            appHost.GetPlugin<MetadataFeature>()
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/postman", nameof(PostmanFeature));
         }
     }
 

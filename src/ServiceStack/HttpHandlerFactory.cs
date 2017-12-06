@@ -33,12 +33,12 @@ namespace ServiceStack
             //Apache+mod_mono treats path="servicestack*" as path="*" so takes over root path, so we need to serve matching resources
             var hostedAtRootPath = appHost.Config.HandlerFactoryPath.IsNullOrEmpty();
 
-#if !NETSTANDARD2_0
-            //DefaultHttpHandler not supported in IntegratedPipeline mode
-            if (!Platform.IsIntegratedPipeline && HostContext.IsAspNetHost && !hostedAtRootPath && !Env.IsMono)
-                DefaultHttpHandler = new DefaultHttpHandler();
-#endif
-            var rootFiles = appHost.VirtualFileSources.GetRootFiles().ToList();
+//#if !NETSTANDARD2_0
+//            //DefaultHttpHandler not supported in IntegratedPipeline mode
+//            if (!Platform.IsIntegratedPipeline && HostContext.IsAspNetHost && !hostedAtRootPath && !Env.IsMono)
+//                DefaultHttpHandler = new DefaultHttpHandler();
+//#endif
+            var rootFiles = appHost.VirtualFileSources.GetRootFiles();
             DefaultRootFileName = null;
             foreach (var file in rootFiles)
             {

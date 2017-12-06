@@ -27,6 +27,9 @@ namespace ServiceStack
         {
             appHost.ServiceExceptionHandlers.Add(HandleServiceException);
             appHost.UncaughtExceptionHandlers.Add(HandleUncaughtException);
+
+            appHost.GetPlugin<MetadataFeature>()
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/request-logger#redis-request-logger", nameof(RedisErrorLoggerFeature));
         }
 
         /// <summary>
