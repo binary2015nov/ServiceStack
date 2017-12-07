@@ -96,8 +96,8 @@ namespace ServiceStack.Formats
 			foreach (var ns in appHost.Config.RazorNamespaces)
 				Evaluator.AddAssembly(ns);
 
-			this.MarkdownBaseType = this.MarkdownBaseType;
-			this.MarkdownGlobalHelpers = this.MarkdownGlobalHelpers;
+			//this.MarkdownBaseType = this.MarkdownBaseType;
+			//this.MarkdownGlobalHelpers = this.MarkdownGlobalHelpers;
 
 			this.ReplaceTokens = appHost.Config.HtmlReplaceTokens ?? new Dictionary<string, string>();
 			var webHostUrl = appHost.Config.WebHostUrl;
@@ -159,7 +159,7 @@ namespace ServiceStack.Formats
 			appHost.Config.IgnoreFormatsInMetadata.Add(MimeTypes.PlainText.ToContentFormat());
 
             appHost.GetPlugin<MetadataFeature>()
-                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/markdown-razor", nameof(MarkdownFormat));
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/markdown-razor", "Markdown Razor");
         }
 
 		public MarkdownPage FindByPathInfo(string pathInfo)

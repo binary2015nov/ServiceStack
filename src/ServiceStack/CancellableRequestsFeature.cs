@@ -30,7 +30,7 @@ namespace ServiceStack
             appHost.RegisterService(typeof(CancellableRequestService), AtPath);
 
             appHost.GetPlugin<MetadataFeature>()
-                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/cancellable-requests", nameof(CancellableRequestsFeature));
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/cancellable-requests", "Cancellable Requests");
         }
     }
 

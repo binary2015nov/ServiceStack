@@ -30,7 +30,7 @@ namespace ServiceStack
             appHost.GlobalResponseFiltersAsync.Add(HandleCacheResponses);
 
             appHost.GetPlugin<MetadataFeature>()
-                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/http-caching", nameof(HttpCacheFeature));          
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/http-caching", "HTTP Caching");          
         }
 
         public async Task HandleCacheResponses(IRequest req, IResponse res, object response)

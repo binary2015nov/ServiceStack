@@ -97,7 +97,7 @@ namespace ServiceStack
 			}
 
             appHost.GetPlugin<MetadataFeature>()
-                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/server-events", nameof(ServerEventsFeature));
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/server-events", "Server Events");
         }
 
 		internal bool CanAccessSubscription(IRequest req, SubscriptionInfo sub)

@@ -64,7 +64,7 @@ namespace ServiceStack
                 : null);
 
             appHost.GetPlugin<MetadataFeature>()
-                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/proxy-feature", nameof(ProxyFeature));
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/proxy-feature", "Proxy Feature");
         }
     }
 
