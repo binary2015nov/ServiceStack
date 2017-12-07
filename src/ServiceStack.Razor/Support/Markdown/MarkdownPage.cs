@@ -96,8 +96,8 @@ namespace ServiceStack.Support.Markdown
 			return exprSeq++;
 		}
 
-		public TemplateBlock[] MarkdownBlocks { get; set; }
-		public TemplateBlock[] HtmlBlocks { get; set; }
+        public TemplateBlock[] MarkdownBlocks { get; set; } = { };
+        public TemplateBlock[] HtmlBlocks { get; set; } = { };
 
 		private Exception initException;
 		private TemplateBlock lastBlockProcessed;
@@ -235,12 +235,12 @@ namespace ServiceStack.Support.Markdown
 						initException = null;
 						hasCompletedFirstRun = true;
 					}
-					catch (Exception ex)
-					{
-						initException = ex;
-						throw;
-					}
-					finally
+                    catch (Exception ex)
+                    {
+                        initException = ex;
+                        throw;
+                    }
+                    finally
 					{
 						isBusy = false;
 					}

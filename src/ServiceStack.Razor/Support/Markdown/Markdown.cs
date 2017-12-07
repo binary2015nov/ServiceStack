@@ -359,7 +359,7 @@ namespace MarkdownSharp
         /// </remarks>
         public string Transform(string text)
         {
-            if (String.IsNullOrEmpty(text)) return "";
+            if (string.IsNullOrEmpty(text)) return "";
 
             if (UseMarkdownDeep)
 			{

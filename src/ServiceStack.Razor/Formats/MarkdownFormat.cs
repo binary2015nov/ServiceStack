@@ -96,9 +96,6 @@ namespace ServiceStack.Formats
 			foreach (var ns in appHost.Config.RazorNamespaces)
 				Evaluator.AddAssembly(ns);
 
-			//this.MarkdownBaseType = this.MarkdownBaseType;
-			//this.MarkdownGlobalHelpers = this.MarkdownGlobalHelpers;
-
 			this.ReplaceTokens = appHost.Config.HtmlReplaceTokens ?? new Dictionary<string, string>();
 			var webHostUrl = appHost.Config.WebHostUrl;
 			if (!webHostUrl.IsNullOrEmpty())
@@ -164,7 +161,9 @@ namespace ServiceStack.Formats
 
 		public MarkdownPage FindByPathInfo(string pathInfo)
 		{
-			var normalizedPathInfo = pathInfo.IsNullOrEmpty() ? DefaultPage : pathInfo.TrimStart(DirSeps);
+            var filePath = pathInfo.TrimStart(DirSeps);
+
+            var normalizedPathInfo = filePath.IsNullOrEmpty() ? DefaultPage : filePath;
 			var markdownPage = GetContentPage(
 				normalizedPathInfo,
 				normalizedPathInfo.CombineWith(DefaultPage));
