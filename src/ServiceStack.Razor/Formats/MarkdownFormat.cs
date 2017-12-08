@@ -457,7 +457,7 @@ namespace ServiceStack.Formats
 					? templateProvider.GetTemplatePath(markDownFile.Directory)
 					: null;
 
-				yield return new MarkdownPage(this, markDownFile.VirtualPath,
+				yield return new MarkdownPage(this, markDownFile.RealPath,
 					pageName, pageContents, pageType) {
 						Template = templatePath,
 						LastModified = markDownFile.LastModified,

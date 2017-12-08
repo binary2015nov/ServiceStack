@@ -124,7 +124,7 @@ namespace ServiceStack.VirtualPath
             if (dirName[dirName.Length - 1] == ':')
             {
                 var dir = new DirectoryInfo(dirName + Path.DirectorySeparatorChar);
-                var subDirs = dir.GetDirectories();
+                return dir.GetDirectories();
             }
 
             return BackingDirInfo.GetDirectories(dirName, SearchOption.TopDirectoryOnly);
