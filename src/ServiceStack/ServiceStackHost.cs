@@ -104,6 +104,8 @@ namespace ServiceStack
                 typeof(HotReloadFilesService),
                 typeof(TemplateApiPagesService),
                 typeof(TemplateMetadataDebugService),
+                typeof(ServerEventsSubscribersService),
+                typeof(ServerEventsUnRegisterService),
             };
         }
 

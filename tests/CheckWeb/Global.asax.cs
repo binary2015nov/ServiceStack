@@ -94,7 +94,15 @@ namespace CheckWeb
             Plugins.Add(new AdminFeature());
 
             Plugins.Add(new PostmanFeature());
-            Plugins.Add(new CorsFeature());
+            Plugins.Add(new CorsFeature(
+                allowOriginWhitelist: new[] { "http://localhost", "http://localhost:8080", "http://localhost:56500", "http://test.servicestack.net", "http://null.jsbin.com" },
+                allowCredentials: true,
+                allowedHeaders: "Content-Type, Allow, Authorization, X-Args"));
+
+            Plugins.Add(new ServerEventsFeature
+            {
+                LimitToAuthenticatedUsers = true
+            });
 
             GlobalRequestFilters.Add((req, res, dto) =>
             {
@@ -243,6 +251,11 @@ namespace CheckWeb
                 new IAuthProvider[]
                 {
                     new CredentialsAuthProvider(AppSettings),
+                    new JwtAuthProvider(AppSettings)
+                    {
+                        AuthKey = Convert.FromBase64String("3n/aJNQHPx0cLu/2dN3jWf0GSYL35QlMqgz+LH3hUyA="),
+                        RequireSecureConnection = false,
+                    }, 
                     new ApiKeyAuthProvider(AppSettings),
                     new BasicAuthProvider(AppSettings),
                 }));
