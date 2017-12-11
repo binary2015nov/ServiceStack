@@ -70,7 +70,7 @@ namespace ServiceStack.Auth
             return jwtProvider;
         }
 
-        public static void Init(Func<IAuthSession> sessionFactory, params IAuthProvider[] authProviders)
+        public static void Init(params IAuthProvider[] authProviders)
         {
             if (authProviders.Length == 0)
                 throw new ArgumentNullException(nameof(authProviders));

@@ -863,8 +863,8 @@ namespace ServiceStack
                 throw new ArgumentNullException(nameof(httpMethod));
 
             this.PopulateRequestMetadata(request);
-
-            if (!HttpUtils.HasRequestBody(httpMethod) && request != null)
+            var hasRequestBody = HttpUtils.HasRequestBody(httpMethod);
+            if (!hasRequestBody && request != null)
             {
                 var queryString = QueryStringSerializer.SerializeToString(request);
                 if (!string.IsNullOrEmpty(queryString))

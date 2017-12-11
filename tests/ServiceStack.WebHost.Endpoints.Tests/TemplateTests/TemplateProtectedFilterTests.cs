@@ -48,15 +48,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests.TemplateTests
     {
         class AppHost : AppSelfHostBase
         {
-            public AppHost() : base(nameof(TemplateProtectedFilterTests), typeof(TemplatePageServices).Assembly) {}
+            public AppHost() : base(nameof(TemplateProtectedFilterTests), typeof(TemplatePageServices).Assembly)
+            {
+                Config.UseCamelCase = true; //normalize with .NET Core
+            }
 
             public override void Configure(Container container)
             {
-                SetConfig(new HostConfig
-                {
-                    UseCamelCase = false, //normalize with .NET Core
-                });
-
                 Plugins.Add(new TemplatePagesFeature
                 {
                     Args =

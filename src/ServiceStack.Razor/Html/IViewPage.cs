@@ -6,7 +6,7 @@ namespace ServiceStack
 	{
 		bool IsCompiled { get; }
 
-		void Compile(bool force=false);
+		void Compile(bool force = false);
 	}
 }
 

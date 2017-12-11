@@ -37,13 +37,12 @@ namespace ServiceStack
             {
                 return XmlSerializer.Deserialize<T>(stream);
             }
-            catch (XmlException ex)
+            catch (Exception ex)
             {
-                if (ex.LineNumber == 0 && ex.LinePosition == 0)
-                {
+                if ((ex.InnerException ?? ex) is XmlException xmlException && xmlException.LineNumber == 0 && xmlException.LinePosition == 0)               
                     //if (ex.Message == "Unexpected end of file.") //Empty responses
                     return default(T);
-                }
+                
                 throw;
             }
         }

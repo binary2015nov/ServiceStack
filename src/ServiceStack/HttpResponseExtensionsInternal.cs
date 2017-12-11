@@ -321,7 +321,7 @@ namespace ServiceStack
                     //.NET Core prohibuts some status codes from having a body
                     if (originalEx is InvalidOperationException invalidEx)
                     {
-                        Log.Error(invalidEx.Message, invalidEx);
+                        Logger.Error(invalidEx.Message, invalidEx);
                         await response.OutputStream.FlushAsync(token); // Prevent hanging clients
                     }
 
