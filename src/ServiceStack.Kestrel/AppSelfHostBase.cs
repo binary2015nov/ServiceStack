@@ -27,6 +27,11 @@ namespace ServiceStack
         {
             this.app = app;
 
+            if (pathBase != null)
+            {
+                this.app.UsePathBase(pathBase);
+            }
+
             var env = app.ApplicationServices.GetService<IHostingEnvironment>();
             WebHostPhysicalPath = env.WebRootPath ?? env.ContentRootPath;
             Config.DebugMode = env.IsDevelopment();
@@ -131,8 +136,27 @@ namespace ServiceStack
             return base.Init();
         }
 
+        private string pathBase;
+        private string ParsePathBase(string urlBase)
+        {
+            var pos = urlBase.IndexOf('/', "https://".Length);
+            if (pos >= 0)
+            {
+                var afterHost = urlBase.Substring(pos);
+                if (afterHost.Length > 1)
+                {
+                    pathBase = afterHost;
+                    return urlBase.Substring(0, pos + 1);
+                }
+            }
+
+            return urlBase;
+        }
+
         public override ServiceStackHost Start(string urlBase)
         {
+            urlBase = ParsePathBase(urlBase);
+
             return Start(new[] { urlBase });
         }
 

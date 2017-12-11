@@ -151,7 +151,7 @@ namespace ServiceStack
             this.PopulateRequestMetadata(request);
 
             var requestUri = absoluteUrl;
-            var hasQueryString = request != null && !httpMethod.HasRequestBody();
+            var hasQueryString = request != null && !HttpUtils.HasRequestBody(httpMethod);
             if (hasQueryString)
             {
                 var queryString = QueryStringSerializer.SerializeToString(request);
@@ -221,7 +221,7 @@ namespace ServiceStack
 
             try
             {
-                if (webReq.Method.HasRequestBody())
+                if (HttpUtils.HasRequestBody(webReq.Method))
                 {
                     webReq.ContentType = ContentType;
 

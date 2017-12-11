@@ -16,4 +16,9 @@ namespace ServiceStack.Configuration
 
         T Get<T>(string key, T defaultValue);
     }
+
+    public interface IRuntimeAppSettings
+    {
+        T Get<T>(Web.IRequest request, string name, T defaultValue);
+    }
 }

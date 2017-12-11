@@ -23,26 +23,27 @@ namespace ServiceStack.MiniProfiler
 		public void Stop() => MiniProfiler.Stop(discardResults:false);
 		public IDisposable Step(string name) => Current?.Step(name);
 
-		public IHtmlString RenderIncludes(RenderPosition? position = null, bool? showTrivial = null, bool? showTimeWithChildren = null,
-			int? maxTracesToShow = null, bool xhtml = false, bool? showControls = null)
-		{
-			return Current?.RenderIncludes(position, showTrivial, showTimeWithChildren, maxTracesToShow, xhtml, showControls);
-		}
-	}
-	
-	/// <summary>
-	/// A single MiniProfiler can be used to represent any number of steps/levels in a call-graph, via Step()
-	/// </summary>
-	/// <remarks>Totally baller.</remarks>
-	[Exclude(Feature.Soap)]
-	[DataContract]
-	public partial class MiniProfiler : IProfiler 
-	{
-		/// <summary>
-		/// Identifies this Profiler so it may be stored/cached.
-		/// </summary>
-		[DataMember(Order = 1, Name = "Id")]
-		public Guid Id { get; set; }
+        public IHtmlString RenderIncludes(RenderPosition? position = null, bool? showTrivial = null, bool? showTimeWithChildren = null,
+            int? maxTracesToShow = null, bool xhtml = false, bool? showControls = null)
+        {
+            var result = Current?.RenderIncludes(position, showTrivial, showTimeWithChildren, maxTracesToShow, xhtml, showControls);
+            return result ?? HtmlString.Empty;
+        }
+    }
+    
+    /// <summary>
+    /// A single MiniProfiler can be used to represent any number of steps/levels in a call-graph, via Step()
+    /// </summary>
+    /// <remarks>Totally baller.</remarks>
+    [Exclude(Feature.Soap)]
+    [DataContract]
+    public partial class MiniProfiler : IProfiler 
+    {
+        /// <summary>
+        /// Identifies this Profiler so it may be stored/cached.
+        /// </summary>
+        [DataMember(Order = 1, Name = "Id")]
+        public Guid Id { get; set; }
 
 		/// <summary>
 		/// A display name for this profiling session.

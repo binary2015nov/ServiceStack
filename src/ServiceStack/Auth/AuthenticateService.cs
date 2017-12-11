@@ -27,7 +27,7 @@ namespace ServiceStack.Auth
             {
                 foreach (var authProvider in AuthProviders)
                 {
-                    if (authProvider is IUserSessionSource sessionSource)
+                    if (authProvider is IUserSessionSource sessionSource) //don't remove
                         return sessionSource;
                 }
             }
@@ -59,14 +59,24 @@ namespace ServiceStack.Auth
             return null;
         }
 
-        public static void Init(params IAuthProvider[] authProviders)
+        public static JwtAuthProviderReader GetJwtAuthProvider() => GetAuthProvider(JwtAuthProviderReader.Name) as JwtAuthProviderReader;
+
+        public static JwtAuthProviderReader GetRequiredJwtAuthProvider()
         {
-            var oauthProvider = authProviders.FirstOrDefault(p => p is IOAuthProvider);
-            if (oauthProvider != null)
-            {
-                DefaultOAuthProvider = oauthProvider.Provider;
-                DefaultOAuthRealm = oauthProvider.AuthRealm;
-            }
+            var jwtProvider = GetJwtAuthProvider();
+            if (jwtProvider == null)
+                throw new NotSupportedException("JwtAuthProvider is required but was not registered in AuthFeature's AuthProviders");
+
+            return jwtProvider;
+        }
+
+        public static void Init(Func<IAuthSession> sessionFactory, params IAuthProvider[] authProviders)
+        {
+            if (authProviders.Length == 0)
+                throw new ArgumentNullException(nameof(authProviders));
+
+            DefaultOAuthProvider = authProviders[0].Provider;
+            DefaultOAuthRealm = authProviders[0].AuthRealm;
 
             AuthProviders = authProviders;
             AuthWithRequestProviders = authProviders.OfType<IAuthWithRequest>().ToArray();
@@ -103,7 +113,7 @@ namespace ServiceStack.Auth
             if (AuthProviderCatageries.LogoutAction.EqualsIgnoreCase(request.Provider))
                 return authProvider.Logout(this, request);
 
-            if (authProvider is IAuthWithRequest authWithRequest && !Request.IsInProcessRequest())
+            if (authProvider is IAuthWithRequest && !base.Request.IsInProcessRequest())
             {
                 //IAuthWithRequest normally doesn't call Authenticate directly, but they can to return Auth Info
                 //But as AuthenticateService doesn't have [Authenticate] we need to call it manually

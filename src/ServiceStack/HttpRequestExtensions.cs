@@ -35,11 +35,11 @@ namespace ServiceStack
         /// <returns>string value or null if it doesn't exist</returns>
         public static string GetItemOrCookie(this IRequest httpReq, string name)
         {
-            object value;
-            if (httpReq.Items.TryGetValue(name, out value)) return value.ToString();
+            if (httpReq.Items.TryGetValue(name, out var value))
+                return value.ToString();
 
-            Cookie cookie;
-            if (httpReq.Cookies.TryGetValue(name, out cookie)) return cookie.Value;
+            if (httpReq.Cookies.TryGetValue(name, out var cookie))
+                return cookie.Value;
 
             return null;
         }
@@ -63,11 +63,9 @@ namespace ServiceStack
             //TryGetValue is not happy with null dictionary keys, so we should bail out here
             if (name.IsNullOrEmpty()) return null;
 
-            Cookie cookie;
-            if (httpReq.Cookies.TryGetValue(name, out cookie)) return cookie.Value;
+            if (httpReq.Cookies.TryGetValue(name, out var cookie)) return cookie.Value;
 
-            object oValue;
-            if (httpReq.Items.TryGetValue(name, out oValue)) return oValue.ToString();
+            if (httpReq.Items.TryGetValue(name, out var oValue)) return oValue.ToString();
 
             return null;
         }

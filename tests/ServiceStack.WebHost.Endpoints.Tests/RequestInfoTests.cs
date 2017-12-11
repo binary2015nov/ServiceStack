@@ -20,7 +20,12 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             protected override void OnBeforeInit()
             {
+#if NETCORE
+                var useProjectPath = MapProjectPath("~/"); // .NET Core accurately reports the ContentPath from where it's run
+#else
                 var useProjectPath = MapProjectPath("~/../");
+#endif
+
                 var parentDir = useProjectPath.Replace("\\", "/").TrimEnd('/').LastRightPart('/');
                 Assert.That(parentDir, Is.EqualTo("ServiceStack.WebHost.Endpoints.Tests"));
                 WebHostPhysicalPath = useProjectPath;

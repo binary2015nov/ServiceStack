@@ -935,9 +935,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [Test]
-#if NETCORE
-        [Ignore("Temporary disabled on .NET Core to fix build on CI")]
-#endif
         public void Html_clients_receive_redirect_to_login_page_when_accessing_unauthenticated()
         {
             var client = (ServiceClientBase)GetHtmlClient();
@@ -957,7 +954,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             {
 #if NETCORE
                 //AllowAutoRedirect=false is not implemented in .NET Core and throws NotFound exception
-                if (ex.StatusCode == (int)HttpStatusCode.NotFound)
+                if (ex.StatusCode == (int)HttpStatusCode.Found)
                     return;
 #endif
                 throw ex;
@@ -969,9 +966,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [Test]
-#if NETCORE
-        [Ignore("Temporary disabled on .NET Core to fix build on CI")]
-#endif
         public void Html_clients_receive_secured_url_attempt_in_login_page_redirect_query_string()
         {
             var client = (ServiceClientBase)GetHtmlClient();
@@ -991,7 +985,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             {
 #if NETCORE
                 //AllowAutoRedirect=false is not implemented in .NET Core and throws NotFound exception
-                if (ex.StatusCode == (int)HttpStatusCode.NotFound)
+                if (ex.StatusCode == (int)HttpStatusCode.Found)
                     return;
 #endif
                 throw ex;
@@ -1013,9 +1007,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
 
         [Test]
-#if NETCORE
-        [Ignore("Temporary disabled on .NET Core to fix build on CI")]
-#endif
         public void Html_clients_receive_secured_url_including_query_string_within_login_page_redirect_query_string()
         {
             var client = (ServiceClientBase)GetHtmlClient();
@@ -1036,7 +1027,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             {
 #if NETCORE
                 //AllowAutoRedirect=false is not implemented in .NET Core and throws NotFound exception
-                if (ex.StatusCode == (int)HttpStatusCode.NotFound)
+                if (ex.StatusCode == (int)HttpStatusCode.Found)
                     return;
 #endif
                 throw ex;
@@ -1078,7 +1069,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             {
 #if NETCORE
                 //AllowAutoRedirect=false is not implemented in .NET Core and throws NotFound exception
-                if (ex.StatusCode == (int)HttpStatusCode.NotFound)
+                if (ex.StatusCode == (int)HttpStatusCode.Redirect)
                     return;
 #endif
                 throw ex;
