@@ -411,6 +411,16 @@
             Modify the registration of ConvertSessionToToken Service
             </summary>
         </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.AllowInQueryString">
+            <summary>
+            Allow JWT in ?ss-tok=jwt QueryString. (default false)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.AllowInFormData">
+            <summary>
+            Allow JWT in ss-tok=jwt HTML POST FormData. (default false)
+            </summary>
+        </member>
         <member name="M:ServiceStack.Auth.OAuthProvider.Authenticate(ServiceStack.IServiceBase,ServiceStack.Auth.IAuthSession,ServiceStack.Authenticate)">
             <summary>
             The entry point for all AuthProvider providers. Runs inside the AuthService so exceptions are treated normally.
@@ -4800,6 +4810,11 @@
             Context to capture IService action
             </summary>
         </member>
+        <member name="P:ServiceStack.Host.AspNet.AspNetResponse.HasStarted">
+            <summary>
+            Can ignore as doesn't throw if HTTP Headers already written
+            </summary>
+        </member>
         <member name="M:ServiceStack.Host.ContainerResolveCache.CreateInstance(ServiceStack.Configuration.IResolver,System.Type)">
             <summary>
             Creates instance using straight Resolve approach.
@@ -4873,6 +4888,11 @@
             http://msdn.microsoft.com/en-us/library/windows/desktop/cc307223(v=vs.85).aspx
             </summary>
             <returns>Reserved Url if the process completes successfully</returns>
+        </member>
+        <member name="P:ServiceStack.Host.HttpListener.ListenerResponse.HasStarted">
+            <summary>
+            Can ignore as doesn't throw if HTTP Headers already written
+            </summary>
         </member>
         <member name="M:ServiceStack.Host.RestHandler.CreateRequestAsync(ServiceStack.Web.IRequest,System.String)">
             <summary>

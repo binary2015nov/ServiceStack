@@ -380,6 +380,16 @@
             Modify the registration of ConvertSessionToToken Service
             </summary>
         </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.AllowInQueryString">
+            <summary>
+            Allow JWT in ?ss-tok=jwt QueryString. (default false)
+            </summary>
+        </member>
+        <member name="P:ServiceStack.Auth.JwtAuthProviderReader.AllowInFormData">
+            <summary>
+            Allow JWT in ss-tok=jwt HTML POST FormData. (default false)
+            </summary>
+        </member>
         <member name="M:ServiceStack.Auth.OAuthProvider.Authenticate(ServiceStack.IServiceBase,ServiceStack.Auth.IAuthSession,ServiceStack.Authenticate)">
             <summary>
             The entry point for all AuthProvider providers. Runs inside the AuthService so exceptions are treated normally.
