@@ -53,6 +53,8 @@ namespace ServiceStack.WebHost.IntegrationTests
 
             public override void Configure(Funq.Container container)
             {
+                IocShared.Configure(this);
+
                 this.PreRequestFilters.Add((req, res) =>
                 {
                     req.Items["_DataSetAtPreRequestFilters"] = true;
@@ -77,7 +79,7 @@ namespace ServiceStack.WebHost.IntegrationTests
                         res.ReturnAuthRequired();
                     }
                 });
-
+                
                 Plugins.Add(new SoapFormat());
                 Plugins.Add(new MiniProfilerFeature());
 
