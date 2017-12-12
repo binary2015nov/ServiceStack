@@ -16,6 +16,7 @@ using ServiceStack.MiniProfiler.Data;
 using ServiceStack.OrmLite;
 using ServiceStack.ProtoBuf;
 using ServiceStack.Redis;
+using ServiceStack.Shared.Tests;
 using ServiceStack.Text;
 using ServiceStack.Validation;
 using ServiceStack.Web;

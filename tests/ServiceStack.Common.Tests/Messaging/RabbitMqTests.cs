@@ -154,7 +154,7 @@ namespace ServiceStack.Common.Tests.Messaging
                         channel.BasicAck(e.DeliveryTag, multiple: false);
                         break;
                     }
-                    catch (OperationInterruptedException ex)
+                    catch (OperationInterruptedException)
                     {
                         // The consumer was removed, either through
                         // channel or connection closure, or through the

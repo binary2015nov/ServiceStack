@@ -52,7 +52,7 @@ namespace ServiceStack.SmartThreadPool
             }
         }
 
-        private bool IsListening => this.IsStarted && this.Listener != null && this.Listener.IsListening;
+        private new bool IsListening => this.IsStarted && this.Listener != null && this.Listener.IsListening;
 
         // Loop here to begin processing of new requests.
         protected override void Listen(object state)
