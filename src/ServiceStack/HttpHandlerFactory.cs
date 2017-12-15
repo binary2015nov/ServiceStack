@@ -148,7 +148,7 @@ namespace ServiceStack
             if (filePath.IsNullOrEmpty() || filePath == "/")
                 return true;
 
-            foreach (var path in HostContext.AppHost.Config.ForbiddenPaths)
+            foreach (var path in HostContext.Config.ForbiddenPaths)
             {
                 if (filePath.StartsWith(path))
                     return false;
@@ -159,10 +159,10 @@ namespace ServiceStack
                 return false;
 
             var fileExt = parts[1];
-            if (HostContext.AppHost.Config.AllowFileExtensions.Contains(fileExt))
+            if (HostContext.Config.AllowFileExtensions.Contains(fileExt))
                 return true;
 
-            foreach (var pathGlob in HostContext.AppHost.Config.AllowFilePaths)
+            foreach (var pathGlob in HostContext.Config.AllowFilePaths)
             {
                 if (filePath.GlobPath(pathGlob))
                     return true;

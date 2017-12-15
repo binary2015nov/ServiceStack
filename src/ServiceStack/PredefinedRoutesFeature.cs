@@ -15,7 +15,7 @@ namespace ServiceStack
             appHost.CatchAllHandlers.Add(ProcessRequest);
 
             appHost.GetPlugin<MetadataFeature>()
-                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/routing#pre-defined-routes", nameof(PredefinedRoutesFeature));
+                ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/routing#pre-defined-routes", "Pre-defined Routes");
         }
 
         public IHttpHandler ProcessRequest(string httpMethod, string pathInfo, string filePath)

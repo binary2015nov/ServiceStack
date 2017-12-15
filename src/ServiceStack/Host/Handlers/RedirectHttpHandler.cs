@@ -21,7 +21,7 @@ namespace ServiceStack.Host.Handlers
 
         public static string MakeRelative(string relativeUrl)
         {
-            if (string.IsNullOrEmpty(relativeUrl))
+            if (relativeUrl.IsNullOrEmpty())
                 return null;
 
             if (relativeUrl.StartsWith("~/"))
