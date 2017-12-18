@@ -123,7 +123,7 @@ namespace ServiceStack.Host
                 if (response is IHttpError error)
                 {
                     var ex = (Exception) error;
-                    var result = HandleException(req, requestDto, ex);
+                    var result = await HandleExceptionAsync(req, requestDto, ex);
 
                     if (result == null)
                         throw ex;
@@ -155,9 +155,10 @@ namespace ServiceStack.Host
             catch (Exception ex)
             {
                 //Sync Exception Handling
-                var result = HandleException(req, requestDto, ex);
+                var result = await HandleExceptionAsync(req, requestDto, ex);
 
-                if (result == null) throw;
+                if (result == null)
+                    throw;
 
                 return result;
             }
@@ -186,9 +187,13 @@ namespace ServiceStack.Host
             return ExecuteAsync(req, instance, request.GetBody()).Result;
         }
 
-        public virtual object HandleException(IRequest request, TRequest requestDto, Exception ex)
+        [Obsolete("Override HandleExceptionAsync instead")]
+        public virtual object HandleException(IRequest request, TRequest requestDto, Exception ex) => null;
+
+        public virtual async Task<object> HandleExceptionAsync(IRequest request, TRequest requestDto, Exception ex)
         {
-            var errorResponse = HostContext.RaiseServiceException(request, requestDto, ex)
+            var errorResponse = HandleException(request, requestDto, ex)
+                ?? await HostContext.RaiseServiceException(request, requestDto, ex)
                 ?? DtoUtils.CreateErrorResponse(requestDto, ex);
 
             AfterEachRequest(request, requestDto, errorResponse ?? ex);

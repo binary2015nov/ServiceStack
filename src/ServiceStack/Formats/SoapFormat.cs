@@ -80,7 +80,7 @@ namespace ServiceStack
             }
             catch (Exception ex)
             {
-                var response = OnServiceException(req, req.Dto, ex);
+                var response = OnServiceException(req, req.Dto, ex).Result;
                 if (response == null || !outputStream.CanSeek)
                     return;
 

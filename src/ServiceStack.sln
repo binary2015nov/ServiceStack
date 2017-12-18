@@ -3,15 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2008
 VisualStudioVersion = 15.0.27004.2009
+VisualStudioVersion = 15.0.27130.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4EBD29DD-21A1-47B5-80DB-F9D58C91BED5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{EB65E771-6C97-4D64-8E11-FD88AE48A41A}"
 	ProjectSection(SolutionItems) = preProject
-		..\build\build-core.proj = ..\build\build-core.proj
-		..\build\build-deps-core.proj = ..\build\build-deps-core.proj
-		..\build\build-deps.proj = ..\build\build-deps.proj
-		..\build\build-pcl.proj = ..\build\build-pcl.proj
 		..\build\build.bat = ..\build\build.bat
 		..\build\build.proj = ..\build\build.proj
 		..\build\build.tasks = ..\build\build.tasks
@@ -44,10 +41,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{EB65E771
 		..\NuGet\ServiceStack.Logging.NLog\servicestack.logging.nlog.nuspec = ..\NuGet\ServiceStack.Logging.NLog\servicestack.logging.nlog.nuspec
 		..\NuGet\ServiceStack.Logging.Serilog\servicestack.logging.serilog.nuspec = ..\NuGet\ServiceStack.Logging.Serilog\servicestack.logging.serilog.nuspec
 		..\NuGet\ServiceStack.Logging.Slack\servicestack.logging.slack.nuspec = ..\NuGet\ServiceStack.Logging.Slack\servicestack.logging.slack.nuspec
+		..\NuGet\ServiceStack.MsgPack.Core\servicestack.msgpack.core.nuspec = ..\NuGet\ServiceStack.MsgPack.Core\servicestack.msgpack.core.nuspec
 		..\NuGet\ServiceStack.MsgPack\servicestack.msgpack.nuspec = ..\NuGet\ServiceStack.MsgPack\servicestack.msgpack.nuspec
 		..\NuGet\ServiceStack.Mvc\servicestack.mvc.nuspec = ..\NuGet\ServiceStack.Mvc\servicestack.mvc.nuspec
 		..\NuGet\ServiceStack.NetFramework\servicestack.netframework.nuspec = ..\NuGet\ServiceStack.NetFramework\servicestack.netframework.nuspec
 		..\NuGet\ServiceStack\servicestack.nuspec = ..\NuGet\ServiceStack\servicestack.nuspec
+		..\NuGet\ServiceStack.ProtoBuf.Core\servicestack.protobuf.core.nuspec = ..\NuGet\ServiceStack.ProtoBuf.Core\servicestack.protobuf.core.nuspec
 		..\NuGet\ServiceStack.ProtoBuf\servicestack.protobuf.nuspec = ..\NuGet\ServiceStack.ProtoBuf\servicestack.protobuf.nuspec
 		..\NuGet\ServiceStack.RabbitMq\servicestack.rabbitmq.nuspec = ..\NuGet\ServiceStack.RabbitMq\servicestack.rabbitmq.nuspec
 		..\NuGet\ServiceStack.Razor.BuildTask\servicestack.razor.buildtask.nuspec = ..\NuGet\ServiceStack.Razor.BuildTask\servicestack.razor.buildtask.nuspec
