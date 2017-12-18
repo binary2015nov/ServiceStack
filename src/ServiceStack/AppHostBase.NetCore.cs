@@ -206,6 +206,11 @@ namespace ServiceStack
             return app;
         }
 
+        public static IApplicationBuilder Use(this IApplicationBuilder app, System.Web.IHttpAsyncHandler httpHandler)
+        {
+            return app.Use(httpHandler.Middleware);
+        }
+
         public static IHttpRequest ToRequest(this HttpContext httpContext, string operationName = null)
         {
             var req = new NetCoreRequest(httpContext, operationName, RequestAttributes.None);

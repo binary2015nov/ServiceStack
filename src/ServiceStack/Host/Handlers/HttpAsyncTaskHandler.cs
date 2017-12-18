@@ -160,7 +160,7 @@ namespace ServiceStack.Host.Handlers
             var httpReq = context.ToRequest(operationName);
             var httpRes = httpReq.Response;
 
-            if (!string.IsNullOrEmpty(RequestName))
+            if (!RequestName.IsNullOrEmpty())
                 operationName = RequestName;
 
             var task = ProcessRequestAsync(httpReq, httpRes, operationName);

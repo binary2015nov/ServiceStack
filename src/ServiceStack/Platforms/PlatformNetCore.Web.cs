@@ -30,7 +30,7 @@ namespace System.Web
     {
         //IAsyncResult BeginProcessRequest(HttpContext context, AsyncCallback cb, object extraData);
         //void EndProcessRequest(IAsyncResult result);
-        //Task Middleware(Microsoft.AspNetCore.Http.HttpContext context, Func<Task> next); //.NET Core
+        Task Middleware(Microsoft.AspNetCore.Http.HttpContext context, Func<Task> next); //.NET Core
     }
 
     public class HtmlString : IHtmlString
