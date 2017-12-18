@@ -70,7 +70,9 @@ namespace ServiceStack
             GatewayResponseFiltersAsync = new List<Func<IRequest, object, Task>>();
             ViewEngines = new List<IViewEngine>();
             ServiceExceptionHandlers = new List<ServiceExceptionHandler>();
+            ServiceExceptionHandlersAsync = new List<HandleServiceExceptionAsyncDelegate>();
             UncaughtExceptionHandlers = new List<UncatchedExceptionHandler>();
+            UncaughtExceptionHandlersAsync = new List<HandleUncaughtExceptionAsyncDelegate>();
             AfterInitCallbacks = new List<Action<IAppHost>>();
             OnDisposeCallbacks = new List<Action<IAppHost>>();
             OnEndRequestCallbacks = new List<Action<IRequest>>();
@@ -506,7 +508,11 @@ namespace ServiceStack
 
         public List<ServiceExceptionHandler> ServiceExceptionHandlers { get; set; }
 
+        public List<HandleServiceExceptionAsyncDelegate> ServiceExceptionHandlersAsync { get; set; }
+
         public List<UncatchedExceptionHandler> UncaughtExceptionHandlers { get; set; }
+
+        public List<HandleUncaughtExceptionAsyncDelegate> UncaughtExceptionHandlersAsync { get; set; }
 
         public List<Action<IAppHost>> AfterInitCallbacks { get; set; }
 
@@ -559,12 +565,16 @@ namespace ServiceStack
         /// <summary>
         /// Occurs when the Service throws an Exception.
         /// </summary>
-        public virtual object OnServiceException(IRequest request, object requestDto, Exception ex)
+        public virtual async Task<object> OnServiceException(IRequest httpReq, object request, Exception ex)
         {
             object lastError = null;
             foreach (var errorHandler in ServiceExceptionHandlers)
             {
-                lastError = errorHandler(request, requestDto, ex) ?? lastError;
+                lastError = errorHandler(httpReq, request, ex) ?? lastError;
+            }
+            foreach (var errorHandler in ServiceExceptionHandlersAsync)
+            {
+                lastError = await errorHandler(httpReq, request, ex) ?? lastError;
             }
             return lastError;
         }
@@ -572,18 +582,19 @@ namespace ServiceStack
         /// <summary>
         /// Occurs when an exception is thrown whilst processing a request.
         /// </summary>
-        public virtual void OnUncaughtException(IRequest httpReq, IResponse httpRes, string operationName, Exception ex)
+        public virtual async Task OnUncaughtException(IRequest httpReq, IResponse httpRes, string operationName, Exception ex)
         {
-            if (UncaughtExceptionHandlers.Count > 0)
+            foreach (var errorHandler in UncaughtExceptionHandlers)
             {
-                foreach (var errorHandler in UncaughtExceptionHandlers)
-                {
-                    errorHandler(httpReq, httpRes, operationName, ex);
-                }
+                errorHandler(httpReq, httpRes, operationName, ex);
+            }
+            foreach (var errorHandler in UncaughtExceptionHandlersAsync)
+            {
+                await errorHandler(httpReq, httpRes, operationName, ex);
             }
         }
 
-        public virtual void HandleUncaughtException(IRequest httpReq, IResponse httpRes, string operationName, Exception ex)
+        public virtual Task HandleUncaughtException(IRequest httpReq, IResponse httpRes, string operationName, Exception ex)
         {
             //Only add custom error messages to StatusDescription
             var httpError = ex as IHttpError;
@@ -592,7 +603,7 @@ namespace ServiceStack
 
             //httpRes.WriteToResponse always calls .Close in it's finally statement so 
             //if there is a problem writing to response, by now it will be closed
-            httpRes.WriteErrorToResponse(httpReq, httpReq.ResponseContentType, operationName, errorMessage, ex, statusCode).Wait();
+            return httpRes.WriteErrorToResponse(httpReq, httpReq.ResponseContentType, operationName, errorMessage, ex, statusCode);
         }
 
         protected virtual void OnStartupException(Exception ex)

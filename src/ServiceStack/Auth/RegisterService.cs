@@ -97,7 +97,7 @@ namespace ServiceStack.Auth
                 var existingUser = session.IsAuthenticated ? AuthRepository.GetUserAuth(session, null) : null;
                 registerNewUser = existingUser == null;
 
-                if (!HostContext.AppHost.GlobalRequestFilters.Contains(ValidationFilters.RequestFilter)) //Already gets run
+                if (!HostContext.AppHost.GlobalMessageRequestFiltersAsync.Contains(ValidationFilters.RequestFilterAsync)) //Already gets run
                 {
                     if (RegistrationValidator is IRequiresRequest)
                         ((IRequiresRequest)RegistrationValidator).Request = base.Request;

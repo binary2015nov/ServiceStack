@@ -28,13 +28,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         public class AppHost : AppSelfHostBase
         {
-            public AppHost()
-                : base(nameof(ExceptionHandlingTestsAsync), typeof(UserService).Assembly) { }
+            public AppHost() : base(nameof(ExceptionHandlingTestsAsync), typeof(UserService).Assembly)
+            {
+                Config.DebugMode = true;
+            }
 
             public override void Configure(Container container)
             {
-                SetConfig(new HostConfig { DebugMode = false });
-
                 //Custom global uncaught exception handling strategy
                 this.UncaughtExceptionHandlersAsync.Add(async (req, res, operationName, ex) =>
                 {

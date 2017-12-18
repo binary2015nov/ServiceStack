@@ -362,7 +362,7 @@ namespace ServiceStack
             {
                 //Exception in writing to response should not hide the original exception
                 Logger.Info("Failed to write error to response: {0}", writeErrorEx);
-                return originalEx;
+                throw originalEx;
             }
         }
 
