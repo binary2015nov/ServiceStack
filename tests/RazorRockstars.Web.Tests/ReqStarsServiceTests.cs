@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net;
 using NUnit.Framework;
 using ServiceStack;
-using ServiceStack.Logging;
 using ServiceStack.MsgPack;
 using ServiceStack.Text;
 

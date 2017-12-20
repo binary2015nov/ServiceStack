@@ -26,10 +26,10 @@ namespace ServiceStack
             : base(serviceName, assembliesWithServices) { }
 
         IApplicationBuilder app;
+        IHostingEnvironment env => app?.ApplicationServices.GetService<IHostingEnvironment>();
         public virtual void Bind(IApplicationBuilder app)
         {
             this.app = app;
-            var env = app.ApplicationServices.GetService<IHostingEnvironment>();
 
             WebHostPhysicalPath = GetWebRootPath();
             Config.DebugMode = env.IsDevelopment();
@@ -48,10 +48,9 @@ namespace ServiceStack
         /// </summary>
         protected override string GetWebRootPath()
         {
-            if (app == null)
+            if (env == null)
                 return base.GetWebRootPath();
 
-            var env = app.ApplicationServices.GetService<IHostingEnvironment>();
             return env.WebRootPath ?? env.ContentRootPath;
         }
 
@@ -83,7 +82,7 @@ namespace ServiceStack
                 : "/";
 
             var mode = Config.HandlerFactoryPath;
-            if (!string.IsNullOrEmpty(mode))
+            if (!mode.IsNullOrEmpty())
             {
                 if (pathInfo.IndexOf(mode, StringComparison.Ordinal) != 1)
                 {
@@ -162,7 +161,6 @@ namespace ServiceStack
 
         public override string MapProjectPath(string relativePath)
         {
-            var env = app?.ApplicationServices.GetService<IHostingEnvironment>();
             if (env?.ContentRootPath != null && relativePath?.StartsWith("~") == true)
                 return Path.GetFullPath(env.ContentRootPath.CombineWith(relativePath.Substring(1)));
 
