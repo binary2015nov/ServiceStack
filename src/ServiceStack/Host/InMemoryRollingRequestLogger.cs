@@ -103,7 +103,7 @@ namespace ServiceStack.Host
                     && requestType != null
                     && !HideRequestBodyForRequestDtoTypes.Contains(requestType))
                 {
-                    entry.RequestDto = requestDto;
+                    entry.RequestDto = requestType.Name;
 
                     if (!isClosed)
                         entry.FormData = request.FormData.ToDictionary();
