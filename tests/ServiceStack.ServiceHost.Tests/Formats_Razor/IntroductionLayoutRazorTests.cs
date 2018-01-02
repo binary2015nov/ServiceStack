@@ -128,7 +128,7 @@ with a layout template. The content you are seeing here
 comes from ^^^websiteTemplate.</p>
 
 <p>And obviously I can have code in here too. Here is the
-current date/year: 2017</p>
+current date/year: 2018</p>
         </div>
     
     </body>
@@ -260,7 +260,7 @@ with a layout template. The content you are seeing here
 comes from ^^^websiteTemplate.</p>
 
 <p>And obviously I can have code in here too. Here is the
-current date/year: 2017</p>
+current date/year: 2018</p>
 
 
 
