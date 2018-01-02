@@ -22,7 +22,7 @@ namespace ServiceStack
         public string AbsoluteUri { get; set; }
         public string PathInfo { get; set; }
         public string RequestBody { get; set; }
-        public string RequestDto { get; set; }
+        public object RequestDto { get; set; }
         public string UserAuthId { get; set; }
         public string SessionId { get; set; }
         public string IpAddress { get; set; }

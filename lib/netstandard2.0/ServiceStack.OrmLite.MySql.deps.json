@@ -1337,7 +1337,7 @@
     "Microsoft.CSharp/4.0.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-0j8+n4DxAvE7Yn8r+TXn63bhGsKB69qZOAqVRJHawligQVkiZb52SB/vpeuCI9nmtR4/xjRlRZorSWyRWEMfEg==",
+      "sha512": "sha512-F3vXO0znGMUFDD5Yk203Y7WWEpfVQ6LcnvriP0mE4OAu1/nEaTUq69GCBI54/DHsHXQk00er87zR6QgdJ2RKLg==",
       "path": "microsoft.csharp/4.0.1",
       "hashPath": "microsoft.csharp.4.0.1.nupkg.sha512"
     },
@@ -1442,7 +1442,7 @@
     "Newtonsoft.Json/9.0.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-rPQ3imgwyNSMCBdVKjYP6fzLRS6oF5ffpC+yaUQSXF/kzWL890y8HOXU+zRXDk/BBZSBE6Gs3vfmxInDPaXgPQ==",
+      "sha512": "sha512-p//Taj2QVrzXcEQuTUgSllBsrde1JU0FFAbuPAYHzndLZaM+e+KIjBFWape2VUGkPy6TIbFxQkcgYLb5MmIQ/g==",
       "path": "newtonsoft.json/9.0.1",
       "hashPath": "newtonsoft.json.9.0.1.nupkg.sha512"
     },
@@ -1652,7 +1652,7 @@
     "System.ComponentModel.TypeConverter/4.3.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-UBjTLp8nNGvWfL92MCvsBb3NjT12aCJi0pW0/TtYb+WCddi9yll31QLcMJMQOyYshT6ctpxDZOe9MZ4a0Sw+4g==",
+      "sha512": "sha512-16pQ6P+EdhcXzPiEK4kbA953Fu0MNG2ovxTZU81/qsCd1zPRsKc3uif5NgvllCY598k6bI0KUyKW8fanlfaDQg==",
       "path": "system.componentmodel.typeconverter/4.3.0",
       "hashPath": "system.componentmodel.typeconverter.4.3.0.nupkg.sha512"
     },
