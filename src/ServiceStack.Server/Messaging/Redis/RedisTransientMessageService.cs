@@ -17,10 +17,7 @@ namespace ServiceStack.Messaging.Redis
 			this.messageFactory = messageFactory;
 		}
 
-		public override IMessageFactory MessageFactory
-		{
-			get { return messageFactory; }
-		}
+		public override IMessageFactory MessageFactory => messageFactory;
 	}
 
 }
