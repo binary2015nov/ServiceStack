@@ -161,7 +161,7 @@ namespace ServiceStack.Host.HttpListener
 			if (v.Length > 20)
 				v = v.Substring(0, 16) + "...\"";
 
-			string msg = String.Format("A potentially dangerous Request.{0} value was " +
+			string msg = string.Format("A potentially dangerous Request.{0} value was " +
 							"detected from the client ({1}={2}).", name, key, v);
 
 			throw new HttpRequestValidationException(msg);

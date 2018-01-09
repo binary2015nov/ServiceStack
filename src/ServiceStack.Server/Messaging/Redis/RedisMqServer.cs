@@ -293,7 +293,7 @@ namespace ServiceStack.Messaging.Redis
 
         void DisposeWorkerThreads()
         {
-            Log.Debug("Disposing all Redis MQ Server worker threads...");
+            Logger.Debug("Disposing all Redis MQ Server worker threads...");
             workers?.Each(x => x.Dispose());
         }
 
