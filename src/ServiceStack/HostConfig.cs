@@ -141,7 +141,6 @@ namespace ServiceStack
             UseCamelCase = true;
             EnableOptimizations = true;
 #endif
-            DisableChunkedEncoding = false;
         }
 
         public string WsdlServiceNamespace { get; set; }
@@ -252,9 +251,6 @@ namespace ServiceStack
 
         public bool UseCamelCase { get { return JsConfig.EmitCamelCaseNames; } set { JsConfig.EmitCamelCaseNames = value; } }
         public bool EnableOptimizations { get { return MemoryStreamFactory.UseRecyclableMemoryStream; } set { MemoryStreamFactory.UseRecyclableMemoryStream = value; } }
-
-        //Disables chunked encoding on Kestrel Server
-        public bool DisableChunkedEncoding { get; set; }
 
         public string AdminAuthSecret { get; set; }
 

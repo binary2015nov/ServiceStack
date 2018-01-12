@@ -91,7 +91,7 @@ namespace ServiceStack.Host.NetCore
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("Error closing .NET Core OutputStream", ex);
+                    Logger.Error("Error closing .NET Core OutputStream", ex);
                 }
             }
         }
