@@ -980,10 +980,7 @@ namespace ServiceStack
 
         public static void SetAutoBatchCompletedHeader(this IRequest req, int completed)
         {
-            if (req == null || req.Response == null)
-                return;
-
-            req.Response.AddHeader(HttpHeaders.XAutoBatchCompleted, completed.ToString());
+            req?.Response?.AddHeader(HttpHeaders.XAutoBatchCompleted, completed.ToString());
         }
 
         public static void SetRoute(this IRequest req, IRestPath route)
@@ -993,9 +990,8 @@ namespace ServiceStack
 
         public static IRestPath GetRoute(this IRequest req)
         {
-            object route;
-            req.Items.TryGetValue(Keywords.Route, out route);
-            return route as IRestPath;
+            req.Items.TryGetValue(Keywords.Route, out var route);
+            return route as RestPath;
         }
 
         public static bool IsHtml(this IRequest req)
