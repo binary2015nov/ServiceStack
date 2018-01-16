@@ -46,10 +46,10 @@ namespace ServiceStack.Host.HttpListener
             var mode = HostContext.Config.HandlerFactoryPath;
 
             string pathInfo;
-            var pos = request.RawUrl.IndexOf("?", StringComparison.Ordinal);
+            var pos = RawUrl.IndexOf("?", StringComparison.Ordinal);
             if (pos != -1)
             {
-                var path = request.RawUrl.Substring(0, pos);
+                var path = RawUrl.Substring(0, pos);
                 pathInfo = HttpRequestExtensions.GetPathInfo(
                     path,
                     mode,
@@ -57,7 +57,7 @@ namespace ServiceStack.Host.HttpListener
             }
             else
             {
-                pathInfo = request.RawUrl;
+                pathInfo = RawUrl;
             }
 
             pathInfo = pathInfo.UrlDecode();
@@ -96,7 +96,8 @@ namespace ServiceStack.Host.HttpListener
             return reader.ReadToEnd();
         }
 
-        public string RawUrl => request.RawUrl;
+        private string rawUrl;
+        public string RawUrl => rawUrl ?? (rawUrl = request.RawUrl.Replace("//", "/"));
 
         public string AbsoluteUri => request.Url.AbsoluteUri.TrimEnd('/');
 
