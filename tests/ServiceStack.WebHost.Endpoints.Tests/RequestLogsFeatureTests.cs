@@ -36,11 +36,6 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             public override void Configure(Container container)
             {
-                SetConfig(new HostConfig
-                {
-                    DebugMode = true
-                });
-
                 Plugins.Add(new RequestLogsFeature
                 {
                     LimitToServiceRequests = false

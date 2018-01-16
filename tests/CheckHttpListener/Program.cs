@@ -29,7 +29,8 @@ namespace CheckHttpListener
 
         public AppSelfHost() : base("DocuRec Services", typeof(TestService).Assembly)
         {
-            Config.CompressFilesWithExtensions = new HashSet<string> { "html", "js" };          ;
+            Config.HandlerFactoryPath = "api";
+            Config.CompressFilesWithExtensions = new HashSet<string> { "html", "js" };
             Config.DebugMode = true;
         }
 
@@ -60,13 +61,6 @@ namespace CheckHttpListener
             });
 
             Plugins.Add(new RequestLogsFeature());
-
-            SetConfig(new HostConfig
-            {
-                HandlerFactoryPath = "api",
-                CompressFilesWithExtensions = { "html", "js" },
-                DebugMode = true
-            });
         }
 
         public override string ResolvePathInfo(IRequest request, string originalPathInfo) =>
