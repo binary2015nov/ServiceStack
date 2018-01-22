@@ -66,7 +66,7 @@ namespace ServiceStack.Auth
     //
     public class OAuthAuthorizer
     {
-        private static ILog log = LogManager.GetLogger(typeof(OAuthAuthorizer));
+        private readonly static ILog Logger = LogManager.GetLogger(typeof(OAuthAuthorizer));
 
         // No issue has been reported with Twitter OAuth, but alt OAuth providers may require lexical ordering
         public static bool OrderHeadersLexically = false;
