@@ -338,7 +338,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         private void CreateUser(int id, string username, string email, string password, List<string> roles = null, List<string> permissions = null)
         {
-            new SaltedHash().GetHashAndSaltString(password, out string hash, out string salt);
+            new SaltedHash().GetHashAndSaltString(password, out var hash, out var salt);
 
             userRep.CreateUserAuth(new UserAuth
             {
