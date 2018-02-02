@@ -31,8 +31,11 @@ namespace ServiceStack.Host.AspNet
         private readonly HttpRequestBase request;
         private readonly IHttpResponse response;
         
-        public AspNetRequest(HttpContextBase httpContext)
-            : this(httpContext, string.Empty, RequestAttributes.None) { }
+        public AspNetRequest(HttpContextBase httpContext, string operationName = null)
+            : this(httpContext, operationName, RequestAttributes.None)
+        {
+            this.RequestAttributes = this.GetAttributes() | RequestAttributes.Http;
+        }
 
         public AspNetRequest(HttpContextBase httpContext, string operationName)
             : this(httpContext, operationName ?? string.Empty, RequestAttributes.None) { }
@@ -45,7 +48,7 @@ namespace ServiceStack.Host.AspNet
             this.RequestAttributes = (requestAttributes != RequestAttributes.None ? requestAttributes : this.GetAttributes());
             this.RequestPreferences = new RequestPreferences(httpContext);
 
-            if (httpContext.Items != null && httpContext.Items.Count > 0)
+            if (httpContext.Items.Count > 0)
             {
                 foreach (var key in httpContext.Items.Keys)
                 {

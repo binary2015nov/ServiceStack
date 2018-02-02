@@ -102,7 +102,7 @@ namespace ServiceStack
             try 
             {
                 httpReq = new NetCoreRequest(context, operationName, RequestAttributes.None, pathInfo); 
-                httpReq.RequestAttributes = httpReq.GetAttributes();
+                httpReq.RequestAttributes = httpReq.GetAttributes() | RequestAttributes.Http;
                 
                 httpRes = httpReq.Response;
                 handler = HttpHandlerFactory.GetHandler(httpReq);
@@ -212,7 +212,7 @@ namespace ServiceStack
         public static IHttpRequest ToRequest(this HttpContext httpContext, string operationName = null)
         {
             var req = new NetCoreRequest(httpContext, operationName, RequestAttributes.None);
-            req.RequestAttributes = req.GetAttributes();
+            req.RequestAttributes = req.GetAttributes() | RequestAttributes.Http;
             return req;
         }
     }

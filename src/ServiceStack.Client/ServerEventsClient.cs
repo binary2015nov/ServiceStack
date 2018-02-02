@@ -107,7 +107,7 @@ namespace ServiceStack
             }
             set
             {
-                this.EventStreamPath = value.AppendPath("event-stream");
+                this.eventStreamPath = value.AppendPath("event-stream");
                 BuildEventStreamUri();
 
                 if (this.ServiceClient is IServiceClientMeta meta)
@@ -132,7 +132,18 @@ namespace ServiceStack
                 .AddQueryParam("channels", string.Join(",", this.channels));
         }
 
-        public string EventStreamPath { get; set; }
+        private string eventStreamPath;
+        public string EventStreamPath
+        {
+            get => eventStreamPath;
+            set
+            {
+                eventStreamPath = value?.StartsWith("/") == true
+                    ? (BaseUri ?? "").CombineWith(value)
+                    : value;
+                BuildEventStreamUri();
+            }
+        }
 
         private string eventStreamUri;
         public string EventStreamUri
@@ -162,7 +173,7 @@ namespace ServiceStack
 
         public ServerEventsClient(string baseUri, params string[] channels)
         {
-            this.EventStreamPath = baseUri.AppendPath("event-stream");
+            this.eventStreamPath = baseUri.AppendPath("event-stream");
             this.Channels = channels;
 
             this.ServiceClient = new JsonServiceClient(baseUri);
@@ -214,7 +225,7 @@ namespace ServiceStack
 
                 LastPulseAt = DateTime.UtcNow;
                 if (Logger.IsDebugEnabled)
-                    Logger.Debug("[SSE-CLIENT] LastPulseAt: " + DateTime.UtcNow.TimeOfDay);
+                    Logger.Debug("[SSE-CLIENT] LastPulseAt: " + DateTime.Now.TimeOfDay);
 
                 if (Interlocked.CompareExchange(ref status, WorkerStatus.Started, WorkerStatus.Starting) != WorkerStatus.Starting)
                     return this;
