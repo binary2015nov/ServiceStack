@@ -37,9 +37,6 @@ namespace ServiceStack.Host.AspNet
             this.RequestAttributes = this.GetAttributes() | RequestAttributes.Http;
         }
 
-        public AspNetRequest(HttpContextBase httpContext, string operationName)
-            : this(httpContext, operationName ?? string.Empty, RequestAttributes.None) { }
-
         public AspNetRequest(HttpContextBase httpContext, string operationName, RequestAttributes requestAttributes)
         {         
             this.request = httpContext.Request;
