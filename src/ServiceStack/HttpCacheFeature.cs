@@ -48,8 +48,7 @@ namespace ServiceStack
                     return;
             }
 
-            var httpResult = response as HttpResult;
-            if (httpResult == null)
+            if (!(response is HttpResult httpResult))
                 return;
 
             cacheInfo = httpResult.ToCacheInfo();
@@ -80,6 +79,10 @@ namespace ServiceStack
 
             if (req.ETagMatch(httpResult.ETag) || req.NotModifiedSince(httpResult.LastModified))
             {
+                foreach (var header in httpResult.Headers)
+                {
+                    res.AddHeader(header.Key, header.Value);
+                }
                 res.EndNotModified();
                 httpResult.Dispose();
             }
@@ -257,8 +260,7 @@ namespace ServiceStack
                 var ifModifiedSince = req.Headers[HttpHeaders.IfModifiedSince];
                 if (ifModifiedSince != null)
                 {
-                    DateTime modifiedSinceDate;
-                    if (DateTime.TryParse(ifModifiedSince, new DateTimeFormatInfo(), DateTimeStyles.RoundtripKind, out modifiedSinceDate))
+                    if (DateTime.TryParse(ifModifiedSince, new DateTimeFormatInfo(), DateTimeStyles.RoundtripKind, out var modifiedSinceDate))
                     {
                         var lastModifiedUtc = lastModified.Value.Truncate(TimeSpan.FromSeconds(1)).ToUniversalTime();
                        return modifiedSinceDate >= lastModifiedUtc;
