@@ -57,8 +57,8 @@ namespace ServiceStack
             }
             catch (Exception ex)
             {
-                if (log.IsDebugEnabled)
-                    log.Debug($"Could not parse Error ResponseDto {ResponseDto?.GetType().Name}", ex);
+                if (Logger.IsDebugEnabled)
+                    Logger.Debug($"Could not parse Error ResponseDto {ResponseDto?.GetType().Name}", ex);
             }        
         }
 
