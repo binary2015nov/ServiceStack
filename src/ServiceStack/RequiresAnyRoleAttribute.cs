@@ -53,7 +53,7 @@ namespace ServiceStack
                 return;
 
             res.StatusCode = (int)HttpStatusCode.Forbidden;
-            res.StatusDescription = ErrorMessages.InvalidRole;
+            res.StatusDescription = ErrorMessages.InvalidRole.Localize(req);
             res.EndRequest();
         }
 
@@ -111,7 +111,7 @@ namespace ServiceStack
                 ? (int)HttpStatusCode.Forbidden
                 : (int)HttpStatusCode.Unauthorized;
 
-            throw new HttpError(statusCode, ErrorMessages.InvalidRole);
+            throw new HttpError(statusCode, ErrorMessages.InvalidRole.Localize(req));
         }
     }
 }

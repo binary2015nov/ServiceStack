@@ -87,7 +87,8 @@ namespace ServiceStack
             var statusCode = session != null && session.IsAuthenticated
                 ? (int)HttpStatusCode.Forbidden
                 : (int)HttpStatusCode.Unauthorized;
-            throw new HttpError(statusCode, ErrorMessages.InvalidRole);
+
+            throw new HttpError(statusCode, ErrorMessages.InvalidRole.Localize(req));
         }
 
         public bool Equals(RequiredRoleAttribute other)

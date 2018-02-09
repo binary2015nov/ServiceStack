@@ -23,7 +23,7 @@ namespace ServiceStack.Auth
             var password = request.Password;
 
             if (userName.IsNullOrEmpty() || password.IsNullOrEmpty())
-                throw HttpError.Unauthorized(ErrorMessages.InvalidBasicAuthCredentials);
+                throw HttpError.Unauthorized(ErrorMessages.InvalidBasicAuthCredentials.loca);
 
             return Authenticate(authService, session, userName, password, request.Continue);
         }

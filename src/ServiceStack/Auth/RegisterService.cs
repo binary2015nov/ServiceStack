@@ -35,7 +35,7 @@ namespace ServiceStack.Auth
                             }
                         })
                         .WithErrorCode("AlreadyExists")
-                        .WithMessage(ErrorMessages.UsernameAlreadyExists)
+                        .WithMessage(ErrorMessages.UsernameAlreadyExists.Localize(base.Request))
                         .When(x => !x.UserName.IsNullOrEmpty());
                     RuleFor(x => x.Email)
                         .Must(x =>
@@ -47,7 +47,7 @@ namespace ServiceStack.Auth
                             }
                         })
                         .WithErrorCode("AlreadyExists")
-                        .WithMessage(ErrorMessages.EmailAlreadyExists)
+                        .WithMessage(ErrorMessages.EmailAlreadyExists.Localize(base.Request))
                         .When(x => !x.Email.IsNullOrEmpty());
                 });
             RuleSet(
@@ -106,7 +106,7 @@ namespace ServiceStack.Auth
                 }
                 
                 if (!registerNewUser && !AllowUpdates)
-                    throw new NotSupportedException(ErrorMessages.RegisterUpdatesDisabled);
+                    throw new NotSupportedException(ErrorMessages.RegisterUpdatesDisabled.Localize(Request));
 
                 user = registerNewUser
                     ? AuthRepository.CreateUserAuth(newUserAuth, request.Password)
