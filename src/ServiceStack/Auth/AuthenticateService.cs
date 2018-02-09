@@ -133,7 +133,7 @@ namespace ServiceStack.Auth
                 // to refresh the current session reference.
                 session = this.GetSession();
 
-                if (request.provider == null && !session.IsAuthenticated)
+                if (request.Provider == null && !session.IsAuthenticated)
                     throw HttpError.Unauthorized(ErrorMessages.NotAuthenticated.Localize(Request));
 
                 var referrerUrl = request.Continue
