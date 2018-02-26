@@ -111,7 +111,10 @@ namespace ServiceStack.Host
                     return await HostContext.AppHost.ApplyRequestConvertersAsync(httpReq, dtoFromBinder);
 
                 var requestParams = httpReq.GetFlattenedRequestParams();
-                return await HostContext.AppHost.ApplyRequestConvertersAsync(httpReq,
+                if (Log.IsDebugEnabled)
+                    Log.DebugFormat("CreateRequestAsync/requestParams:" + string.Join(",", requestParams.Keys));
+
+                var taskResponse = HostContext.AppHost.ApplyRequestConvertersAsync(httpReq,
                     CreateRequest(httpReq, restPath, requestParams));
             }
         }
@@ -125,9 +128,8 @@ namespace ServiceStack.Host
 
         public static object CreateRequest(IRequest httpReq, IRestPath restPath, Dictionary<string, string> requestParams, object requestDto)
         {
-            string contentType;
             var pathInfo = !restPath.IsWildCardPath
-                ? GetSanitizedPathInfo(httpReq.PathInfo, out contentType)
+                ? GetSanitizedPathInfo(httpReq.PathInfo, out _)
                 : httpReq.PathInfo;
 
             return restPath.CreateRequest(pathInfo, requestParams, requestDto);

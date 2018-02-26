@@ -99,7 +99,13 @@ namespace ServiceStack
             return this.Roles != null && this.Roles.Contains(role);
         }
 
-        public virtual void OnRegistered(IRequest httpReq, IAuthSession session, IServiceBase service) { }
+        /// <summary>
+        /// Override with Custom Validation logic to Assert if User is allowed to Authenticate. 
+        /// Returning a non-null response invalidates Authentication with IHttpResult response returned to client.
+        /// </summary>
+        public virtual IHttpResult Validate(IServiceBase authService, IAuthSession session, IAuthTokens tokens, Dictionary<string, string> authInfo) => null;
+
+        public virtual void OnRegistered(IRequest httpReq, IAuthSession session, IServiceBase service) {}
         public virtual void OnAuthenticated(IServiceBase authService, IAuthSession session, IAuthTokens tokens, Dictionary<string, string> authInfo) { }
         public virtual void OnLogout(IServiceBase authService) { }
         public virtual void OnCreated(IRequest httpReq) { }

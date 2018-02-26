@@ -60,7 +60,10 @@ namespace ServiceStack
             if (result is Stream stream)
             {
                 if (bodyPrefix != null) await response.OutputStream.WriteAsync(bodyPrefix, token);
-                stream.Position = 0;
+                if (stream.CanSeek)
+                {
+                    stream.Position = 0;
+                }
                 await stream.CopyToAsync(response.OutputStream, token);
                 if (bodySuffix != null) await response.OutputStream.WriteAsync(bodySuffix, token);
                 return true;
@@ -523,7 +526,7 @@ namespace ServiceStack
 
         public static bool ShouldWriteGlobalHeaders(IResponse httpRes)
         {
-            if (HostContext.Config != null && !httpRes.Items.ContainsKey("__global_headers"))
+            if (!httpRes.HasStarted && HostContext.Config != null && !httpRes.Items.ContainsKey("__global_headers"))
             {
                 httpRes.Items["__global_headers"] = true;
                 return true;

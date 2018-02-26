@@ -680,10 +680,10 @@ namespace ServiceStack
 			Notify(UserNameSubcriptions, userName, selector, message, channel);
 		}
 
-		public void NotifySession(string sspid, string selector, object message, string channel = null)
-		{
-			Notify(SessionSubcriptions, sspid, selector, message, channel);
-		}
+        public void NotifySession(string sessionId, string selector, object message, string channel = null)
+        {
+            Notify(SessionSubcriptions, sessionId, selector, message, channel);
+        }
 
 		protected void Notify(ConcurrentDictionary<string, ConcurrentDictionary<IEventSubscription, bool>> map,
 			string key, string selector, object message, string channel = null)
@@ -1085,9 +1085,8 @@ namespace ServiceStack
 			if (key == null || subscription == null)
 				return;
 
-			IEventSubscription inMap;
-			map.TryRemove(key, out inMap);
-		}
+            map.TryRemove(key, out _);
+        }
 
 		void HandleUnsubscription(IEventSubscription subscription)
 		{
@@ -1134,7 +1133,7 @@ namespace ServiceStack
 
 		void NotifyUserName(string userName, string selector, object message, string channel = null);
 
-		void NotifySession(string sspid, string selector, object message, string channel = null);
+        void NotifySession(string sessionId, string selector, object message, string channel = null);
 
 		SubscriptionInfo GetSubscriptionInfo(string id);
 
@@ -1253,10 +1252,9 @@ namespace ServiceStack
 			if (dic == null || key == null)
 				return default(TElement);
 
-			TElement res;
-			dic.TryGetValue(key, out res);
-			return res;
-		}
+            dic.TryGetValue(key, out var res);
+            return res;
+        }
 
 		internal static IEnumerable<TElement> ValuesWithoutLock<TKey, TElement>(this ConcurrentDictionary<TKey, TElement> source)
 		{
