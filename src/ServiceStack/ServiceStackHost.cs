@@ -328,7 +328,10 @@ namespace ServiceStack
             {
                 Container.Register<IAuthRepository>(c => c.Resolve<IUserAuthRepository>());
             }
-            
+
+            if (Config.UseJsObject)
+                JS.Configure();
+
             if (Config.LogUnobservedTaskExceptions)
             {
                 TaskScheduler.UnobservedTaskException += (sender, args) =>

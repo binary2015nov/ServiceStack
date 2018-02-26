@@ -133,7 +133,7 @@ namespace ServiceStack
             };
             FallbackRestPath = null;
             UseHttpsLinks = false;
-            UseBclJsonSerializers = false;
+            UseJsObject = true;
 #if !NETSTANDARD2_0
             UseCamelCase = false;
             EnableOptimizations = false;
@@ -250,6 +250,7 @@ namespace ServiceStack
         public bool UseHttpsLinks { get; set; }
 
         public bool UseCamelCase { get { return JsConfig.EmitCamelCaseNames; } set { JsConfig.EmitCamelCaseNames = value; } }
+        public bool UseJsObject { get; set; }
         public bool EnableOptimizations { get { return MemoryStreamFactory.UseRecyclableMemoryStream; } set { MemoryStreamFactory.UseRecyclableMemoryStream = value; } }
 
         public string AdminAuthSecret { get; set; }

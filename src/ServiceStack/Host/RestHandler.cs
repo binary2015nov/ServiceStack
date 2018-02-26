@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using ServiceStack.Host.Handlers;
+using ServiceStack.Logging;
 using ServiceStack.MiniProfiler;
 using ServiceStack.Web;
 using ServiceStack.Text;
@@ -11,6 +12,8 @@ namespace ServiceStack.Host
 {
     public class RestHandler : ServiceStackHandlerBase, IRequestHttpHandler
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(RestHandler));
+
         public RestHandler()
         {
             this.HandlerAttributes = RequestAttributes.Reply;
@@ -111,11 +114,11 @@ namespace ServiceStack.Host
                     return await HostContext.AppHost.ApplyRequestConvertersAsync(httpReq, dtoFromBinder);
 
                 var requestParams = httpReq.GetFlattenedRequestParams();
-                if (Log.IsDebugEnabled)
-                    Log.DebugFormat("CreateRequestAsync/requestParams:" + string.Join(",", requestParams.Keys));
 
                 var taskResponse = HostContext.AppHost.ApplyRequestConvertersAsync(httpReq,
                     CreateRequest(httpReq, restPath, requestParams));
+
+                return taskResponse;
             }
         }
 

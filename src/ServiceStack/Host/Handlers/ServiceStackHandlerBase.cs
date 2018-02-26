@@ -197,8 +197,8 @@ namespace ServiceStack.Host.Handlers
 #endif
                                 ));
 
-                    if (Log.IsDebugEnabled)
-                        Log.DebugFormat($"CreateContentTypeRequest/hasContentBody:{hasContentBody}:{httpReq.Verb}:{contentType}:{httpReq.ContentLength}:{httpReq.GetContentEncoding()}");
+                    if (Logger.IsDebugEnabled)
+                        Logger.DebugFormat($"CreateContentTypeRequest/hasContentBody:{hasContentBody}:{httpReq.Verb}:{contentType}:{httpReq.ContentLength}:{httpReq.GetContentEncoding()}");
 
                     if (hasContentBody)
                     {

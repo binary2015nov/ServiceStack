@@ -146,6 +146,7 @@ namespace ServiceStack
         public static void ClearRuntime()
         {
             JsConfig.Reset();
+            JS.UnConfigure();
             PlatformExtensions.ClearRuntimeAttributes(); //Clears Runtime Attributes
             ReflectionExtensions.Reset();
             MemoryCacheClient.Default.Dispose();
