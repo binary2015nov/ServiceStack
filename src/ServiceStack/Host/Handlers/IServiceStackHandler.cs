@@ -3,7 +3,12 @@ using ServiceStack.Web;
 
 namespace ServiceStack.Host.Handlers
 {
+
     public interface IServiceStackHandler
+
+#if !NETSTANDARD2_0
+        : System.Web.IHttpHandler
+#endif
     {
         string RequestName { get; }
 

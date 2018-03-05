@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Web;
+using ServiceStack.Host.Handlers;
 using ServiceStack.Web;
 
 namespace ServiceStack.Host
 {
-	public delegate IHttpHandler HttpHandlerResolver(string httpMethod, string pathInfo, string filePath);
+	public delegate IServiceStackHandler HttpHandlerResolver(string httpMethod, string pathInfo, string filePath);
 
 	public delegate bool StreamSerializerResolverDelegate(IRequest requestContext, object dto, IResponse httpRes);
 

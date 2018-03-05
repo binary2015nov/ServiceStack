@@ -14,7 +14,7 @@ namespace ServiceStack.ServiceHost.Tests.Routes
             routes.AddFromAssembly(typeof(NewApiRestServiceWithAllVerbsImplemented).Assembly);
 
             RestPath restWithAllMethodsRoute =
-                (from r in routes.RestPaths
+                (from r in routes
                  where r.Path == "/NewApiRequestDto"
                  select r).FirstOrDefault();
 
@@ -27,7 +27,7 @@ namespace ServiceStack.ServiceHost.Tests.Routes
             Assert.That(restWithAllMethodsRoute.AllowedVerbs.Contains("PATCH"));
 
             RestPath restWithAllMethodsRoute2 =
-                (from r in routes.RestPaths
+                (from r in routes
                  where r.Path == "/NewApiRequestDto2"
                  select r).FirstOrDefault();
 
@@ -46,14 +46,14 @@ namespace ServiceStack.ServiceHost.Tests.Routes
             var routes = new ServiceRoutes();
             routes.AddFromAssembly(typeof(NewApiRequestDtoWithIdService).Assembly);
 
-            var route = (from r in routes.RestPaths
+            var route = (from r in routes
                          where r.Path == "/NewApiRequestDtoWithId"
                          select r).FirstOrDefault();
 
             Assert.That(route, Is.Not.Null);
             Assert.That(route.AllowedVerbs, Is.Null);
 
-            route = (from r in routes.RestPaths
+            route = (from r in routes
                      where r.Path == "/NewApiRequestDtoWithId/{Id}"
                      select r).FirstOrDefault();
 
@@ -67,14 +67,14 @@ namespace ServiceStack.ServiceHost.Tests.Routes
             var routes = new ServiceRoutes();
             routes.AddFromAssembly(typeof(NewApiRequestDtoWithFieldIdService).Assembly);
 
-            var route = (from r in routes.RestPaths
+            var route = (from r in routes
                          where r.Path == "/NewApiRequestDtoWithFieldId"
                          select r).FirstOrDefault();
 
             Assert.That(route, Is.Not.Null);
             Assert.That(route.AllowedVerbs, Is.Null);
 
-            route = (from r in routes.RestPaths
+            route = (from r in routes
                      where r.Path == "/NewApiRequestDtoWithFieldId/{Id}"
                      select r).FirstOrDefault();
 
@@ -87,7 +87,7 @@ namespace ServiceStack.ServiceHost.Tests.Routes
         {
             var routes = new ServiceRoutes();
             routes.Add<Customer>("/Users/{0}/Orders/{1}", ApplyTo.Get, x => x.Name, x => x.OrderId);
-            var route = routes.RestPaths.Last();
+            var route = routes.Last();
             Assert.That(route.Path, Is.EqualTo("/Users/{Name}/Orders/{OrderId}"));
         }
     }

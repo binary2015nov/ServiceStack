@@ -67,22 +67,32 @@ namespace ServiceStack
             }
         }
 
-        public static IServiceRoutes Add<TRequest>(this IServiceRoutes routes, string restPath, ApplyTo verbs)
+        public static IServiceRoutes Add<TRequest>(this IServiceRoutes routes, string path)
         {
-            return routes.Add<TRequest>(restPath, verbs.ToVerbsString());
+            return routes.Add(new RestPath(typeof(TRequest), path));
         }
 
-        public static IServiceRoutes Add(this IServiceRoutes routes, Type requestType, string restPath, ApplyTo verbs)
+        public static IServiceRoutes Add<TRequest>(this IServiceRoutes routes, string path, string verbs)
         {
-            return routes.Add(requestType, restPath, verbs.ToVerbsString());
+            return routes.Add(new RestPath(typeof(TRequest), path, verbs));
         }
 
-        public static string ToVerbsString(this ApplyTo verbs)
+        public static IServiceRoutes Add<TRequest>(this IServiceRoutes routes, string path, ApplyTo applyTo)
+        {
+            return routes.Add(new RestPath(typeof(TRequest), path, applyTo.ToVerbsString()));
+        }
+
+        public static IServiceRoutes Add(this IServiceRoutes routes, Type requestType, string path, ApplyTo applyTo)
+        {
+            return routes.Add(new RestPath(requestType, path, applyTo.ToVerbsString()));
+        }
+
+        public static string ToVerbsString(this ApplyTo applyTo)
         {
             var allowedMethods = new List<string>();
             foreach (var entry in ApplyToUtils.ApplyToVerbs)
             {
-                if (verbs.Has(entry.Key))
+                if (applyTo.Has(entry.Key))
                     allowedMethods.Add(entry.Value);
             }
 

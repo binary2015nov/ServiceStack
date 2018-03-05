@@ -233,8 +233,8 @@ namespace ServiceStack.Host.HttpListener
         {
             try
             {
-                var task = ProcessRequestAsync(context);
-                task = HostContext.Async.ContinueWith(task, x => HandleError(x.Exception, context), TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.AttachedToParent);
+                var task = ProcessRequestAsync(context).ContinueWith(x => HandleError(x.Exception, context), 
+                    TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.AttachedToParent);
 
                 if (task.Status == TaskStatus.Created)
                 {

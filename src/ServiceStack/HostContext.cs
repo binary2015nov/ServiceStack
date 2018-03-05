@@ -20,7 +20,7 @@ namespace ServiceStack
     {
         public static ServiceStackHost AppHost { get; internal set; }
 
-        public static bool IsReady() => AppHost != null && AppHost.Ready;
+        public static bool IsReady() => AppHost != null && AppHost.IsReady;
 
         public static RequestContext RequestContext => RequestContext.Instance;
 
@@ -29,7 +29,7 @@ namespace ServiceStack
         internal static ServiceStackHost AssertAppHost()
         {
             if (AppHost == null)
-                throw new ConfigurationErrorsException(
+                throw new NotSupportedException(
                     "ServiceStack: AppHost does not exist or has not been initialized. " +
                     "Make sure you have created an AppHost and started it with 'new AppHost().Init();' " +
                     " in your Global.asax Application_Start() or alternative Application StartUp");

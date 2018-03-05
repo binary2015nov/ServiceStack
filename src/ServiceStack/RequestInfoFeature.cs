@@ -19,7 +19,7 @@ namespace ServiceStack
                 ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/debugging#request-info", "Request Info");
         }
 
-        public static IHttpHandler GetRequestInfoHandler(IRequest request)
+        public static IServiceStackHandler GetRequestInfoHandler(IHttpRequest request)
         {
             if (request.QueryString[Keywords.Debug] != Keywords.RequestInfo)
                 return null;

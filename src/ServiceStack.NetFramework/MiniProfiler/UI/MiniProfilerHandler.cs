@@ -20,7 +20,7 @@ namespace ServiceStack.MiniProfiler.UI
 	/// </summary>
 	public class MiniProfilerHandler : /*IRouteHandler, */ HttpAsyncTaskHandler
 	{
-		public static IHttpHandler MatchesRequest(IHttpRequest request)
+		public static IServiceStackHandler MatchesRequest(IHttpRequest request)
 		{
 			var file = GetFileNameWithoutExtension(request.PathInfo);
 			return file != null && file.StartsWith("ssr-")

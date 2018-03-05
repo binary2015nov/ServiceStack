@@ -6,7 +6,7 @@ namespace ServiceStack.Host
     /// <summary>
     /// Context to capture IService action
     /// </summary>
-    public class ActionContext
+    public sealed class ActionContext
     {
         public const string AnyAction = "ANY";
 

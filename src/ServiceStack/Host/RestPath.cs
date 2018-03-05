@@ -9,13 +9,13 @@ using ServiceStack.Web;
 
 namespace ServiceStack.Host
 {
-    public class RestPath : IRestPath
+    public sealed class RestPath : IRestPath
     {
         private const string WildCard = "*";
         private const char WildCardChar = '*';
         private const string PathSeparator = "/";
         private const char PathSeparatorChar = '/';
-        private static readonly char[] PathSeparatorChars = {'/'};
+        private static readonly char[] PathSeparatorChars = { '/' };
         private const char ComponentSeparator = '.';
         private const string VariablePrefix = "{";
 
@@ -344,7 +344,8 @@ namespace ServiceStack.Host
                                 return reqValue == exactMatch;
                             };
                         }
-                        else throw new NotSupportedException($"Unknown Matches Rule '{MatchRule}' in Route '{Path}'");
+                        else
+                            throw new NotSupportedException($"Unknown Matches Rule '{MatchRule}' in Route '{Path}'");
                     }
                 }
             }

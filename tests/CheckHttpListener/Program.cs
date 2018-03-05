@@ -29,7 +29,7 @@ namespace CheckHttpListener
 
         public AppSelfHost() : base("DocuRec Services", typeof(TestService).Assembly)
         {
-            Config.HandlerFactoryPath = "api";
+            //Config.HandlerFactoryPath = "api";
             Config.CompressFilesWithExtensions = new HashSet<string> { "html", "js" };
             Config.DebugMode = true;
         }

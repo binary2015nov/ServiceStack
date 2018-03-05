@@ -29,7 +29,7 @@ namespace ServiceStack.Host
 
 		public static void WithRequestDtoName(IServiceRoutes routes, Type requestType, string allowedVerbs)
 		{
-			routes.Add(requestType, restPath: $"/{requestType.GetOperationName()}", verbs: allowedVerbs, priority: AutoGenPriority);
+			routes.Add(new RestPath(requestType, $"/{requestType.GetOperationName()}", verbs: allowedVerbs) { Priority = AutoGenPriority });
 		}
 
 		public static void WithMatchingAttributes(IServiceRoutes routes, Type requestType, string allowedVerbs)
@@ -44,7 +44,7 @@ namespace ServiceStack.Host
 			membersWithAttribute.Insert(0, $"/{requestType.GetOperationName()}");
 
 			var restPath = membersWithAttribute.Join("/");
-			routes.Add(requestType, restPath: restPath, verbs: allowedVerbs, priority: AutoGenPriority);
+			routes.Add(new RestPath(requestType, restPath, verbs: allowedVerbs) { Priority = AutoGenPriority });
 		}
 
 		public static void WithMatchingPropertyNames(IServiceRoutes routes, Type requestType, string allowedVerbs)
@@ -59,7 +59,7 @@ namespace ServiceStack.Host
 			membersWithName.Insert(0, $"/{requestType.GetOperationName()}");
 
 			var restPath = membersWithName.Join("/");
-			routes.Add(requestType, restPath: restPath, verbs: allowedVerbs, priority: AutoGenPriority);
+			routes.Add(new RestPath(requestType, restPath, verbs: allowedVerbs) { Priority = AutoGenPriority });
 		}
 	}
 }

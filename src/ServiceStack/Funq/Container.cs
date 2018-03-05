@@ -57,7 +57,9 @@ namespace Funq
         public Container CreateChildContainer()
         {
             var child = InstantiateChildContainer();
-            lock (childContainers) childContainers.Push(child);
+            lock (childContainers)
+                childContainers.Push(child);
+
             return child;
         }
 
@@ -480,21 +482,12 @@ namespace Funq
             GetEntry<TService, TFunc>(name, true);
         }
 
-        /// <summary>
-        /// Disposes the container and all instances owned by it (<see cref="Owner.Container"/>), as well as all child containers 
-        /// created through <see cref="CreateChildContainer"/>.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
         private bool disponsed = false;
         protected virtual void Dispose(bool disposing)
         {
             if (disponsed)
                 return;
+
             if (disposing)
             {
                 lock (disposables)
@@ -529,14 +522,19 @@ namespace Funq
             disponsed = true;
         }
 
+        /// <summary>
+        /// Disposes the container and all instances owned by it (<see cref="Owner.Container"/>), as well as all child containers 
+        /// created through <see cref="CreateChildContainer"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         ~Container()
         {
             Dispose(false);
         }
-    }
-
-    public interface IHasContainer
-    {
-        Container Container { get; }
     }
 }

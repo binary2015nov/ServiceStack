@@ -8,7 +8,7 @@ namespace ServiceStack
 {
     public class PredefinedRoutesFeature : IPlugin
     {
-        public Dictionary<string, Func<IHttpHandler>> HandlerMappings { get; } = new Dictionary<string, Func<IHttpHandler>>();
+        public Dictionary<string, Func<IServiceStackHandler>> HandlerMappings { get; } = new Dictionary<string, Func<IServiceStackHandler>>();
         
         public void Register(IAppHost appHost)
         {
@@ -18,14 +18,14 @@ namespace ServiceStack
                 ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/routing#pre-defined-routes", "Pre-defined Routes");
         }
 
-        public IHttpHandler ProcessRequest(string httpMethod, string pathInfo, string filePath)
+        public IServiceStackHandler ProcessRequest(string httpMethod, string pathInfo, string filePath)
         {
             var pathParts = pathInfo.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             if (pathParts.Length == 0) return null;
             return GetHandlerForPathParts(pathParts);
         }
 
-        private IHttpHandler GetHandlerForPathParts(string[] pathParts)
+        private IServiceStackHandler GetHandlerForPathParts(string[] pathParts)
         {
             var pathController = pathParts[0].ToLower();
 

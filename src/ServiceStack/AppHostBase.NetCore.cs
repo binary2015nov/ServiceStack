@@ -35,7 +35,7 @@ namespace ServiceStack
             Config.DebugMode = env.IsDevelopment();
 
             RegisterLicenseFromAppSettings(AppSettings);
-            if (!Ready)
+            if (!IsReady)
             {
                 Container.Adapter = new NetCoreContainerAdapter(app.ApplicationServices);
                 Init();

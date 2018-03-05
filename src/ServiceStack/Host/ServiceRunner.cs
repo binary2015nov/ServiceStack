@@ -79,7 +79,7 @@ namespace ServiceStack.Host
                 BeforeEachRequest(req, requestDto);
 
                 var res = req.Response;
-                var container = HostContext.Container;
+                var container = AppHost.Container;
 
                 if (RequestFilters != null)
                 {
@@ -101,7 +101,7 @@ namespace ServiceStack.Host
 
                 var response = AfterEachRequest(req, requestDto, ServiceAction(instance, requestDto));
 
-                if (HostContext.Config.StrictMode.GetValueOrDefault())
+                if (AppHost.Config.StrictMode.GetValueOrDefault())
                 {
                     if (response != null && response.GetType().IsValueType)
                         throw new StrictModeException(
@@ -193,7 +193,7 @@ namespace ServiceStack.Host
         public virtual async Task<object> HandleExceptionAsync(IRequest request, TRequest requestDto, Exception ex)
         {
             var errorResponse = HandleException(request, requestDto, ex)
-                ?? await HostContext.RaiseServiceException(request, requestDto, ex)
+                ?? await AppHost.OnServiceException(request, requestDto, ex)
                 ?? DtoUtils.CreateErrorResponse(requestDto, ex);
 
             AfterEachRequest(request, requestDto, errorResponse ?? ex);

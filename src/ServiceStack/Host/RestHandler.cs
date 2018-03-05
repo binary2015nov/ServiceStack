@@ -115,10 +115,8 @@ namespace ServiceStack.Host
 
                 var requestParams = httpReq.GetFlattenedRequestParams();
 
-                var taskResponse = HostContext.AppHost.ApplyRequestConvertersAsync(httpReq,
+                return await HostContext.AppHost.ApplyRequestConvertersAsync(httpReq,
                     CreateRequest(httpReq, restPath, requestParams));
-
-                return taskResponse;
             }
         }
 

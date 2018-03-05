@@ -15,7 +15,7 @@ using ServiceStack.Web;
 
 namespace ServiceStack
 {
-    public class HostConfig
+    public sealed class HostConfig
     {
         public const string DefaultWsdlNamespace = "http://schemas.servicestack.net/types";
 
@@ -134,10 +134,7 @@ namespace ServiceStack
             FallbackRestPath = null;
             UseHttpsLinks = false;
             UseJsObject = true;
-#if !NETSTANDARD2_0
-            UseCamelCase = false;
-            EnableOptimizations = false;
-#else
+#if NETSTANDARD2_0
             UseCamelCase = true;
             EnableOptimizations = true;
 #endif

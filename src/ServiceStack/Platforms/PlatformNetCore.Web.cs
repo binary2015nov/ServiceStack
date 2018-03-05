@@ -14,24 +14,24 @@ using ServiceStack;
 
 namespace System.Web
 {
-    public interface IHttpHandler
-    {
-        //
-        // Summary:
-        //     Gets a value indicating whether another request can use the System.Web.IHttpHandler
-        //     instance.
-        //
-        // Returns:
-        //     true if the System.Web.IHttpHandler instance is reusable; otherwise, false.
-        bool IsReusable { get; }
-    }
+    //public interface IHttpHandler
+    //{
+    //    //
+    //    // Summary:
+    //    //     Gets a value indicating whether another request can use the System.Web.IHttpHandler
+    //    //     instance.
+    //    //
+    //    // Returns:
+    //    //     true if the System.Web.IHttpHandler instance is reusable; otherwise, false.
+    //    bool IsReusable { get; }
+    //}
 
-    public interface IHttpAsyncHandler : IHttpHandler
-    {
-        //IAsyncResult BeginProcessRequest(HttpContext context, AsyncCallback cb, object extraData);
-        //void EndProcessRequest(IAsyncResult result);
-        Task Middleware(Microsoft.AspNetCore.Http.HttpContext context, Func<Task> next); //.NET Core
-    }
+    //public interface IHttpAsyncHandler : IHttpHandler
+    //{
+    //    //IAsyncResult BeginProcessRequest(HttpContext context, AsyncCallback cb, object extraData);
+    //    //void EndProcessRequest(IAsyncResult result);
+    //    Task Middleware(Microsoft.AspNetCore.Http.HttpContext context, Func<Task> next); //.NET Core
+    //}
 
     public class HtmlString : IHtmlString
     {

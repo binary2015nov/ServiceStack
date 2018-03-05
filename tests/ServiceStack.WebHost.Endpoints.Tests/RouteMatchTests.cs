@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using Funq;
 using NUnit.Framework;
+using ServiceStack.Host;
 using ServiceStack.Web;
 
 namespace ServiceStack.WebHost.Endpoints.Tests
@@ -166,7 +167,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             public override void Configure(Container container)
             {
-                Routes.Add(typeof(MatchesCsv), "/matches/csv", null, null, null, matches:"AcceptsCsv");
+                Routes.Add(new RestPath(typeof(MatchesCsv), "/matches/csv", null, null, null, "AcceptsCsv"));
             }
         }
 

@@ -470,12 +470,12 @@ namespace ServiceStack
             return httpHandler ?? new NotFoundHttpHandler();
         }
 
-        public IHttpHandler GetCustomErrorHttpHandler(HttpStatusCode errorStatus)
+        public IServiceStackHandler GetCustomErrorHttpHandler(HttpStatusCode errorStatus)
         {
             var ssHandler = GetCustomErrorHandler(errorStatus)
                 ?? GetNotFoundHandler();
             if (ssHandler == null) return null;
-            var httpHandler = ssHandler as IHttpHandler;
+            var httpHandler = ssHandler as IServiceStackHandler;
             return httpHandler ?? new ServiceStackHttpHandler(ssHandler);
         }
 

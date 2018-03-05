@@ -14,7 +14,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 {
     public class CustomValidationAppHost : AppHostHttpListenerBase
     {
-        public CustomValidationAppHost() : base("Custom Error", typeof(CustomValidationAppHost).Assembly) { }
+        public CustomValidationAppHost() : base("Custom Error", typeof(CustomValidationAppHost).Assembly)
+        {
+            ServiceStack.FluentValidation.ValidatorOptions.LanguageManager.Culture = new System.Globalization.CultureInfo("en-us");
+        }
 
         public override void Configure(Container container)
         {

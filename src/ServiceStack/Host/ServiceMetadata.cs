@@ -39,9 +39,9 @@ namespace ServiceStack.Host
 
         public void Add(Type serviceType, Type requestType, Type responseType)
         {
-            ServiceTypes.Add(serviceType);
             RequestTypes.Add(requestType);
-        
+            ServiceTypes.Add(serviceType);
+
             var restrictTo = requestType.FirstAttribute<RestrictAttribute>()
                           ?? serviceType.FirstAttribute<RestrictAttribute>();
 

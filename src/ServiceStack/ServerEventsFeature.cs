@@ -81,7 +81,7 @@ namespace ServiceStack
 
 			appHost.RawHttpHandlers.Add(httpReq =>
 				httpReq.PathInfo.EndsWith(StreamPath)
-					? (IHttpHandler)new ServerEventsHandler()
+					? (IServiceStackHandler)new ServerEventsHandler()
 					: httpReq.PathInfo.EndsWith(HeartbeatPath)
 					  ? new ServerEventsHeartbeatHandler()
 					  : null);

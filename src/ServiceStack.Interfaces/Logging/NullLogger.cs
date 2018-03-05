@@ -2,21 +2,17 @@ using System;
 
 namespace ServiceStack.Logging
 {
-	/// <summary>
-	/// Default logger is to System.Diagnostics.Debug.Print
-	/// Made public so its testable
-	/// </summary>
 	public class NullLogger : ILog
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="DebugLogger"/> class.
+		/// Initializes a new instance of the <see cref="NullLogger"/> class.
 		/// </summary>
 		public NullLogger(string name) { }
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="DebugLogger"/> class.
-		/// </summary>
-		public NullLogger(Type type) { }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NullLogger"/> class.
+        /// </summary>
+        public NullLogger(Type type) { }
 
 		public bool IsDebugEnabled { get; set; }
 

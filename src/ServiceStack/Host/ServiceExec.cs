@@ -13,18 +13,22 @@ namespace ServiceStack.Host
 {
     public interface IServiceExec
     {
+        Dictionary<Type, List<ActionContext>> ActionMap { get; }
+
         object Execute(IRequest request, IService service, object requestDto);
+
+        void Reset(IAppHost appHost);
     }
 
-    class ServiceExec<TService> : IServiceExec where TService : IService
+    public class ServiceExec<TService> : IServiceExec where TService : class, IService
     {
         private const string ResponseDtoSuffix = "Response";
 
-        public static Dictionary<Type, List<ActionContext>> ActionMap { get; private set; }
+        public Dictionary<Type, List<ActionContext>> ActionMap { get; private set; }
 
-        private static Dictionary<string, InstanceExecFn> execMap;
+        private Dictionary<string, InstanceExecFn> execMap;
 
-        public static void Reset(IAppHost appHost)
+        public void Reset(IAppHost appHost)
         {
             ActionMap = new Dictionary<Type, List<ActionContext>>();
             execMap = new Dictionary<string, InstanceExecFn>(StringComparer.OrdinalIgnoreCase);
@@ -103,7 +107,7 @@ namespace ServiceStack.Host
             }
         }
 
-        private static ActionInvokerFn CreateExecFn(Type requestType, MethodInfo mi)
+        private ActionInvokerFn CreateExecFn(Type requestType, MethodInfo mi)
         {
             var serviceType = typeof(TService);
 

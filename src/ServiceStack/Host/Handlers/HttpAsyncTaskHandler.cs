@@ -11,7 +11,11 @@ using ServiceStack.Web;
 
 namespace ServiceStack.Host.Handlers
 {
+#if !NETSTANDARD2_0
     public abstract class HttpAsyncTaskHandler : IHttpAsyncHandler, IServiceStackHandler
+#else
+    public abstract class HttpAsyncTaskHandler : IServiceStackHandler
+#endif
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(HttpAsyncTaskHandler));
 
@@ -106,12 +110,9 @@ namespace ServiceStack.Host.Handlers
         //ASP.NET IHttpAsyncHandler entry point
         IAsyncResult IHttpAsyncHandler.BeginProcessRequest(HttpContext context, AsyncCallback cb, object extraData)
         {
-            if (cb == null)
-                throw new ArgumentNullException(nameof(cb));
-
             var task = ProcessRequestAsync(context.Request.RequestContext.HttpContext);
 
-            HostContext.Async.ContinueWith(task, ar =>
+            task.ContinueWith(ar =>
                 cb(ar));
 
             if (task.Status == TaskStatus.Created)
@@ -121,11 +122,13 @@ namespace ServiceStack.Host.Handlers
         }
 
         void IHttpAsyncHandler.EndProcessRequest(IAsyncResult result)
-        {
+        {        
             var task = (Task)result;
+            //task.Wait(); // avoid an exception being thrown on the finalizer thread.
 
-            task.Wait(); // avoid an exception being thrown on the finalizer thread.
-
+            if (task.IsFaulted)
+                Logger.Error(task.Exception);
+            
             // Shouldn't dispose of tasks:
             // http://blogs.msdn.com/b/pfxteam/archive/2012/03/25/10287435.aspx
             // http://bradwilson.typepad.com/blog/2012/04/tpl-and-servers-pt4.html

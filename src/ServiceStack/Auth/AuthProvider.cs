@@ -450,7 +450,7 @@ namespace ServiceStack.Auth
 
     public static class AuthExtensions
     {
-        private static ILog Log = LogManager.GetLogger(typeof(AuthExtensions));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(AuthExtensions));
 
         public static bool IsAuthorizedSafe(this IAuthProvider authProvider, IAuthSession session, IAuthTokens tokens)
         {
@@ -576,8 +576,8 @@ namespace ServiceStack.Auth
 
             if (passwordHasher == null)
             {
-                if (Log.IsDebugEnabled)
-                    Log.Debug("Found newer PasswordHash without Salt but no registered IPasswordHasher to verify it");
+                if (Logger.IsDebugEnabled)
+                    Logger.Debug("Found newer PasswordHash without Salt but no registered IPasswordHasher to verify it");
 
                 return false;
             }
@@ -593,8 +593,8 @@ namespace ServiceStack.Auth
                 var decodedHashedPassword = Convert.FromBase64String(userAuth.PasswordHash);
                 if (decodedHashedPassword.Length == 0)
                 {
-                    if (Log.IsDebugEnabled)
-                        Log.Debug("userAuth.PasswordHash is empty");
+                    if (Logger.IsDebugEnabled)
+                        Logger.Debug("userAuth.PasswordHash is empty");
 
                     return false;
                 }

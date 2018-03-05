@@ -50,7 +50,7 @@ namespace ServiceStack.Auth
          * (All UInt32s are stored big-endian.)
          */
 
-        public static ILog Log = LogManager.GetLogger(typeof(PasswordHasher));
+        public static readonly ILog Logger = LogManager.GetLogger(typeof(PasswordHasher));
 
         public const int DefaultIterationCount = 10000;
 
@@ -59,7 +59,7 @@ namespace ServiceStack.Auth
         /// </summary>
         public int IterationCount { get; }
 
-        public PasswordHasher() : this(DefaultIterationCount) {}
+        public PasswordHasher() : this(DefaultIterationCount) { }
 
         /// <summary>
         /// The number of iterations used when hashing passwords using PBKDF2. Default is 10,000.
@@ -92,8 +92,8 @@ namespace ServiceStack.Auth
             // read the format marker from the hashed password
             if (decodedHashedPassword.Length == 0)
             {
-                if (Log.IsDebugEnabled)
-                    Log.Debug("hashedPassword is empty");
+                if (Logger.IsDebugEnabled)
+                    Logger.Debug("hashedPassword is empty");
 
                 return false;
             }
@@ -117,8 +117,8 @@ namespace ServiceStack.Auth
 
                 default:
 
-                    if (Log.IsDebugEnabled)
-                        Log.Debug($"Unknown Password Format Marker '{formatMarker}'");
+                    if (Logger.IsDebugEnabled)
+                        Logger.Debug($"Unknown Password Format Marker '{formatMarker}'");
 
                     return false;
             }

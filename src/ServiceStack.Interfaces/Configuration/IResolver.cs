@@ -5,9 +5,9 @@
         /// <summary>
         /// Resolve a dependency from the AppHost's IOC
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TService"></typeparam>
         /// <returns></returns>
-        T TryResolve<T>();
+        TService TryResolve<TService>();
     }
 
     public interface IHasResolver

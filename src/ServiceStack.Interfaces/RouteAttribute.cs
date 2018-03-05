@@ -130,7 +130,8 @@ namespace ServiceStack
                 && string.Equals(Summary, other.Summary) 
                 && string.Equals(Notes, other.Notes) 
                 && string.Equals(Verbs, other.Verbs) 
-                && Priority == other.Priority;
+                && Priority == other.Priority
+                && string.Equals(Matches, other.Matches);
         }
 
         public override bool Equals(object obj)
@@ -151,6 +152,7 @@ namespace ServiceStack
                 hashCode = (hashCode * 397) ^ (Notes != null ? Notes.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Verbs != null ? Verbs.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ Priority;
+                hashCode = (hashCode * 397) ^ (Matches != null ? Matches.GetHashCode() : 0);
                 return hashCode;
             }
         }

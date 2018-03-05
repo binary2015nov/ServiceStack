@@ -27,7 +27,7 @@ namespace ServiceStack.Host
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(ServiceController));
 
-        private readonly ServiceStackHost appHost;
+        public readonly ServiceStackHost AppHost;
 
         public ServiceController(ServiceStackHost appHost)
             : this(appHost, appHost.ServiceAssemblies) { }
@@ -40,7 +40,7 @@ namespace ServiceStack.Host
 
         public ServiceController(ServiceStackHost appHost, Assembly[] assembliesWithServices, Func<IEnumerable<Type>> resolveServicesFn)
         {
-            this.appHost = appHost;
+            AppHost = appHost;
             appHost.Container.DefaultOwner = Owner.External;
             typeFactory = new ContainerResolveCache();
             this.RequestTypeFactoryMap = new Dictionary<Type, Func<IRequest, object>>();
@@ -54,8 +54,6 @@ namespace ServiceStack.Host
             = new Dictionary<Type, RestrictAttribute>();
 
         public Dictionary<Type, Func<IRequest, object>> RequestTypeFactoryMap { get; set; }
-
-        public string DefaultOperationsNamespace { get; set; }
 
         public Func<IEnumerable<Type>> ResolveServicesFn { get; set; }
 
@@ -74,34 +72,31 @@ namespace ServiceStack.Host
         {
             foreach (var serviceType in Service.GetServiceTypes(assembly))
             {
-                if (appHost.ExcludeAutoRegisteringServiceTypes.Contains(serviceType))
+                if (AppHost.ExcludeAutoRegisteringServiceTypes.Contains(serviceType))
                     continue;
 
                 RegisterService(serviceType);
             }
         }
 
+        private readonly Dictionary<Type, Dictionary<Type, List<ActionContext>>> serviceActionMap = new Dictionary<Type, Dictionary<Type, List<ActionContext>>>();
+
         public void RegisterService(Type serviceType)
         {
             RegisterService(serviceType, typeFactory);
         }
 
-        private readonly Dictionary<Type, Dictionary<Type, List<ActionContext>>> serviceActionMap = new Dictionary<Type, Dictionary<Type, List<ActionContext>>>();
-
         public void RegisterService(Type serviceType, ITypeFactory serviceFactoryFn)
         {
             if (!Service.IsServiceType(serviceType))
-                throw new ArgumentException($"{serviceType.FullName} is not a service type that implements IService");
+                throw new ArgumentException($"{serviceType.FullName} is not a service type that implements IService.");
 
             if (!serviceActionMap.TryGetValue(serviceType, out Dictionary<Type, List<ActionContext>> actionMap))
             {
                 var serviceExecDef = typeof(ServiceExec<>).MakeGenericType(serviceType);
-                serviceExecDef.GetMethod("Reset", BindingFlags.Public | BindingFlags.Static).Invoke(null, new object[] { appHost });
-
-                var property = serviceExecDef.GetProperty("ActionMap", BindingFlags.Public | BindingFlags.Static);
-                actionMap = property.GetValue(null) as Dictionary<Type, List<ActionContext>>;
-
                 var iserviceExec = (IServiceExec)serviceExecDef.CreateInstance();
+                iserviceExec.Reset(AppHost);
+                actionMap = iserviceExec.ActionMap;
                 foreach (var requestType in actionMap.Keys)
                 {
                     ServiceExecFn handlerFn = (req, dto) =>
@@ -114,8 +109,14 @@ namespace ServiceStack.Host
                         return ManagedServiceExec(serviceExec, service, req, dto);
                     };
                     AddToRequestExecMap(requestType, serviceType, handlerFn);
-                    var responseType = actionMap[requestType].Select(p => p.ResponseType).FirstOrDefault();
-                    appHost.Metadata.Add(serviceType, requestType, responseType);
+                    foreach (var item in actionMap[requestType])
+                    {
+                        AppHost.Metadata.Add(serviceType, requestType, item.ResponseType);
+
+                        if (Logger.IsDebugEnabled)
+                            Logger.DebugFormat("Registering {0} service '{1}' with request '{2}'",
+                                item.ResponseType != null ? "Reply" : "OneWay", serviceType.GetOperationName(), requestType.GetOperationName());
+                    }
 
                     RegisterRestPaths(requestType);
                     if (typeof(IRequiresRequestStream).IsAssignableFrom(requestType))
@@ -131,13 +132,10 @@ namespace ServiceStack.Host
                             rawReq.RequestStream = req.InputStream;
                             return rawReq;
                         };
-                    }
-                    if (Logger.IsDebugEnabled)
-                        Logger.DebugFormat("Registering {0} service '{1}' with request '{2}'",
-                            responseType != null ? "Reply" : "OneWay", serviceType.GetOperationName(), requestType.GetOperationName());
+                    }         
                 }
                 serviceActionMap[serviceType] = actionMap;
-                appHost.Container.RegisterAutoWiredType(serviceType);
+                AppHost.Container.RegisterAutoWiredType(serviceType);
             }
         }
 
@@ -145,26 +143,26 @@ namespace ServiceStack.Host
 
         public void RegisterRestPaths(Type requestType)
         {
-            var attrs = appHost.GetRouteAttributes(requestType);
-            foreach (RouteAttribute attr in attrs)
+            var restPaths = new List<RestPath>(AppHost.Routes.Where(p => p.RequestType == requestType));
+            foreach (RouteAttribute attr in requestType.GetCustomAttributes<RouteAttribute>())
             {
                 var restPath = new RestPath(requestType, attr.Path, attr.Verbs, attr.Summary, attr.Notes, attr.Matches);
 
                 if (attr is FallbackRouteAttribute defaultAttr)
                 {
-                    if (appHost.Config.FallbackRestPath != null)
+                    if (AppHost.Config.FallbackRestPath != null)
                         throw new NotSupportedException(
                             "Config.FallbackRestPath is already defined. Only 1 [FallbackRoute] is allowed.");
 
-                    appHost.Config.FallbackRestPath = httpReq => restPath.IsMatch(httpReq) ? restPath : null;
+                    AppHost.Config.FallbackRestPath = httpReq => restPath.IsMatch(httpReq) ? restPath : null;
 
                     continue;
                 }
+                restPaths.Add(restPath);       
+            }
 
-                if (!restPath.IsValid)
-                    throw new NotSupportedException(
-                        $"RestPath '{attr.Path}' on Type '{requestType.GetOperationName()}' is not Valid");
-
+            foreach (var restPath in restPaths)
+            {
                 RegisterRestPath(restPath);
             }
         }
@@ -178,6 +176,9 @@ namespace ServiceStack.Host
             if (restPath.Path.IndexOfAny(InvalidRouteChars) != -1)
                 throw new ArgumentException($"Route '{restPath.Path}' on '{restPath.RequestType.GetOperationName()}' contains invalid chars. " +
                                             "See http://docs.servicestack.net/routing for info on valid routes.");
+            if (!restPath.IsValid)
+                throw new NotSupportedException(
+                    $"RestPath '{restPath.Path}' on Type '{restPath.RequestType.GetOperationName()}' is not Valid.");
 
             if (!RestPathMap.TryGetValue(restPath.FirstMatchHashKey, out var pathsAtFirstMatch))
             {
@@ -186,7 +187,7 @@ namespace ServiceStack.Host
             }
             pathsAtFirstMatch.Add(restPath);
 
-            if (!appHost.Metadata.OperationsMap.TryGetValue(restPath.RequestType, out Operation operation))
+            if (!AppHost.Metadata.OperationsMap.TryGetValue(restPath.RequestType, out Operation operation))
                 return;
 
             operation.Routes.Add(restPath);
@@ -302,7 +303,7 @@ namespace ServiceStack.Host
                 object response = null;
                 try
                 {
-                    requestDto = appHost.OnPreExecuteServiceFilter(service, requestDto, request, request.Response);
+                    requestDto = AppHost.OnPreExecuteServiceFilter(service, requestDto, request, request.Response);
 
                     if (request.Dto == null) // Don't override existing batched DTO[]
                         request.Dto = requestDto; 
@@ -310,7 +311,7 @@ namespace ServiceStack.Host
                     //Executes the service and returns the result
                     response = serviceExec(request, requestDto);
 
-                    response = appHost.OnPostExecuteServiceFilter(service, response, request, request.Response);
+                    response = AppHost.OnPostExecuteServiceFilter(service, response, request, request.Response);
 
                     return response;
                 }
@@ -319,11 +320,11 @@ namespace ServiceStack.Host
                     //Gets disposed by AppHost or ContainerAdapter if set
                     if (response is Task taskResponse)
                     {
-                        HostContext.Async.ContinueWith(request, taskResponse, task => appHost.Release(service));
+                        HostContext.Async.ContinueWith(request, taskResponse, task => AppHost.Release(service));
                     }
                     else
                     {
-                        appHost.Release(service);
+                        AppHost.Release(service);
                     }
                 }
             }
@@ -359,9 +360,9 @@ namespace ServiceStack.Host
                 response = taskResponse.GetResult();
             }
 
-            response = await appHost.ApplyResponseConvertersAsync(req, response);
+            response = await AppHost.ApplyResponseConvertersAsync(req, response);
 
-            await appHost.ApplyResponseFiltersAsync(req, req.Response, response);
+            await AppHost.ApplyResponseFiltersAsync(req, req.Response, response);
             if (req.Response.IsClosed)
                 return req.Response.Dto;
 
@@ -385,8 +386,8 @@ namespace ServiceStack.Host
 
             req.PopulateFromRequestIfHasSessionId(message.Body);
 
-            req.Dto = appHost.ApplyRequestConvertersAsync(req, message.Body).Result;
-            if (appHost.ApplyMessageRequestFilters(req, req.Response, message.Body))
+            req.Dto = AppHost.ApplyRequestConvertersAsync(req, message.Body).Result;
+            if (AppHost.ApplyMessageRequestFilters(req, req.Response, message.Body))
                 return req.Response.Dto;
 
             var response = Execute(message.Body, req);
@@ -394,9 +395,9 @@ namespace ServiceStack.Host
             if (response is Task taskResponse)
                 response = taskResponse.GetResult();
 
-            response = appHost.ApplyResponseConvertersAsync(req, response).Result;
+            response = AppHost.ApplyResponseConvertersAsync(req, response).Result;
 
-            if (appHost.ApplyMessageResponseFilters(req, req.Response, response))
+            if (AppHost.ApplyMessageResponseFilters(req, req.Response, response))
                 response = req.Response.Dto;
 
             req.Response.EndMqRequest();
@@ -420,11 +421,11 @@ namespace ServiceStack.Host
             req.Dto = requestDto;
             var requestType = requestDto.GetType();
 
-            if (appHost.Config.EnableAccessRestrictions)
+            if (AppHost.Config.EnableAccessRestrictions)
                 AssertServiceRestrictions(requestType, req.RequestAttributes);
 
             var handlerFn = GetService(requestType);
-            return appHost.OnAfterExecute(req, requestDto, handlerFn(req, requestDto));
+            return AppHost.OnAfterExecute(req, requestDto, handlerFn(req, requestDto));
         }
 
         /// <summary>
@@ -435,7 +436,7 @@ namespace ServiceStack.Host
             req.Dto = requestDto;
             var requestType = requestDto.GetType();
 
-            if (appHost.Config.EnableAccessRestrictions)
+            if (AppHost.Config.EnableAccessRestrictions)
                 AssertServiceRestrictions(requestType, req.RequestAttributes);
 
             var handlerFn = GetService(requestType);
@@ -445,7 +446,7 @@ namespace ServiceStack.Host
                 await responseTask;
                 response = responseTask.GetResult();
             }
-            return appHost.OnAfterExecute(req, requestDto, response);
+            return AppHost.OnAfterExecute(req, requestDto, response);
         }
 
         // Only Used internally by TypedFilterTests 
@@ -457,11 +458,11 @@ namespace ServiceStack.Host
 
                 if (applyFilters)
                 {
-                    var task = appHost.ApplyRequestConvertersAsync(req, requestDto);
+                    var task = AppHost.ApplyRequestConvertersAsync(req, requestDto);
                     task.Wait();
                     requestDto = task.Result;
 
-                    appHost.ApplyRequestFiltersAsync(req, req.Response, requestDto).Wait();
+                    AppHost.ApplyRequestFiltersAsync(req, req.Response, requestDto).Wait();
                     if (req.Response.IsClosed)
                         return null;
                 }
@@ -494,9 +495,9 @@ namespace ServiceStack.Host
 
                 if (applyFilters)
                 {
-                    requestDto = appHost.ApplyRequestConverters(req, requestDto);
+                    requestDto = AppHost.ApplyRequestConverters(req, requestDto);
 
-                    appHost.ApplyRequestFiltersAsync(req, req.Response, requestDto).Wait();
+                    AppHost.ApplyRequestFiltersAsync(req, req.Response, requestDto).Wait();
                     if (req.Response.IsClosed)
                         return null;
                 }
@@ -518,15 +519,15 @@ namespace ServiceStack.Host
             req.Dto = requestDto;
             var requestType = requestDto.GetType();
 
-            if (appHost.Config.EnableAccessRestrictions)
+            if (AppHost.Config.EnableAccessRestrictions)
             {
                 AssertServiceRestrictions(requestType, req.RequestAttributes);
             }
 
             if (applyFilters)
             {
-                requestDto = appHost.ApplyRequestConvertersAsync(req, requestDto);
-                appHost.ApplyRequestFiltersAsync(req, req.Response, requestDto).Wait();
+                requestDto = AppHost.ApplyRequestConvertersAsync(req, requestDto);
+                AppHost.ApplyRequestFiltersAsync(req, req.Response, requestDto).Wait();
                 if (req.Response.IsClosed)
                     return null;
             }
@@ -660,7 +661,7 @@ namespace ServiceStack.Host
 
         public void AssertServiceRestrictions(Type requestType, RequestAttributes actualAttributes)
         {
-            if (!appHost.Config.EnableAccessRestrictions) return;
+            if (!AppHost.Config.EnableAccessRestrictions) return;
             if ((RequestAttributes.InProcess & actualAttributes) == RequestAttributes.InProcess) return;
 
             var hasNoAccessRestrictions = !requestServiceAttrs.TryGetValue(requestType, out var restrictAttr)

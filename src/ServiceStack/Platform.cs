@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using ServiceStack.Caching;
 using ServiceStack.Configuration;
+using ServiceStack.Serialization;
 using ServiceStack.Text;
 using ServiceStack.Web;
 
@@ -141,15 +142,6 @@ namespace ServiceStack
                 throw new NotSupportedException("The current assembly is loaded from a byte array");
 
             return new FileInfo(assembly.Location).LastWriteTime;           
-        }
-
-        public static void ClearRuntime()
-        {
-            JsConfig.Reset();
-            JS.UnConfigure();
-            PlatformExtensions.ClearRuntimeAttributes(); //Clears Runtime Attributes
-            ReflectionExtensions.Reset();
-            MemoryCacheClient.Default.Dispose();
         }
     }
 }

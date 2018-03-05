@@ -34,7 +34,7 @@ namespace ServiceStack
             AddLink(AvailableFeatures, "http://docs.servicestack.net/metadata-page", "Metadata Page");
         }
 
-        public virtual IHttpHandler ProcessRequest(string httpMethod, string pathInfo, string filePath)
+        public virtual IServiceStackHandler ProcessRequest(string httpMethod, string pathInfo, string filePath)
         {
             string metadata = HostContext.Config.MetadataRedirectPath.IsNullOrEmpty()
                 ? "/metadata"

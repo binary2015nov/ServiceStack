@@ -3,7 +3,7 @@ using System;
 namespace ServiceStack.Logging
 {
     /// <summary>
-    /// Provides access to log factories and loggers. This class cannot be inherited.
+    /// Provides access to loggers. This class cannot be inherited.
     /// </summary>
     public static class LogManager
     {

@@ -3,9 +3,7 @@ using System;
 namespace ServiceStack.Logging
 {
 	/// <summary>
-	/// Creates a Debug Logger, that logs all messages to: System.Diagnostics.Debug
-	/// 
-	/// Made public so its testable
+	/// Creates a empty Logger, that does not log anything.
 	/// </summary>
 	public class NullLogFactory : ILogFactory
 	{

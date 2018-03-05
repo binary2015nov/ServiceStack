@@ -7,8 +7,8 @@ namespace ServiceStack.Auth
 {
     public interface IHashProvider
     {
-        void GetHashAndSaltString(string Data, out string Hash, out string Salt);
-        bool VerifyHashString(string Data, string Hash, string Salt);
+        void GetHashAndSaltString(string data, out string hash, out string salt);
+        bool VerifyHashString(string data, string hash, string salt);
     }
 
     /// <summary>
@@ -20,69 +20,69 @@ namespace ServiceStack.Auth
     /// </summary>
     public class SaltedHash : IHashProvider
     {
-        readonly HashAlgorithm HashProvider;
-        readonly int SalthLength;
+        public readonly HashAlgorithm HashProvider;
+        public readonly int SalthLength;
 
-        public SaltedHash(HashAlgorithm HashAlgorithm, int theSaltLength)
+        public SaltedHash(HashAlgorithm hashAlgorithm, int saltLength)
         {
-            HashProvider = HashAlgorithm;
-            SalthLength = theSaltLength;
+            HashProvider = hashAlgorithm;
+            SalthLength = saltLength;
         }
 
-        public SaltedHash() : this(SHA256.Create(), 4) {}
+        public SaltedHash() : this(SHA256.Create(), 4) { }
 
-        private byte[] ComputeHash(byte[] Data, byte[] Salt)
+        private byte[] ComputeHash(byte[] data, byte[] salt)
         {
-            var DataAndSalt = new byte[Data.Length + SalthLength];
-            Array.Copy(Data, DataAndSalt, Data.Length);
-            Array.Copy(Salt, 0, DataAndSalt, Data.Length, SalthLength);
+            var dataAndSalt = new byte[data.Length + SalthLength];
+            Array.Copy(data, dataAndSalt, data.Length);
+            Array.Copy(salt, 0, dataAndSalt, data.Length, SalthLength);
 
-            return HashProvider.ComputeHash(DataAndSalt);
+            return HashProvider.ComputeHash(dataAndSalt);
         }
 
-        public void GetHashAndSalt(byte[] Data, out byte[] Hash, out byte[] Salt)
+        public void GetHashAndSalt(byte[] data, out byte[] hash, out byte[] salt)
         {
-            Salt = new byte[SalthLength];
+            salt = new byte[SalthLength];
 
             var random = RandomNumberGenerator.Create();
 #if !NETSTANDARD2_0
-            random.GetNonZeroBytes(Salt);
+            random.GetNonZeroBytes(salt);
 #else
-            random.GetBytes(Salt);
+            random.GetBytes(salt);
 #endif
 
-            Hash = ComputeHash(Data, Salt);
+            hash = ComputeHash(data, salt);
         }
 
-        public void GetHashAndSaltString(string Data, out string Hash, out string Salt)
+        public void GetHashAndSaltString(string data, out string hash, out string salt)
         {
-            GetHashAndSalt(Encoding.UTF8.GetBytes(Data), out var hashOut, out var saltOut);
+            GetHashAndSalt(Encoding.UTF8.GetBytes(data), out var hashOut, out var saltOut);
 
-            Hash = Convert.ToBase64String(hashOut);
-            Salt = Convert.ToBase64String(saltOut);
+            hash = Convert.ToBase64String(hashOut);
+            salt = Convert.ToBase64String(saltOut);
         }
 
-        public bool VerifyHash(byte[] Data, byte[] Hash, byte[] Salt)
+        public bool VerifyHash(byte[] data, byte[] hash, byte[] salt)
         {
-            var NewHash = ComputeHash(Data, Salt);
+            var newHash = ComputeHash(data, salt);
 
-            if (NewHash.Length != Hash.Length) return false;
+            if (newHash.Length != hash.Length) return false;
 
-            for (int Lp = 0; Lp < Hash.Length; Lp++)
-                if (!Hash[Lp].Equals(NewHash[Lp]))
+            for (int Lp = 0; Lp < hash.Length; Lp++)
+                if (!hash[Lp].Equals(newHash[Lp]))
                     return false;
 
             return true;
         }
 
-        public bool VerifyHashString(string Data, string Hash, string Salt)
+        public bool VerifyHashString(string data, string hash, string salt)
         {
-            if (Hash == null || Salt == null)
+            if (hash == null || salt == null)
                 return false;
             
-            byte[] HashToVerify = Convert.FromBase64String(Hash);
-            byte[] SaltToVerify = Convert.FromBase64String(Salt);
-            byte[] DataToVerify = Encoding.UTF8.GetBytes(Data);
+            byte[] HashToVerify = Convert.FromBase64String(hash);
+            byte[] SaltToVerify = Convert.FromBase64String(salt);
+            byte[] DataToVerify = Encoding.UTF8.GetBytes(data);
             return VerifyHash(DataToVerify, HashToVerify, SaltToVerify);
         }
     }
@@ -91,7 +91,7 @@ namespace ServiceStack.Auth
     {
         public static string ToSha256Hash(this string value)
         {
-            var sb = StringBuilderCache.Allocate();
+            var sb = new StringBuilder();
             using (var hash = SHA256.Create())
             {
                 var result = hash.ComputeHash(value.ToUtf8Bytes());
@@ -100,7 +100,7 @@ namespace ServiceStack.Auth
                     sb.Append(b.ToString("x2"));
                 }
             }
-            return StringBuilderCache.Retrieve(sb);
+            return sb.ToString();
         }
 
         public static byte[] ToSha256HashBytes(this byte[] bytes)

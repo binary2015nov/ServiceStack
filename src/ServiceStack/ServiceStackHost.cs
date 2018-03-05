@@ -24,18 +24,17 @@ using ServiceStack.Metadata;
 using ServiceStack.MiniProfiler;
 using ServiceStack.NativeTypes;
 using ServiceStack.Redis;
+using ServiceStack.Serialization;
 using ServiceStack.Text;
 using ServiceStack.Web;
 
 namespace ServiceStack
 {
-    public abstract partial class ServiceStackHost : IAppHost, IFunqlet, IHasContainer, IDisposable
+    public abstract partial class ServiceStackHost : IAppHost, IDisposable
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(ServiceStackHost));
 
         public readonly DateTime CreatedAt = DateTime.Now;
-
-        public HostConfig Config { get; private set; }
 
         protected ServiceStackHost(string serviceName, params Assembly[] assembliesWithServices)
         {
@@ -77,7 +76,7 @@ namespace ServiceStack
             OnDisposeCallbacks = new List<Action<IAppHost>>();
             OnEndRequestCallbacks = new List<Action<IRequest>>();
             AddVirtualFileSources = new List<IVirtualPathProvider>();
-            RawHttpHandlers = new List<Func<IHttpRequest, IHttpHandler>> {
+            RawHttpHandlers = new List<Func<IHttpRequest, IServiceStackHandler>> {
                 ReturnRedirectHandler
             };
             CatchAllHandlers = new List<HttpHandlerResolver>();
@@ -111,6 +110,8 @@ namespace ServiceStack
             };
         }
 
+        public HostConfig Config { get; private set; }
+
         public string ServiceName { get; set; }
 
         public Assembly[] ServiceAssemblies { get; set; }
@@ -139,13 +140,13 @@ namespace ServiceStack
         /// </summary>
         public virtual ServiceStackHost Init()
         {
-            if (Ready) throw new InvalidOperationException($"The current method has been already invoked.");
+            if (IsReady) throw new InvalidOperationException($"The current method has been already invoked.");
 
             HostContext.AppHost = this;
             
             OnBeforeInit();
 
-            Container.Register<IAppSettings>(AppSettings);
+            Container.Register(AppSettings);
             Container.Register<IHashProvider>(c => new SaltedHash()).ReusedWithin(ReuseScope.None);
             Container.Register<IPasswordHasher>(c => new PasswordHasher());
             if (Config.DebugMode)           
@@ -189,7 +190,7 @@ namespace ServiceStack
             return this;
         }
 
-        public bool Ready => ReadyAt != DateTime.MinValue;
+        public bool IsReady => ReadyAt != DateTime.MinValue;
 
         /// <summary>
         /// Collection of added plugins.
@@ -352,20 +353,20 @@ namespace ServiceStack
             {
                 callback(this);
             }
-            //Register any routes configured on Routes
-            foreach (var restPath in Routes.RestPaths)
-            {
-                ServiceController.RegisterRestPath(restPath);
+            ////Register any routes configured on Routes
+            //foreach (var restPath in Routes)
+            //{
+            //    ServiceController.RegisterRestPath(restPath);
 
-                //Auto add Route Attributes so they're available in T.ToUrl() extension methods
-                restPath.RequestType
-                    .AddAttributes(new RouteAttribute(restPath.Path, restPath.AllowedVerbs)
-                    {
-                        Priority = restPath.Priority,
-                        Summary = restPath.Summary,
-                        Notes = restPath.Notes,
-                    });
-            }
+            //    //Auto add Route Attributes so they're available in T.ToUrl() extension methods
+            //    restPath.RequestType
+            //        .AddAttributes(new RouteAttribute(restPath.Path, restPath.AllowedVerbs)
+            //        {
+            //            Priority = restPath.Priority,
+            //            Summary = restPath.Summary,
+            //            Notes = restPath.Notes,
+            //        });
+            //}
 
             HttpHandlerFactory.Init();
         }
@@ -444,9 +445,9 @@ namespace ServiceStack
         // and let them register them manually
         public HashSet<Type> ExcludeAutoRegisteringServiceTypes { get; private set; }
 
-        public ServiceRoutes Routes { get; private set; }
+        public IServiceRoutes Routes { get; private set; }
 
-        public IEnumerable<RestPath> RestPaths => ServiceController?.RestPathMap.SelectMany(x => x.Value) ?? Routes.RestPaths;
+        public IEnumerable<RestPath> RestPaths => ServiceController?.RestPathMap.SelectMany(x => x.Value) ?? Routes;
 
         public Dictionary<Type, Func<IRequest, object>> RequestBinders => ServiceController?.RequestTypeFactoryMap;
 
@@ -523,7 +524,7 @@ namespace ServiceStack
 
         public List<Action<IRequest>> OnEndRequestCallbacks { get; set; }
 
-        public List<Func<IHttpRequest, IHttpHandler>> RawHttpHandlers { get; private set; }
+        public List<Func<IHttpRequest, IServiceStackHandler>> RawHttpHandlers { get; private set; }
 
         public List<HttpHandlerResolver> CatchAllHandlers { get; private set; }
 
@@ -826,7 +827,7 @@ namespace ServiceStack
             }
         }
 
-        public void RegisterServicesInAssembly(Assembly assembly)
+        public virtual void RegisterServicesInAssembly(Assembly assembly)
         {
             ServiceController.RegisterServicesInAssembly(assembly);
         }
@@ -920,7 +921,7 @@ namespace ServiceStack
                 : normalizedPathInfo;
         }
 
-        public virtual IHttpHandler ReturnRedirectHandler(IHttpRequest httpReq)
+        public virtual IServiceStackHandler ReturnRedirectHandler(IHttpRequest httpReq)
         {
             var pathInfo = httpReq.PathInfo;
             return Config.RedirectPaths.TryGetValue(pathInfo, out string redirectPath)
@@ -943,8 +944,13 @@ namespace ServiceStack
                 Container = null;              
             }
             //clear unmanaged resources here
-            Platform.ClearRuntime();
-            if (Ready)
+            JsConfig.Reset();
+            JS.UnConfigure();
+            PlatformExtensions.ClearRuntimeAttributes(); //Clears Runtime Attributes
+            ReflectionExtensions.Reset();
+            MemoryCacheClient.Default.Dispose();
+            JsonDataContractSerializer.Instance.UseBcl = false;
+            if (HostContext.AppHost == this)
                 HostContext.AppHost = null;
             disposed = true;
         }
@@ -959,5 +965,10 @@ namespace ServiceStack
         {
             Dispose(false);
         }
+    }
+
+    public interface IHasContainer : IFunqlet
+    {
+        Container Container { get; }
     }
 }

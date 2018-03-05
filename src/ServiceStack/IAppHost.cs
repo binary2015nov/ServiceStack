@@ -18,7 +18,7 @@ namespace ServiceStack
     /// <summary>
     /// ASP.NET or HttpListener ServiceStack host
     /// </summary>
-    public interface IAppHost : IResolver
+    public interface IAppHost : IHasContainer, IResolver
     {
         /// <summary>
         /// The assemblies reflected to find api services provided in the AppHost constructor
@@ -71,7 +71,7 @@ namespace ServiceStack
         /// <summary>
         /// Register user-defined custom routes.
         /// </summary>
-        ServiceRoutes Routes { get; }
+        IServiceRoutes Routes { get; }
 
         /// <summary>
         /// Inferred Metadata available from existing services 
@@ -220,7 +220,7 @@ namespace ServiceStack
         /// <summary>
         /// Skip the ServiceStack Request Pipeline and process the returned IHttpHandler instead
         /// </summary>
-        List<Func<IHttpRequest, IHttpHandler>> RawHttpHandlers { get; }
+        List<Func<IHttpRequest, IServiceStackHandler>> RawHttpHandlers { get; }
 
         /// <summary>
         /// Provide a catch-all handler that doesn't match any routes
@@ -303,10 +303,7 @@ namespace ServiceStack
         /// Execute MQ Message in ServiceStack
         /// </summary>
         object ExecuteMessage(IMessage mqMessage);
-    }
 
-    public interface IHasAppHost
-    {
-        IAppHost AppHost { get; }
+        Task<object> OnServiceException(IRequest httpReq, object request, Exception ex);
     }
 }

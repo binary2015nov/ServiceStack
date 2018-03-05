@@ -101,14 +101,13 @@ namespace ServiceStack
         public IHttpHandler GetHandler(HttpContext context, string requestType, string url, string pathTranslated)
         {
             var httpContext = context.Request.RequestContext.HttpContext;
-            var opeationName = HostContext.AppHost.Config.StripApplicationVirtualPath? url.TrimPrefixes(context.Request.ApplicationPath) : url;
-            var httpReq = new ServiceStack.Host.AspNet.AspNetRequest(httpContext, opeationName) { PhysicalPath = pathTranslated };
+            var httpReq = new ServiceStack.Host.AspNet.AspNetRequest(httpContext, url.SanitizedVirtualPath()) { PhysicalPath = pathTranslated };
             return GetHandler(httpReq);
         }
 #endif
 
         // Entry point for HttpListener and .NET Core
-        public static IHttpHandler GetHandler(IHttpRequest httpReq)
+        public static IServiceStackHandler GetHandler(IHttpRequest httpReq)
         {
             var appHost = HostContext.AppHost;
             foreach (var rawHttpHandler in appHost.RawHttpHandlers)
@@ -124,7 +123,7 @@ namespace ServiceStack
             LastHandlerArgs = httpReq.Verb + "|" + httpReq.RawUrl + "|" + physicalPath;
 
             //Default Request /
-            if (pathInfo.IsNullOrEmpty() || pathInfo == "/")
+            if (pathInfo == "/")
             {
                 //If the fallback route can handle it, let it
                 var restPath = appHost.Config.FallbackRestPath?.Invoke(httpReq);
@@ -135,7 +134,7 @@ namespace ServiceStack
                 }
                 
                 //e.g. CatchAllHandler to Process Markdown files
-                var catchAllHandler = GetCatchAllHandlerIfAny(httpReq.HttpMethod, pathInfo, httpReq.GetPhysicalPath());
+                var catchAllHandler = GetCatchAllHandlerIfAny(httpReq.HttpMethod, pathInfo, physicalPath);
                 if (catchAllHandler != null) return catchAllHandler;
 
                 return DefaultHttpHandler ?? NotFoundHttpHandler;

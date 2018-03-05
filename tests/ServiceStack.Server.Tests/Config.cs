@@ -10,6 +10,6 @@ namespace ServiceStack.Server.Tests
 
         public static readonly string RabbitMQConnString = Environment.GetEnvironmentVariable("CI_RABBITMQ") ?? "localhost";
         public static readonly string SqlServerBuildDb = Environment.GetEnvironmentVariable("CI_SQLSERVER")
-            ?? @"Data Source=.\SQLEXPRESS;database=test;Integrated Security=True;";
+            ?? @"Data Source=.\SQLEXPRESS;Initial Catalog=test;Integrated Security=True;";
     }
 }

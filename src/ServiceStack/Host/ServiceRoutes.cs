@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -9,60 +10,44 @@ namespace ServiceStack.Host
     public class ServiceRoutes : IServiceRoutes
     {
         private List<RestPath> restPaths = new List<RestPath>();
-        public IEnumerable<RestPath> RestPaths { get { return restPaths; } }
 
-        public IServiceRoutes Add<TRequest>(string restPath)
+        public virtual IServiceRoutes Add(RestPath restPath)
         {
-            if (HasExistingRoute(typeof(TRequest), restPath)) return this;
+            if (restPath == null || HasExistingRoute(restPath.RequestType, restPath.Path))
+                return this;
 
-            restPaths.Add(new RestPath(typeof(TRequest), restPath));
-            return this;
-        }
+            //Auto add Route Attributes so they're available in T.ToUrl() extension methods
+            restPath.RequestType
+                .AddAttributes(new RouteAttribute(restPath.Path, restPath.AllowedVerbs)
+                {
+                    Priority = restPath.Priority,
+                    Summary = restPath.Summary,
+                    Notes = restPath.Notes,
+                    Matches = restPath.MatchRule
+                });
 
-        public IServiceRoutes Add<TRequest>(string restPath, string verbs)
-        {
-            if (HasExistingRoute(typeof(TRequest), restPath)) return this;
+            restPaths.Add(restPath);
 
-            restPaths.Add(new RestPath(typeof(TRequest), restPath, verbs));
-            return this;
-        }
-
-        public IServiceRoutes Add(Type requestType, string restPath, string verbs)
-        {
-            if (HasExistingRoute(requestType, restPath)) return this;
-
-            restPaths.Add(new RestPath(requestType, restPath, verbs));
-            return this;
-        }
-
-        public IServiceRoutes Add(Type requestType, string restPath, string verbs, int priority)
-        {
-            if (HasExistingRoute(requestType, restPath)) return this;
-
-            restPaths.Add(new RestPath(requestType, restPath, verbs) { Priority = priority });
-            return this;
-        }
-
-        public IServiceRoutes Add(Type requestType, string restPath, string verbs, string summary, string notes)
-        {
-            if (HasExistingRoute(requestType, restPath)) return this;
-
-            restPaths.Add(new RestPath(requestType, restPath, verbs, summary, notes));
-            return this;
-        }
-
-        public IServiceRoutes Add(Type requestType, string restPath, string verbs, string summary, string notes, string matches)
-        {
-            if (HasExistingRoute(requestType, restPath)) return this;
-
-            restPaths.Add(new RestPath(requestType, restPath, verbs, summary, notes, matches));
             return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool HasExistingRoute(Type requestType, string restPath)
         {
-            return RestPaths.FirstOrDefault(x => x.RequestType == requestType && x.Path == restPath) != null;
+            return restPaths.FirstOrDefault(x => x.RequestType == requestType && x.Path == restPath) != null;
+        }
+
+        public IEnumerator<RestPath> GetEnumerator()
+        {
+            foreach (var restPath in restPaths)
+            {
+                yield return restPath;
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

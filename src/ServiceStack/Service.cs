@@ -27,28 +27,7 @@ namespace ServiceStack
                 && !type.IsAbstract && !type.IsGenericTypeDefinition && !type.ContainsGenericParameters;
         }
 
-        public static IEnumerable<MethodInfo> GetActions(Type type)
-        {
-            foreach (var methodInfo in type.GetMethods(BindingFlags.Public | BindingFlags.Instance))
-            {
-                if (methodInfo.IsGenericMethod || methodInfo.GetParameters().Length != 1)
-                    continue;
-
-                var paramType = methodInfo.GetParameters()[0].ParameterType;
-                if (paramType.IsValueType || paramType == typeof(string))
-                    continue;
-
-                string actionName = methodInfo.Name.ToUpper();
-                if (!HttpMethods.AllVerbs.Contains(actionName) && actionName != ActionContext.AnyAction &&
-                !HttpMethods.AllVerbs.Any(verb => ContentTypes.KnownFormats.Any(format => actionName.EqualsIgnoreCase(verb + format))) &&
-                !ContentTypes.KnownFormats.Any(format => actionName.EqualsIgnoreCase(ActionContext.AnyAction + format)))
-                    continue;
-
-                yield return methodInfo;
-            }
-        }
-
-        public static List<Type> GetServiceTypes(params Assembly[] assembliesWithServices)
+        public static IEnumerable<Type> GetServiceTypes(params Assembly[] assembliesWithServices)
         {
             if (assembliesWithServices == null || assembliesWithServices.Length == 0)
                 throw new ArgumentException("No Assemblies provided to extract the service.\n"
@@ -72,6 +51,27 @@ namespace ServiceStack
             catch (Exception ex)
             {
                 throw new TypeLoadException($"Failed loading types, last assembly '{assemblyName}', type: '{typeName}'", ex);
+            }
+        }
+
+        public static IEnumerable<MethodInfo> GetActions(Type type)
+        {
+            foreach (var methodInfo in type.GetMethods(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (methodInfo.IsGenericMethod || methodInfo.GetParameters().Length != 1)
+                    continue;
+
+                var paramType = methodInfo.GetParameters()[0].ParameterType;
+                if (paramType.IsValueType || paramType == typeof(string))
+                    continue;
+
+                string actionName = methodInfo.Name.ToUpper();
+                if (!HttpMethods.AllVerbs.Contains(actionName) && actionName != ActionContext.AnyAction &&
+                !HttpMethods.AllVerbs.Any(verb => ContentTypes.KnownFormats.Any(format => actionName.EqualsIgnoreCase(verb + format))) &&
+                !ContentTypes.KnownFormats.Any(format => actionName.EqualsIgnoreCase(ActionContext.AnyAction + format)))
+                    continue;
+
+                yield return methodInfo;
             }
         }
 
