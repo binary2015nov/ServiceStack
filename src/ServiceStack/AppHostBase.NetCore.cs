@@ -97,7 +97,7 @@ namespace ServiceStack
 
             NetCoreRequest httpReq;
             IResponse httpRes;
-            System.Web.IHttpHandler handler;
+            IServiceStackHandler handler;
 
             try 
             {
@@ -204,7 +204,7 @@ namespace ServiceStack
             return app;
         }
 
-        public static IApplicationBuilder Use(this IApplicationBuilder app, System.Web.IHttpAsyncHandler httpHandler)
+        public static IApplicationBuilder Use(this IApplicationBuilder app, IServiceStackHandler httpHandler)
         {
             return app.Use(httpHandler.Middleware);
         }

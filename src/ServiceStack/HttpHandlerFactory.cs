@@ -16,10 +16,10 @@ namespace ServiceStack
         private static string WebHostPhysicalPath;
         public static string DefaultRootFileName { get; private set; }
 
-        private static IHttpHandler DefaultHttpHandler;
-        private static IHttpHandler ForbiddenHttpHandler;
-        private static IHttpHandler NotFoundHttpHandler;
-        private static readonly IHttpHandler StaticFilesHandler = new StaticFileHandler();
+        private static IServiceStackHandler DefaultHttpHandler;
+        private static IServiceStackHandler ForbiddenHttpHandler;
+        private static IServiceStackHandler NotFoundHttpHandler;
+        private static readonly IServiceStackHandler StaticFilesHandler = new StaticFileHandler();
 
         [ThreadStatic]
         public static string LastHandlerArgs;
@@ -169,7 +169,7 @@ namespace ServiceStack
             return false;
         }
 
-        public static IHttpHandler GetHandlerForPathInfo(IHttpRequest httpReq, string filePath)
+        public static IServiceStackHandler GetHandlerForPathInfo(IHttpRequest httpReq, string filePath)
         {
             var appHost = HostContext.AppHost;
 
@@ -214,7 +214,7 @@ namespace ServiceStack
             return null;
         }
 
-        private static IHttpHandler GetCatchAllHandlerIfAny(string httpMethod, string pathInfo, string filePath)
+        private static IServiceStackHandler GetCatchAllHandlerIfAny(string httpMethod, string pathInfo, string filePath)
         {
             foreach (var httpHandlerResolver in HostContext.AppHost.CatchAllHandlers)
             {
@@ -226,6 +226,8 @@ namespace ServiceStack
             return null;
         }
 
+#if !NETSTANDARD2_0
         public void ReleaseHandler(IHttpHandler handler) { }
+#endif
     }
 }

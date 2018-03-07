@@ -34,7 +34,7 @@ namespace ServiceStack
             return null;
         }
 
-        public static IHttpHandler GetRequestInfoHandler(string httpMethod, string pathInfo, string filePath)
+        public static IServiceStackHandler GetRequestInfoHandler(string httpMethod, string pathInfo, string filePath)
         {
             if (pathInfo.IsNullOrEmpty())
                 return null;

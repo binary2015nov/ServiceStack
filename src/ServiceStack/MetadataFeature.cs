@@ -65,12 +65,12 @@ namespace ServiceStack
 #if !NETSTANDARD2_0
                 case "soap11":
                     return pathArray[1] == "metadata"
-                        ? new Soap11MetadataHandler() as IHttpHandler
+                        ? new Soap11MetadataHandler() as IServiceStackHandler
                         : (pathArray[1] == "wsdl" ? new Soap11WsdlMetadataHandler() : null);
 
                 case "soap12":
                     return pathArray[1] == "metadata"
-                        ? new Soap12MetadataHandler() as IHttpHandler
+                        ? new Soap12MetadataHandler() as IServiceStackHandler
                         : (pathArray[1] == "wsdl" ? new Soap12WsdlMetadataHandler() : null);
 #endif
 

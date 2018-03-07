@@ -107,7 +107,7 @@ namespace ServiceStack
         private readonly ConcurrentDictionary<string, byte> catchAllPathsNotFound =
             new ConcurrentDictionary<string, byte>();
 
-        protected virtual IHttpHandler RequestHandler(string httpMethod, string pathInfo, string filePath)
+        protected virtual IServiceStackHandler RequestHandler(string httpMethod, string pathInfo, string filePath)
         {
             if (!DebugMode && catchAllPathsNotFound.ContainsKey(pathInfo))
                 return null;

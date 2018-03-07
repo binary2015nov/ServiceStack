@@ -63,7 +63,7 @@ namespace ServiceStack
 
             IHttpRequest httpReq;
             IResponse httpRes;
-            System.Web.IHttpHandler handler;
+            IServiceStackHandler handler;
 
             try 
             {

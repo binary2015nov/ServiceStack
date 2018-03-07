@@ -33,7 +33,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		[Test]
 		public void Should_infer_route_from_RequestDTO_type()
 		{
-			var restPath = (from r in appHost.RestPaths
+			var restPath = (from r in appHost.Routes
 							 where r.RequestType == typeof(RequestNoMembers)
 							 select r).FirstOrDefault();
 
@@ -55,7 +55,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		[Test]
 		public void Should_infer_route_from_AnyPublicProperty_named_Id()
 		{
-			var restPath = (from r in appHost.RestPaths
+			var restPath = (from r in appHost.Routes
 							where r.RequestType == typeof(RequestWithMemberCalledId)
 							//routes without {placeholders} are tested above
 							&& r.PathComponentsCount > 1 
@@ -70,7 +70,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		[Test]
 		public void Should_infer_route_from_AnyPublicProperty_named_Ids()
 		{
-			var restPath = (from r in appHost.RestPaths
+			var restPath = (from r in appHost.Routes
 							where r.RequestType == typeof(RequestWithMemberCalledIds)
 							//routes without {placeholders} are tested above
 							&& r.PathComponentsCount > 1
@@ -85,7 +85,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		[Test]
 		public void Should_infer_route_from_AnyPublicProperty_in_MatchingNameStrategy()
 		{
-			var restPath = (from r in appHost.RestPaths
+			var restPath = (from r in appHost.Routes
 							where r.RequestType == typeof(RequestWithMemberCalledSpecialName)
 							//routes without {placeholders} are tested above
 							&& r.PathComponentsCount > 1
@@ -100,7 +100,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		[Test]
 		public void Should_infer_route_from_AnyPublicProperty_with_PrimaryKeyAttribute()
 		{
-			var restPath = (from r in appHost.RestPaths
+			var restPath = (from r in appHost.Routes
 							where r.RequestType == typeof(RequestWithPrimaryKeyAttribute)
 							//routes without {placeholders} are tested above
 							&& r.PathComponentsCount > 1
@@ -116,7 +116,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		[Test]
 		public void Should_infer_route_from_AnyPublicProperty_in_MatchingAttributeStrategy()
 		{
-			var restPath = (from r in appHost.RestPaths
+			var restPath = (from r in appHost.Routes
 							where r.RequestType == typeof(RequestWithMemberWithKeyAttribute)
 							//routes without {placeholders} are tested above
 							&& r.PathComponentsCount > 1
@@ -132,7 +132,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 		[Test]
 		public void Should_infer_route_from_AnyPubicProperty_FromAnyStrategy_AndCompositeTheRoute()
 		{
-			var restPath = (from r in appHost.RestPaths
+			var restPath = (from r in appHost.Routes
 							where r.RequestType == typeof(RequestWithCompositeKeys)
 							//routes without {placeholders} are tested above
 							&& r.PathComponentsCount > 1

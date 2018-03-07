@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using ServiceStack.Web;
 
@@ -19,5 +20,10 @@ namespace ServiceStack.Host.Handlers
         Task ProcessRequestAsync(IRequest httpReq, IResponse httpRes, string operationName);
 
         void ProcessRequest(IRequest httpReq, IResponse httpRes, string operationName);
+
+#if NETSTANDARD2_0
+        Task Middleware(Microsoft.AspNetCore.Http.HttpContext context, Func<Task> next); //.NET Core
+#endif
+
     }
 }

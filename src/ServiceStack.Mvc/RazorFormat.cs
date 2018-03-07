@@ -78,7 +78,7 @@ namespace ServiceStack.Mvc
                 ?.AddLink(MetadataFeature.AvailableFeatures, "http://docs.servicestack.net/razor-notes", nameof(RazorFormat));
         }
 
-        public System.Web.IHttpHandler CatchAllHandler(string httpmethod, string pathInfo, string filepath)
+        public IServiceStackHandler CatchAllHandler(string httpmethod, string pathInfo, string filepath)
         {
             var viewEngineResult = GetPageFromPathInfo(pathInfo);
 

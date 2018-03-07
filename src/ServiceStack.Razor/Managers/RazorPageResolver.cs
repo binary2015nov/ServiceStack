@@ -40,7 +40,7 @@ namespace ServiceStack.Razor.Managers
             this.viewManager = viewManager;
         }
 
-        public IHttpHandler CatchAllHandler(string httpmethod, string pathInfo, string filepath)
+        public IServiceStackHandler CatchAllHandler(string httpmethod, string pathInfo, string filepath)
         {
             //does not have a .cshtml extension
             var ext = Path.GetExtension(pathInfo);

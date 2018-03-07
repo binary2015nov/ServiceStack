@@ -430,7 +430,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 }
                 catch (WebException ex)
                 {
-                    Assert.That(ex.GetStatus(), Is.EqualTo(HttpStatusCode.MethodNotAllowed));
+                    Assert.That(ex.GetStatus(), Is.EqualTo(HttpStatusCode.NotFound));
                 }
             }
         }
